@@ -62,9 +62,13 @@ Language and framework are not decided. Requirements it must meet:
 - Store the key in an environment variable read at startup.
 - Fail closed: if the upstream is down, serve the last good cache with a `stale: true` flag.
 
+## Design
+
+Follow `docs/design-reference.md` (Apple Sports layout adapted to tvOS) for every screen. Judge each build on the screenshot against that note.
+
 ## Open decisions (ask Julien, do not guess)
 
-- Which leagues are in the MVP.
+- Which leagues are in the MVP (candidates seen on Julien's Apple Sports: Champions League, Formula 1, NBA, NFL, Men's Tennis).
 - Which data provider (candidates so far: football-data.org, API-Sports).
 - Proxy language.
 - Whether the repo stays private.
