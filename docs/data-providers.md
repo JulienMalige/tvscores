@@ -29,6 +29,20 @@ live F1 or tennis. API-Sports per sport stays the best price/speed mix for
 our leagues: its live endpoints refresh about every 15 s and the proxy can
 poll every 30–60 s on a $19 plan.
 
+## MotoGP (asked 2026-09-13)
+
+API-Sports has no MotoGP. Options:
+
+| Source | Free | Live | Commercial | Verdict |
+|---|---|---|---|---|
+| Orange Cat Blacktop MotoGP API (ocblacktop.com) | 7,500 req/month, prototyping only | no, post-session results | paid plan only; no rights to the championship data itself | fine for results and calendar, paid plan before release |
+| TheSportsDB | demo key | no | $9 plan | motorsport events with results, same caveats as elsewhere |
+| Sportradar MotoGP | trial key | schedules + post-race results | enterprise pricing | out of budget |
+| motogp.com hidden API (api.motogp.pulselive.com) | open, no key | session results | none, undocumented | excluded, same reasoning as Sofascore scrapers |
+
+Nothing affordable gives live MotoGP timing. Treat MotoGP like F1: calendar,
+session results and standings, with the "Race · Final" row shape.
+
 ## RapidAPI
 
 RapidAPI is a marketplace, not a data source. Two kinds of listings:
