@@ -1,0 +1,38 @@
+# Xcode
+*.xcodeproj/
+xcuserdata/
+DerivedData/
+build/
+*.xcworkspace/xcuserdata/
+*.xcuserstate
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/
+
+# Secrets and local config
+.env
+.env.*
+*.pem
+*.p8
+*.p12
+*.mobileprovision
+*.cer
+
+# Proxy runtime
+proxy/node_modules/
+proxy/__pycache__/
+proxy/.venv/
+proxy/cache/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
