@@ -78,6 +78,9 @@ subscription receipt and terms page in this folder before submission.
   is live, hourly otherwise), which fits 100 calls/day per sport. Upgrade a
   sport to the $19 plan only when live refresh needs to be faster.
 - F1 results: Jolpica as the free source; API-Formula-1 if we want live.
-- Tennis: deferred. TheSportsDB at $9/mo is the fallback if it must ship.
+- Post-MVP (agreed direction 2026-09-13): add **TheSportsDB Small Business ($20/mo,
+  commercial tier)** as the long-tail source for tennis, MotoGP and any league
+  API-Sports lacks; accept its 2-min refresh and no live motorsport/tennis.
+  It stays a secondary adapter, never the live source for the core leagues.
 - Football alternative: football-data.org if API-Football's terms worry a
   reviewer; it also covers the Champions League.
