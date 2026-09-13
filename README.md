@@ -66,6 +66,6 @@ Prerequisites on the Mac: current Xcode from the App Store, `brew install xcodeg
 
 ## Status
 
-- `app/`: localised hello-world tvOS app, built and screenshotted on every push by the GitHub Actions workflow (`.github/workflows/tvos.yml`).
+- `app/`: Yesterday / Today / Upcoming scoreboard reading the proxy (or a bundled sample with `-TVScoresDemo`), Apple Sports row layout, en/fr/pt/es. Built and screenshotted on every push by the GitHub Actions workflow (`.github/workflows/tvos.yml`).
 - `proxy/`: live on the VPS with Champions League, NFL, NBA (API-Sports free plans) and Formula 1 (Jolpica); quota-aware polling, disk cache, public HTTPS via Tailscale Funnel.
-- Next: the real Today / Yesterday / Upcoming screen reading the proxy.
+- Next: match detail screen, favourites, Top Shelf and app icon, then the Apple Developer enrollment for a TestFlight build on the real Apple TV.
