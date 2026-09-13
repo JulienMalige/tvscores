@@ -21,7 +21,7 @@ private struct RowContent: View {
     var body: some View {
         HStack(spacing: 0) {
             side(event.home, leading: true)
-                .frame(width: 320, alignment: .leading)
+                .frame(width: 360, alignment: .leading)
             scoreText(event.score?.home, winner: winner == .home)
                 .frame(width: 140, alignment: .trailing)
             StatusView(status: event.status, start: event.start)
@@ -29,7 +29,7 @@ private struct RowContent: View {
             scoreText(event.score?.away, winner: winner == .away)
                 .frame(width: 140, alignment: .leading)
             side(event.away, leading: false)
-                .frame(width: 320, alignment: .trailing)
+                .frame(width: 360, alignment: .trailing)
         }
         .padding(.vertical, 14)
         .padding(.horizontal, 24)
@@ -52,9 +52,9 @@ private struct RowContent: View {
     private func side(_ team: TeamRef?, leading: Bool) -> some View {
         if let team {
             HStack(spacing: 16) {
-                if !leading { Text(team.label).font(.title3).lineLimit(1) }
+                if !leading { Text(team.label).font(.title3).lineLimit(1).minimumScaleFactor(0.7) }
                 TeamBadge(code: team.short)
-                if leading { Text(team.label).font(.title3).lineLimit(1) }
+                if leading { Text(team.label).font(.title3).lineLimit(1).minimumScaleFactor(0.7) }
             }
         }
     }
@@ -98,6 +98,11 @@ struct StatusView: View {
         VStack(spacing: 4) {
             switch status.state {
             case .scheduled:
+                if !Calendar.current.isDateInToday(start) {
+                    Text(start, format: .dateTime.weekday(.abbreviated).day().month(.abbreviated))
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
                 Text(start, format: .dateTime.hour().minute())
                     .font(.title2.weight(.semibold))
                 if let d = status.detail { detailText(d) }

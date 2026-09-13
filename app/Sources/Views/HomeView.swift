@@ -73,16 +73,32 @@ struct HomeView: View {
 
 struct DayTabs: View {
     @Binding var selected: Day
+    @FocusState private var focused: Day?
 
     var body: some View {
         HStack(spacing: 24) {
             ForEach(Day.allCases) { d in
-                Button(title(d)) { selected = d }
-                    .buttonStyle(.bordered)
-                    .tint(selected == d ? .accentColor : .secondary)
+                Button {
+                    selected = d
+                } label: {
+                    Text(title(d))
+                        .font(.headline)
+                        .padding(.horizontal, 28)
+                        .padding(.vertical, 12)
+                        .background(
+                            Capsule().fill(selected == d ? Color.accentColor.opacity(focused == d ? 1 : 0.85) : Color.white.opacity(focused == d ? 0.25 : 0.08))
+                        )
+                        .foregroundStyle(selected == d ? .white : .primary)
+                        .scaleEffect(focused == d ? 1.06 : 1)
+                        .animation(.easeOut(duration: 0.15), value: focused)
+                }
+                .buttonStyle(.plain)
+                .focused($focused, equals: d)
             }
             Spacer()
         }
+        .focusSection()
+        .defaultFocus($focused, selected)
     }
 
     private func title(_ d: Day) -> LocalizedStringKey {
