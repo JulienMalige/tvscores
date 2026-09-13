@@ -14,6 +14,21 @@ Prices are as published on the dates checked; re-check before subscribing.
 | SportMonks | CL (football) | 2 leagues, 14-day trial of paid | €29/mo | Yes | Football only, no advantage over the two above for us. |
 | SportsDataIO / Sportradar | all five | trial with scrambled data | ~$99–149/mo per sport, sales for production | Yes | Enterprise tier, out of budget. |
 
+## "One key for everything" options (checked 2026-09-13)
+
+| Provider | Everything? | Live speed | Price |
+|---|---|---|---|
+| TheSportsDB | all five sports, but livescores only for soccer, NFL, NBA, MLB, NHL (no F1 or tennis live) | 2-min refresh | $9/mo (100 req/min) or $20/mo (120 req/min) |
+| balldontlie All-Access | 20+ leagues incl. Champions League, Ligue 1, F1, ATP/WTA | real-time via webhooks (push, no polling) | $299.99/mo; single sport $9.99 (60/min) or $39.99 (600/min) |
+| Goalserve Full Package | 20+ sports incl. tennis and F1 | live feeds; websocket add-on $200/mo | $800/mo, ~$425/mo on a 12-month deal |
+| Sportradar / SportsDataIO | everything, broadcast grade | push feeds | sales-quoted, well above $100/mo per sport |
+
+Takeaway: "everything and fast" starts at about $300/mo (balldontlie
+All-Access). Cheap "everything" is TheSportsDB at 2-minute latency with no
+live F1 or tennis. API-Sports per sport stays the best price/speed mix for
+our leagues: its live endpoints refresh about every 15 s and the proxy can
+poll every 30–60 s on a $19 plan.
+
 ## Licensing reality
 
 None of the affordable providers grants rights to league marks or crests, and
