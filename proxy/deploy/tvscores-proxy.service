@@ -1,0 +1,15 @@
+[Unit]
+Description=TV Scores caching proxy
+After=network-online.target
+
+[Service]
+WorkingDirectory=%h/tvscores/proxy
+ExecStart=/usr/bin/node src/index.js
+Restart=on-failure
+RestartSec=5
+Environment=NODE_ENV=production
+Environment=TVSCORES_PORT=8787
+Environment=TVSCORES_PATH_PREFIX=/tvscores
+
+[Install]
+WantedBy=default.target

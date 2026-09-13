@@ -55,12 +55,13 @@ Send the screenshot to Julien after every visible change. Judge on the image, no
 
 ## Proxy
 
-Language and framework are not decided. Requirements it must meet:
-
-- Poll the sports API on a schedule (not on request), respecting the free tier limits.
-- Serve `GET /v1/fixtures?date=YYYY-MM-DD` and `GET /v1/fixtures?week=YYYY-Www` as JSON with cache headers.
-- Store the key in an environment variable read at startup.
-- Fail closed: if the upstream is down, serve the last good cache with a `stale: true` flag.
+Built 2026-09-13 in `proxy/` (Node 22, no dependencies, see `proxy/README.md`).
+Runs on Julien's VPS as a systemd user service, public at
+`https://srv1822832.tailf78112.ts.net/tvscores/v1/scoreboard?tz=<IANA tz>`.
+The app reads only `/v1/scoreboard` (and `/v1/health` for a debug screen).
+Rules: polling on a schedule, never per request; per-sport daily budget with a
+reserve; last good cache served with `stale` flags when upstream fails; the
+`/v1/health` endpoint exposes quota use per sport.
 
 ## Design
 
@@ -69,8 +70,8 @@ Follow `docs/design-reference.md` (Apple Sports layout adapted to tvOS) for ever
 ## Open decisions (ask Julien, do not guess)
 
 - Which leagues are in the MVP (candidates seen on Julien's Apple Sports: Champions League, Formula 1, NBA, NFL, Men's Tennis).
-- Which data provider (candidates so far: football-data.org, API-Sports).
-- Proxy language.
+- Data provider: decided, API-Sports free plans + Jolpica for F1 (see `docs/data-providers.md`).
+- Proxy language: decided, Node 22 plain JS.
 - Whether the repo stays private.
 
 ## Working with Julien

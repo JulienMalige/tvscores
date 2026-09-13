@@ -1,0 +1,12 @@
+{
+  "name": "tvscores-proxy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Caching middleman between the TV Scores app and the sports data providers.",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test test/*.test.js"
+  }
+}

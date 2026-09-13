@@ -20,7 +20,7 @@ Apple TV (SwiftUI, tvOS)  ──HTTPS──▶  proxy on the VPS  ──schedule
 ```
 
 - **`app/`** — the tvOS app. Native SwiftUI, no cross-platform layer. Project generated from `project.yml` with XcodeGen so the Xcode project is reproducible from text.
-- **`proxy/`** — a tiny service on the VPS that polls the sports API on a schedule, caches results, and serves plain JSON to the app. The API key lives here only. Cost is fixed regardless of user count.
+- **`proxy/`** — a tiny Node service on the VPS that polls the sports APIs on a schedule, caches results, and serves plain JSON to the app. The API key lives here only. Cost is fixed regardless of user count. See `proxy/README.md`.
 
 ## Development setup
 
@@ -66,4 +66,6 @@ Prerequisites on the Mac: current Xcode from the App Store, `brew install xcodeg
 
 ## Status
 
-Day 0: localised hello-world tvOS app in `app/`, built and screenshotted on every push by the GitHub Actions workflow (`.github/workflows/tvos.yml`). Screenshots are downloadable from the run artifacts.
+- `app/`: localised hello-world tvOS app, built and screenshotted on every push by the GitHub Actions workflow (`.github/workflows/tvos.yml`).
+- `proxy/`: live on the VPS with Champions League, NFL, NBA (API-Sports free plans) and Formula 1 (Jolpica); quota-aware polling, disk cache, public HTTPS via Tailscale Funnel.
+- Next: the real Today / Yesterday / Upcoming screen reading the proxy.
