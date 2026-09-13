@@ -50,3 +50,16 @@ TV Scores. The screenshots stay on his device; this note records what to copy.
 
 UEFA Champions League, Formula 1, NBA, NFL, Men's Tennis. MVP subset to be
 confirmed by Julien; provider coverage drives the choice.
+
+## Design system
+
+- Apple **Human Interface Guidelines**, tvOS section:
+  https://developer.apple.com/design/human-interface-guidelines/designing-for-tvos
+- **Liquid Glass** (WWDC 2025, tvOS 26+): the current look. Standard SwiftUI
+  controls adopt it automatically when built with Xcode 26; custom containers
+  use `.glassEffect()`. Apple Sports on iOS 26 is a reference implementation.
+  https://developer.apple.com/documentation/technologyoverviews/liquid-glass
+- Fonts: San Francisco via `Font.system`. Icons: SF Symbols only.
+- tvOS rules to respect: focus engine (focused item scales, others dim),
+  safe zone ≈ 60 pt top/bottom and 80 pt sides on 1920×1080, large type,
+  Top Shelf image and layered app icon before any store submission.
