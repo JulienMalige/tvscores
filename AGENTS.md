@@ -28,7 +28,7 @@ Always from `app/`:
 
 ```bash
 xcodegen generate
-xcodebuild -project tvscores.xcodeproj -scheme tvscores \
+xcodebuild -project CoupDEnvoi.xcodeproj -scheme CoupDEnvoi \
   -destination 'platform=tvOS Simulator,name=Apple TV' build
 ```
 
@@ -37,8 +37,8 @@ To see it, boot a simulator and take a screenshot rather than describing the UI:
 ```bash
 xcrun simctl boot "Apple TV" 2>/dev/null; open -a Simulator
 xcrun simctl install booted <path to .app from DerivedData>
-xcrun simctl launch booted com.julienmalige.tvscores
-xcrun simctl io booted screenshot /tmp/tvscores.png
+xcrun simctl launch booted com.julienmalige.coupdenvoi
+xcrun simctl io booted screenshot /tmp/coupdenvoi.png
 ```
 
 Send the screenshot to Julien after every visible change. Judge on the image, not on the code.
@@ -47,7 +47,7 @@ Send the screenshot to Julien after every visible change. Judge on the image, no
 
 - Swift, SwiftUI, Swift Concurrency (`async/await`). No Combine unless a framework forces it.
 - Minimum tvOS: the current major version minus one.
-- Bundle id `com.julienmalige.tvscores`.
+- Product name **Coup d'envoi**, bundle id `com.julienmalige.coupdenvoi`, Xcode scheme and target `CoupDEnvoi`.
 - One feature per commit, with a message that says what changed for the user.
 - Every decision that is not derivable from the code goes into `docs/` as a dated note.
 
