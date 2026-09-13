@@ -82,19 +82,9 @@ struct DayTabs: View {
                     selected = d
                 } label: {
                     Text(title(d))
-                        .font(.headline)
-                        .padding(.horizontal, 28)
-                        .padding(.vertical, 12)
-                        .background(
-                            Capsule().fill(selected == d ? Color.tabSelected.opacity(focused == d ? 1 : 0.8) : Color.white.opacity(focused == d ? 0.3 : 0.08))
-                        )
-                        .overlay(Capsule().strokeBorder(Color.white.opacity(focused == d ? 0.9 : 0), lineWidth: 3))
-                        .foregroundStyle(.white)
-                        .scaleEffect(focused == d ? 1.06 : 1)
-                        .animation(.easeOut(duration: 0.15), value: focused)
+                        .fontWeight(selected == d ? .bold : .regular)
                 }
-                .buttonStyle(.plain)
-                .focusEffectDisabled()
+                .buttonStyle(.bordered)
                 .focused($focused, equals: d)
             }
             Spacer()
@@ -111,11 +101,6 @@ struct DayTabs: View {
         case .upcoming: "tab.upcoming"
         }
     }
-}
-
-extension Color {
-    /// Selected tab fill; a real accent colour lands with the app icon work.
-    static let tabSelected = Color(red: 0.16, green: 0.52, blue: 0.94)
 }
 
 struct EmptyDay: View {
