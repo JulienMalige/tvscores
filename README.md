@@ -1,4 +1,4 @@
-# Coup d'envoi (repo: tvscores)
+# TV Scores
 
 A small, fast Apple TV app that answers one question: **what games are on today and this week, and what is the score?**
 
@@ -54,9 +54,9 @@ Prerequisites on the Mac: current Xcode from the App Store, `brew install xcodeg
 
 ## Name and store listing
 
-- Product name: **Coup d'envoi** (checked 2026-09-13: no App Store app uses it).
-- Bundle id: `com.julienmalige.coupdenvoi`.
-- Subtitle carries the search terms, per storefront: "Scores et matchs du jour" (fr), "Live sports scores, today" (en).
+- Product name: **TV Scores** (checked 2026-09-13: no App Store app uses the exact name; "Scores TV", "ScoreTV" and "Scores and Odds TV" exist, so the subtitle must differentiate).
+- Bundle id: `com.julienmalige.tvscores`.
+- Subtitle carries the rest, per storefront: "Matchs du jour et résultats" (fr), "Today's games, live" (en).
 - Keywords field (100 chars, per language) holds the rest: football, ligue 1, résultats, match, ce soir, live, calendrier, fixtures, tv.
 
 ## Status
