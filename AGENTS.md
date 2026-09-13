@@ -47,6 +47,8 @@ Send the screenshot to Julien after every visible change. Judge on the image, no
 
 - Swift, SwiftUI, Swift Concurrency (`async/await`). No Combine unless a framework forces it.
 - Minimum tvOS: the current major version minus one.
+- **Four languages from day one: French, English, Portuguese, Spanish.** Development language is English. Every user-facing string goes through a String Catalog (`Localizable.xcstrings`) with all four translations filled in before a feature is called done; no hard-coded strings in views. Store listing (name, subtitle, keywords, screenshots) is localised for the same four. Default store locales: fr-FR, en-US, pt-BR, es-ES; add pt-PT and es-MX as copies later if wanted.
+- Dates, times and team names are locale-aware: kickoff times in the viewer's time zone, day names via `Date.FormatStyle`, never hand-formatted.
 - Product name **TV Scores**, bundle id `com.julienmalige.tvscores`, Xcode scheme and target `TVScores`.
 - One feature per commit, with a message that says what changed for the user.
 - Every decision that is not derivable from the code goes into `docs/` as a dated note.

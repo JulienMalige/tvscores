@@ -56,7 +56,12 @@ Prerequisites on the Mac: current Xcode from the App Store, `brew install xcodeg
 
 - Product name: **TV Scores** (checked 2026-09-13: no App Store app uses the exact name; "Scores TV", "ScoreTV" and "Scores and Odds TV" exist, so the subtitle must differentiate).
 - Bundle id: `com.julienmalige.tvscores`.
-- Subtitle carries the rest, per storefront: "Matchs du jour et résultats" (fr), "Today's games, live" (en).
+- Launch languages: **French, English, Portuguese, Spanish**. App UI and store listing in all four from the first release.
+- Subtitle carries the rest, per storefront:
+  - fr: "Matchs du jour et résultats"
+  - en: "Today's games, live"
+  - pt: "Jogos de hoje, ao vivo"
+  - es: "Partidos de hoy, en directo"
 - Keywords field (100 chars, per language) holds the rest: football, ligue 1, résultats, match, ce soir, live, calendrier, fixtures, tv.
 
 ## Status
