@@ -29,6 +29,25 @@ live F1 or tennis. API-Sports per sport stays the best price/speed mix for
 our leagues: its live endpoints refresh about every 15 s and the proxy can
 poll every 30–60 s on a $19 plan.
 
+## RapidAPI
+
+RapidAPI is a marketplace, not a data source. Two kinds of listings:
+
+- **Official mirrors** (API-Sports lists API-Football, API-Basketball,
+  API-American-Football there). Same data and same free tier, but paid plans
+  bill overage instead of hard-capping, and every call goes through RapidAPI's
+  proxy, which adds a hop. Subscribing direct at api-sports.io is cheaper to
+  reason about and has no overage.
+- **Unofficial wrappers** such as "AllSportsApi2" (all sports, tennis, F1,
+  cheap): the listing itself says the data comes from Sofascore's public
+  endpoints, and Sofascore states it cannot offer an API because of its own
+  provider agreements. That is scraped data with no licence, exactly what App
+  Store guideline 5.2.2 rejects, and it can break the day Sofascore changes
+  a URL. Do not use these in TV Scores.
+
+Rule: use RapidAPI only if a provider exists nowhere else, and only official
+listings.
+
 ## Licensing reality
 
 None of the affordable providers grants rights to league marks or crests, and
