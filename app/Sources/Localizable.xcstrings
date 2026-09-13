@@ -1,0 +1,38 @@
+{
+  "sourceLanguage" : "en",
+  "version" : "1.0",
+  "strings" : {
+    "app.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "TV Scores" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "TV Scores" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "TV Scores" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "TV Scores" } }
+      }
+    },
+    "section.today" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Today" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aujourd’hui" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Hoje" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Hoy" } }
+      }
+    },
+    "section.week" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This week" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Cette semaine" } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Esta semana" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Esta semana" } }
+      }
+    },
+    "home.empty" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No games loaded yet." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aucun match chargé pour l’instant." } },
+        "pt" : { "stringUnit" : { "state" : "translated", "value" : "Ainda não há jogos carregados." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Todavía no hay partidos cargados." } }
+      }
+    }
+  }
+}

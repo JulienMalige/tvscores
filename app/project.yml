@@ -1,0 +1,42 @@
+name: TVScores
+options:
+  bundleIdPrefix: com.julienmalige
+  developmentLanguage: en
+  deploymentTarget:
+    tvOS: "18.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+settings:
+  base:
+    SWIFT_VERSION: "5.10"
+    CODE_SIGNING_ALLOWED: "NO"
+    CODE_SIGN_IDENTITY: ""
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  TVScores:
+    type: application
+    platform: tvOS
+    sources:
+      - path: Sources
+    info:
+      path: Sources/Info.plist
+      properties:
+        CFBundleDisplayName: TV Scores
+        CFBundleName: TV Scores
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleLocalizations: [en, fr, pt, es]
+        UIUserInterfaceStyle: Automatic
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.julienmalige.tvscores
+        TARGETED_DEVICE_FAMILY: "3"
+        ENABLE_PREVIEWS: "YES"
+schemes:
+  TVScores:
+    build:
+      targets:
+        TVScores: all
+    run:
+      config: Debug

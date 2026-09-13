@@ -66,4 +66,4 @@ Prerequisites on the Mac: current Xcode from the App Store, `brew install xcodeg
 
 ## Status
 
-Day 0. Repo contains only this README and the agent brief.
+Day 0: localised hello-world tvOS app in `app/`, built and screenshotted on every push by the GitHub Actions workflow (`.github/workflows/tvos.yml`). Screenshots are downloadable from the run artifacts.

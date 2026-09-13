@@ -1,0 +1,90 @@
+name: tvOS build
+
+on:
+  push:
+    branches: [main]
+    paths: ["app/**", ".github/workflows/tvos.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: tvos-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build, run in simulator, screenshot
+    runs-on: macos-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain info
+        run: |
+          sw_vers
+          xcodebuild -version
+          xcrun simctl list runtimes | grep -i tvos || echo "no tvOS runtime yet"
+
+      - name: Ensure a tvOS simulator runtime exists
+        run: |
+          if ! xcrun simctl list runtimes | grep -q tvOS; then
+            sudo xcodebuild -downloadPlatform tvOS
+          fi
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build for tvOS simulator
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project TVScores.xcodeproj \
+            -scheme TVScores \
+            -destination 'generic/platform=tvOS Simulator' \
+            -derivedDataPath build \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            build 2>&1 | tee build.log | grep -E "error:|warning:|BUILD" || true
+          grep -q "BUILD SUCCEEDED" build.log
+
+      - name: Run in simulator and take screenshots
+        run: |
+          set -euo pipefail
+          UDID=$(xcrun simctl list devices available -j \
+            | jq -r '.devices | to_entries[] | select(.key | test("tvOS")) | .value[] | select(.name | test("^Apple TV( 4K)?")) | .udid' \
+            | head -1)
+          echo "Using simulator $UDID"
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          APP=$(find build/Build/Products -name 'TVScores.app' -maxdepth 2 | head -1)
+          echo "App bundle: $APP"
+          mkdir -p shots
+          for lang in en fr pt es; do
+            xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+            xcrun simctl uninstall "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+            xcrun simctl install "$UDID" "$APP"
+            xcrun simctl launch "$UDID" com.julienmalige.tvscores -AppleLanguages "($lang)" -AppleLocale "$lang"
+            sleep 6
+            xcrun simctl io "$UDID" screenshot "shots/home-$lang.png"
+          done
+          ls -la shots
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: app/shots/*.png
+          if-no-files-found: warn
+
+      - name: Upload build log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: app/build.log
