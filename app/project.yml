@@ -19,6 +19,8 @@ targets:
     platform: tvOS
     sources:
       - path: Sources
+      - path: Resources
+        buildPhase: resources
     info:
       path: Sources/Info.plist
       properties:
@@ -27,6 +29,7 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleLocalizations: [en, fr, pt, es]
+        TVScoresProxyURL: https://srv1822832.tailf78112.ts.net/tvscores
         UIUserInterfaceStyle: Automatic
     settings:
       base:

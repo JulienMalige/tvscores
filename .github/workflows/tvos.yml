@@ -64,14 +64,16 @@ jobs:
           APP=$(find build/Build/Products -name 'TVScores.app' -maxdepth 2 | head -1)
           echo "App bundle: $APP"
           mkdir -p shots
-          for lang in en fr pt es; do
+          xcrun simctl install "$UDID" "$APP"
+          shot() { # $1 lang, $2 tab
             xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
-            xcrun simctl uninstall "$UDID" com.julienmalige.tvscores 2>/dev/null || true
-            xcrun simctl install "$UDID" "$APP"
-            xcrun simctl launch "$UDID" com.julienmalige.tvscores -AppleLanguages "($lang)" -AppleLocale "$lang"
+            xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab "$2" -AppleLanguages "($1)" -AppleLocale "$1"
             sleep 6
-            xcrun simctl io "$UDID" screenshot "shots/home-$lang.png"
-          done
+            xcrun simctl io "$UDID" screenshot "shots/$2-$1.png"
+          }
+          for lang in en fr pt es; do shot "$lang" today; done
+          shot en yesterday
+          shot en upcoming
           ls -la shots
 
       - name: Upload screenshots

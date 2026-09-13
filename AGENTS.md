@@ -37,7 +37,7 @@ To see it, boot a simulator and take a screenshot rather than describing the UI:
 ```bash
 xcrun simctl boot "Apple TV" 2>/dev/null; open -a Simulator
 xcrun simctl install booted <path to .app from DerivedData>
-xcrun simctl launch booted com.julienmalige.tvscores
+xcrun simctl launch booted com.julienmalige.tvscores -TVScoresDemo -TVScoresTab today   # bundled sample; drop -TVScoresDemo for the live proxy
 xcrun simctl io booted screenshot /tmp/tvscores.png
 ```
 
