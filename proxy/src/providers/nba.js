@@ -20,8 +20,8 @@ export function normaliseGame(g, league) {
     start: new Date(g.date.start).toISOString(),
     round: g.stage != null ? `Stage ${g.stage}` : undefined,
     status: { state, clock, detail: halftime ? "Half-time" : undefined },
-    home: team(g.teams.home.name, g.teams.home.code, { nick: true }),
-    away: team(g.teams.visitors.name, g.teams.visitors.code, { nick: true }),
+    home: team(g.teams.home.name, g.teams.home.code, { nick: true, logo: g.teams.home.logo }),
+    away: team(g.teams.visitors.name, g.teams.visitors.code, { nick: true, logo: g.teams.visitors.logo }),
     score: { home: g.scores.home.points, away: g.scores.visitors.points },
   };
 }

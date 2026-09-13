@@ -53,7 +53,7 @@ private struct RowContent: View {
         if let team {
             HStack(spacing: 16) {
                 if !leading { Text(team.label).font(.title3).lineLimit(1).minimumScaleFactor(0.7) }
-                TeamBadge(code: team.short)
+                TeamBadge(code: team.short, logo: team.logo)
                 if leading { Text(team.label).font(.title3).lineLimit(1).minimumScaleFactor(0.7) }
             }
         }
@@ -71,11 +71,29 @@ private struct RowContent: View {
     }
 }
 
-/// Monogram in place of a crest (see docs/design-reference.md, no licensed logos in the MVP).
+/// Team crest from the proxy when it has one, otherwise a coloured monogram.
 struct TeamBadge: View {
     let code: String
+    var logo: URL? = nil
 
     var body: some View {
+        Group {
+            if let logo {
+                AsyncImage(url: logo) { phase in
+                    if let image = phase.image {
+                        image.resizable().scaledToFit().padding(6)
+                    } else {
+                        monogram
+                    }
+                }
+            } else {
+                monogram
+            }
+        }
+        .frame(width: 72, height: 72)
+    }
+
+    private var monogram: some View {
         Text(code)
             .font(.system(size: 22, weight: .heavy, design: .rounded))
             .foregroundStyle(.white)

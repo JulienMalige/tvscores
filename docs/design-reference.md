@@ -43,8 +43,10 @@ TV Scores. The screenshots stay on his device; this note records what to copy.
   frame.
 - Dark green tinted background is Apple's; we use our own dark neutral and
   the league's accent colour on the header only.
-- Logos: Apple licenses crests. We show a coloured monogram in the team's
-  colours until a licensing decision says otherwise (see AGENTS.md rule 5).
+- Logos: Apple licenses crests. Julien decided on 2026-09-14 to show the
+  crests API-Sports serves (`team.logo`), accepting the trademark risk noted
+  in `docs/data-providers.md`; the coloured monogram remains the fallback
+  while an image loads or is missing. F1 drivers get a nationality flag.
 
 ## Leagues seen on Julien's home screen
 

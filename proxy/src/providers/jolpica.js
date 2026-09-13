@@ -1,5 +1,5 @@
 import { getJson } from "../http.js";
-import { STATE } from "../model.js";
+import { STATE, flag } from "../model.js";
 
 const BASE = "https://api.jolpi.ca/ergast/f1";
 
@@ -28,6 +28,7 @@ export function normaliseRace(r, league, results) {
           driver: `${x.Driver.givenName[0]}. ${x.Driver.familyName}`,
           code: x.Driver.code,
           nationality: x.Driver.nationality,
+          flag: flag(x.Driver.nationality),
           team: x.Constructor.name,
           gap: x.Time?.time ?? x.status,
         }))

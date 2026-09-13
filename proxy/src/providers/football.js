@@ -22,8 +22,8 @@ export function normaliseFixture(f, league) {
     start: new Date(f.fixture.date).toISOString(),
     round: f.league.round,
     status: { state, clock, detail },
-    home: team(f.teams.home.name),
-    away: team(f.teams.away.name),
+    home: team(f.teams.home.name, undefined, { logo: f.teams.home.logo }),
+    away: team(f.teams.away.name, undefined, { logo: f.teams.away.logo }),
     score: { home: f.goals.home, away: f.goals.away },
   };
 }

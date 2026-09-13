@@ -37,8 +37,22 @@ export function nickname(name) {
   return words.length >= 2 && /^[A-Z0-9]/.test(words.at(-1)) && !/^(FC|SC|CF|AC|United|City)$/.test(words.at(-1)) ? words.at(-1) : name;
 }
 
-export function team(name, code, { nick = false } = {}) {
-  return { name, short: code || OVERRIDES[name] || shortName(name), nick: nick ? nickname(name) : name };
+export function team(name, code, { nick = false, logo } = {}) {
+  return { name, short: code || OVERRIDES[name] || shortName(name), nick: nick ? nickname(name) : name, logo: logo || undefined };
+}
+
+const NATIONALITY_ISO = {
+  Italian: "IT", Dutch: "NL", British: "GB", Spanish: "ES", Monegasque: "MC", Australian: "AU", Mexican: "MX",
+  Canadian: "CA", French: "FR", German: "DE", Finnish: "FI", Danish: "DK", Thai: "TH", Japanese: "JP", Chinese: "CN",
+  American: "US", Brazilian: "BR", Argentine: "AR", "New Zealander": "NZ", Swiss: "CH", Belgian: "BE", Austrian: "AT",
+  Russian: "RU", Polish: "PL", Swedish: "SE", Irish: "IE", Colombian: "CO", Indonesian: "ID", Venezuelan: "VE",
+};
+
+/** "Italian" -> "🇮🇹" (regional indicator pair); undefined when unknown. */
+export function flag(nationality) {
+  const iso = NATIONALITY_ISO[nationality];
+  if (!iso) return undefined;
+  return [...iso].map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65)).join("");
 }
 
 export const STATE = { scheduled: "scheduled", live: "live", final: "final", other: "other" };

@@ -37,7 +37,7 @@ private struct RaceContent: View {
                             Text("\(r.pos)")
                                 .font(.system(size: 34, weight: .bold, design: .rounded))
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(r.driver).font(.callout.weight(.semibold))
+                                Text([r.flag, r.driver].compactMap { $0 }.joined(separator: " ")).font(.callout.weight(.semibold))
                                 Text(r.gap ?? r.team ?? "").font(.footnote).foregroundStyle(.secondary)
                             }
                         }

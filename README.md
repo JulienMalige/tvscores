@@ -9,7 +9,7 @@ Think Apple Sports or Flashscore, reduced to the essentials and designed for the
 - One or two leagues (decided in `AGENTS.md`), expandable later.
 - Screens: **Yesterday / Today / Upcoming** grouped by league, and a **Match** detail (score, status, kickoff time, minute). Layout follows Apple Sports, see `docs/design-reference.md`.
 - Favourite teams filter, stored on-device.
-- Team names and colours; no crests or league marks in the MVP (trademark safety).
+- Team crests from the data provider, monogram fallback (decision 2026-09-14; trademark risk noted in `docs/`).
 - No odds, no betting links, no streaming links.
 
 ## Architecture

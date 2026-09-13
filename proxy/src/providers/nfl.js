@@ -21,8 +21,8 @@ export function normaliseGame(g, league) {
     start: new Date(g.game.date.timestamp * 1000).toISOString(),
     round: g.game.week,
     status: { state, clock, detail },
-    home: team(g.teams.home.name, undefined, { nick: true }),
-    away: team(g.teams.away.name, undefined, { nick: true }),
+    home: team(g.teams.home.name, undefined, { nick: true, logo: g.teams.home.logo }),
+    away: team(g.teams.away.name, undefined, { nick: true, logo: g.teams.away.logo }),
     score: { home: g.scores.home.total, away: g.scores.away.total },
   };
 }

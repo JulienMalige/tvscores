@@ -18,7 +18,7 @@ None of these directories exist yet. Create them as the work needs them, not up 
 2. **Native SwiftUI for tvOS only.** No React Native, Flutter, or web views.
 3. **Licensed data only.** Do not add code that scrapes a website or calls an undocumented endpoint. If a provider is proposed, record its terms in `docs/data-licence.md` first.
 4. **No odds, betting, or streaming links** anywhere in the app.
-5. **Team names and colours, not crests**, until a decision in `docs/` says otherwise.
+5. **Crests come from the proxy** (`team.logo`, API-Sports media CDN), decided by Julien on 2026-09-14 knowing the trademark risk; the monogram stays as the fallback. Never bundle logo files in the app.
 6. **Do not commit** `.xcodeproj` contents, `DerivedData`, `xcuserdata`, `.env`, or any secret. The `.gitignore` covers these; keep it that way.
 7. **Do not run anything that needs an Apple Developer account** (archive, upload, TestFlight) unless Julien has said the enrollment is done.
 

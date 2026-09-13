@@ -22,12 +22,14 @@ test("football statuses map to live / half-time / final / scheduled", () => {
   assert.equal(ns.status.state, "scheduled");
   assert.equal(ns.score.home, null);
   assert.equal(live.league.short, "UCL");
+  assert.match(live.home.logo, /^https:\/\/media\.api-sports\.io\//);
   assert.ok(live.start.endsWith("Z"));
 });
 
 test("nfl final game", () => {
   const g = nflGame(fx("nfl").response[0], { id: 1, name: "NFL", short: "NFL" });
   assert.equal(g.status.state, "final");
+  assert.ok(g.home.logo.startsWith("https://"));
   assert.equal(g.kind, "match");
   assert.equal(g.score.home + g.score.away > 0, true);
 });
@@ -62,6 +64,7 @@ test("f1 race with results is final and keeps the podium", () => {
   assert.equal(done.results.length, 3);
   assert.equal(done.results[0].pos, 1);
   assert.match(done.results[1].gap, /^\+/);
+  assert.equal(done.results[0].flag, "🇮🇹");
   const future = normaliseRace(races[races.length - 1], F1, undefined);
   assert.equal(future.status.state, "scheduled");
   assert.equal(future.results, undefined);

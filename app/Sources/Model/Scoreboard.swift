@@ -90,6 +90,7 @@ struct TeamRef: Decodable {
     let name: String
     let short: String
     let nick: String?
+    let logo: URL?
     /// What the row shows under the badge: nickname for US teams, club name otherwise.
     var label: String { nick ?? name }
 }
@@ -104,6 +105,7 @@ struct RaceResult: Decodable, Identifiable {
     let driver: String
     let code: String?
     let nationality: String?
+    let flag: String?
     let team: String?
     let gap: String?
     var id: Int { pos }
