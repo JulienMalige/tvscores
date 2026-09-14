@@ -58,6 +58,26 @@ final class ScoreboardStore {
         task = nil
     }
 
+    /// Standings for one league, or nil when the proxy has none (free-plan sports).
+    func standings(for ref: LeagueRef) async -> Standings? {
+        do {
+            switch source {
+            case .bundled:
+                guard let url = Bundle.main.url(forResource: "sample-standings", withExtension: "json") else { return nil }
+                let bundle = try ScoreboardDecoder.make().decode(StandingsBundle.self, from: Data(contentsOf: url))
+                return bundle.standings["\(ref.sport):\(ref.leagueId)"]
+            case .remote(let base):
+                var req = URLRequest(url: base.appending(path: "v1/standings/\(ref.sport)/\(ref.leagueId)"))
+                req.timeoutInterval = 15
+                let (d, resp) = try await URLSession.shared.data(for: req)
+                guard let http = resp as? HTTPURLResponse, http.statusCode == 200 else { return nil }
+                return try ScoreboardDecoder.make().decode(Standings.self, from: d)
+            }
+        } catch {
+            return nil
+        }
+    }
+
     private func load() async throws -> Scoreboard {
         let data: Data
         switch source {

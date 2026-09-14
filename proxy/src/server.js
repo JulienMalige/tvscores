@@ -30,13 +30,21 @@ export function createApp({ store, config, startedAt = Date.now() }) {
     }
 
     if (path === "/v1/scoreboard") {
-      return send(res, 200, buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase }));
+      return send(res, 200, buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings }));
     }
     if (path === "/v1/fixtures") {
       const date = url.searchParams.get("date");
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date || "")) return send(res, 400, { error: "date=YYYY-MM-DD required" });
       const events = store.all().filter((e) => localDate(e.start, tz) === date);
       return send(res, 200, { date, tz, events });
+    }
+    if (path === "/v1/standings") {
+      return send(res, 200, { standings: store.standings });
+    }
+    const one = path.match(/^\/v1\/standings\/([a-z0-9-]+)\/([a-z0-9-]+)$/);
+    if (one) {
+      const data = store.standings[`${one[1]}:${one[2]}`];
+      return data ? send(res, 200, data) : send(res, 404, { error: "no standings for this league" });
     }
     const asset = path.match(/^\/v1\/assets\/leagues\/([a-z0-9-]+)\.png$/);
     if (asset) {

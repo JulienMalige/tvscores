@@ -30,7 +30,7 @@ if (config.ocBlacktopKey) {
     const league = config.leagues[leagueKey][0];
     const quota = new Quota(store.sportMeta(leagueKey), { dailyQuota: config.schedule.ocbDailyQuota, quotaReserve: 10 });
     const provider = motorsportProvider({ sport, league, key: config.ocBlacktopKey, quota, log, nationalities: leagueKey === "f1" ? f1Nationalities : undefined });
-    schedulers.push(new CalendarScheduler({ provider, store, log }));
+    schedulers.push(new CalendarScheduler({ provider, store, log, quota }));
   }
 } else {
   log("no Orange Cat Blacktop key: Formula 1 via Jolpica, no MotoGP");

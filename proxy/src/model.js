@@ -48,6 +48,22 @@ const NATIONALITY_ISO = {
   Russian: "RU", Polish: "PL", Swedish: "SE", Irish: "IE", Colombian: "CO", Indonesian: "ID", Venezuelan: "VE",
 };
 
+const ISO3_TO_2 = {
+  ita: "IT", esp: "ES", usa: "US", gbr: "GB", fra: "FR", ger: "DE", deu: "DE", srb: "RS", rus: "RU", aus: "AU", can: "CA",
+  arg: "AR", bra: "BR", chi: "CL", chl: "CL", col: "CO", mex: "MX", jpn: "JP", chn: "CN", kor: "KR", ind: "IN", kaz: "KZ",
+  blr: "BY", ukr: "UA", pol: "PL", cze: "CZ", svk: "SK", hun: "HU", rou: "RO", bul: "BG", gre: "GR", tur: "TR", sui: "CH",
+  che: "CH", aut: "AT", ned: "NL", nld: "NL", bel: "BE", den: "DK", dnk: "DK", nor: "NO", swe: "SE", fin: "FI", por: "PT",
+  prt: "PT", cro: "HR", hrv: "HR", slo: "SI", svn: "SI", bih: "BA", geo: "GE", egy: "EG", rsa: "ZA", zaf: "ZA", tun: "TN",
+  mar: "MA", uzb: "UZ", tpe: "TW", tha: "TH", ina: "ID", idn: "ID", nzl: "NZ", per: "PE", ecu: "EC", uru: "UY", ven: "VE",
+  bol: "BO", par: "PY", dom: "DO", isr: "IL", lat: "LV", ltu: "LT", est: "EE", mda: "MD", lux: "LU", mon: "MC", mco: "MC",
+};
+
+/** "ita" -> "🇮🇹" from an ISO-3166 alpha-3 (IOC style) code. */
+export function flagIso3(code) {
+  const iso = ISO3_TO_2[String(code || "").toLowerCase()];
+  return iso ? [...iso].map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65)).join("") : undefined;
+}
+
 /** "Italian" -> "🇮🇹" (regional indicator pair); undefined when unknown. */
 export function flag(nationality) {
   const iso = NATIONALITY_ISO[nationality];

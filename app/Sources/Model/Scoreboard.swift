@@ -42,6 +42,57 @@ struct League: Decodable {
     let name: String
     let short: String
     let logo: URL?
+    let hasStandings: Bool?
+}
+
+/// Identifies a league page; Hashable so it can be a navigation value.
+struct LeagueRef: Hashable {
+    let sport: String
+    let leagueId: String
+    let name: String
+    let short: String
+    let logo: URL?
+    let hasStandings: Bool
+
+    init(group: LeagueGroup) {
+        sport = group.sport
+        leagueId = group.league.id.raw
+        name = group.league.name
+        short = group.league.short
+        logo = group.league.logo
+        hasStandings = group.league.hasStandings ?? false
+    }
+
+    func matches(_ group: LeagueGroup) -> Bool {
+        group.sport == sport && group.league.id.raw == leagueId
+    }
+}
+
+struct Standings: Decodable {
+    let updatedAt: Date
+    let tables: [StandingsTable]
+}
+
+struct StandingsTable: Decodable, Identifiable {
+    let id: String   // drivers | constructors | teams | rankings
+    let rows: [StandingsRow]
+}
+
+struct StandingsRow: Decodable, Identifiable {
+    let pos: Int
+    let name: String
+    let sub: String?
+    let value: Int?
+    let extra: String?
+    let code: String?
+    let color: String?
+    let flag: String?
+    var id: String { "\(pos)-\(name)" }
+}
+
+/// Bundled demo file: { "standings": { "sport:league": Standings } }
+struct StandingsBundle: Decodable {
+    let standings: [String: Standings]
 }
 
 /// League ids are numbers for API-Sports and strings for NBA ("standard") and F1.

@@ -2,6 +2,19 @@ import { Quota } from "./quota.js";
 import { STATE } from "./model.js";
 
 const MIN = 60e3;
+const STANDINGS_EVERY = 6 * 3600e3;
+
+/** Shared: refresh a provider's standings every 6 h when it offers them. */
+async function refreshStandings(self, now) {
+  if (!self.p.standings) return;
+  const last = self.meta.lastStandings ? Date.parse(self.meta.lastStandings) : 0;
+  if (now - last < STANDINGS_EVERY) return;
+  if (self.quota && self.quota.spendable(now) < 2) return;
+  const data = await self.p.standings();
+  if (data && data.tables) self.store.setStandings(self.p.sport, self.p.sport, data);
+  else for (const [leagueId, d] of Object.entries(data || {})) self.store.setStandings(self.p.sport, leagueId, d);
+  self.meta.lastStandings = new Date(now).toISOString();
+}
 
 function dateOffset(offset, now = Date.now()) {
   return new Date(now + offset * 86400e3).toISOString().slice(0, 10);
@@ -89,6 +102,7 @@ export class TeamSportScheduler {
     try {
       if (this.needsDaily(now)) await this.daily(now);
       if (this.hasLiveWindow(now)) await this.live(now);
+      await refreshStandings(this, now);
       this.meta.lastError = undefined;
     } catch (err) {
       this.meta.lastError = { at: new Date(now).toISOString(), message: String(err.message || err) };
@@ -112,10 +126,11 @@ export class TeamSportScheduler {
 
 /** Calendar sports (F1, MotoGP): season list + results of finished races, every 30 min. */
 export class CalendarScheduler {
-  constructor({ provider, store, log }) {
+  constructor({ provider, store, log, quota }) {
     this.p = provider;
     this.store = store;
     this.log = log;
+    this.quota = quota;
     this.meta = store.sportMeta(provider.sport);
   }
 
@@ -126,6 +141,7 @@ export class CalendarScheduler {
       // Keep cached podiums for rounds the provider did not re-fetch this time.
       const merged = season.map((e) => (e.results ? e : { ...e, results: this.store.events.get(e.id)?.results }));
       this.store.replaceSport(this.p.sport, merged);
+      await refreshStandings(this, now);
       this.meta.lastOk = new Date(now).toISOString();
       this.meta.lastError = undefined;
     } catch (err) {

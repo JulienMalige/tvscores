@@ -1,5 +1,5 @@
 import { getJson } from "../http.js";
-import { STATE } from "../model.js";
+import { STATE, flagIso3 } from "../model.js";
 
 const BASE = "https://api.livetennisapi.com/api/public/v1";
 const TOURS = {
@@ -65,8 +65,27 @@ export function tennisProvider({ key, quota, log = () => {} }) {
     log(`GET tennis ${status} -> ${body.data?.length ?? 0} matches, ${rows.length} ATP/WTA singles`);
     return rows;
   }
+  /** Top 25 per tour built from the ranked player list (1 call; /rankings is a paid tier). */
+  async function standings() {
+    if (!key) throw new Error("Live Tennis API key missing");
+    const { body } = await getJson(`${BASE}/players?limit=200`, { headers });
+    quota.record(undefined);
+    const byTour = { atp: [], wta: [] };
+    for (const p of body.data || []) {
+      if (p.is_doubles_team || !p.ranking || !byTour[p.tour]) continue;
+      byTour[p.tour].push({ pos: p.ranking, name: p.name, sub: p.country?.toUpperCase(), value: p.ranking_points, extra: p.ranking_movement, flag: flagIso3(p.country) });
+    }
+    const out = {};
+    for (const tour of Object.keys(byTour)) {
+      const rows = byTour[tour].sort((a, b) => a.pos - b.pos).slice(0, 25);
+      out[tour] = { updatedAt: new Date().toISOString(), tables: [{ id: "rankings", rows }] };
+    }
+    log(`GET tennis players -> rankings ATP ${out.atp.tables[0].rows.length}, WTA ${out.wta.tables[0].rows.length}`);
+    return out; // keyed by league id
+  }
   return {
     sport: "tennis",
+    standings,
     /** Orphans of the live feed are over (no `completed` listing on the free tier). */
     finalizeOrphans: true,
     daily: () => list("upcoming"),

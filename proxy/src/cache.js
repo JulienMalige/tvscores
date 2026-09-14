@@ -10,6 +10,7 @@ export class Store {
     this.dir = dir;
     this.file = join(dir, "store.json");
     this.events = new Map();
+    this.standings = {}; // "sport:leagueId" -> { updatedAt, tables }
     this.meta = {}; // per sport: { lastDaily, lastLive, lastOk, lastError, calls: { day, used } }
     mkdirSync(dir, { recursive: true });
     this.load();
@@ -19,6 +20,7 @@ export class Store {
     try {
       const raw = JSON.parse(readFileSync(this.file, "utf8"));
       for (const e of raw.events || []) this.events.set(e.id, e);
+      this.standings = raw.standings || {};
       this.meta = raw.meta || {};
     } catch {
       /* first run */
@@ -27,7 +29,7 @@ export class Store {
 
   save() {
     const tmp = this.file + ".tmp";
-    writeFileSync(tmp, JSON.stringify({ events: [...this.events.values()], meta: this.meta }));
+    writeFileSync(tmp, JSON.stringify({ events: [...this.events.values()], standings: this.standings, meta: this.meta }));
     renameSync(tmp, this.file);
   }
 
@@ -39,6 +41,10 @@ export class Store {
   replaceSport(sport, events) {
     for (const [id, e] of this.events) if (e.sport === sport) this.events.delete(id);
     this.upsert(events);
+  }
+
+  setStandings(sport, leagueId, data) {
+    this.standings[`${sport}:${leagueId}`] = data;
   }
 
   hasResults(id) {

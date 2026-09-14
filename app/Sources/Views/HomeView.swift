@@ -3,19 +3,41 @@ import SwiftUI
 struct HomeView: View {
     @State private var store = ScoreboardStore()
     @State private var day: Day = Self.initialDay()
+    @State private var path: [LeagueRef] = []
+    @State private var openedInitialLeague = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 28) {
-            header
-            DayTabs(selected: $day)
-            content
+        NavigationStack(path: $path) {
+            VStack(alignment: .leading, spacing: 28) {
+                header
+                DayTabs(selected: $day)
+                content
+            }
+            .padding(.horizontal, 80)
+            .padding(.top, 60)
+            .padding(.bottom, 40)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .navigationDestination(for: LeagueRef.self) { ref in
+                LeagueView(ref: ref, store: store, day: day)
+            }
         }
-        .padding(.horizontal, 80)
-        .padding(.top, 60)
-        .padding(.bottom, 40)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .task { store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
+        .onChange(of: store.board == nil) { _, isNil in
+            // `-TVScoresLeague f1` opens that league page once data exists (CI screenshots).
+            guard !isNil, !openedInitialLeague, let wanted = Self.initialLeague(), let board = store.board else { return }
+            let all = Day.allCases.flatMap { board.groups(for: $0) }
+            if let g = all.first(where: { $0.sport == wanted }) {
+                path = [LeagueRef(group: g)]
+                openedInitialLeague = true
+            }
+        }
+    }
+
+    private static func initialLeague() -> String? {
+        let args = ProcessInfo.processInfo.arguments
+        if let i = args.firstIndex(of: "-TVScoresLeague"), i + 1 < args.count { return args[i + 1] }
+        return nil
     }
 
     private var header: some View {
@@ -44,7 +66,7 @@ struct HomeView: View {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 36) {
                         ForEach(groups) { group in
-                            LeagueSection(group: group)
+                            LeagueSection(group: group, linkToLeague: true)
                         }
                     }
                     .padding(.bottom, 60)

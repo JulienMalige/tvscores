@@ -78,8 +78,37 @@ export function motorsportProvider({ sport, league, key, quota, log = () => {}, 
     quota.record(undefined);
     return body;
   }
+  const teamTable = sport === "formula1" ? { path: "/standings/constructors", id: "constructors" } : { path: "/standings/teams", id: "teams" };
   return {
     sport: league.id,
+    /** Drivers + teams championship tables. 2 calls. */
+    async standings() {
+      const nats = nationalities ? await nationalities().catch(() => ({})) : {};
+      const drivers = await get("/standings/drivers");
+      const teams = await get(teamTable.path);
+      const rows = (x) => (Array.isArray(x) ? x : x.data || []);
+      return {
+        updatedAt: new Date().toISOString(),
+        tables: [
+          {
+            id: "drivers",
+            rows: rows(drivers).map((d) => ({
+              pos: d.position,
+              name: `${(d.firstName || "?")[0]}. ${d.lastName || "?"}`,
+              sub: d.teams?.[0]?.shortName || d.teams?.[0]?.name,
+              value: Math.round(Number(d.points)),
+              code: d.code || undefined,
+              color: d.teams?.[0]?.color || undefined,
+              flag: flag(nats[d.lastName]),
+            })),
+          },
+          {
+            id: teamTable.id,
+            rows: rows(teams).map((t) => ({ pos: t.position, name: t.shortName || t.name, value: Math.round(Number(t.points)), color: t.color || undefined })),
+          },
+        ],
+      };
+    },
     /**
      * Calendar of the current year with podiums for finished races.
      * `hasResults(id)` lets the caller skip result calls already cached.

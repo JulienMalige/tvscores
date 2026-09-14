@@ -65,16 +65,18 @@ jobs:
           echo "App bundle: $APP"
           mkdir -p shots
           xcrun simctl install "$UDID" "$APP"
-          shot() { # $1 lang, $2 tab
+          shot() { # $1 lang, $2 tab, $3 optional league sport (opens the league page)
             xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
             # Demo sample is bucketed in São Paulo time (see app/README note); run the simulator in the same zone.
-            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab "$2" -AppleLanguages "($1)" -AppleLocale "$1"
-            sleep 6
-            xcrun simctl io "$UDID" screenshot "shots/$2-$1.png"
+            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab "$2" ${3:+-TVScoresLeague "$3"} -AppleLanguages "($1)" -AppleLocale "$1"
+            sleep 7
+            xcrun simctl io "$UDID" screenshot "shots/${3:+league-$3-}$2-$1.png"
           }
           for lang in en fr pt es; do shot "$lang" today; done
           shot en yesterday
           shot en upcoming
+          shot en today f1
+          shot en upcoming tennis
           ls -la shots
 
       - name: Upload screenshots
