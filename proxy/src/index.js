@@ -10,6 +10,7 @@ import { motorsportProvider } from "./providers/ocblacktop.js";
 import { tennisProvider } from "./providers/livetennis.js";
 import { TeamSportScheduler, CalendarScheduler } from "./scheduler.js";
 import { createApp } from "./server.js";
+import { PhotoResolver } from "./photos.js";
 
 const log = (msg) => console.log(`${new Date().toISOString()} ${msg}`);
 const store = new Store(config.cacheDir);
@@ -42,15 +43,18 @@ if (config.ocBlacktopKey) {
   schedulers.push(new TeamSportScheduler({ provider: tennisProvider({ key: config.liveTennisKey, quota, log }), store, cfg: config.schedule, log }));
 }
 
-const app = createApp({ store, config });
+const photos = new PhotoResolver({ store, key: config.theSportsDbKey, log });
+const app = createApp({ store, config, photos });
 app.listen(config.port, config.host, () => {
   log(`tvscores proxy listening on http://${config.host}:${config.port} (prefix ${config.pathPrefix || "none"})`);
   for (const s of schedulers) s.start();
+  setTimeout(() => photos.start(), 15000); // after the first fetches land
 });
 
 for (const sig of ["SIGINT", "SIGTERM"]) {
   process.on(sig, () => {
     for (const s of schedulers) s.stop();
+    photos.stop();
     store.save();
     app.close(() => process.exit(0));
   });

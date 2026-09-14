@@ -30,7 +30,22 @@ function groupByLeague(events, sportOrder, leagues = {}, publicBase = "", standi
  * Buckets: yesterday, today, upcoming (tomorrow onwards, F1 calendar included),
  * computed in the viewer's time zone so "today" means their evening.
  */
-export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {} } = {}) {
+/** Copy of an event with cached photo URLs on podium rows and tennis players. */
+export function withPhotos(e, photoFor) {
+  if (!photoFor) return e;
+  const out = { ...e };
+  if (e.results) out.results = e.results.map((r) => ({ ...r, photo: photoFor(r.fullName || r.driver) }));
+  if (e.sport === "tennis") for (const side of ["home", "away"]) if (e[side]) out[side] = { ...e[side], photo: photoFor(e[side].name) };
+  return out;
+}
+
+export function withTablePhotos(standings, photoFor) {
+  if (!photoFor || !standings) return standings;
+  return { ...standings, tables: standings.tables.map((t) => ({ ...t, rows: t.rows.map((r) => ({ ...r, photo: photoFor(r.fullName || r.name) })) })) };
+}
+
+export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor } = {}) {
+  events = events.map((e) => withPhotos(e, photoFor));
   const today = localDate(new Date(now).toISOString(), tz);
   const yesterday = localDate(new Date(now - 86400e3).toISOString(), tz);
   const days = { yesterday: [], today: [], upcoming: [] };

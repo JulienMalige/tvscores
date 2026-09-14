@@ -11,6 +11,7 @@ export class Store {
     this.file = join(dir, "store.json");
     this.events = new Map();
     this.standings = {}; // "sport:leagueId" -> { updatedAt, tables }
+    this.photos = {}; // athlete name -> { url|null, at }
     this.meta = {}; // per sport: { lastDaily, lastLive, lastOk, lastError, calls: { day, used } }
     mkdirSync(dir, { recursive: true });
     this.load();
@@ -21,6 +22,7 @@ export class Store {
       const raw = JSON.parse(readFileSync(this.file, "utf8"));
       for (const e of raw.events || []) this.events.set(e.id, e);
       this.standings = raw.standings || {};
+      this.photos = raw.photos || {};
       this.meta = raw.meta || {};
     } catch {
       /* first run */
@@ -29,7 +31,7 @@ export class Store {
 
   save() {
     const tmp = this.file + ".tmp";
-    writeFileSync(tmp, JSON.stringify({ events: [...this.events.values()], standings: this.standings, meta: this.meta }));
+    writeFileSync(tmp, JSON.stringify({ events: [...this.events.values()], standings: this.standings, photos: this.photos, meta: this.meta }));
     renameSync(tmp, this.file);
   }
 

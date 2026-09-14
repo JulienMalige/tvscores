@@ -118,11 +118,9 @@ private struct StandingsRowView: View {
                 .font(.system(size: 30, weight: .bold, design: .rounded))
                 .monospacedDigit()
                 .frame(width: 64, alignment: .trailing)
-            RoundedRectangle(cornerRadius: 3)
-                .fill(Color(hex: row.color) ?? .clear)
-                .frame(width: 6, height: 40)
+            Avatar(photo: row.photo, flag: row.flag, color: Color(hex: row.color), monogram: row.code ?? String(row.name.suffix(3)).uppercased(), size: 56)
             VStack(alignment: .leading, spacing: 2) {
-                Text([row.flag, row.name].compactMap { $0 }.joined(separator: " "))
+                Text(row.name)
                     .font(.title3.weight(.semibold))
                 if let sub = row.sub {
                     Text(sub).font(.callout).foregroundStyle(.secondary)

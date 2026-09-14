@@ -21,6 +21,8 @@ export const config = {
   apiSportsKey: readKey("TVSCORES_APISPORTS_KEY", "api-sports.key"),
   liveTennisKey: readKey("TVSCORES_LIVETENNIS_KEY", "livetennisapi.key"),
   ocBlacktopKey: readKey("TVSCORES_OCBLACKTOP_KEY", "ocblacktop.key"),
+  /** TheSportsDB key for athlete cutouts; "3" is the public test key, swap for the paid one before release. */
+  theSportsDbKey: env.TVSCORES_TSDB_KEY || "3",
   /** Optional URL prefix the reverse proxy leaves on the path (Tailscale serve --set-path). */
   pathPrefix: env.TVSCORES_PATH_PREFIX || "/tvscores",
   /** Public base the app reaches us at; used for asset URLs in responses. */

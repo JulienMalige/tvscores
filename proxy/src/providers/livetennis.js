@@ -10,7 +10,7 @@ const TOURS = {
 function player(p) {
   const name = p?.name || "TBD";
   const surname = name.split(/\s+/).at(-1) || name;
-  return { name, short: surname.slice(0, 3).toUpperCase(), nick: surname, country: p?.country?.toUpperCase() };
+  return { name, short: surname.slice(0, 3).toUpperCase(), nick: surname, country: p?.country?.toUpperCase(), flag: flagIso3(p?.country) };
 }
 
 /** "Set 3 · 4-2" from the score block; undefined when no games are known. */

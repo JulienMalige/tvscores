@@ -87,6 +87,7 @@ struct StandingsRow: Decodable, Identifiable {
     let code: String?
     let color: String?
     let flag: String?
+    let photo: URL?
     var id: String { "\(pos)-\(name)" }
 }
 
@@ -143,6 +144,8 @@ struct TeamRef: Decodable {
     let short: String
     let nick: String?
     let logo: URL?
+    let photo: URL?
+    let flag: String?
     /// What the row shows under the badge: nickname for US teams, club name otherwise.
     var label: String { nick ?? name }
 }
@@ -159,7 +162,9 @@ struct RaceResult: Decodable, Identifiable {
     let nationality: String?
     let flag: String?
     let team: String?
+    let teamColor: String?
     let gap: String?
+    let photo: URL?
     var id: Int { pos }
 }
 

@@ -33,11 +33,12 @@ private struct RaceContent: View {
             if let results = event.results, !results.isEmpty {
                 HStack(spacing: 24) {
                     ForEach(results) { r in
-                        HStack(spacing: 12) {
+                        HStack(spacing: 14) {
                             Text("\(r.pos)")
                                 .font(.system(size: 34, weight: .bold, design: .rounded))
+                            Avatar(photo: r.photo, flag: r.flag, color: Color(hex: r.teamColor), monogram: r.code ?? String(r.driver.suffix(3)).uppercased(), size: 64)
                             VStack(alignment: .leading, spacing: 2) {
-                                Text([r.flag, r.driver].compactMap { $0 }.joined(separator: " ")).font(.callout.weight(.semibold))
+                                Text(r.driver).font(.callout.weight(.semibold))
                                 Text(r.gap ?? r.team ?? "").font(.footnote).foregroundStyle(.secondary)
                             }
                         }

@@ -53,7 +53,11 @@ private struct RowContent: View {
         if let team {
             HStack(spacing: 16) {
                 if !leading { Text(team.label).font(.title3).lineLimit(1).minimumScaleFactor(0.7) }
-                TeamBadge(code: team.short, logo: team.logo)
+                if team.logo == nil, team.flag != nil || team.photo != nil {
+                    Avatar(photo: team.photo, flag: team.flag, monogram: team.short)
+                } else {
+                    TeamBadge(code: team.short, logo: team.logo)
+                }
                 if leading { Text(team.label).font(.title3).lineLimit(1).minimumScaleFactor(0.7) }
             }
         }
