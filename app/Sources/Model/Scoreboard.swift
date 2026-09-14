@@ -88,6 +88,8 @@ struct StandingsRow: Decodable, Identifiable {
     let color: String?
     let flag: String?
     let photo: URL?
+    /// Constructor or team badge; a table of marques, not of people.
+    let logo: URL?
     var id: String { "\(pos)-\(name)" }
 }
 

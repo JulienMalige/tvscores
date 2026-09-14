@@ -1,10 +1,11 @@
 import { createServer } from "node:http";
-import { readFileSync, statSync } from "node:fs";
+import { readFileSync, statSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ASSETS = join(dirname(fileURLToPath(import.meta.url)), "..", "assets");
 import { buildScoreboard, localDate, withTablePhotos } from "./scoreboard.js";
+import { slug } from "./model.js";
 
 /** Crests and portraits change once in a blue moon; let the TV keep them. */
 const IMAGE_CACHE = "public, max-age=2592000, immutable";
@@ -24,6 +25,18 @@ function send(res, status, body, extra = {}) {
 export function createApp({ store, config, startedAt = Date.now(), photos, images, activeSports = [], limits = {} }) {
   const photoFor = photos ? (name) => photos.photoFor(name) : undefined;
   const mirror = images ? (url) => images.url(url) : undefined;
+  // Constructor badges are files we shipped; list them once so a missing one
+  // falls back to the monogram instead of a broken image.
+  const teamBadges = new Set();
+  for (const sport of readdirSync(join(ASSETS, "teams"), { withFileTypes: true }).filter((d) => d.isDirectory())) {
+    for (const file of readdirSync(join(ASSETS, "teams", sport.name))) {
+      if (file.endsWith(".png")) teamBadges.add(`${sport.name}/${file.slice(0, -4)}`);
+    }
+  }
+  const badgeFor = (sport) => (name) => {
+    const path = `${sport}/${slug(name)}`;
+    return teamBadges.has(path) ? `${config.publicBase}/v1/assets/teams/${path}.png` : undefined;
+  };
   const memo = new Map(); // tz -> { at, body }: the board changes at most every poll, not per request
   const MEMO_MS = 15000;
   return createServer((req, res) => {
@@ -51,12 +64,12 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
       return send(res, 200, { date, tz, events });
     }
     if (path === "/v1/standings") {
-      return send(res, 200, { standings: Object.fromEntries(Object.entries(store.standings).map(([k, v]) => [k, withTablePhotos(v, photoFor, mirror)])) });
+      return send(res, 200, { standings: Object.fromEntries(Object.entries(store.standings).map(([k, v]) => [k, withTablePhotos(v, photoFor, mirror, badgeFor(k.split(":")[0]))])) });
     }
     const one = path.match(/^\/v1\/standings\/([a-z0-9-]+)\/([a-z0-9-]+)$/);
     if (one) {
       const data = store.standings[`${one[1]}:${one[2]}`];
-      return data ? send(res, 200, withTablePhotos(data, photoFor, mirror)) : send(res, 404, { error: "no standings for this league" });
+      return data ? send(res, 200, withTablePhotos(data, photoFor, mirror, badgeFor(one[1]))) : send(res, 404, { error: "no standings for this league" });
     }
     const img = path.match(/^\/v1\/img\/([0-9a-f]{40})$/);
     if (img && images) {
@@ -76,6 +89,11 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
         res.end(hit.body);
       }).catch(() => send(res, 502, { error: "image fetch failed" }));
       return;
+    }
+    const team = path.match(/^\/v1\/assets\/teams\/([a-z0-9-]+)\/([a-z0-9-]+)\.png$/);
+    if (team && teamBadges.has(`${team[1]}/${team[2]}`)) {
+      res.writeHead(200, { "content-type": "image/png", "cache-control": IMAGE_CACHE, "access-control-allow-origin": "*" });
+      return res.end(readFileSync(join(ASSETS, "teams", team[1], `${team[2]}.png`)));
     }
     const asset = path.match(/^\/v1\/assets\/leagues\/([a-z0-9-]+)\.png$/);
     if (asset) {

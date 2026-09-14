@@ -106,7 +106,22 @@ struct RaceDetailView: View {
     }
 }
 
+/// tvOS puts `\.isFocused` into the environment *below* the view that becomes
+/// focusable, so the row that reads it has to be the child of the one that
+/// declares it. Reading it in the same body leaves it stuck at false: focus
+/// moves and clicks, but nothing lights up.
 private struct RaceResultRow: View {
+    let result: RaceResult
+
+    var body: some View {
+        ResultContent(result: result)
+            // tvOS scrolls by moving focus. Without this the page would be
+            // stuck at the top and most of the field unreachable.
+            .focusable()
+    }
+}
+
+private struct ResultContent: View {
     let result: RaceResult
     @Environment(\.isFocused) private var isFocused
 
@@ -149,9 +164,6 @@ private struct RaceResultRow: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(isFocused ? Color.white.opacity(0.14) : Color.white.opacity(0.04))
         )
-        // tvOS scrolls by moving focus. Without this the page would be stuck
-        // at the top and most of the field unreachable.
-        .focusable()
         .scaleEffect(isFocused ? 1.01 : 1)
         .animation(.easeOut(duration: 0.15), value: isFocused)
     }

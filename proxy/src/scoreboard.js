@@ -56,8 +56,13 @@ export function withPhotos(e, photoFor, mirror) {
   return out;
 }
 
-export function withTablePhotos(standings, photoFor, mirror) {
-  if (!photoFor && !mirror) return standings;
+/**
+ * @param badgeFor (name) => URL of that constructor's badge, or undefined.
+ * Team rows get a badge instead of a portrait: a constructors table is a list
+ * of marques, not of people.
+ */
+export function withTablePhotos(standings, photoFor, mirror, badgeFor) {
+  if (!photoFor && !mirror && !badgeFor) return standings;
   if (!standings) return standings;
   const img = mirror ? (u) => mirror(u) : (u) => u;
   const rowPhoto = (r) => {
@@ -65,7 +70,10 @@ export function withTablePhotos(standings, photoFor, mirror) {
     const k = photoKey(r);
     return img(k ? photoFor(k) : undefined);
   };
-  return { ...standings, tables: standings.tables.map((t) => ({ ...t, rows: t.rows.map((r) => ({ ...r, photo: rowPhoto(r) })) })) };
+  const decorate = (r) => (r.kind === "team"
+    ? { ...r, logo: badgeFor ? badgeFor(r.name) : undefined }
+    : { ...r, photo: rowPhoto(r) });
+  return { ...standings, tables: standings.tables.map((t) => ({ ...t, rows: t.rows.map(decorate) })) };
 }
 
 export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, mirror, activeSports = [], upcomingDays = 7 } = {}) {

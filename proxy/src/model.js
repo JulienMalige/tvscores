@@ -72,3 +72,12 @@ export function flag(nationality) {
 }
 
 export const STATE = { scheduled: "scheduled", live: "live", final: "final", other: "other" };
+
+/** File-name form of a team name. Must match slug() in scripts/build-team-badges.py. */
+export function slug(name) {
+  return String(name || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}

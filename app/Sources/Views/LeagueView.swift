@@ -118,7 +118,18 @@ private struct StandingsRowView: View {
                 .font(.system(size: 30, weight: .bold, design: .rounded))
                 .monospacedDigit()
                 .frame(width: 64, alignment: .trailing)
-            Avatar(photo: row.photo, flag: row.flag, color: Color(hex: row.color), monogram: row.code ?? Avatar.monogram(for: row.name), size: 56)
+            if let logo = row.logo {
+                AsyncImage(url: logo) { phase in
+                    if let image = phase.image {
+                        image.resizable().scaledToFit()
+                    } else {
+                        Color.clear
+                    }
+                }
+                .frame(width: 92, height: 56)
+            } else {
+                Avatar(photo: row.photo, flag: row.flag, color: Color(hex: row.color), monogram: row.code ?? Avatar.monogram(for: row.name), size: 56)
+            }
             VStack(alignment: .leading, spacing: 2) {
                 Text(row.name)
                     .font(.title3.weight(.semibold))
