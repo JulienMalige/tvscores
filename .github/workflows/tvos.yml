@@ -79,6 +79,31 @@ jobs:
           shot en upcoming tennis
           ls -la shots
 
+          # The demo runs above never touch the network. Launch once against the
+          # real proxy, which is the code path a TestFlight build actually takes,
+          # and keep any crash report the simulator writes.
+          xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+          rm -f ~/Library/Logs/DiagnosticReports/TVScores*.ips
+          SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -AppleLanguages "(en)"
+          sleep 20
+          xcrun simctl io "$UDID" screenshot shots/live-en.png
+          if xcrun simctl spawn "$UDID" launchctl list 2>/dev/null | grep -q com.julienmalige.tvscores; then
+            echo "live run: still running"
+          else
+            echo "::warning::the app is no longer running after the live launch"
+          fi
+          mkdir -p crash
+          cp ~/Library/Logs/DiagnosticReports/TVScores*.ips crash/ 2>/dev/null || echo "no crash report"
+          ls -la crash || true
+
+      - name: Upload crash reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crash-reports
+          path: app/crash/*
+          if-no-files-found: ignore
+
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@v4
