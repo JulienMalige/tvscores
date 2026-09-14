@@ -67,5 +67,5 @@ Prerequisites on the Mac: current Xcode from the App Store, `brew install xcodeg
 ## Status
 
 - `app/`: Yesterday / Today / Upcoming scoreboard reading the proxy (or a bundled sample with `-TVScoresDemo`), Apple Sports row layout, en/fr/pt/es. Built and screenshotted on every push by the GitHub Actions workflow (`.github/workflows/tvos.yml`).
-- `proxy/`: live on the VPS with Champions League, NFL, NBA (API-Sports free plans) and Formula 1 (Jolpica); quota-aware polling, disk cache, public HTTPS via Tailscale Funnel.
+- `proxy/`: live on the VPS with Champions League, NFL, NBA (API-Sports free plans), Formula 1 and MotoGP (Orange Cat Blacktop, results and calendar), ATP/WTA tennis (livetennisapi.com); quota-aware polling, disk cache, public HTTPS via Tailscale Funnel.
 - Next: match detail screen, favourites, Top Shelf and app icon, then the Apple Developer enrollment for a TestFlight build on the real Apple TV.

@@ -28,7 +28,8 @@ Event shape: see `src/model.js`. Team events have `home/away {name, nick, short}
 | football (Champions League) | API-Sports v3, free plan | 3 daily (yesterday, today, tomorrow) + live polling |
 | nfl | API-Sports american-football, free | same |
 | nba | API-Sports v2 nba, free | same |
-| f1 | Jolpica (Ergast successor), free, no key | 2 every 30 min, no quota |
+| f1, motogp | Orange Cat Blacktop (free key, 7,500/month), Jolpica fallback for F1 without a key | 1 calendar call + 1 per newly finished race, every 30 min; F1 flags from 1 Jolpica call/day |
+| tennis (ATP, WTA singles) | livetennisapi.com free key, 100/day | 1 upcoming call daily + live polling inside match windows |
 
 API-Sports free plan facts learned 2026-09-13: 100 calls/day per sport, only the
 dates **yesterday..tomorrow**, no `season` or `next` parameters for the current

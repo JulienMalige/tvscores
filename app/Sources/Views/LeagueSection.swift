@@ -31,6 +31,8 @@ enum Sport {
         case "nfl": "football"
         case "nba": "basketball"
         case "f1": "flag.checkered"
+        case "motogp": "flag.checkered.2.crossed"
+        case "tennis": "tennisball"
         default: "sportscourt"
         }
     }
@@ -41,6 +43,8 @@ enum Sport {
         case "nfl": .brown
         case "nba": .orange
         case "f1": .red
+        case "motogp": .orange
+        case "tennis": .green
         default: .secondary
         }
     }

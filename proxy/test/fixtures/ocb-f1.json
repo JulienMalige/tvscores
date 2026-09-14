@@ -1,0 +1,265 @@
+{
+ "events": [
+  {
+   "id": "c4608821-8a20-488d-b99b-bef8a515be81",
+   "name": "Spanish Grand Prix",
+   "dateStart": "2026-09-11",
+   "dateEnd": "2026-09-13",
+   "status": "completed",
+   "location": {
+    "id": "261acf15-a4a0-4047-a4ce-626c01c5c403",
+    "name": "Madring",
+    "city": "Madrid",
+    "country": {
+     "name": "Spain",
+     "twoCode": "ES",
+     "threeCode": "ESP"
+    }
+   },
+   "sportId": "formula-1",
+   "schedule": [
+    {
+     "id": "66ad65e3-dd9c-4c37-8111-fe26755ce0f9",
+     "name": "FP1",
+     "type": "practice",
+     "startTime": "2026-09-11T11:30:00.000Z",
+     "endTime": "2026-09-11T12:30:00.000Z",
+     "status": "completed"
+    },
+    {
+     "id": "7ef0bdab-3d19-4492-8021-0946a5e3ee13",
+     "name": "FP2",
+     "type": "practice",
+     "startTime": "2026-09-11T15:00:00.000Z",
+     "endTime": "2026-09-11T16:00:00.000Z",
+     "status": "completed"
+    },
+    {
+     "id": "26dad685-93e4-4895-903e-e959ee14549a",
+     "name": "FP3",
+     "type": "practice",
+     "startTime": "2026-09-12T10:30:00.000Z",
+     "endTime": "2026-09-12T11:30:00.000Z",
+     "status": "completed"
+    },
+    {
+     "id": "dbec8296-cfe2-4516-b11f-746c2d4725e2",
+     "name": "Qualifying",
+     "type": "qualifying",
+     "startTime": "2026-09-12T14:00:00.000Z",
+     "endTime": "2026-09-12T15:00:00.000Z",
+     "status": "completed"
+    },
+    {
+     "id": "934051c0-f471-4168-8919-3c0810d3d938",
+     "name": "Race",
+     "type": "race",
+     "startTime": "2026-09-13T13:00:00.000Z",
+     "endTime": "2026-09-13T15:00:00.000Z",
+     "status": "completed"
+    }
+   ]
+  },
+  {
+   "id": "ad0fdc72-8e34-4e25-82ff-256c46ab43a1",
+   "name": "Azerbaijan Grand Prix",
+   "dateStart": "2026-09-24",
+   "dateEnd": "2026-09-26",
+   "status": "scheduled",
+   "location": {
+    "id": "2daab29a-f4c4-483a-bd24-4d01123da25f",
+    "name": "Baku City Circuit",
+    "city": "Baku",
+    "country": {
+     "name": "Azerbaijan",
+     "twoCode": "AZ",
+     "threeCode": "AZE"
+    }
+   },
+   "sportId": "formula-1",
+   "schedule": [
+    {
+     "id": "fc06a197-f595-4057-acba-46c5374dfe29",
+     "name": "FP1",
+     "type": "practice",
+     "startTime": "2026-09-24T08:30:00.000Z",
+     "endTime": "2026-09-24T09:30:00.000Z",
+     "status": "scheduled"
+    },
+    {
+     "id": "6e5be7fa-6d39-423f-b73a-4f2cea044323",
+     "name": "FP2",
+     "type": "practice",
+     "startTime": "2026-09-24T12:00:00.000Z",
+     "endTime": "2026-09-24T13:00:00.000Z",
+     "status": "scheduled"
+    },
+    {
+     "id": "8b8feb97-c11d-4e6f-abd3-6d34e2f797bc",
+     "name": "FP3",
+     "type": "practice",
+     "startTime": "2026-09-25T08:30:00.000Z",
+     "endTime": "2026-09-25T09:30:00.000Z",
+     "status": "scheduled"
+    },
+    {
+     "id": "b19b53bc-fb85-41a3-9485-41cff5238980",
+     "name": "Qualifying",
+     "type": "qualifying",
+     "startTime": "2026-09-25T12:00:00.000Z",
+     "endTime": "2026-09-25T13:00:00.000Z",
+     "status": "scheduled"
+    },
+    {
+     "id": "b033e6a1-d601-4a33-81ea-148d7d084d4a",
+     "name": "Race",
+     "type": "race",
+     "startTime": "2026-09-26T11:00:00.000Z",
+     "endTime": "2026-09-26T13:00:00.000Z",
+     "status": "scheduled"
+    }
+   ]
+  },
+  {
+   "id": "15402d02-b422-4750-9a0b-ff90c69c1b50",
+   "name": "Pre-Season Testing",
+   "dateStart": "2026-02-18",
+   "dateEnd": "2026-02-20",
+   "status": "completed",
+   "location": {
+    "id": "74995fb3-78be-460f-94dc-c9da326cf6d4",
+    "name": "Bahrain International Circuit",
+    "city": "Sakhir",
+    "country": {
+     "name": "Bahrain",
+     "twoCode": "BH",
+     "threeCode": "BRN"
+    }
+   },
+   "sportId": "formula-1",
+   "schedule": [
+    {
+     "id": "9ef9375a-bb20-4cdb-a3bb-a864fa4b0b10",
+     "name": "FP1",
+     "type": "practice",
+     "startTime": "2026-02-18T07:00:00.000Z",
+     "endTime": "2026-02-18T16:00:00.000Z",
+     "status": "completed"
+    },
+    {
+     "id": "10081c5a-fbb0-4adc-8715-4401529b9cb5",
+     "name": "FP2",
+     "type": "practice",
+     "startTime": "2026-02-19T07:00:00.000Z",
+     "endTime": "2026-02-19T16:00:00.000Z",
+     "status": "completed"
+    },
+    {
+     "id": "645f2561-33b9-4e70-9a8b-36c634c18053",
+     "name": "FP3",
+     "type": "practice",
+     "startTime": "2026-02-20T07:00:00.000Z",
+     "endTime": "2026-02-20T16:00:00.000Z",
+     "status": "completed"
+    }
+   ]
+  }
+ ],
+ "results": [
+  {
+   "position": "1",
+   "lapTime": "1:34:23.754",
+   "gap": "LAP 57",
+   "status": "OK",
+   "driver": {
+    "id": "66dbab4b-4aac-4be1-b0cf-8a584fc7b09d",
+    "firstName": "Kimi",
+    "lastName": "Antonelli",
+    "code": "ANT",
+    "number": 12
+   },
+   "team": {
+    "id": "c443f518-bb74-479f-9c71-d0ecd9410299",
+    "name": "Mercedes",
+    "shortName": "Mercedes",
+    "color": "#27f4d2"
+   }
+  },
+  {
+   "position": "2",
+   "lapTime": "1:34:28.105",
+   "gap": "+4.351",
+   "status": "OK",
+   "driver": {
+    "id": "84334610-8768-47ce-a07f-9923987801e3",
+    "firstName": "Max",
+    "lastName": "Verstappen",
+    "code": "VER",
+    "number": 3
+   },
+   "team": {
+    "id": "a3f1b5d4-e7f0-4413-96cc-2df67b55e673",
+    "name": "Red Bull Racing",
+    "shortName": "Red Bull Racing",
+    "color": "#3671c6"
+   }
+  },
+  {
+   "position": "3",
+   "lapTime": "1:34:28.843",
+   "gap": "+5.089",
+   "status": "OK",
+   "driver": {
+    "id": "c90b21c7-5f23-48f6-897e-384eca7f9df9",
+    "firstName": "Lando",
+    "lastName": "Norris",
+    "code": "NOR",
+    "number": 1
+   },
+   "team": {
+    "id": "b0a8938a-51dc-4c6d-ab07-376c842eeb1d",
+    "name": "McLaren",
+    "shortName": "McLaren",
+    "color": "#ff8000"
+   }
+  },
+  {
+   "position": "4",
+   "lapTime": "1:34:52.870",
+   "gap": "+29.116",
+   "status": "OK",
+   "driver": {
+    "id": "68113195-9d28-43aa-a460-b6b12282d2da",
+    "firstName": "Charles",
+    "lastName": "Leclerc",
+    "code": "LEC",
+    "number": 16
+   },
+   "team": {
+    "id": "ced24186-02e1-452c-ac42-32fe04ea04f9",
+    "name": "Ferrari",
+    "shortName": "Ferrari",
+    "color": "#e8002d"
+   }
+  },
+  {
+   "position": "5",
+   "lapTime": "1:34:53.583",
+   "gap": "+29.829",
+   "status": "OK",
+   "driver": {
+    "id": "6f8f9f16-11f3-4495-a657-c82951f1eaa1",
+    "firstName": "George",
+    "lastName": "Russell",
+    "code": "RUS",
+    "number": 63
+   },
+   "team": {
+    "id": "c443f518-bb74-479f-9c71-d0ecd9410299",
+    "name": "Mercedes",
+    "shortName": "Mercedes",
+    "color": "#27f4d2"
+   }
+  }
+ ]
+}

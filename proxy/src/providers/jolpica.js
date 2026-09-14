@@ -36,11 +36,22 @@ export function normaliseRace(r, league, results) {
   };
 }
 
+/** { familyName: nationality } for the current season, cached 24 h. Used to put flags on OCB podiums. */
+let natCache = { at: 0, map: {} };
+export async function f1Nationalities(year = new Date().getUTCFullYear()) {
+  if (Date.now() - natCache.at < 24 * 3600e3) return natCache.map;
+  const { body } = await getJson(`${BASE}/${year}/drivers.json?limit=100`);
+  const map = {};
+  for (const d of body.MRData.DriverTable.Drivers) map[d.familyName] = d.nationality;
+  natCache = { at: Date.now(), map };
+  return map;
+}
+
 export function f1Provider(league, log = () => {}) {
   return {
     sport: "f1",
     /** Whole season calendar plus the latest classified race, 2 cheap calls. */
-    async season(year = new Date().getUTCFullYear()) {
+    async season({ year = new Date().getUTCFullYear() } = {}) {
       const { body: sched } = await getJson(`${BASE}/${year}.json?limit=40`);
       const races = sched.MRData.RaceTable.Races;
       const { body: last } = await getJson(`${BASE}/${year}/last/results.json`);

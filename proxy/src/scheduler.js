@@ -48,11 +48,15 @@ export class TeamSportScheduler {
   }
 
   async daily(now = Date.now()) {
-    const need = this.cfg.dayOffsets.length;
+    const need = this.p.daily ? 1 : this.cfg.dayOffsets.length;
     if (this.quota.spendable(now) < need) return this.log(`${this.p.sport}: skip daily, quota ${this.quota.remaining(now)} left`);
-    for (const off of this.cfg.dayOffsets) {
-      const rows = await this.p.byDate(dateOffset(off, now));
-      this.store.upsert(rows);
+    if (this.p.daily) {
+      this.store.upsert(await this.p.daily());
+    } else {
+      for (const off of this.cfg.dayOffsets) {
+        const rows = await this.p.byDate(dateOffset(off, now));
+        this.store.upsert(rows);
+      }
     }
     this.meta.lastDaily = new Date(now).toISOString();
     this.meta.lastOk = this.meta.lastDaily;
@@ -65,7 +69,12 @@ export class TeamSportScheduler {
     // Games that should have started but are not in the live feed: they ended or were
     // postponed. Refresh today at most every 20 min to learn their final state.
     const liveIds = new Set(rows.map((r) => r.id));
-    const orphan = this.events().some((e) => e.status.state === STATE.live && !liveIds.has(e.id));
+    const orphans = this.events().filter((e) => e.status.state === STATE.live && !liveIds.has(e.id));
+    if (this.p.finalizeOrphans) {
+      // No terminal listing on this provider: a match gone from the live feed is over.
+      this.store.upsert(orphans.map((e) => ({ ...e, status: { state: STATE.final, detail: e.status.detail?.startsWith("Set") ? undefined : e.status.detail } })));
+    }
+    const orphan = orphans.length > 0 && !this.p.finalizeOrphans;
     const lastToday = this.meta.lastToday ? Date.parse(this.meta.lastToday) : 0;
     if (orphan && now - lastToday > 20 * MIN && this.quota.spendable(now) > 0) {
       this.store.upsert(await this.p.byDate(dateOffset(0, now)));
@@ -101,19 +110,22 @@ export class TeamSportScheduler {
   }
 }
 
-/** Formula 1 via Jolpica: calendar + last result, refreshed every 30 min (no quota). */
-export class F1Scheduler {
+/** Calendar sports (F1, MotoGP): season list + results of finished races, every 30 min. */
+export class CalendarScheduler {
   constructor({ provider, store, log }) {
     this.p = provider;
     this.store = store;
     this.log = log;
-    this.meta = store.sportMeta("f1");
+    this.meta = store.sportMeta(provider.sport);
   }
 
   async tick() {
     const now = Date.now();
     try {
-      this.store.upsert(await this.p.season());
+      const season = await this.p.season({ hasResults: (id) => this.store.hasResults(id) });
+      // Keep cached podiums for rounds the provider did not re-fetch this time.
+      const merged = season.map((e) => (e.results ? e : { ...e, results: this.store.events.get(e.id)?.results }));
+      this.store.replaceSport(this.p.sport, merged);
       this.meta.lastOk = new Date(now).toISOString();
       this.meta.lastError = undefined;
     } catch (err) {

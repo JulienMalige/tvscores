@@ -43,6 +43,25 @@ API-Sports has no MotoGP. Options:
 Nothing affordable gives live MotoGP timing. Treat MotoGP like F1: calendar,
 session results and standings, with the "Race · Final" row shape.
 
+**Decision 2026-09-14: Orange Cat Blacktop for both F1 and MotoGP** (Julien
+registered a free key; stored at `~/.config/tvscores/ocblacktop.key`).
+Compared on the 2026 Spanish GP: identical podium and times to Jolpica, plus
+driver codes, team colours, per-session schedule (practice, qualifying,
+sprint, race) and cleaner names ("Bahrain Grand Prix" where Jolpica had a
+placeholder). Endpoints: `GET /v1/{formula1|moto-gp}/events?limit=100`
+(`season` param is ignored, filter by `dateStart` year) and
+`GET /v1/{sport}/events/{eventId}/sessions/{sessionId}/results`. No driver
+nationality, so F1 flags come from one Jolpica driver-list call per day; MotoGP
+has no flags. Jolpica stays as the keyless fallback. Free tier is
+non-commercial: a paid OCB plan is due before the store release.
+
+**Tennis, decided 2026-09-14:** livetennisapi.com free key (Julien's, stored at
+`~/.config/tvscores/livetennisapi.key`). Base `https://api.livetennisapi.com/api/public/v1`,
+`Authorization: Bearer`, `GET /matches?status=live|upcoming&limit=200`. ATP and
+WTA singles only; a match gone from the live feed is marked final (no
+`completed` listing on the free tier). Quota 100/day, 30/min, tracked like
+API-Sports.
+
 ## Tennis (checked 2026-09-14)
 
 Correction 2026-09-14 (second look): there ARE cheap sources for live tennis.

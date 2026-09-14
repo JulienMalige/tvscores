@@ -35,10 +35,21 @@ export class Store {
     for (const e of events) this.events.set(e.id, { ...this.events.get(e.id), ...e });
   }
 
+  /** Calendar sports: the season list is authoritative, replace everything for that sport. */
+  replaceSport(sport, events) {
+    for (const [id, e] of this.events) if (e.sport === sport) this.events.delete(id);
+    this.upsert(events);
+  }
+
+  hasResults(id) {
+    const e = this.events.get(id);
+    return Boolean(e && e.status.state === "final" && e.results && e.results.length);
+  }
+
   /** Drop events older than 3 days so the file does not grow forever. */
   prune(now = Date.now()) {
     const cutoff = now - 3 * 86400e3;
-    for (const [id, e] of this.events) if (Date.parse(e.start) < cutoff && e.status.state === "final") this.events.delete(id);
+    for (const [id, e] of this.events) if (e.kind !== "race" && Date.parse(e.start) < cutoff && e.status.state === "final") this.events.delete(id);
   }
 
   sportMeta(sport) {

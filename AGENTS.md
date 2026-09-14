@@ -70,7 +70,7 @@ Follow `docs/design-reference.md` (Apple Sports layout adapted to tvOS) for ever
 
 ## Open decisions (ask Julien, do not guess)
 
-- Which leagues are in the MVP (candidates seen on Julien's Apple Sports: Champions League, Formula 1, NBA, NFL, Men's Tennis).
+- Which leagues are in the MVP: currently Champions League, F1, MotoGP, ATP/WTA, NBA, NFL. Rugby is available on the API-Sports plan if Julien wants it.
 - Data provider: decided, API-Sports free plans + Jolpica for F1 (see `docs/data-providers.md`).
 - Proxy language: decided, Node 22 plain JS.
 - Whether the repo stays private.

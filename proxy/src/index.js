@@ -5,8 +5,10 @@ import { ApiSports } from "./providers/apisports.js";
 import { footballProvider } from "./providers/football.js";
 import { nflProvider } from "./providers/nfl.js";
 import { nbaProvider } from "./providers/nba.js";
-import { f1Provider } from "./providers/jolpica.js";
-import { TeamSportScheduler, F1Scheduler } from "./scheduler.js";
+import { f1Provider, f1Nationalities } from "./providers/jolpica.js";
+import { motorsportProvider } from "./providers/ocblacktop.js";
+import { tennisProvider } from "./providers/livetennis.js";
+import { TeamSportScheduler, CalendarScheduler } from "./scheduler.js";
 import { createApp } from "./server.js";
 
 const log = (msg) => console.log(`${new Date().toISOString()} ${msg}`);
@@ -23,7 +25,22 @@ for (const [sport, make] of [
   const client = new ApiSports({ key: config.apiSportsKey, quota, log });
   schedulers.push(new TeamSportScheduler({ provider: make(client, config.leagues[sport]), store, cfg: config.schedule, log }));
 }
-schedulers.push(new F1Scheduler({ provider: f1Provider(config.leagues.f1[0], log), store, log }));
+if (config.ocBlacktopKey) {
+  for (const [sport, leagueKey] of [["formula1", "f1"], ["moto-gp", "motogp"]]) {
+    const league = config.leagues[leagueKey][0];
+    const quota = new Quota(store.sportMeta(leagueKey), { dailyQuota: config.schedule.ocbDailyQuota, quotaReserve: 10 });
+    const provider = motorsportProvider({ sport, league, key: config.ocBlacktopKey, quota, log, nationalities: leagueKey === "f1" ? f1Nationalities : undefined });
+    schedulers.push(new CalendarScheduler({ provider, store, log }));
+  }
+} else {
+  log("no Orange Cat Blacktop key: Formula 1 via Jolpica, no MotoGP");
+  schedulers.push(new CalendarScheduler({ provider: f1Provider(config.leagues.f1[0], log), store, log }));
+}
+{
+  const meta = store.sportMeta("tennis");
+  const quota = new Quota(meta, config.schedule);
+  schedulers.push(new TeamSportScheduler({ provider: tennisProvider({ key: config.liveTennisKey, quota, log }), store, cfg: config.schedule, log }));
+}
 
 const app = createApp({ store, config });
 app.listen(config.port, config.host, () => {

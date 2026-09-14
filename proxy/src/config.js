@@ -4,9 +4,9 @@ import { join } from "node:path";
 
 const env = process.env;
 
-function readKey() {
-  if (env.TVSCORES_APISPORTS_KEY) return env.TVSCORES_APISPORTS_KEY.trim();
-  const file = env.TVSCORES_APISPORTS_KEY_FILE || join(homedir(), ".config/tvscores/api-sports.key");
+function readKey(envName, fileName) {
+  if (env[envName]) return env[envName].trim();
+  const file = env[`${envName}_FILE`] || join(homedir(), ".config/tvscores", fileName);
   try {
     return readFileSync(file, "utf8").trim();
   } catch {
@@ -18,7 +18,9 @@ export const config = {
   host: env.TVSCORES_HOST || "127.0.0.1",
   port: Number(env.TVSCORES_PORT || 8787),
   cacheDir: env.TVSCORES_CACHE_DIR || join(homedir(), ".local/state/tvscores"),
-  apiSportsKey: readKey(),
+  apiSportsKey: readKey("TVSCORES_APISPORTS_KEY", "api-sports.key"),
+  liveTennisKey: readKey("TVSCORES_LIVETENNIS_KEY", "livetennisapi.key"),
+  ocBlacktopKey: readKey("TVSCORES_OCBLACKTOP_KEY", "ocblacktop.key"),
   /** Optional URL prefix the reverse proxy leaves on the path (Tailscale serve --set-path). */
   pathPrefix: env.TVSCORES_PATH_PREFIX || "/tvscores",
   /** Which competitions to keep, per provider. */
@@ -27,9 +29,11 @@ export const config = {
     nfl: [{ id: 1, name: "NFL", short: "NFL" }],
     nba: [{ id: "standard", name: "NBA", short: "NBA" }],
     f1: [{ id: "f1", name: "Formula 1", short: "F1" }],
+    motogp: [{ id: "motogp", name: "MotoGP", short: "MotoGP" }],
+    tennis: [{ id: "atp", name: "ATP Tour", short: "ATP" }, { id: "wta", name: "WTA Tour", short: "WTA" }],
   },
   /** Display order of sports on the scoreboard. */
-  sportOrder: ["football", "f1", "nba", "nfl"],
+  sportOrder: ["football", "f1", "motogp", "tennis", "nba", "nfl"],
   schedule: {
     /** Free plan: dates yesterday..tomorrow only, 100 calls/day per sport. */
     dayOffsets: [-1, 0, 1],
@@ -41,5 +45,7 @@ export const config = {
     dailyQuota: 100,
     /** A game counts as "maybe live" from 10 min before kickoff until this long after. */
     liveWindowHours: 4,
+    /** Orange Cat Blacktop free tier is 7,500/month; keep a day well under that. */
+    ocbDailyQuota: 200,
   },
 };
