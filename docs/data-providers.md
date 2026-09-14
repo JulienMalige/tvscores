@@ -45,12 +45,26 @@ session results and standings, with the "Race · Final" row shape.
 
 ## Tennis (checked 2026-09-14)
 
-No free source for match scores. TheSportsDB's ATP feed had no upcoming
-matches and its last recorded match was 23 August (demo key). balldontlie's
-free tier covers players, tournaments and rankings only. Matches with live
-status (`status_state`: scheduled / in_progress / final) and set scores need
-**balldontlie ALL-STAR, $9.99/mo per tour (ATP, WTA), 60 req/min**.
-Decision pending Julien; adapter to be written once a key exists.
+Correction 2026-09-14 (second look): there ARE cheap sources for live tennis.
+
+| Source | Free | Live | Schedule / results | Licensing statement |
+|---|---|---|---|---|
+| livetennisapi.com | 100 req/day, 30/min, no card | yes, `GET /matches?status=live` + `/matches/{id}/score` | history and other statuses on Basic $9.99/mo (1k/day) | "arbitrated multi-source feed", nothing explicit |
+| live-tennis-api.com | 100 credits at signup | yes, set-by-set | yes | none stated; $0.001 per call after the free credits |
+| balldontlie ATP / WTA | players, tournaments, rankings only | ALL-STAR $9.99/mo per tour, 60/min | yes | clearest of the three |
+| api-tennis.com | none, 14-day trial | yes | yes | from $40/mo |
+| TheSportsDB | demo key | no | thin: no upcoming ATP matches, last result 23 Aug | $9–20/mo |
+
+Cheapest path to a live tennis row: livetennisapi.com free tier polled only
+while matches are live (100/day fits ~3 h of 2-min polling). Upcoming matches
+need a paid tier or balldontlie. Licensing of the two cheap feeds is unstated,
+so treat them like API-Sports: usable, rights on the data are ours to carry.
+
+## Rugby (checked 2026-09-14)
+
+API-Sports **Rugby** is on Julien's free plan (`v1.rugby.api-sports.io/games?date=`),
+same ±1 day window and 100 calls/day. Leagues: Top 14, Premiership, URC,
+Six Nations, Rugby Championship, World Cup. Adapter = copy of the NFL one.
 
 ## RapidAPI
 
