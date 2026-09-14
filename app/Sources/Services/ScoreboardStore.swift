@@ -37,6 +37,8 @@ final class ScoreboardStore {
             let fresh = try await load()
             if fresh != board { board = fresh } // avoid re-rendering an unchanged board
             error = nil
+            let urls = fresh.imageURLs
+            Task.detached(priority: .utility) { await ImagePrefetcher.shared.prefetch(urls) }
         } catch {
             self.error = error.localizedDescription
         }
