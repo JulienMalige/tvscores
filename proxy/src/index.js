@@ -35,7 +35,7 @@ if (config.ocBlacktopKey) {
   }
 } else {
   log("no Orange Cat Blacktop key: Formula 1 via Jolpica, no MotoGP");
-  schedulers.push(new CalendarScheduler({ provider: f1Provider(config.leagues.f1[0], log), store, log }));
+  schedulers.push(new CalendarScheduler({ provider: f1Provider(config.leagues.f1[0], log, store.sportMeta("f1")), store, log }));
 }
 {
   const meta = store.sportMeta("tennis");
@@ -44,7 +44,9 @@ if (config.ocBlacktopKey) {
 }
 
 const photos = new PhotoResolver({ store, key: config.theSportsDbKey, log });
-const app = createApp({ store, config, photos, activeSports: schedulers.map((s) => s.p.sport) });
+const limits = Object.fromEntries(schedulers.filter((s) => s.quota).map((s) => [s.p.sport, s.quota.dailyQuota]));
+limits.photos = 1000; // TheSportsDB test key: ~30/min; a soft daily line for the health page
+const app = createApp({ store, config, photos, activeSports: schedulers.map((s) => s.p.sport), limits });
 app.listen(config.port, config.host, () => {
   log(`tvscores proxy listening on http://${config.host}:${config.port} (prefix ${config.pathPrefix || "none"})`);
   for (const s of schedulers) s.start();

@@ -35,7 +35,7 @@ export function normaliseMatch(m) {
   else if (m.status === "live") state = STATE.live;
   else if (m.status === "completed") state = STATE.final;
   const interrupted = m.event_status === "Interrupted";
-  const detail = state === STATE.final ? setsLine(m.score) : [m.round, interrupted ? "Interrupted" : null].filter(Boolean).join(" · ") || undefined;
+  const detail = state === STATE.final ? setsLine(m.score) : m.round || undefined;
   return {
     id: `tennis:${m.id}`,
     sport: "tennis",
@@ -44,7 +44,7 @@ export function normaliseMatch(m) {
     start: new Date(m.scheduled_time || m.live_at || Date.now()).toISOString(),
     round: m.round,
     tournament: m.tournament,
-    status: { state, clock: state === STATE.live && !interrupted ? liveClock(m.score) : undefined, detail },
+    status: { state, clock: state === STATE.live && !interrupted ? liveClock(m.score) : undefined, detail, note: interrupted ? "Interrupted" : undefined },
     home: player(m.players?.p1),
     away: player(m.players?.p2),
     score: { home: m.score?.sets?.[0] ?? null, away: m.score?.sets?.[1] ?? null },

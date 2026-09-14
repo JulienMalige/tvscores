@@ -30,7 +30,8 @@ test("upcoming and interrupted states", () => {
   assert.equal(up.score.home, null);
   const paused = normaliseMatch({ ...raw, event_status: "Interrupted" });
   assert.equal(paused.status.clock, undefined);
-  assert.match(paused.status.detail, /Interrupted$/);
+  assert.equal(paused.status.detail, raw.round);
+  assert.equal(paused.status.note, "Interrupted");
 });
 
 test("helpers", () => {

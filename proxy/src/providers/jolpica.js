@@ -48,14 +48,17 @@ export async function f1Nationalities(year = new Date().getUTCFullYear()) {
   return map;
 }
 
-export function f1Provider(league, log = () => {}) {
+export function f1Provider(league, log = () => {}, meta) {
+  const count = () => { if (!meta) return; const day = new Date().toISOString().slice(0, 10); if (meta.calls.day !== day) meta.calls = { day, used: 0 }; meta.calls.used += 1; };
   return {
     sport: "f1",
     /** Whole season calendar plus the latest classified race, 2 cheap calls. */
     async season({ year = new Date().getUTCFullYear() } = {}) {
       const { body: sched } = await getJson(`${BASE}/${year}.json?limit=40`);
+      count();
       const races = sched.MRData.RaceTable.Races;
       const { body: last } = await getJson(`${BASE}/${year}/last/results.json`);
+      count();
       const lastRace = last.MRData.RaceTable.Races[0];
       log(`Jolpica: ${races.length} races, last classified round ${lastRace?.round ?? "none"}`);
       return races.map((r) => normaliseRace(r, league, lastRace && lastRace.round === r.round ? lastRace.Results : undefined));

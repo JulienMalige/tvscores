@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { withPhotos, withTablePhotos } from "../src/scoreboard.js";
-import { pickPlayer, normalise } from "../src/photos.js";
+import { pickPlayer, normalise, photoKey } from "../src/photos.js";
 
 const photoFor = (n) => ({ "Kimi Antonelli": "https://x/ant.png", "Jannik Sinner": "https://x/sin.png" }[n]);
 
@@ -28,9 +28,10 @@ test("photo pick needs an exact, accent-insensitive name and the right sport", (
     { strPlayer: "Marc Marquez Jr", strSport: "Motorsport", strCutout: "https://x/junior.png" },
     { strPlayer: "Marc Marquez", strSport: "Soccer", strCutout: "https://x/soccer.png" },
   ];
-  assert.equal(pickPlayer(players, "Marc Marquez", "motogp").strCutout, "https://x/mm.png");
+  assert.equal(pickPlayer(players, "Marc Marquez", "motogp"), null, "Márquez and Marquez Jr are two exact hits: ambiguous");
+  assert.equal(pickPlayer([players[0], players[2]], "Marc Marquez", "motogp").strCutout, "https://x/mm.png");
   assert.equal(pickPlayer(players, "Marc Marquez", "tennis"), null);
-  assert.equal(pickPlayer([players[1]], "Marc Marquez", "motogp").strCutout, "https://x/junior.png", "single superset candidate is accepted");
+  assert.equal(pickPlayer([players[1]], "Marc Marquez", "motogp").strCutout, "https://x/junior.png", "a lone Jr is the same name");
   assert.equal(pickPlayer(players.slice(0, 2), "Marquez", "motogp"), null, "ambiguous superset is rejected");
   const kimi = [{ strPlayer: "Andrea Kimi Antonelli", strSport: "Motorsport", strCutout: "https://x/kimi.png" }, { strPlayer: "Marco Antonelli", strSport: "Motorsport", strCutout: "https://x/other.png" }];
   assert.equal(pickPlayer(kimi, "Kimi Antonelli", "f1").strCutout, "https://x/kimi.png");
@@ -46,4 +47,17 @@ test("namesakes in the same sport are refused; odd letters normalise", () => {
   assert.equal(pickPlayer(two, "Carlos Sainz", "f1"), null);
   assert.equal(normalise("Novak Đoković"), "novak djokovic");
   assert.equal(normalise("Łukasz Kubot"), "lukasz kubot");
+});
+
+test("photoKey: people by full name, never teams or abbreviations", () => {
+  assert.equal(photoKey({ fullName: "Kimi Antonelli", name: "K. Antonelli" }), "Kimi Antonelli");
+  assert.equal(photoKey({ name: "K. Antonelli" }), undefined);
+  assert.equal(photoKey({ name: "Jannik Sinner" }), "Jannik Sinner");
+  assert.equal(photoKey({ name: "Mercedes", kind: "team" }), undefined);
+});
+
+test("symmetric related match with the same surname", () => {
+  const tsdb = [{ strPlayer: "Kimi Antonelli", strSport: "Motorsport", strCutout: "https://x/k.png" }];
+  assert.equal(pickPlayer(tsdb, "Andrea Kimi Antonelli", "f1").strCutout, "https://x/k.png");
+  assert.equal(pickPlayer(tsdb, "Andrea Kimi Rossi", "f1"), null);
 });

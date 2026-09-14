@@ -1,4 +1,5 @@
 import { STATE } from "./model.js";
+import { photoKey } from "./photos.js";
 
 /** Local calendar date (YYYY-MM-DD) of an instant in a time zone. */
 export function localDate(iso, tz) {
@@ -34,14 +35,15 @@ function groupByLeague(events, sportOrder, leagues = {}, publicBase = "", standi
 export function withPhotos(e, photoFor) {
   if (!photoFor) return e;
   const out = { ...e };
-  if (e.results) out.results = e.results.map((r) => ({ ...r, photo: r.fullName ? photoFor(r.fullName) : undefined }));
-  if (e.sport === "tennis") for (const side of ["home", "away"]) if (e[side]) out[side] = { ...e[side], photo: photoFor(e[side].name) };
+  const photo = (row) => { const k = photoKey(row); return k ? photoFor(k) : undefined; };
+  if (e.results) out.results = e.results.map((r) => ({ ...r, photo: photo(r) }));
+  if (e.sport === "tennis") for (const side of ["home", "away"]) if (e[side]) out[side] = { ...e[side], photo: photo(e[side]) };
   return out;
 }
 
 export function withTablePhotos(standings, photoFor) {
   if (!photoFor || !standings) return standings;
-  return { ...standings, tables: standings.tables.map((t) => ({ ...t, rows: t.rows.map((r) => ({ ...r, photo: r.kind === "team" ? undefined : photoFor(r.fullName || r.name) })) })) };
+  return { ...standings, tables: standings.tables.map((t) => ({ ...t, rows: t.rows.map((r) => { const k = photoKey(r); return { ...r, photo: k ? photoFor(k) : undefined }; }) })) };
 }
 
 export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, activeSports = [] } = {}) {

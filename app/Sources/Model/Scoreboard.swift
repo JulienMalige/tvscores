@@ -1,14 +1,14 @@
 import Foundation
 
 /// Mirrors the proxy's `/v1/scoreboard` JSON. See proxy/src/model.js.
-struct Scoreboard: Decodable {
+struct Scoreboard: Decodable, Equatable {
     let generatedAt: Date
     let tz: String
     let stale: [String: Bool]
     let live: Int
     let days: Days
 
-    struct Days: Decodable {
+    struct Days: Decodable, Equatable {
         let yesterday: [LeagueGroup]
         let today: [LeagueGroup]
         let upcoming: [LeagueGroup]
@@ -30,14 +30,14 @@ enum Day: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-struct LeagueGroup: Decodable, Identifiable {
+struct LeagueGroup: Decodable, Identifiable, Equatable {
     let sport: String
     let league: League
     let events: [Event]
     var id: String { "\(sport):\(league.id.raw)" }
 }
 
-struct League: Decodable {
+struct League: Decodable, Equatable {
     let id: FlexibleID
     let name: String
     let short: String
@@ -105,7 +105,7 @@ struct FlexibleID: Decodable, Hashable {
     }
 }
 
-struct Event: Decodable, Identifiable {
+struct Event: Decodable, Identifiable, Equatable {
     let id: String
     let sport: String
     let kind: Kind
@@ -122,15 +122,17 @@ struct Event: Decodable, Identifiable {
     let country: String?
     let results: [RaceResult]?
 
-    enum Kind: String, Decodable { case match, race }
+    enum Kind: String, Decodable, Equatable { case match, race }
 }
 
-struct Status: Decodable {
+struct Status: Decodable, Equatable {
     let state: State
     let clock: String?
     let detail: String?
+    /// Short English token from the proxy (e.g. "Interrupted"), localised by the app.
+    let note: String?
 
-    enum State: String, Decodable {
+    enum State: String, Decodable, Equatable {
         case scheduled, live, final, other
         init(from decoder: Decoder) throws {
             let raw = try decoder.singleValueContainer().decode(String.self)
@@ -139,7 +141,7 @@ struct Status: Decodable {
     }
 }
 
-struct TeamRef: Decodable {
+struct TeamRef: Decodable, Equatable {
     let name: String
     let short: String
     let nick: String?
@@ -150,12 +152,12 @@ struct TeamRef: Decodable {
     var label: String { nick ?? name }
 }
 
-struct Score: Decodable {
+struct Score: Decodable, Equatable {
     let home: Int?
     let away: Int?
 }
 
-struct RaceResult: Decodable, Identifiable {
+struct RaceResult: Decodable, Identifiable, Equatable {
     let pos: Int
     let driver: String
     let code: String?

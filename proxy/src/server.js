@@ -17,8 +17,11 @@ function send(res, status, body, extra = {}) {
   res.end(json);
 }
 
-export function createApp({ store, config, startedAt = Date.now(), photos, activeSports = [] }) {
+/** @param limits per-source daily caps ({ football: 100, f1: 200, photos: 1000, ... }), supplied by index.js from the actual quotas. */
+export function createApp({ store, config, startedAt = Date.now(), photos, activeSports = [], limits = {} }) {
   const photoFor = photos ? (name) => photos.photoFor(name) : undefined;
+  const memo = new Map(); // tz -> { at, body }: the board changes at most every poll, not per request
+  const MEMO_MS = 15000;
   return createServer((req, res) => {
     const url = new URL(req.url, "http://localhost");
     let path = url.pathname;
@@ -31,7 +34,11 @@ export function createApp({ store, config, startedAt = Date.now(), photos, activ
     }
 
     if (path === "/v1/scoreboard") {
-      return send(res, 200, buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, activeSports }));
+      const hit = memo.get(tz);
+      if (hit && Date.now() - hit.at < MEMO_MS) return send(res, 200, hit.body);
+      const body = buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, activeSports });
+      memo.set(tz, { at: Date.now(), body });
+      return send(res, 200, body);
     }
     if (path === "/v1/fixtures") {
       const date = url.searchParams.get("date");
@@ -65,10 +72,10 @@ export function createApp({ store, config, startedAt = Date.now(), photos, activ
         events: store.events.size,
         photos: { cached: Object.keys(store.photos || {}).length, pending: photos ? photos.pending().length : undefined },
         quota: Object.fromEntries(Object.entries(store.meta).map(([sport, m]) => {
-          const limit = ["f1", "motogp"].includes(sport) ? config.schedule.ocbDailyQuota : config.schedule.dailyQuota;
+          const limit = limits[sport] ?? null; // null = no daily cap known (e.g. Jolpica)
           return [sport, {
             day: m.calls?.day, used: m.calls?.used ?? 0, limit,
-            remaining: Math.max(0, limit - (m.calls?.used ?? 0)),
+            remaining: limit == null ? null : Math.max(0, limit - (m.calls?.used ?? 0)),
             lastOk: m.lastOk, lastError: m.lastError,
           }];
         })),

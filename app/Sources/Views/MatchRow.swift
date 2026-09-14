@@ -129,10 +129,10 @@ struct StatusView: View {
                     .font(.title2.weight(.semibold))
                 if let d = status.detail { detailText(d) }
             case .live:
-                Text(status.clock ?? localizedDetail(status.detail) ?? String(localized: "status.live"))
+                Text(status.clock ?? localizedDetail(status.note) ?? localizedDetail(status.detail) ?? String(localized: "status.live"))
                     .font(.title2.weight(.semibold))
-                    .foregroundStyle(.green)
-                if status.clock != nil, let d = status.detail { detailText(d) }
+                    .foregroundStyle(status.note == nil ? .green : .orange)
+                if status.clock != nil || status.note != nil, let d = status.detail { detailText(d) }
             case .final:
                 Text("status.final")
                     .font(.title2.weight(.semibold))
@@ -159,6 +159,7 @@ struct StatusView: View {
             "After extra time": "status.aet", "After penalties": "status.apen", "After overtime": "status.aot",
             "Postponed": "status.postponed", "Cancelled": "status.cancelled", "Suspended": "status.suspended",
             "Interrupted": "status.interrupted", "Abandoned": "status.abandoned", "Time TBD": "status.tbd", "Race": "status.race",
+            "Break": "status.break", "Awarded": "status.awarded", "Walkover": "status.walkover", "Cancelled": "status.cancelled",
         ]
         guard let key = keys[d] else { return d }
         return String(localized: String.LocalizationValue(key))

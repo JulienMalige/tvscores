@@ -3,13 +3,12 @@ import { STATE } from "./model.js";
 
 const MIN = 60e3;
 const STANDINGS_EVERY = 6 * 3600e3;
-const STANDINGS_VERSION = 3; // bump when row shape changes (e.g. fullName added) to force a refetch
 
 /** Shared: refresh a provider's standings every 6 h when it offers them. */
 async function refreshStandings(self, now) {
   if (!self.p.standings) return;
   const last = self.meta.lastStandings ? Date.parse(self.meta.lastStandings) : 0;
-  if (now - last < STANDINGS_EVERY && self.meta.standingsVersion === STANDINGS_VERSION) return;
+  if (now - last < STANDINGS_EVERY) return;
   if (self.quota && self.quota.spendable(now) < 2) return;
   const data = await self.p.standings();
   const nonEmpty = (d) => d && d.tables && d.tables.some((t) => t.rows && t.rows.length);
@@ -20,7 +19,7 @@ async function refreshStandings(self, now) {
     for (const [leagueId, d] of Object.entries(data || {})) if (nonEmpty(d)) self.store.setStandings(self.p.sport, leagueId, d);
   }
   self.meta.lastStandings = new Date(now).toISOString();
-  self.meta.standingsVersion = STANDINGS_VERSION;
+  self.store.touch();
 }
 
 function dateOffset(offset, now = Date.now()) {
@@ -118,6 +117,7 @@ export class TeamSportScheduler {
       this.log(`${this.p.sport}: ${err.message}`);
     }
     this.store.prune(now);
+    this.store.touch(); // meta (quota counters, timestamps) changed
     this.store.save();
     const next = this.hasLiveWindow(now) ? this.quota.liveInterval(this.cfg.liveIntervalSeconds, now) * 1000 : 5 * MIN;
     this.timer = setTimeout(() => this.tick(), next);
@@ -155,8 +155,9 @@ export class CalendarScheduler {
       this.meta.lastError = undefined;
     } catch (err) {
       this.meta.lastError = { at: new Date(now).toISOString(), message: String(err.message || err) };
-      this.log(`f1: ${err.message}`);
+      this.log(`${this.p.sport}: ${err.message}`);
     }
+    this.store.touch();
     this.store.save();
     this.timer = setTimeout(() => this.tick(), 30 * MIN);
     this.timer.unref?.();

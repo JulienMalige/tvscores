@@ -34,21 +34,22 @@ final class ScoreboardStore {
         loading = true
         defer { loading = false }
         do {
-            board = try await load()
+            let fresh = try await load()
+            if fresh != board { board = fresh } // avoid re-rendering an unchanged board
             error = nil
         } catch {
             self.error = error.localizedDescription
         }
     }
 
-    /// Poll every 30 s while something is live, every 2 min otherwise. Idempotent.
+    /// The proxy polls live feeds every 150 s at most, so 60 s while live / 3 min idle is plenty. Idempotent.
     func startAutoRefresh() {
         guard task == nil else { return }
         task = Task { [weak self] in
             while !Task.isCancelled {
                 await self?.refresh()
                 let live = (self?.board?.live ?? 0) > 0
-                try? await Task.sleep(for: .seconds(live ? 30 : 120))
+                try? await Task.sleep(for: .seconds(live ? 60 : 180))
             }
         }
     }
