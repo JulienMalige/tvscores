@@ -6,7 +6,7 @@ struct LeagueSection: View {
     var showHeader = true
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 18) {
             if linkToLeague {
                 NavigationLink(value: LeagueRef(group: group)) {
                     LeagueHeader(group: group, chevron: true)
@@ -15,7 +15,7 @@ struct LeagueSection: View {
             } else if showHeader {
                 LeagueHeader(group: group, chevron: false)
             }
-            VStack(spacing: 4) {
+            VStack(spacing: 10) {
                 ForEach(group.events) { event in
                     switch event.kind {
                     case .match: MatchRow(event: event)

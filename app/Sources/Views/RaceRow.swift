@@ -47,8 +47,8 @@ private struct RaceContent: View {
                 }
             }
         }
-        .padding(.vertical, 16)
-        .padding(.horizontal, 24)
+        .padding(.vertical, 22)
+        .padding(.horizontal, 28)
         .background(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(isFocused ? Color.white.opacity(0.14) : Color.white.opacity(0.04))

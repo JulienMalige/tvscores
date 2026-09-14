@@ -31,8 +31,8 @@ private struct RowContent: View {
             side(event.away, leading: false)
                 .frame(width: 360, alignment: .trailing)
         }
-        .padding(.vertical, 14)
-        .padding(.horizontal, 24)
+        .padding(.vertical, 20)
+        .padding(.horizontal, 28)
         .background(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(isFocused ? Color.white.opacity(0.14) : Color.white.opacity(0.04))

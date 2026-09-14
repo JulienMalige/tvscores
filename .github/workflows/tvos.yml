@@ -86,7 +86,13 @@ jobs:
           rm -f ~/Library/Logs/DiagnosticReports/TVScores*.ips
           SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -AppleLanguages "(en)"
           sleep 20
-          xcrun simctl io "$UDID" screenshot shots/live-en.png
+          xcrun simctl io "$UDID" screenshot shots/live-today-en.png
+          # Yesterday carries the NFL section, which is where the league badge
+          # and the densest list are; check both against the real feed.
+          xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+          SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresTab yesterday -AppleLanguages "(en)"
+          sleep 20
+          xcrun simctl io "$UDID" screenshot shots/live-yesterday-en.png
           if xcrun simctl spawn "$UDID" launchctl list 2>/dev/null | grep -q com.julienmalige.tvscores; then
             echo "live run: still running"
           else

@@ -8,18 +8,12 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            VStack(alignment: .leading, spacing: 28) {
-                header
-                DayTabs(selected: $day)
-                content
-            }
-            .padding(.horizontal, 80)
-            .padding(.top, 60)
-            .padding(.bottom, 40)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .navigationDestination(for: LeagueRef.self) { ref in
-                LeagueView(ref: ref, store: store, day: day)
-            }
+            content
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .safeAreaInset(edge: .top, spacing: 0) { headerBar }
+                .navigationDestination(for: LeagueRef.self) { ref in
+                    LeagueView(ref: ref, store: store, day: day)
+                }
         }
         .task { store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
@@ -40,10 +34,24 @@ struct HomeView: View {
         return nil
     }
 
+    /// Title and tabs live in the top safe area, so the list scrolls underneath
+    /// them instead of over them and the focus engine keeps rows clear of it.
+    private var headerBar: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            header
+            DayTabs(selected: $day)
+        }
+        .padding(.horizontal, 80)
+        .padding(.top, 44)
+        .padding(.bottom, 24)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.regularMaterial)
+    }
+
     private var header: some View {
         HStack(alignment: .firstTextBaseline) {
             Text("app.title")
-                .font(.system(size: 56, weight: .bold))
+                .font(.system(size: 46, weight: .bold))
             Spacer()
             if let board = store.board, board.isStale {
                 Label("home.stale", systemImage: "exclamationmark.triangle")
@@ -64,14 +72,15 @@ struct HomeView: View {
                 EmptyDay()
             } else {
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 36) {
+                    LazyVStack(alignment: .leading, spacing: 48) {
                         ForEach(groups) { group in
                             LeagueSection(group: group, linkToLeague: true)
                         }
                     }
-                    .padding(.bottom, 60)
+                    .padding(.horizontal, 80)
+                    .padding(.top, 28)
+                    .padding(.bottom, 80)
                 }
-                .scrollClipDisabled()
             }
         } else if let error = store.error {
             VStack(spacing: 12) {
