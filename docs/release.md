@@ -1,9 +1,14 @@
 # Release and TestFlight
 
 No Mac is involved. A GitHub Actions macOS runner archives the app and hands
-it to App Store Connect; signing certificates and profiles are created in the
-cloud by `xcodebuild -allowProvisioningUpdates` using an App Store Connect API
-key.
+it to App Store Connect.
+
+Signing is **manual**. Xcode's cloud signing (`-allowProvisioningUpdates`) was
+tried first and Apple refused it with "Cloud signing permission error": that
+path needs an API key with the Admin role, and ours is App Manager. The same
+App Manager key can create the signing assets through the API directly, so the
+distribution certificate and the App Store profile were minted once and stored
+as repository secrets.
 
 ## Apple side (already done)
 
@@ -15,6 +20,8 @@ key.
 | API key | `72PN8L6U72`, role App Manager |
 | Issuer ID | `69a6de7c-7178-47e3-e053-5b8c7c11a4d1` |
 | Internal TestFlight group | `Internal`, account holder added as tester |
+| Distribution certificate | `TLAS59R725`, expires 2027-09-14 |
+| Provisioning profile | `TV Scores tvOS App Store`, expires 2027-09-14 |
 
 The `.p8` private key lives only in `~/.config/tvscores/` on the VPS (mode 600)
 and in GitHub Actions secrets. It is never committed; `.gitignore` blocks
@@ -22,7 +29,27 @@ and in GitHub Actions secrets. It is never committed; `.gitignore` blocks
 
 ## GitHub secrets
 
-`ASC_KEY_P8`, `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_TEAM_ID`.
+`ASC_KEY_P8`, `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_TEAM_ID` authenticate the
+upload. `DIST_P12_BASE64`, `DIST_P12_PASSWORD`, `DIST_PROFILE_BASE64` carry the
+signing assets; the workflow imports them into a throwaway keychain that it
+deletes afterwards. Copies live on the VPS in `~/.config/tvscores/` as
+`dist.p12`, `dist.p12.password`, `dist.key` and `dist.mobileprovision`.
+
+## Renewing the certificate or the profile
+
+Both expire on 2027-09-14. To mint new ones, without a Mac:
+
+```sh
+openssl req -new -newkey rsa:2048 -nodes -keyout dist.key -out dist.csr \
+  -subj "/CN=TV Scores Distribution/C=BR"
+node scripts/asc.mjs get /v1/certificates      # see what exists first
+```
+
+Then POST the CSR to `/v1/certificates` with `certificateType: DISTRIBUTION`,
+POST a `/v1/profiles` of type `TVOS_APP_STORE` bound to the bundle id and that
+certificate, convert the returned certificate to a `.p12` with the private key,
+and replace the three `DIST_*` secrets. A team may hold only a few distribution
+certificates at once, so revoke the old one when it is no longer referenced.
 
 ## Shipping a build
 
