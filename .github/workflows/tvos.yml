@@ -67,7 +67,8 @@ jobs:
           xcrun simctl install "$UDID" "$APP"
           shot() { # $1 lang, $2 tab
             xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
-            xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab "$2" -AppleLanguages "($1)" -AppleLocale "$1"
+            # Demo sample is bucketed in São Paulo time (see app/README note); run the simulator in the same zone.
+            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab "$2" -AppleLanguages "($1)" -AppleLocale "$1"
             sleep 6
             xcrun simctl io "$UDID" screenshot "shots/$2-$1.png"
           }
