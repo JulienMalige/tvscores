@@ -97,6 +97,20 @@ proxy serves at `/v1/assets/leagues/<id>.png` (so nothing is hotlinked and
 the app gets a stable URL). Trademark caveat as for crests: the marks belong
 to the leagues.
 
+## Player and driver photos (checked 2026-09-14)
+
+| Source | Coverage | Shape | Terms |
+|---|---|---|---|
+| TheSportsDB `searchplayers.php?p=<name>` | tennis, F1, MotoGP, and team sports; hits for Sinner, Sabalenka, Cobolli, Antonelli, Márquez | `strCutout` = transparent PNG, head-and-shoulders, ideal for the round avatar; `strThumb` = action photo | crowd-uploaded photographs, rights unstated; $9–20 tier for production; lookup by name, so cache the URL per player |
+| API-Sports F1 `/drivers?search=` (free plan allows it) | F1 drivers only | 150×150 PNG headshot | same responsibility clause as the rest of API-Sports |
+| Live Tennis API, Orange Cat | no images | – | – |
+| Wikimedia Commons via the Wikipedia API (`pageimages`) | most well-known athletes | photo with a CC licence | attribution required in the app |
+
+Recommendation if Julien wants faces: TheSportsDB cutouts, resolved once per
+player by the proxy and cached with the standings/podium rows (name → URL),
+monogram fallback. Photos carry photographer copyright and personality
+rights, a step riskier than logos; Apple licenses theirs.
+
 ## RapidAPI
 
 RapidAPI is a marketplace, not a data source. Two kinds of listings:
