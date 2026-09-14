@@ -3,7 +3,7 @@ import { STATE } from "./model.js";
 
 const MIN = 60e3;
 const STANDINGS_EVERY = 6 * 3600e3;
-const STANDINGS_VERSION = 2; // bump when row shape changes (e.g. fullName added) to force a refetch
+const STANDINGS_VERSION = 3; // bump when row shape changes (e.g. fullName added) to force a refetch
 
 /** Shared: refresh a provider's standings every 6 h when it offers them. */
 async function refreshStandings(self, now) {
