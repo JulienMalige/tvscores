@@ -20,9 +20,18 @@ struct HomeView: View {
         .onDisappear { store.stopAutoRefresh() }
         .onChange(of: store.board == nil) { _, isNil in
             // `-TVScoresLeague f1` opens that league page once data exists (CI screenshots).
-            guard !isNil, !openedInitialLeague, let wanted = Self.initialLeague(), let board = store.board else { return }
+            guard !isNil, !openedInitialLeague, let board = store.board else { return }
             let all = Day.allCases.flatMap { board.groups(for: $0) }
-            if let g = all.first(where: { $0.sport == wanted }) {
+            if let wanted = Self.initialRace() {
+                let race = all.filter { $0.sport == wanted }
+                    .flatMap(\.events)
+                    .first { !($0.results ?? []).isEmpty }
+                guard let race else { return }
+                var next = NavigationPath()
+                next.append(race)
+                path = next
+                openedInitialLeague = true
+            } else if let wanted = Self.initialLeague(), let g = all.first(where: { $0.sport == wanted }) {
                 var next = NavigationPath()
                 next.append(LeagueRef(group: g))
                 path = next
@@ -31,9 +40,14 @@ struct HomeView: View {
         }
     }
 
-    private static func initialLeague() -> String? {
+    private static func initialLeague() -> String? { argument("-TVScoresLeague") }
+
+    /// `-TVScoresRace f1` opens that series' latest classified race (CI screenshots).
+    private static func initialRace() -> String? { argument("-TVScoresRace") }
+
+    private static func argument(_ name: String) -> String? {
         let args = ProcessInfo.processInfo.arguments
-        if let i = args.firstIndex(of: "-TVScoresLeague"), i + 1 < args.count { return args[i + 1] }
+        if let i = args.firstIndex(of: name), i + 1 < args.count { return args[i + 1] }
         return nil
     }
 

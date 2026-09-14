@@ -72,11 +72,21 @@ jobs:
             sleep 7
             xcrun simctl io "$UDID" screenshot "shots/${3:+league-$3-}$2-$1.png"
           }
+          race() { # $1 lang, $2 series: opens that series' race result page
+            xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab yesterday -TVScoresRace "$2" -AppleLanguages "($1)" -AppleLocale "$1"
+            sleep 8
+            xcrun simctl io "$UDID" screenshot "shots/race-$2-$1.png"
+          }
           for lang in en fr pt es; do shot "$lang" today; done
           shot en yesterday
           shot en upcoming
           shot en today f1
           shot en upcoming tennis
+          shot en yesterday football
+          race en f1
+          race en motogp
+          race fr f1
           ls -la shots
 
           # The demo runs above never touch the network. Launch once against the
