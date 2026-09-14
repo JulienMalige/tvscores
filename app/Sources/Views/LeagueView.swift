@@ -132,7 +132,7 @@ private struct StandingsRowView: View {
                         Color.clear
                     }
                 }
-                .frame(width: 92, height: 56)
+                .frame(width: 56, height: 56)
             } else {
                 Avatar(photo: row.photo, flag: row.flag, color: Color(hex: row.color), monogram: row.code ?? Avatar.monogram(for: row.name), size: 56)
             }

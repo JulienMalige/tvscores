@@ -39,6 +39,14 @@ and committed. They change about once a season, the app cannot work without
 them, and both scripts use an explicit name mapping because searching
 "Mercedes" by name returns an Argentinian football club.
 
+Constructor badges are composed, not copied: the source ships sponsor lockups,
+so the script crops the marque out of each with a hand-written box, drops it on
+a disc of that team's own colour, and paints it as a silhouette when it would
+otherwise melt into its disc. Re-run it after a livery season and look at the
+result; a lockup that changed shape puts the crop in the wrong place. A team
+with no marque in its lockup is left out on purpose and keeps the monogram the
+app already draws.
+
 `~/.local/state/tvscores/` holds **cache**, never committed and safe to delete:
 `store.json` for events, standings and resolved portrait URLs, and `images/`
 for the mirror below. Losing it costs one refetch, nothing else.
