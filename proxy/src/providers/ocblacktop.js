@@ -1,5 +1,5 @@
 import { getJson } from "../http.js";
-import { STATE, flag } from "../model.js";
+import { STATE, flag, shortName } from "../model.js";
 
 const BASE = "https://api.ocblacktop.com/v1";
 const RACE_HOURS = 3;
@@ -106,7 +106,7 @@ export function motorsportProvider({ sport, league, key, quota, log = () => {}, 
           },
           {
             id: teamTable.id,
-            rows: rows(teams).map((t) => ({ pos: t.position, name: t.shortName || t.name, value: Math.round(Number(t.points)), color: t.color || undefined })),
+            rows: rows(teams).map((t) => ({ pos: t.position, name: t.shortName || t.name, code: shortName(t.shortName || t.name), value: Math.round(Number(t.points)), color: t.color || undefined, kind: "team" })),
           },
         ],
       };
@@ -128,6 +128,7 @@ export function motorsportProvider({ sport, league, key, quota, log = () => {}, 
           const rows = await get(`/events/${base._eventId}/sessions/${base._sessionId}/results`);
           resultCalls += 1;
           Object.assign(base, normaliseEvent(e, { sport, league, results: Array.isArray(rows) ? rows : rows.data, nationalities: nats }));
+          base.resultsFetchedAt = new Date().toISOString();
         }
         delete base._sessionId; delete base._eventId; delete base._completed;
         out.push(base);

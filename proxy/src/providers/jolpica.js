@@ -26,6 +26,7 @@ export function normaliseRace(r, league, results) {
       ? results.slice(0, 3).map((x) => ({
           pos: Number(x.position),
           driver: `${x.Driver.givenName[0]}. ${x.Driver.familyName}`,
+          fullName: `${x.Driver.givenName} ${x.Driver.familyName}`,
           code: x.Driver.code,
           nationality: x.Driver.nationality,
           flag: flag(x.Driver.nationality),

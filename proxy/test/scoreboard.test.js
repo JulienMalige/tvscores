@@ -42,3 +42,17 @@ test("localDate", () => {
   assert.equal(localDate("2026-09-13T23:30:00Z", "Europe/Paris"), "2026-09-14");
   assert.equal(localDate("2026-09-13T23:30:00Z", "America/New_York"), "2026-09-13");
 });
+
+test("upcoming keeps ten rounds per racing series, not ten overall", () => {
+  const race = (sport, i) => ({ id: `${sport}${i}`, sport, kind: "race", start: new Date(Date.UTC(2026, 9, 1 + i)).toISOString(), status: { state: "scheduled" }, league: { id: sport, name: sport, short: sport } });
+  const events = [...Array(12)].flatMap((_, i) => [race("f1", i), race("motogp", i)]);
+  const sb = buildScoreboard(events, { now: Date.UTC(2026, 8, 20), sportOrder: ["f1", "motogp"] });
+  const counts = Object.fromEntries(sb.days.upcoming.map((g) => [g.sport, g.events.length]));
+  assert.deepEqual(counts, { f1: 10, motogp: 10 });
+});
+
+test("stale only covers sports with a scheduler this run", () => {
+  const now = Date.UTC(2026, 8, 13, 12);
+  const meta = { f1: { lastOk: new Date(now).toISOString() }, motogp: { lastOk: new Date(now - 10 * 3600e3).toISOString() } };
+  assert.deepEqual(buildScoreboard([], { now, meta, activeSports: ["f1"] }).stale, { f1: false });
+});

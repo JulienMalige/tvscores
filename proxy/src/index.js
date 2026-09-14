@@ -44,7 +44,7 @@ if (config.ocBlacktopKey) {
 }
 
 const photos = new PhotoResolver({ store, key: config.theSportsDbKey, log });
-const app = createApp({ store, config, photos });
+const app = createApp({ store, config, photos, activeSports: schedulers.map((s) => s.p.sport) });
 app.listen(config.port, config.host, () => {
   log(`tvscores proxy listening on http://${config.host}:${config.port} (prefix ${config.pathPrefix || "none"})`);
   for (const s of schedulers) s.start();

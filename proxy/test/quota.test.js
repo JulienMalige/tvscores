@@ -26,3 +26,15 @@ test("live interval stretches to fit the day", () => {
   q.meta.calls.used = 100;
   assert.equal(q.liveInterval(150, noon), 12 * 3600);
 });
+
+test("a missing rate-limit header does not zero the budget", async () => {
+  const { getJson } = await import("../src/http.js");
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ response: [] }), { status: 200, headers: { "content-type": "application/json" } });
+  try {
+    const r = await getJson("https://example.test/x");
+    assert.equal(r.remaining, undefined);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});

@@ -51,10 +51,12 @@ export class Store {
     this.standings[`${sport}:${leagueId}`] = data;
   }
 
+  /** True when the podium is cached (or a fetch already came back empty): never refetch every tick. */
   hasResults(id) {
     const e = this.events.get(id);
-    // Podiums cached without full names (before photo support) are refetched once.
-    return Boolean(e && e.status.state === "final" && e.results && e.results.length && e.results.every((r) => r.fullName));
+    if (!e || e.status.state !== "final") return false;
+    if (e.resultsFetchedAt && !e.results?.length) return true; // empty classification, tried already
+    return Boolean(e.results && e.results.length && e.results.every((r) => r.fullName));
   }
 
   /** Drop events older than 3 days so the file does not grow forever. */

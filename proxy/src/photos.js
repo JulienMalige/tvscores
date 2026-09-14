@@ -7,8 +7,12 @@ const SPORT_HINT = { f1: "Motorsport", motogp: "Motorsport", tennis: "Tennis", f
 const CACHE_VERSION = 3; // bump when the matching rule changes so stale picks are re-resolved
 
 /** "Marc Márquez" -> "marc marquez" for exact, accent-insensitive comparison. */
+const LETTER_MAP = { ł: "l", Ł: "l", ø: "o", Ø: "o", đ: "dj", Đ: "dj", ß: "ss", æ: "ae", Æ: "ae", œ: "oe", Œ: "oe", ı: "i" }; // đ -> dj as in "Djokovic"
 export function normalise(name) {
-  return String(name || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z ]/g, " ").replace(/\s+/g, " ").trim();
+  return String(name || "")
+    .replace(/[łŁøØđĐßæÆœŒı]/g, (c) => LETTER_MAP[c])
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase().replace(/[^a-z ]/g, " ").replace(/\s+/g, " ").trim();
 }
 
 /**
@@ -21,8 +25,9 @@ export function pickPlayer(players, name, sport) {
   const words = want.split(" ");
   const hint = SPORT_HINT[sport];
   const pool = players.filter((p) => p.strCutout && (!hint || p.strSport === hint));
-  const exact = pool.find((p) => normalise(p.strPlayer) === want);
-  if (exact) return exact;
+  const exact = pool.filter((p) => normalise(p.strPlayer) === want);
+  if (exact.length === 1) return exact[0];
+  if (exact.length > 1) return null; // namesakes in the same sport: don't guess
   const superset = pool.filter((p) => {
     const theirs = normalise(p.strPlayer).split(" ");
     return words.every((w) => theirs.includes(w));
@@ -64,7 +69,7 @@ export class PhotoResolver {
     }
     for (const [key, s] of Object.entries(this.store.standings)) {
       const sport = key.split(":")[0];
-      for (const t of s.tables || []) for (const r of t.rows) if (r.fullName || r.name) wanted.set(r.fullName || r.name, sport);
+      for (const t of s.tables || []) for (const r of t.rows) if (r.kind !== "team" && (r.fullName || r.name)) wanted.set(r.fullName || r.name, sport);
     }
     return [...wanted].filter(([name]) => !this.cached(name));
   }

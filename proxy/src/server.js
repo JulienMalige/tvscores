@@ -17,7 +17,7 @@ function send(res, status, body, extra = {}) {
   res.end(json);
 }
 
-export function createApp({ store, config, startedAt = Date.now(), photos }) {
+export function createApp({ store, config, startedAt = Date.now(), photos, activeSports = [] }) {
   const photoFor = photos ? (name) => photos.photoFor(name) : undefined;
   return createServer((req, res) => {
     const url = new URL(req.url, "http://localhost");
@@ -31,7 +31,7 @@ export function createApp({ store, config, startedAt = Date.now(), photos }) {
     }
 
     if (path === "/v1/scoreboard") {
-      return send(res, 200, buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor }));
+      return send(res, 200, buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, activeSports }));
     }
     if (path === "/v1/fixtures") {
       const date = url.searchParams.get("date");

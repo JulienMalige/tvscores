@@ -37,3 +37,13 @@ test("photo pick needs an exact, accent-insensitive name and the right sport", (
   assert.equal(pickPlayer(kimi, "K. Antonelli", "f1"), null, "abbreviated names never match");
   assert.equal(normalise("Álex  Márquez"), "alex marquez");
 });
+
+test("namesakes in the same sport are refused; odd letters normalise", () => {
+  const two = [
+    { strPlayer: "Carlos Sainz", strSport: "Motorsport", strCutout: "https://x/dad.png" },
+    { strPlayer: "Carlos Sainz", strSport: "Motorsport", strCutout: "https://x/son.png" },
+  ];
+  assert.equal(pickPlayer(two, "Carlos Sainz", "f1"), null);
+  assert.equal(normalise("Novak Đoković"), "novak djokovic");
+  assert.equal(normalise("Łukasz Kubot"), "lukasz kubot");
+});

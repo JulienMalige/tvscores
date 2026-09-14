@@ -12,8 +12,13 @@ async function refreshStandings(self, now) {
   if (now - last < STANDINGS_EVERY && self.meta.standingsVersion === STANDINGS_VERSION) return;
   if (self.quota && self.quota.spendable(now) < 2) return;
   const data = await self.p.standings();
-  if (data && data.tables) self.store.setStandings(self.p.sport, self.p.sport, data);
-  else for (const [leagueId, d] of Object.entries(data || {})) self.store.setStandings(self.p.sport, leagueId, d);
+  const nonEmpty = (d) => d && d.tables && d.tables.some((t) => t.rows && t.rows.length);
+  if (data && data.tables) {
+    if (nonEmpty(data)) self.store.setStandings(self.p.sport, self.p.sport, data);
+    else return self.log(`${self.p.sport}: empty standings ignored, keeping the previous table`);
+  } else {
+    for (const [leagueId, d] of Object.entries(data || {})) if (nonEmpty(d)) self.store.setStandings(self.p.sport, leagueId, d);
+  }
   self.meta.lastStandings = new Date(now).toISOString();
   self.meta.standingsVersion = STANDINGS_VERSION;
 }
@@ -92,7 +97,9 @@ export class TeamSportScheduler {
     const orphan = orphans.length > 0 && !this.p.finalizeOrphans;
     const lastToday = this.meta.lastToday ? Date.parse(this.meta.lastToday) : 0;
     if (orphan && now - lastToday > 20 * MIN && this.quota.spendable(now) > 0) {
-      this.store.upsert(await this.p.byDate(dateOffset(0, now)));
+      // Refetch the orphan's own UTC date: a game that started before midnight is not in "today".
+      const date = new Date(orphans[0].start).toISOString().slice(0, 10);
+      this.store.upsert(await this.p.byDate(date));
       this.meta.lastToday = new Date(now).toISOString();
     }
     this.meta.lastLive = new Date(now).toISOString();

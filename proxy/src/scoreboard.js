@@ -41,10 +41,10 @@ export function withPhotos(e, photoFor) {
 
 export function withTablePhotos(standings, photoFor) {
   if (!photoFor || !standings) return standings;
-  return { ...standings, tables: standings.tables.map((t) => ({ ...t, rows: t.rows.map((r) => ({ ...r, photo: photoFor(r.fullName || r.name) })) })) };
+  return { ...standings, tables: standings.tables.map((t) => ({ ...t, rows: t.rows.map((r) => ({ ...r, photo: r.kind === "team" ? undefined : photoFor(r.fullName || r.name) })) })) };
 }
 
-export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor } = {}) {
+export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, activeSports = [] } = {}) {
   events = events.map((e) => withPhotos(e, photoFor));
   const today = localDate(new Date(now).toISOString(), tz);
   const yesterday = localDate(new Date(now - 86400e3).toISOString(), tz);
@@ -56,10 +56,20 @@ export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrd
     else if (d === yesterday) days.yesterday.push(e);
     else if (d > today) days.upcoming.push(e);
   }
-  // Upcoming keeps at most the next 10 F1 rounds and everything else; sorted later.
-  days.upcoming = days.upcoming.filter((e) => e.kind !== "race" || days.upcoming.filter((x) => x.kind === "race" && x.start <= e.start).length <= 10);
+  // Upcoming keeps at most the next 10 rounds per racing series; team sports are unlimited.
+  const seen = new Map();
+  days.upcoming = days.upcoming
+    .sort((a, b) => Date.parse(a.start) - Date.parse(b.start))
+    .filter((e) => {
+      if (e.kind !== "race") return true;
+      const n = (seen.get(e.sport) || 0) + 1;
+      seen.set(e.sport, n);
+      return n <= 10;
+    });
+  // Only sports that actually have a scheduler this run are judged stale.
+  const active = activeSports.length ? new Set(activeSports) : new Set(Object.keys(meta));
   const stale = Object.fromEntries(
-    Object.entries(meta).map(([sport, m]) => [sport, !m.lastOk || now - Date.parse(m.lastOk) > 6 * 3600e3]),
+    Object.entries(meta).filter(([sport]) => active.has(sport)).map(([sport, m]) => [sport, !m.lastOk || now - Date.parse(m.lastOk) > 6 * 3600e3]),
   );
   return {
     generatedAt: new Date(now).toISOString(),
