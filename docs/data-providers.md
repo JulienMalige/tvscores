@@ -85,6 +85,17 @@ API-Sports **Rugby** is on Julien's free plan (`v1.rugby.api-sports.io/games?dat
 same ±1 day window and 100 calls/day. Leagues: Top 14, Premiership, URC,
 Six Nations, Rugby Championship, World Cup. Adapter = copy of the NFL one.
 
+## Competition logos (2026-09-14)
+
+Julien asked for official league marks in the section headers. Sources:
+API-Sports league images exist for UCL/NBA but its NFL one is a placeholder
+and its UCL is navy (invisible on the TV background). **TheSportsDB league
+badges** (`lookupleague.php` → `strBadge`) cover all seven with light-on-dark
+variants, so the proxy config hotlinks those from `r2.thesportsdb.com`.
+TheSportsDB asks Patreon support for production use of its images; before
+release either take the $9 tier or copy the seven PNGs to the VPS. Trademark
+caveat as for crests: the marks belong to the leagues.
+
 ## RapidAPI
 
 RapidAPI is a marketplace, not a data source. Two kinds of listings:
