@@ -5,8 +5,7 @@ struct RaceRow: View {
     let event: Event
 
     var body: some View {
-        Button {
-        } label: {
+        NavigationLink(value: event) {
             RaceContent(event: event)
         }
         .buttonStyle(.plain)
@@ -30,11 +29,12 @@ private struct RaceContent: View {
                 Spacer()
                 StatusView(status: event.status, start: event.start)
             }
-            if let results = event.results, !results.isEmpty {
+            let podium = (event.results ?? []).filter(\.finished).prefix(3)
+            if !podium.isEmpty {
                 HStack(spacing: 24) {
-                    ForEach(results) { r in
+                    ForEach(podium) { r in
                         HStack(spacing: 14) {
-                            Text("\(r.pos)")
+                            Text("\(r.pos ?? 0)")
                                 .font(.system(size: 34, weight: .bold, design: .rounded))
                             Avatar(photo: r.photo, flag: r.flag, color: Color(hex: r.teamColor), monogram: r.code ?? Avatar.monogram(for: r.driver), size: 64)
                             VStack(alignment: .leading, spacing: 2) {

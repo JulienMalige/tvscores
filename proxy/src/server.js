@@ -6,6 +6,9 @@ import { fileURLToPath } from "node:url";
 const ASSETS = join(dirname(fileURLToPath(import.meta.url)), "..", "assets");
 import { buildScoreboard, localDate, withTablePhotos } from "./scoreboard.js";
 
+/** Crests and portraits change once in a blue moon; let the TV keep them. */
+const IMAGE_CACHE = "public, max-age=2592000, immutable";
+
 function send(res, status, body, extra = {}) {
   const json = JSON.stringify(body);
   res.writeHead(status, {
@@ -18,8 +21,9 @@ function send(res, status, body, extra = {}) {
 }
 
 /** @param limits per-source daily caps ({ football: 100, f1: 200, photos: 1000, ... }), supplied by index.js from the actual quotas. */
-export function createApp({ store, config, startedAt = Date.now(), photos, activeSports = [], limits = {} }) {
+export function createApp({ store, config, startedAt = Date.now(), photos, images, activeSports = [], limits = {} }) {
   const photoFor = photos ? (name) => photos.photoFor(name) : undefined;
+  const mirror = images ? (url) => images.url(url) : undefined;
   const memo = new Map(); // tz -> { at, body }: the board changes at most every poll, not per request
   const MEMO_MS = 15000;
   return createServer((req, res) => {
@@ -36,7 +40,7 @@ export function createApp({ store, config, startedAt = Date.now(), photos, activ
     if (path === "/v1/scoreboard") {
       const hit = memo.get(tz);
       if (hit && Date.now() - hit.at < MEMO_MS) return send(res, 200, hit.body);
-      const body = buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, activeSports });
+      const body = buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, mirror, activeSports, upcomingDays: config.schedule.upcomingDays });
       memo.set(tz, { at: Date.now(), body });
       return send(res, 200, body);
     }
@@ -47,12 +51,31 @@ export function createApp({ store, config, startedAt = Date.now(), photos, activ
       return send(res, 200, { date, tz, events });
     }
     if (path === "/v1/standings") {
-      return send(res, 200, { standings: Object.fromEntries(Object.entries(store.standings).map(([k, v]) => [k, withTablePhotos(v, photoFor)])) });
+      return send(res, 200, { standings: Object.fromEntries(Object.entries(store.standings).map(([k, v]) => [k, withTablePhotos(v, photoFor, mirror)])) });
     }
     const one = path.match(/^\/v1\/standings\/([a-z0-9-]+)\/([a-z0-9-]+)$/);
     if (one) {
       const data = store.standings[`${one[1]}:${one[2]}`];
-      return data ? send(res, 200, withTablePhotos(data, photoFor)) : send(res, 404, { error: "no standings for this league" });
+      return data ? send(res, 200, withTablePhotos(data, photoFor, mirror)) : send(res, 404, { error: "no standings for this league" });
+    }
+    const img = path.match(/^\/v1\/img\/([0-9a-f]{40})$/);
+    if (img && images) {
+      if (req.headers["if-none-match"] === `"${img[1]}"` && images.entries.has(img[1])) {
+        res.writeHead(304, { etag: `"${img[1]}"`, "cache-control": IMAGE_CACHE });
+        return res.end();
+      }
+      images.serve(img[1]).then((hit) => {
+        if (!hit) return send(res, 404, { error: "unknown image" });
+        // Cold and unreachable: hand the television the original address
+        // rather than a hole where a crest should be.
+        if (hit.redirect) {
+          res.writeHead(302, { location: hit.redirect, "cache-control": "public, max-age=60" });
+          return res.end();
+        }
+        res.writeHead(200, { "content-type": hit.type, "content-length": hit.body.length, "cache-control": IMAGE_CACHE, etag: `"${hit.etag}"`, "access-control-allow-origin": "*" });
+        res.end(hit.body);
+      }).catch(() => send(res, 502, { error: "image fetch failed" }));
+      return;
     }
     const asset = path.match(/^\/v1\/assets\/leagues\/([a-z0-9-]+)\.png$/);
     if (asset) {
@@ -71,6 +94,7 @@ export function createApp({ store, config, startedAt = Date.now(), photos, activ
         uptimeSeconds: Math.round((Date.now() - startedAt) / 1000),
         events: store.events.size,
         photos: { cached: Object.keys(store.photos || {}).length, pending: photos ? photos.pending().length : undefined },
+        images: images ? images.stats() : undefined,
         quota: Object.fromEntries(Object.entries(store.meta).map(([sport, m]) => {
           const limit = limits[sport] ?? null; // null = no daily cap known (e.g. Jolpica)
           return [sport, {

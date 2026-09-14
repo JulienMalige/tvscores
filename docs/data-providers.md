@@ -152,3 +152,33 @@ subscription receipt and terms page in this folder before submission.
   It stays a secondary adapter, never the live source for the core leagues.
 - Football alternative: football-data.org if API-Football's terms worry a
   reviewer; it also covers the Champions League.
+
+## Changes on 2026-09-14
+
+**Premier League added** (API-Sports league 39). It costs nothing extra: the
+football provider already fetches every fixture for a date in one call and
+filters by league id, so a second competition is a config line and a badge.
+That is also why adding more football leagues later is close to free, while
+adding a new *sport* is not.
+
+**Upcoming is a seven-day window.** It used to show everything after today,
+which turned the tab into a season fixture list. The horizon is counted in the
+viewer's own local days (`schedule.upcomingDays`). Consequence worth knowing:
+Formula 1 and MotoGP race roughly every two weeks, so Upcoming often holds one
+race or none, and the older "next ten rounds per series" cap rarely bites.
+
+**Images are mirrored locally** (`src/images.js`, served at `/v1/img/<sha1>`).
+Crests and portraits live on two other CDNs and almost never change, so the
+television now fetches them from this proxy once, with a month-long cache
+header, instead of opening connections to three hosts. A URL is registered the
+moment it appears in a response and the bytes are fetched in the background; if
+the mirror is cold and the fetch fails, the request is redirected to the
+original, so a picture is never lost. Portraits are taken in TheSportsDB's
+`/preview` size, 200 px and about a fifth of the bytes, which is larger than
+any avatar the app draws.
+
+**Races carry their whole classification**, not just the podium, with grid
+slot, points, laps and the fastest lap, plus the drivers who did not finish
+(no position, outcome shown as DNF/DNS/DSQ). The scoreboard row still shows
+three; the race page shows the rest. Portrait lookups stay podium-first so the
+scoreboard fills before the detail pages do.

@@ -78,7 +78,9 @@ export class Store {
     const e = this.events.get(id);
     if (!e || e.status.state !== "final") return false;
     if (e.resultsFetchedAt && !e.results?.length) return true; // empty classification, tried already
-    return Boolean(e.results && e.results.length && e.results.every((r) => r.fullName));
+    // The podium is what needs full names (they drive the portrait lookup);
+    // one nameless backmarker must not condemn the race to endless refetching.
+    return Boolean(e.results?.length && e.results.slice(0, 3).every((r) => r.fullName));
   }
 
   /** Drop team-sport events older than 3 days (any state but live) so the file does not grow forever. */

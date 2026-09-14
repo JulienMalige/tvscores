@@ -105,6 +105,11 @@ struct FlexibleID: Decodable, Hashable {
     }
 }
 
+/// Hashable by identity so a row can be a navigation value.
+extension Event: Hashable {
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
+}
+
 struct Event: Decodable, Identifiable, Equatable {
     let id: String
     let sport: String
@@ -158,7 +163,8 @@ struct Score: Decodable, Equatable {
 }
 
 struct RaceResult: Decodable, Identifiable, Equatable {
-    let pos: Int
+    /// Missing for a driver who did not finish: there is no position to show.
+    let pos: Int?
     let driver: String
     let code: String?
     let nationality: String?
@@ -167,7 +173,12 @@ struct RaceResult: Decodable, Identifiable, Equatable {
     let teamColor: String?
     let gap: String?
     let photo: URL?
-    var id: Int { pos }
+    let grid: Int?
+    let points: Int?
+    let laps: Int?
+    let fastestLap: Bool?
+    var id: String { "\(pos.map { String($0) } ?? "-")-\(driver)" }
+    var finished: Bool { pos != nil }
 }
 
 enum ScoreboardDecoder {

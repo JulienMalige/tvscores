@@ -14,25 +14,34 @@ export function normaliseEvent(e, { sport, league, results, nationalities = {}, 
   if (race.status === "cancelled" || e.status === "cancelled") state = STATE.other;
   else if (race.status === "completed") state = STATE.final;
   else if (now >= startMs && now < startMs + RACE_HOURS * 3600e3) state = STATE.live;
-  const podium = Array.isArray(results) && results.length
-    ? results
-        .filter((r) => /^\d+$/.test(String(r.position)))
-        .sort((a, b) => Number(a.position) - Number(b.position))
-        .slice(0, 3)
-        .map((r) => {
-          const nat = nationalities[r.driver?.lastName];
-          return {
-            pos: Number(r.position),
-            driver: `${(r.driver?.firstName || "?")[0]}. ${r.driver?.lastName || "?"}`,
-            fullName: [r.driver?.firstName, r.driver?.lastName].filter(Boolean).join(" ") || undefined,
-            code: r.driver?.code || undefined,
-            nationality: nat,
-            flag: flag(nat),
-            team: r.team?.shortName || r.team?.name,
-            teamColor: r.team?.color || undefined,
-            gap: Number(r.position) === 1 ? r.lapTime : gapText(r),
-          };
-        })
+  // The whole classification, not just the podium: the row shows the top three
+  // and the race page shows the rest. Drivers who did not finish come last,
+  // the one who covered most laps first, and carry no position number.
+  const row = (r) => {
+    const nat = nationalities[r.driver?.lastName];
+    const finished = /^\d+$/.test(String(r.position));
+    return {
+      pos: finished ? Number(r.position) : undefined,
+      driver: `${(r.driver?.firstName || "?")[0]}. ${r.driver?.lastName || "?"}`,
+      fullName: [r.driver?.firstName, r.driver?.lastName].filter(Boolean).join(" ") || undefined,
+      code: r.driver?.code || undefined,
+      nationality: nat,
+      flag: flag(nat),
+      team: r.team?.shortName || r.team?.name,
+      teamColor: r.team?.color || undefined,
+      // A retirement wants its outcome, not the gap it had when it stopped.
+      gap: finished ? (Number(r.position) === 1 ? r.lapTime : gapText(r)) : (outcomeText(r) || "DNF"),
+      grid: num(r.gridPosition),
+      points: num(r.points),
+      laps: num(r.laps),
+      fastestLap: r.fastestLap ? true : undefined,
+    };
+  };
+  const classification = Array.isArray(results) && results.length
+    ? [
+        ...results.filter((r) => /^\d+$/.test(String(r.position))).sort((a, b) => Number(a.position) - Number(b.position)),
+        ...results.filter((r) => !/^\d+$/.test(String(r.position))).sort((a, b) => (Number(b.laps) || 0) - (Number(a.laps) || 0)),
+      ].map(row)
     : undefined;
   return {
     id: `${league.id}:ocb:${e.id}`,
@@ -45,17 +54,38 @@ export function normaliseEvent(e, { sport, league, results, nationalities = {}, 
     circuit: e.location?.name,
     country: e.location?.country?.name,
     status: { state, detail: state === STATE.final ? "Race" : state === STATE.other ? "Cancelled" : undefined },
-    results: podium,
+    results: classification,
     _sessionId: race.id,
     _eventId: e.id,
     _completed: race.status === "completed",
   };
 }
 
+/** A number the provider actually sent, zero included. */
+const num = (v) => (v == null || v === "" || !Number.isFinite(Number(v)) ? undefined : Number(v));
+
+/** Motorsport's own shorthand for a car that did not make the flag. */
+// MotoGP speaks in its own codes (OUTSTND, NOTFINISHFIRST); anything not
+// classified is a retirement unless the feed says something more specific.
+const OUTCOME = {
+  retired: "DNF", dnf: "DNF", outstnd: "DNF", notfinishfirst: "DNF",
+  dns: "DNS", "did not start": "DNS", notstarted: "DNS",
+  dsq: "DSQ", disqualified: "DSQ", excluded: "DSQ",
+};
+
+/** DNF, DNS, DSQ: what a car that did not make the flag gets instead of a gap. */
+function outcomeText(r) {
+  for (const field of [r.status, r.displayTime, r.gap]) {
+    const hit = OUTCOME[String(field || "").toLowerCase().trim()];
+    if (hit) return hit;
+  }
+  return undefined;
+}
+
 /** F1 gives "+4.351s" in `gap`/`displayTime`; MotoGP gives a bare "0.657" in `displayTime`. */
 function gapText(r) {
   const raw = r.gap || r.displayTime;
-  if (raw == null || raw === "") return r.status;
+  if (raw == null || raw === "") return outcomeText(r);
   const t = String(raw).trim();
   if (/^\+?\d+(\.\d+)?s?$/.test(t)) return `+${t.replace(/^\+/, "").replace(/s$/, "")}s`;
   return t; // "+1 lap", "LAP 57", etc.

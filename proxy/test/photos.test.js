@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { withPhotos, withTablePhotos } from "../src/scoreboard.js";
-import { pickPlayer, normalise, photoKey } from "../src/photos.js";
+import { pickPlayer, normalise, photoKey, preview } from "../src/photos.js";
 
 const photoFor = (n) => ({ "Kimi Antonelli": "https://x/ant.png", "Jannik Sinner": "https://x/sin.png" }[n]);
 
@@ -71,4 +71,12 @@ test("pending resolves podiums and top-ten before the long tail", async () => {
   };
   const r = new PhotoResolver({ store });
   assert.deepEqual(r.pending().map(([n]) => n), ["Podium Guy", "Top Driver", "Tail Driver"]);
+});
+
+test("portraits are served in the small variant, once", () => {
+  const full = "https://r2.thesportsdb.com/images/media/player/cutout/ei7vss.png";
+  assert.equal(preview(full), `${full}/preview`);
+  assert.equal(preview(`${full}/preview`), `${full}/preview`, "never doubled up");
+  assert.equal(preview("https://media.api-sports.io/american-football/teams/10.png"), "https://media.api-sports.io/american-football/teams/10.png");
+  assert.equal(preview(undefined), undefined);
 });

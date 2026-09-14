@@ -3,7 +3,7 @@ import SwiftUI
 struct HomeView: View {
     @State private var store = ScoreboardStore()
     @State private var day: Day = Self.initialDay()
-    @State private var path: [LeagueRef] = []
+    @State private var path = NavigationPath()
     @State private var openedInitialLeague = false
 
     var body: some View {
@@ -14,6 +14,7 @@ struct HomeView: View {
                 .navigationDestination(for: LeagueRef.self) { ref in
                     LeagueView(ref: ref, store: store, day: day)
                 }
+                .navigationDestination(for: Event.self) { RaceDetailView(eventId: $0.id, fallback: $0, store: store) }
         }
         .task { store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
@@ -22,7 +23,9 @@ struct HomeView: View {
             guard !isNil, !openedInitialLeague, let wanted = Self.initialLeague(), let board = store.board else { return }
             let all = Day.allCases.flatMap { board.groups(for: $0) }
             if let g = all.first(where: { $0.sport == wanted }) {
-                path = [LeagueRef(group: g)]
+                var next = NavigationPath()
+                next.append(LeagueRef(group: g))
+                path = next
                 openedInitialLeague = true
             }
         }

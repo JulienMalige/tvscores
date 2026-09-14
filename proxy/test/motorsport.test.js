@@ -13,8 +13,8 @@ test("completed grand prix with podium, gaps and flags", () => {
   assert.equal(e.status.state, "final");
   assert.equal(e.start, "2026-09-13T13:00:00.000Z");
   assert.equal(e.name, "Spanish Grand Prix");
-  assert.equal(e.results.length, 3);
-  assert.deepEqual(e.results.map((r) => r.pos), [1, 2, 3]);
+  assert.equal(e.results.length, 5, "the whole classification, not just the podium");
+  assert.deepEqual(e.results.map((r) => r.pos), [1, 2, 3, 4, 5]);
   assert.equal(e.results[0].gap, "1:34:23.754");
   assert.equal(e.results[1].gap, "+4.351s");
   assert.equal(e.results[0].flag, "🇮🇹");
@@ -45,4 +45,22 @@ test("weeks without a race session are skipped; shouting names are title-cased",
   if (testing) assert.equal(normaliseEvent(testing, { sport: "formula1", league: F1 }), null);
   const loud = { ...spain, name: "GRAND PRIX OF SAN MARINO" };
   assert.equal(normaliseEvent(loud, { sport: "moto-gp", league: { id: "motogp", name: "MotoGP", short: "MotoGP" } }).name, "Grand Prix of San Marino");
+});
+
+test("a car that did not finish shows its outcome, not the gap it had", () => {
+  const dnf = { position: "NC", status: "DNF", gap: "2 L", displayTime: "DNF", laps: 42, points: "0.0", gridPosition: 20, driver: { firstName: "Carlos", lastName: "Sainz" }, team: { name: "Williams" } };
+  const e = normaliseEvent(spain, { sport: "formula1", league: F1, results: [...fx.results, dnf] });
+  const last = e.results.at(-1);
+  assert.equal(last.pos, undefined);
+  assert.equal(last.gap, "DNF");
+  assert.equal(last.grid, 20);
+  assert.equal(last.points, 0, "zero points is a fact, not a blank");
+  assert.equal(last.laps, 42);
+});
+
+test("MotoGP's own codes still read as a retirement", () => {
+  const out = { position: "NC", status: "OUTSTND", gap: null, displayTime: "0.000", laps: 24, points: "0.0", driver: { firstName: "Jack", lastName: "Miller" }, team: { name: "Pramac" } };
+  const odd = { ...out, status: "SOMETHINGNEW" };
+  const e = normaliseEvent(spain, { sport: "moto-gp", league: F1, results: [...fx.results, out, odd] });
+  assert.deepEqual(e.results.slice(-2).map((r) => r.gap), ["DNF", "DNF"]);
 });

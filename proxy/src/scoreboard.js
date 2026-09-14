@@ -31,32 +31,57 @@ function groupByLeague(events, sportOrder, leagues = {}, publicBase = "", standi
  * Buckets: yesterday, today, upcoming (tomorrow onwards, F1 calendar included),
  * computed in the viewer's time zone so "today" means their evening.
  */
-/** Copy of an event with cached photo URLs on podium rows and tennis players. */
-export function withPhotos(e, photoFor) {
-  if (!photoFor) return e;
+/**
+ * Copy of an event carrying the picture URLs the app should use: portraits
+ * looked up by name, and every image pointed at our own mirror so the
+ * television talks to one host instead of three.
+ */
+export function withPhotos(e, photoFor, mirror) {
+  const img = mirror ? (u) => mirror(u) : (u) => u;
+  if (!photoFor && !mirror) return e;
   const out = { ...e };
-  const photo = (row) => { const k = photoKey(row); return k ? photoFor(k) : undefined; };
+  const photo = (row) => {
+    if (!photoFor) return img(row.photo);
+    const k = photoKey(row);
+    return img(k ? photoFor(k) : undefined);
+  };
   if (e.results) out.results = e.results.map((r) => ({ ...r, photo: photo(r) }));
-  if (e.sport === "tennis") for (const side of ["home", "away"]) if (e[side]) out[side] = { ...e[side], photo: photo(e[side]) };
+  for (const side of ["home", "away"]) {
+    if (!e[side]) continue;
+    const team = { ...e[side], logo: img(e[side].logo) };
+    if (e.sport === "tennis") team.photo = photo(e[side]);
+    else if (team.photo) team.photo = img(team.photo);
+    out[side] = team;
+  }
   return out;
 }
 
-export function withTablePhotos(standings, photoFor) {
-  if (!photoFor || !standings) return standings;
-  return { ...standings, tables: standings.tables.map((t) => ({ ...t, rows: t.rows.map((r) => { const k = photoKey(r); return { ...r, photo: k ? photoFor(k) : undefined }; }) })) };
+export function withTablePhotos(standings, photoFor, mirror) {
+  if (!photoFor && !mirror) return standings;
+  if (!standings) return standings;
+  const img = mirror ? (u) => mirror(u) : (u) => u;
+  const rowPhoto = (r) => {
+    if (!photoFor) return img(r.photo);
+    const k = photoKey(r);
+    return img(k ? photoFor(k) : undefined);
+  };
+  return { ...standings, tables: standings.tables.map((t) => ({ ...t, rows: t.rows.map((r) => ({ ...r, photo: rowPhoto(r) })) })) };
 }
 
-export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, activeSports = [] } = {}) {
-  events = events.map((e) => withPhotos(e, photoFor));
+export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, mirror, activeSports = [], upcomingDays = 7 } = {}) {
+  events = events.map((e) => withPhotos(e, photoFor, mirror));
   const today = localDate(new Date(now).toISOString(), tz);
   const yesterday = localDate(new Date(now - 86400e3).toISOString(), tz);
+  // Upcoming is a window, not the whole calendar: a fixture list weeks out is
+  // not what this screen is for.
+  const horizon = localDate(new Date(now + upcomingDays * 86400e3).toISOString(), tz);
   const days = { yesterday: [], today: [], upcoming: [] };
   for (const e of events) {
     const d = localDate(e.start, tz);
     // A game still in play belongs to "today" even if it kicked off before local midnight.
     if (e.status.state === STATE.live || d === today) days.today.push(e);
     else if (d === yesterday) days.yesterday.push(e);
-    else if (d > today) days.upcoming.push(e);
+    else if (d > today && d <= horizon) days.upcoming.push(e);
   }
   // Upcoming keeps at most the next 10 rounds per racing series; team sports are unlimited.
   const seen = new Map();

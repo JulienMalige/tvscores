@@ -32,7 +32,10 @@ export const config = {
    * proxy/assets/leagues (built by scripts/build-badges.py) served by this proxy.
    */
   leagues: {
-    football: [{ id: 2, name: "UEFA Champions League", short: "UCL", badge: "ucl" }],
+    football: [
+      { id: 39, name: "Premier League", short: "PL", badge: "epl" },
+      { id: 2, name: "UEFA Champions League", short: "UCL", badge: "ucl" },
+    ],
     nfl: [{ id: 1, name: "NFL", short: "NFL", badge: "nfl" }],
     nba: [{ id: "standard", name: "NBA", short: "NBA", badge: "nba" }],
     f1: [{ id: "f1", name: "Formula 1", short: "F1", badge: "f1" }],
@@ -53,6 +56,8 @@ export const config = {
     /** Never spend the last N calls of a sport's daily quota. */
     quotaReserve: 8,
     dailyQuota: 100,
+    /** How far ahead the Upcoming tab looks, in local days. */
+    upcomingDays: 7,
     /** A game counts as "maybe live" from 10 min before kickoff until this long after. */
     liveWindowHours: 4,
     /** Orange Cat Blacktop free tier is 7,500/month; keep a day well under that. */

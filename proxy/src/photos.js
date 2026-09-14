@@ -16,6 +16,16 @@ export function normalise(name) {
 }
 
 /** The name a row is looked up and cached under: full name for people, nothing for teams or abbreviations. */
+/**
+ * TheSportsDB serves a 200 px version of any artwork at `<url>/preview`, a
+ * fifth of the bytes of the 500 px original. An avatar is never shown larger
+ * than that, and the television has to pull every one of them.
+ */
+export function preview(url) {
+  if (!url || !/thesportsdb\.com\//.test(url)) return url;
+  return url.endsWith("/preview") ? url : `${url}/preview`;
+}
+
 export function photoKey(row) {
   if (!row || row.kind === "team") return undefined;
   return row.fullName || (row.name && !/^[A-Z]\.\s/.test(row.name) ? row.name : undefined);
@@ -79,7 +89,9 @@ export class PhotoResolver {
     };
     const today = new Date().toISOString().slice(0, 10);
     for (const e of this.store.events.values()) {
-      for (const r of e.results || []) want(r, e.sport, 0);
+      // The podium is on the scoreboard; the rest of the field only shows on
+      // the race page, so it can queue behind today's matches.
+      (e.results || []).forEach((r, i) => want(r, e.sport, i < 3 ? 0 : 2));
       if (e.sport === "tennis") {
         const prio = e.status.state === "live" || String(e.start).startsWith(today) ? 0 : 2;
         for (const side of ["home", "away"]) want(e[side], "tennis", prio);
@@ -135,6 +147,6 @@ export class PhotoResolver {
 
   /** Attach cached photo URLs to a serialisable copy of an event / table row set. */
   photoFor(name) {
-    return this.cached(name)?.url || undefined;
+    return preview(this.cached(name)?.url) || undefined;
   }
 }

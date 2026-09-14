@@ -6,6 +6,7 @@ from PIL import Image
 
 BADGES = {
     "ucl": "https://r2.thesportsdb.com/images/media/league/badge/facv1u1742998896.png",
+    "epl": "https://r2.thesportsdb.com/images/media/league/badge/gasy9d1737743125.png",
     "nfl": "https://r2.thesportsdb.com/images/media/league/badge/g85fqz1662057187.png",
     "nba": "https://r2.thesportsdb.com/images/media/league/badge/frdjqy1536585083.png",
     "f1": "https://r2.thesportsdb.com/images/media/league/badge/g8cofl1513623681.png",

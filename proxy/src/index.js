@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { config } from "./config.js";
 import { Store } from "./cache.js";
 import { Quota } from "./quota.js";
@@ -11,6 +12,7 @@ import { tennisProvider } from "./providers/livetennis.js";
 import { TeamSportScheduler, CalendarScheduler } from "./scheduler.js";
 import { createApp } from "./server.js";
 import { PhotoResolver } from "./photos.js";
+import { ImageMirror } from "./images.js";
 
 const log = (msg) => console.log(`${new Date().toISOString()} ${msg}`);
 const store = new Store(config.cacheDir);
@@ -44,19 +46,23 @@ if (config.ocBlacktopKey) {
 }
 
 const photos = new PhotoResolver({ store, key: config.theSportsDbKey, log });
+const images = new ImageMirror({ dir: join(config.cacheDir, "images"), publicBase: config.publicBase, log });
 const limits = Object.fromEntries(schedulers.filter((s) => s.quota).map((s) => [s.p.sport, s.quota.dailyQuota]));
 limits.photos = 1000; // TheSportsDB test key: ~30/min; a soft daily line for the health page
-const app = createApp({ store, config, photos, activeSports: schedulers.map((s) => s.p.sport), limits });
+const app = createApp({ store, config, photos, images, activeSports: schedulers.map((s) => s.p.sport), limits });
 app.listen(config.port, config.host, () => {
   log(`tvscores proxy listening on http://${config.host}:${config.port} (prefix ${config.pathPrefix || "none"})`);
   for (const s of schedulers) s.start();
   setTimeout(() => photos.start(), 15000); // after the first fetches land
+  setTimeout(() => images.startWarming(), 25000); // after the board has named its images
+  setInterval(() => images.prune(), 12 * 3600e3).unref?.();
 });
 
 for (const sig of ["SIGINT", "SIGTERM"]) {
   process.on(sig, () => {
     for (const s of schedulers) s.stop();
     photos.stop();
+    images.stop();
     store.save();
     app.close(() => process.exit(0));
   });

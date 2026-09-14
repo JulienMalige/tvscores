@@ -134,15 +134,30 @@ struct StatusView: View {
                     .foregroundStyle(status.note == nil ? .green : .orange)
                 if status.clock != nil || status.note != nil, let d = status.detail { detailText(d) }
             case .final:
-                Text("status.final")
+                Text(finalText)
                     .font(.title2.weight(.semibold))
-                if let d = status.detail { detailText(d) }
+                // "Final/OT" says it on one line; anything else keeps its own.
+                if let d = status.detail, Self.finalCombined[d] == nil { detailText(d) }
             case .other:
                 Text(localizedDetail(status.detail) ?? "–")
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(.secondary)
             }
         }
+    }
+
+    /// Endings worth folding into the "Final" line rather than printing below it.
+    private static let finalCombined: [String: String] = [
+        "After overtime": "status.final.ot",
+        "After extra time": "status.final.aet",
+        "After penalties": "status.final.pen",
+    ]
+
+    private var finalText: String {
+        if let d = status.detail, let key = Self.finalCombined[d] {
+            return String(localized: String.LocalizationValue(key))
+        }
+        return String(localized: "status.final")
     }
 
     private func detailText(_ d: String) -> some View {

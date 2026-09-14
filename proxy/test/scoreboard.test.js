@@ -43,14 +43,32 @@ test("localDate", () => {
   assert.equal(localDate("2026-09-13T23:30:00Z", "America/New_York"), "2026-09-13");
 });
 
+const race = (sport, i) => ({ id: `${sport}${i}`, sport, kind: "race", start: new Date(Date.UTC(2026, 9, 1 + i)).toISOString(), status: { state: "scheduled" }, league: { id: sport, name: sport, short: sport } });
+
 test("upcoming keeps ten rounds per racing series, not ten overall", () => {
-  const race = (sport, i) => ({ id: `${sport}${i}`, sport, kind: "race", start: new Date(Date.UTC(2026, 9, 1 + i)).toISOString(), status: { state: "scheduled" }, league: { id: sport, name: sport, short: sport } });
   const events = [...Array(12)].flatMap((_, i) => [race("f1", i), race("motogp", i)]);
-  const sb = buildScoreboard(events, { now: Date.UTC(2026, 8, 20), sportOrder: ["f1", "motogp"] });
+  const sb = buildScoreboard(events, { now: Date.UTC(2026, 8, 20), sportOrder: ["f1", "motogp"], upcomingDays: 90 });
   const counts = Object.fromEntries(sb.days.upcoming.map((g) => [g.sport, g.events.length]));
   assert.deepEqual(counts, { f1: 10, motogp: 10 });
 });
 
+test("upcoming stops at the end of the window", () => {
+  const events = [...Array(12)].map((_, i) => race("f1", i));
+  const now = Date.UTC(2026, 8, 28, 12); // 28 September, so the window ends on 5 October
+  const sb = buildScoreboard(events, { now, sportOrder: ["f1"], upcomingDays: 7 });
+  const days = sb.days.upcoming.flatMap((g) => g.events.map((e) => e.start.slice(0, 10)));
+  assert.deepEqual(days, ["2026-10-01", "2026-10-02", "2026-10-03", "2026-10-04", "2026-10-05"]);
+});
+
+test("the window is counted in the viewer's own days", () => {
+  // Midday UTC on 1 October is still 1 October in São Paulo (UTC-3), but the
+  // viewer's "today" differs, and with it where the window ends.
+  const kickoff = { id: "x", sport: "f1", kind: "race", start: "2026-10-01T12:00:00Z", status: { state: "scheduled" }, league: { id: "f1", name: "F1", short: "F1" } };
+  const now = Date.UTC(2026, 8, 24, 2); // 24 September in UTC, 23:00 on the 23rd in São Paulo
+  const count = (tz) => buildScoreboard([kickoff], { now, tz, upcomingDays: 7 }).days.upcoming.length;
+  assert.equal(count("UTC"), 1, "seven days after 24 September");
+  assert.equal(count("America/Sao_Paulo"), 0, "eight days after 23 September");
+});
 test("stale only covers sports with a scheduler this run", () => {
   const now = Date.UTC(2026, 8, 13, 12);
   const meta = { f1: { lastOk: new Date(now).toISOString() }, motogp: { lastOk: new Date(now - 10 * 3600e3).toISOString() } };
