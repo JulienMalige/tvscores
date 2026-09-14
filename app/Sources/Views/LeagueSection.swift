@@ -3,6 +3,7 @@ import SwiftUI
 struct LeagueSection: View {
     let group: LeagueGroup
     var linkToLeague = false
+    var showHeader = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -11,7 +12,7 @@ struct LeagueSection: View {
                     LeagueHeader(group: group, chevron: true)
                 }
                 .buttonStyle(.plain)
-            } else {
+            } else if showHeader {
                 LeagueHeader(group: group, chevron: false)
             }
             VStack(spacing: 4) {

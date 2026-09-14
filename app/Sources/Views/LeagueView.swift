@@ -47,7 +47,7 @@ struct LeagueView: View {
                 .frame(maxWidth: .infinity)
         } else {
             ForEach(groups) { group in
-                LeagueSection(group: group)
+                LeagueSection(group: group, showHeader: false)
             }
         }
     }
