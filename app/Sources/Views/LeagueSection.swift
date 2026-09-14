@@ -42,7 +42,8 @@ struct LeagueMark: View {
                 symbol
             }
         }
-        .frame(width: 44, height: 44)
+        // Wide marks (F1, MotoGP, ATP) get room; square badges stay compact.
+        .frame(maxWidth: 132, minHeight: 52, maxHeight: 52)
     }
 
     private var symbol: some View {
