@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { normaliseEvent } from "../src/providers/ocblacktop.js";
+import { normaliseEvent, lapSeconds } from "../src/providers/ocblacktop.js";
 
 const fx = JSON.parse(readFileSync(new URL("./fixtures/ocb-f1.json", import.meta.url)));
 const F1 = { id: "f1", name: "Formula 1", short: "F1" };
@@ -63,4 +63,18 @@ test("MotoGP's own codes still read as a retirement", () => {
   const odd = { ...out, status: "SOMETHINGNEW" };
   const e = normaliseEvent(spain, { sport: "moto-gp", league: F1, results: [...fx.results, out, odd] });
   assert.deepEqual(e.results.slice(-2).map((r) => r.gap), ["DNF", "DNF"]);
+});
+
+test("only the quickest best lap gets the fastest-lap mark", () => {
+  const laps = ["1:36.030", "1:36.760", "1:35.587"];
+  const rows = fx.results.slice(0, 3).map((r, i) => ({ ...r, id: `r${i}`, bestLapTime: laps[i] }));
+  const e = normaliseEvent(spain, { sport: "formula1", league: F1, results: rows });
+  assert.deepEqual(e.results.map((r) => r.fastestLap), [undefined, undefined, true]);
+});
+
+test("lap times parse with and without minutes", () => {
+  assert.equal(lapSeconds("1:35.587"), 95.587);
+  assert.equal(lapSeconds("58.214"), 58.214);
+  assert.equal(lapSeconds(""), undefined);
+  assert.equal(lapSeconds("DNF"), undefined);
 });

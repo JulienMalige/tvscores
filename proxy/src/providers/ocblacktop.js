@@ -17,6 +17,7 @@ export function normaliseEvent(e, { sport, league, results, nationalities = {}, 
   // The whole classification, not just the podium: the row shows the top three
   // and the race page shows the rest. Drivers who did not finish come last,
   // the one who covered most laps first, and carry no position number.
+  const quickest = Array.isArray(results) ? fastestLapId(results) : undefined;
   const row = (r) => {
     const nat = nationalities[r.driver?.lastName];
     const finished = /^\d+$/.test(String(r.position));
@@ -34,7 +35,7 @@ export function normaliseEvent(e, { sport, league, results, nationalities = {}, 
       grid: num(r.gridPosition),
       points: num(r.points),
       laps: num(r.laps),
-      fastestLap: r.fastestLap ? true : undefined,
+      fastestLap: quickest && (r.id ?? r.driver?.id) === quickest ? true : undefined,
     };
   };
   const classification = Array.isArray(results) && results.length
@@ -59,6 +60,32 @@ export function normaliseEvent(e, { sport, league, results, nationalities = {}, 
     _eventId: e.id,
     _completed: race.status === "completed",
   };
+}
+
+/** "1:35.587" or "58.214" in seconds; undefined when there is no lap time. */
+export function lapSeconds(raw) {
+  const t = String(raw ?? "").trim();
+  if (!t) return undefined;
+  const m = t.match(/^(?:(\d+):)?(\d+(?:\.\d+)?)$/);
+  if (!m) return undefined;
+  return Number(m[1] || 0) * 60 + Number(m[2]);
+}
+
+/**
+ * Who set the fastest lap. The feed carries a `fastestLap` object but leaves
+ * it empty, so trust its rank when it has one and otherwise take the quickest
+ * best lap in the field.
+ */
+function fastestLapId(rows) {
+  const ranked = rows.find((r) => Number(r.fastestLap?.rank) === 1);
+  if (ranked) return ranked.id ?? ranked.driver?.id;
+  let best;
+  for (const r of rows) {
+    const s = lapSeconds(r.bestLapTime);
+    if (s === undefined) continue;
+    if (!best || s < best.s) best = { s, id: r.id ?? r.driver?.id };
+  }
+  return best?.id;
 }
 
 /** A number the provider actually sent, zero included. */
