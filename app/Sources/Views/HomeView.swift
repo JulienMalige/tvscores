@@ -8,13 +8,24 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            content
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .safeAreaInset(edge: .top, spacing: 0) { headerBar }
-                .navigationDestination(for: LeagueRef.self) { ref in
-                    LeagueView(ref: ref, store: store, day: day)
+            ScrollView {
+                // Title and tabs scroll away with the list. On a television a
+                // pinned bar saves no input, since reaching the tabs means
+                // moving focus up there anyway, and the focus engine brings
+                // them back on screen when it does.
+                VStack(alignment: .leading, spacing: 24) {
+                    header
+                    DayTabs(selected: $day)
+                    content
                 }
-                .navigationDestination(for: Event.self) { RaceDetailView(eventId: $0.id, fallback: $0, store: store) }
+                .padding(.horizontal, 80)
+                .padding(.top, 48)
+                .padding(.bottom, 80)
+            }
+            .navigationDestination(for: LeagueRef.self) { ref in
+                LeagueView(ref: ref, store: store, day: day)
+            }
+            .navigationDestination(for: Event.self) { RaceDetailView(eventId: $0.id, fallback: $0, store: store) }
         }
         .task { store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
@@ -51,20 +62,6 @@ struct HomeView: View {
         return nil
     }
 
-    /// Title and tabs live in the top safe area, so the list scrolls underneath
-    /// them instead of over them and the focus engine keeps rows clear of it.
-    private var headerBar: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            header
-            DayTabs(selected: $day)
-        }
-        .padding(.horizontal, 80)
-        .padding(.top, 44)
-        .padding(.bottom, 24)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.regularMaterial)
-    }
-
     private var header: some View {
         HStack(alignment: .firstTextBaseline) {
             Text("app.title")
@@ -88,26 +85,22 @@ struct HomeView: View {
             if groups.isEmpty {
                 EmptyDay()
             } else {
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 48) {
-                        ForEach(groups) { group in
-                            LeagueSection(group: group, linkToLeague: true)
-                        }
+                LazyVStack(alignment: .leading, spacing: 48) {
+                    ForEach(groups) { group in
+                        LeagueSection(group: group, linkToLeague: true)
                     }
-                    .padding(.horizontal, 80)
-                    .padding(.top, 28)
-                    .padding(.bottom, 80)
                 }
+                .padding(.top, 4)
             }
         } else if let error = store.error {
             VStack(spacing: 12) {
                 Text("home.error").font(.title3)
                 Text(error).font(.callout).foregroundStyle(.secondary)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity, minHeight: 500)
         } else {
             ProgressView("home.loading")
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity, minHeight: 500)
         }
     }
 
@@ -168,7 +161,7 @@ struct EmptyDay: View {
                 .font(.title3)
                 .foregroundStyle(.secondary)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity, minHeight: 500)
     }
 }
 
