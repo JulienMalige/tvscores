@@ -43,6 +43,15 @@ API-Sports has no MotoGP. Options:
 Nothing affordable gives live MotoGP timing. Treat MotoGP like F1: calendar,
 session results and standings, with the "Race · Final" row shape.
 
+## Tennis (checked 2026-09-14)
+
+No free source for match scores. TheSportsDB's ATP feed had no upcoming
+matches and its last recorded match was 23 August (demo key). balldontlie's
+free tier covers players, tournaments and rankings only. Matches with live
+status (`status_state`: scheduled / in_progress / final) and set scores need
+**balldontlie ALL-STAR, $9.99/mo per tour (ATP, WTA), 60 req/min**.
+Decision pending Julien; adapter to be written once a key exists.
+
 ## RapidAPI
 
 RapidAPI is a marketplace, not a data source. Two kinds of listings:
