@@ -120,9 +120,16 @@ struct DayTabs: View {
             }
             Spacer()
         }
-        .focusSection()
         .defaultFocus($focused, selected, priority: .userInitiated)
-        .onAppear { focused = selected }
+        .focusSection()
+        .task {
+            // The focus engine settles after the first layout pass, and inside a
+            // safe-area inset that happens later than onAppear. Re-assert once so
+            // the highlight starts on the selected day, not the leading tab.
+            focused = selected
+            await Task.yield()
+            focused = selected
+        }
     }
 
     private func title(_ d: Day) -> LocalizedStringKey {
