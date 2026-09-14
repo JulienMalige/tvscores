@@ -1,0 +1,146 @@
+name: TestFlight
+
+# Manual only: archives a signed Release build and uploads it to App Store
+# Connect. Signing certificates and profiles are created in the cloud by
+# -allowProvisioningUpdates using the App Store Connect API key, so no Mac
+# and no local keychain are involved.
+
+on:
+  workflow_dispatch:
+    inputs:
+      build:
+        description: Build number (defaults to the workflow run number)
+        required: false
+        type: string
+
+concurrency:
+  group: testflight
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    name: Archive and upload
+    runs-on: macos-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: app
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_TEAM_ID: ${{ secrets.ASC_TEAM_ID }}
+      BUILD_NUMBER: ${{ inputs.build || github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the credentials are present
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          for name in ASC_KEY_ID ASC_ISSUER_ID ASC_TEAM_ID ASC_KEY_P8; do
+            if [ -z "${!name}" ]; then
+              echo "::error::secret $name is not set on this repository"
+              exit 1
+            fi
+          done
+
+      - name: Toolchain info
+        run: |
+          sw_vers
+          xcodebuild -version
+
+      - name: Ensure a tvOS platform is installed
+        run: |
+          if ! xcodebuild -showsdks | grep -q appletvos; then
+            sudo xcodebuild -downloadPlatform tvOS
+          fi
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Write the App Store Connect key
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          mkdir -p ~/private_keys
+          printf '%s\n' "$ASC_KEY_P8" > ~/private_keys/AuthKey_"$ASC_KEY_ID".p8
+          chmod 600 ~/private_keys/AuthKey_"$ASC_KEY_ID".p8
+
+      - name: Archive
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -project TVScores.xcodeproj \
+            -scheme TVScores \
+            -configuration Release \
+            -destination 'generic/platform=tvOS' \
+            -archivePath "$RUNNER_TEMP/TVScores.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_"$ASC_KEY_ID".p8 \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            DEVELOPMENT_TEAM="$ASC_TEAM_ID" \
+            CODE_SIGN_STYLE=Automatic \
+            CODE_SIGNING_ALLOWED=YES \
+            CODE_SIGNING_REQUIRED=YES \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            2>&1 | tee "$RUNNER_TEMP/archive.log" | grep -E "error:|warning:|Signing|ARCHIVE" || true
+          grep -q "ARCHIVE SUCCEEDED" "$RUNNER_TEMP/archive.log"
+
+      - name: Export and upload to App Store Connect
+        run: |
+          cat > "$RUNNER_TEMP/export.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>$ASC_TEAM_ID</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict>
+          </plist>
+          PLIST
+          set -o pipefail
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/TVScores.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/export.plist" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_"$ASC_KEY_ID".p8 \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            2>&1 | tee "$RUNNER_TEMP/export.log" | grep -E "error:|Upload|EXPORT" || true
+          grep -q "EXPORT SUCCEEDED" "$RUNNER_TEMP/export.log"
+
+      - name: Remove the key
+        if: always()
+        run: rm -f ~/private_keys/AuthKey_*.p8
+
+      # Only on failure, and redacted first: GitHub masks secrets in the
+      # console but not inside uploaded files, and xcodebuild prints the team
+      # id in the signing identity and the key id in the key path.
+      - name: Redact the logs
+        if: failure()
+        run: |
+          for f in "$RUNNER_TEMP"/archive.log "$RUNNER_TEMP"/export.log; do
+            [ -f "$f" ] || continue
+            sed -i '' -e "s/$ASC_TEAM_ID/TEAMID/g" -e "s/$ASC_KEY_ID/KEYID/g" \
+              -e "s/$ASC_ISSUER_ID/ISSUERID/g" "$f"
+          done
+
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testflight-logs
+          path: |
+            ${{ runner.temp }}/archive.log
+            ${{ runner.temp }}/export.log
+          if-no-files-found: ignore
