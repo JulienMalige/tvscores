@@ -13,18 +13,31 @@ function player(p) {
   return { name, short: surname.slice(0, 3).toUpperCase(), nick: surname, country: p?.country?.toUpperCase(), flag: flagIso3(p?.country) };
 }
 
+/**
+ * `score.games` is one array per player, each with a games count per set:
+ * `[[6, 5, 6], [4, 7, 5]]` is 6-4, 5-7, 6-5. The two arrays can differ in
+ * length while a set is being entered, so every read is guarded.
+ */
+function setPairs(score) {
+  const [p1, p2] = score?.games || [];
+  if (!Array.isArray(p1) && !Array.isArray(p2)) return [];
+  const count = Math.max(p1?.length || 0, p2?.length || 0);
+  return Array.from({ length: count }, (_, i) => [p1?.[i] ?? 0, p2?.[i] ?? 0]);
+}
+
 /** "Set 3 · 4-2" from the score block; undefined when no games are known. */
 export function liveClock(score) {
-  if (!score?.games?.length) return undefined;
-  const setNo = score.games.length;
-  const [g1, g2] = score.games[setNo - 1];
-  return `Set ${setNo} · ${g1}-${g2}`;
+  const sets = setPairs(score);
+  if (!sets.length) return undefined;
+  const [a, b] = sets[sets.length - 1];
+  return `Set ${sets.length} · ${a}-${b}`;
 }
 
 /** "7-5 6-7 3-2" summary of every set, for the detail line once a match is final. */
 export function setsLine(score) {
-  if (!score?.games?.length) return undefined;
-  return score.games.map(([a, b]) => `${a}-${b}`).join(" ");
+  const sets = setPairs(score);
+  if (!sets.length) return undefined;
+  return sets.map(([a, b]) => `${a}-${b}`).join(" ");
 }
 
 export function normaliseMatch(m) {
@@ -35,7 +48,11 @@ export function normaliseMatch(m) {
   else if (m.status === "live") state = STATE.live;
   else if (m.status === "completed") state = STATE.final;
   const interrupted = m.event_status === "Interrupted";
-  const detail = state === STATE.final ? setsLine(m.score) : m.round || undefined;
+  const sets = setsLine(m.score);
+  const detail = state === STATE.final ? sets : m.round || undefined;
+  // A match we never saw in play carries a 0-0 score block from the upcoming
+  // feed. Showing "Final 0-0" would be a lie, so report no score instead.
+  const known = state === STATE.live || (state === STATE.final && sets !== undefined);
   return {
     id: `tennis:${m.id}`,
     sport: "tennis",
@@ -47,7 +64,7 @@ export function normaliseMatch(m) {
     status: { state, clock: state === STATE.live && !interrupted ? liveClock(m.score) : undefined, detail, note: interrupted ? "Interrupted" : undefined },
     home: player(m.players?.p1),
     away: player(m.players?.p2),
-    score: { home: m.score?.sets?.[0] ?? null, away: m.score?.sets?.[1] ?? null },
+    score: known ? { home: m.score?.sets?.[0] ?? null, away: m.score?.sets?.[1] ?? null } : { home: null, away: null },
   };
 }
 

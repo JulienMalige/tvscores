@@ -11,11 +11,22 @@ test("live ATP singles match: sets as score, current set as clock, round as deta
   assert.equal(e.league.short, "ATP");
   assert.equal(e.status.state, "live");
   assert.deepEqual([e.score.home, e.score.away], raw.score.sets);
-  assert.equal(e.status.clock, "Set 2 · 6-7");
+  // games [[7, 5, 0], [6, 7, 0]] is 7-6, 5-7, then a third set just started,
+  // which matches the fixture's own sets total of one apiece.
+  assert.equal(e.status.clock, "Set 3 · 0-0");
   assert.equal(e.status.detail, raw.round);
   assert.equal(e.home.nick, "Fenty");
   assert.equal(e.home.short, "FEN");
   assert.ok(e.start.endsWith("Z"));
+});
+
+test("a final we never saw played reports no score rather than 0-0", () => {
+  const ghost = normaliseMatch({ ...raw, status: "completed", score: { sets: [0, 0], games: [[], []] } });
+  assert.equal(ghost.status.state, "final");
+  assert.deepEqual([ghost.score.home, ghost.score.away], [null, null]);
+  const played = normaliseMatch({ ...raw, status: "completed" });
+  assert.equal(played.status.detail, "7-6 5-7 0-0");
+  assert.deepEqual([played.score.home, played.score.away], raw.score.sets);
 });
 
 test("doubles and unknown tours are dropped", () => {
@@ -35,7 +46,13 @@ test("upcoming and interrupted states", () => {
 });
 
 test("helpers", () => {
-  assert.equal(liveClock({ games: [[7, 5, 0], [3, 2, 0]] }), "Set 2 · 3-2");
-  assert.equal(setsLine({ games: [[7, 5, 0], [6, 7, 0]] }), "7-5 6-7");
+  // Shape taken from the live feed: one array per player, one entry per set.
+  assert.equal(liveClock({ games: [[6, 5, 6], [4, 7, 5]] }), "Set 3 · 6-5");
+  assert.equal(setsLine({ games: [[6, 5, 6], [4, 7, 5]] }), "6-4 5-7 6-5");
+  // A set can be half entered; the missing side reads as zero, never undefined.
+  assert.equal(liveClock({ games: [[6, 5], [4]] }), "Set 2 · 5-0");
+  assert.equal(liveClock({ games: [[], []] }), undefined);
+  assert.equal(liveClock({ games: [] }), undefined);
   assert.equal(liveClock(null), undefined);
+  assert.equal(setsLine(null), undefined);
 });
