@@ -33,6 +33,12 @@ struct LeagueView: View {
         .task {
             standings = await store.standings(for: ref)
             standingsLoaded = true
+            // `-TVScoresTable constructors` opens that table (CI screenshots).
+            let args = ProcessInfo.processInfo.arguments
+            if let i = args.firstIndex(of: "-TVScoresTable"), i + 1 < args.count,
+               let hit = standings?.tables.firstIndex(where: { $0.id == args[i + 1] }) {
+                table = hit
+            }
         }
     }
 
