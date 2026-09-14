@@ -24,6 +24,13 @@ test("buckets follow the viewer's time zone", () => {
   assert.deepEqual(utc.days.today.flatMap((g) => g.events.map((e) => e.id)), ["b", "a", "e"]);
 });
 
+test("league logo is attached from config at serve time", () => {
+  const sb = buildScoreboard([ev("a", "2026-09-13T19:00:00Z", "football", "live")], {
+    now: Date.UTC(2026, 8, 13, 20), leagues: { football: [{ id: 2, logo: "https://x/2.png" }] },
+  });
+  assert.equal(sb.days.today[0].league.logo, "https://x/2.png");
+});
+
 test("stale is per sport", () => {
   const now = Date.UTC(2026, 8, 13, 12);
   const meta = { football: { lastOk: new Date(now - 3600e3).toISOString() }, nfl: { lastOk: new Date(now - 10 * 3600e3).toISOString() }, nba: {} };

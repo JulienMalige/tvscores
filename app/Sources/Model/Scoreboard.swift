@@ -41,6 +41,7 @@ struct League: Decodable {
     let id: FlexibleID
     let name: String
     let short: String
+    let logo: URL?
 }
 
 /// League ids are numbers for API-Sports and strings for NBA ("standard") and F1.

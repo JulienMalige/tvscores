@@ -25,7 +25,7 @@ export function createApp({ store, config, startedAt = Date.now() }) {
     }
 
     if (path === "/v1/scoreboard") {
-      return send(res, 200, buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta }));
+      return send(res, 200, buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues }));
     }
     if (path === "/v1/fixtures") {
       const date = url.searchParams.get("date");

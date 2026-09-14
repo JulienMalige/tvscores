@@ -25,9 +25,9 @@ export const config = {
   pathPrefix: env.TVSCORES_PATH_PREFIX || "/tvscores",
   /** Which competitions to keep, per provider. */
   leagues: {
-    football: [{ id: 2, name: "UEFA Champions League", short: "UCL" }],
-    nfl: [{ id: 1, name: "NFL", short: "NFL" }],
-    nba: [{ id: "standard", name: "NBA", short: "NBA" }],
+    football: [{ id: 2, name: "UEFA Champions League", short: "UCL", logo: "https://media.api-sports.io/football/leagues/2.png" }],
+    nfl: [{ id: 1, name: "NFL", short: "NFL", logo: "https://media.api-sports.io/american-football/leagues/1.png" }],
+    nba: [{ id: "standard", name: "NBA", short: "NBA", logo: "https://media.api-sports.io/basketball/leagues/12.png" }],
     f1: [{ id: "f1", name: "Formula 1", short: "F1" }],
     motogp: [{ id: "motogp", name: "MotoGP", short: "MotoGP" }],
     tennis: [{ id: "atp", name: "ATP Tour", short: "ATP" }, { id: "wta", name: "WTA Tour", short: "WTA" }],

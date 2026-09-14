@@ -5,9 +5,8 @@ struct LeagueSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 12) {
-                Image(systemName: Sport.icon(for: group.sport))
-                    .foregroundStyle(Sport.tint(for: group.sport))
+            HStack(spacing: 14) {
+                LeagueMark(sport: group.sport, logo: group.league.logo)
                 Text(group.league.name)
                     .font(.title3.weight(.semibold))
             }
@@ -21,6 +20,35 @@ struct LeagueSection: View {
                 }
             }
         }
+    }
+}
+
+/// Official competition logo when the proxy has one, else the sport's symbol.
+struct LeagueMark: View {
+    let sport: String
+    let logo: URL?
+
+    var body: some View {
+        Group {
+            if let logo {
+                AsyncImage(url: logo) { phase in
+                    if let image = phase.image {
+                        image.resizable().scaledToFit()
+                    } else {
+                        symbol
+                    }
+                }
+            } else {
+                symbol
+            }
+        }
+        .frame(width: 44, height: 44)
+    }
+
+    private var symbol: some View {
+        Image(systemName: Sport.icon(for: sport))
+            .font(.title3)
+            .foregroundStyle(Sport.tint(for: sport))
     }
 }
 
