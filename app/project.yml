@@ -9,10 +9,15 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.10"
-    CODE_SIGNING_ALLOWED: "NO"
-    CODE_SIGN_IDENTITY: ""
     MARKETING_VERSION: "1.0"
     CURRENT_PROJECT_VERSION: "1"
+  configs:
+    # Simulator builds in CI have no team and need no signature. Release is
+    # left alone so the archive can sign automatically with the team passed
+    # on the xcodebuild command line.
+    Debug:
+      CODE_SIGNING_ALLOWED: "NO"
+      CODE_SIGN_IDENTITY: ""
 targets:
   TVScores:
     type: application
