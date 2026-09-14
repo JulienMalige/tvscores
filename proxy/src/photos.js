@@ -65,18 +65,34 @@ export class PhotoResolver {
     return hit;
   }
 
-  /** Names that appear anywhere in the store and have no fresh cache entry. */
+  /**
+   * Names without a fresh cache entry, most visible first: podiums and today's
+   * matches (priority 0), top ten of each table (1), then the long tail (2).
+   */
   pending() {
-    const wanted = new Map();
+    const wanted = new Map(); // name -> { sport, prio }
+    const want = (row, sport, prio) => {
+      const k = photoKey(row);
+      if (!k) return;
+      const cur = wanted.get(k);
+      if (!cur || prio < cur.prio) wanted.set(k, { sport, prio });
+    };
+    const today = new Date().toISOString().slice(0, 10);
     for (const e of this.store.events.values()) {
-      for (const r of e.results || []) { const k = photoKey(r); if (k) wanted.set(k, e.sport); }
-      if (e.sport === "tennis") for (const side of ["home", "away"]) { const k = photoKey(e[side]); if (k) wanted.set(k, "tennis"); }
+      for (const r of e.results || []) want(r, e.sport, 0);
+      if (e.sport === "tennis") {
+        const prio = e.status.state === "live" || String(e.start).startsWith(today) ? 0 : 2;
+        for (const side of ["home", "away"]) want(e[side], "tennis", prio);
+      }
     }
     for (const [key, s] of Object.entries(this.store.standings)) {
       const sport = key.split(":")[0];
-      for (const t of s.tables || []) for (const r of t.rows) { const k = photoKey(r); if (k) wanted.set(k, sport); }
+      for (const t of s.tables || []) for (const r of t.rows) want(r, sport, r.pos <= 10 ? 1 : 2);
     }
-    return [...wanted].filter(([name]) => !this.cached(name));
+    return [...wanted]
+      .filter(([name]) => !this.cached(name))
+      .sort((a, b) => a[1].prio - b[1].prio)
+      .map(([name, { sport }]) => [name, sport]);
   }
 
   async lookup(name, sport) {

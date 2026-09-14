@@ -61,3 +61,14 @@ test("symmetric related match with the same surname", () => {
   assert.equal(pickPlayer(tsdb, "Andrea Kimi Antonelli", "f1").strCutout, "https://x/k.png");
   assert.equal(pickPlayer(tsdb, "Andrea Kimi Rossi", "f1"), null);
 });
+
+test("pending resolves podiums and top-ten before the long tail", async () => {
+  const { PhotoResolver } = await import("../src/photos.js");
+  const store = {
+    photos: {}, meta: {}, sportMeta: () => ({ calls: { day: "", used: 0 } }),
+    events: new Map([["r", { sport: "f1", results: [{ fullName: "Podium Guy" }], status: { state: "final" }, start: "2026-01-01T00:00:00Z" }]]),
+    standings: { "f1:f1": { tables: [{ rows: [{ pos: 15, name: "Tail Driver" }, { pos: 2, name: "Top Driver" }] }] } },
+  };
+  const r = new PhotoResolver({ store });
+  assert.deepEqual(r.pending().map(([n]) => n), ["Podium Guy", "Top Driver", "Tail Driver"]);
+});
