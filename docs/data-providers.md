@@ -91,10 +91,11 @@ Julien asked for official league marks in the section headers. Sources:
 API-Sports league images exist for UCL/NBA but its NFL one is a placeholder
 and its UCL is navy (invisible on the TV background). **TheSportsDB league
 badges** (`lookupleague.php` → `strBadge`) cover all seven with light-on-dark
-variants, so the proxy config hotlinks those from `r2.thesportsdb.com`.
-TheSportsDB asks Patreon support for production use of its images; before
-release either take the $9 tier or copy the seven PNGs to the VPS. Trademark
-caveat as for crests: the marks belong to the leagues.
+variants. `proxy/scripts/build-badges.py` downloads them once, trims the
+transparent padding and writes `proxy/assets/leagues/<id>.png`, which the
+proxy serves at `/v1/assets/leagues/<id>.png` (so nothing is hotlinked and
+the app gets a stable URL). Trademark caveat as for crests: the marks belong
+to the leagues.
 
 ## RapidAPI
 

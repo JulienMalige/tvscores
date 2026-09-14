@@ -8,14 +8,15 @@ export function localDate(iso, tz) {
   return `${get("year")}-${get("month")}-${get("day")}`;
 }
 
-function groupByLeague(events, sportOrder, leagues = {}) {
+function groupByLeague(events, sportOrder, leagues = {}, publicBase = "") {
   const groups = new Map();
   for (const e of events) {
     const key = `${e.sport}:${e.league.id}`;
     if (!groups.has(key)) {
       // League logo comes from config at serve time so cached events need no refresh.
       const cfg = (leagues[e.sport] || []).find((l) => String(l.id) === String(e.league.id));
-      groups.set(key, { sport: e.sport, league: { ...e.league, logo: cfg?.logo }, events: [] });
+      const logo = cfg?.badge ? `${publicBase}/v1/assets/leagues/${cfg.badge}.png` : cfg?.logo;
+      groups.set(key, { sport: e.sport, league: { ...e.league, logo }, events: [] });
     }
     groups.get(key).events.push(e);
   }
@@ -29,7 +30,7 @@ function groupByLeague(events, sportOrder, leagues = {}) {
  * Buckets: yesterday, today, upcoming (tomorrow onwards, F1 calendar included),
  * computed in the viewer's time zone so "today" means their evening.
  */
-export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {} } = {}) {
+export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "" } = {}) {
   const today = localDate(new Date(now).toISOString(), tz);
   const yesterday = localDate(new Date(now - 86400e3).toISOString(), tz);
   const days = { yesterday: [], today: [], upcoming: [] };
@@ -50,6 +51,6 @@ export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrd
     tz,
     stale,
     live: events.filter((e) => e.status.state === STATE.live).length,
-    days: Object.fromEntries(Object.entries(days).map(([k, v]) => [k, groupByLeague(v, sportOrder, leagues)])),
+    days: Object.fromEntries(Object.entries(days).map(([k, v]) => [k, groupByLeague(v, sportOrder, leagues, publicBase)])),
   };
 }

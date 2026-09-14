@@ -23,20 +23,21 @@ export const config = {
   ocBlacktopKey: readKey("TVSCORES_OCBLACKTOP_KEY", "ocblacktop.key"),
   /** Optional URL prefix the reverse proxy leaves on the path (Tailscale serve --set-path). */
   pathPrefix: env.TVSCORES_PATH_PREFIX || "/tvscores",
+  /** Public base the app reaches us at; used for asset URLs in responses. */
+  publicBase: env.TVSCORES_PUBLIC_BASE || "https://srv1822832.tailf78112.ts.net/tvscores",
   /**
-   * Which competitions to keep, per provider. League badges are hotlinked from
-   * TheSportsDB (light-on-dark variants); before the store release either host
-   * copies or take their $9 tier, see docs/data-providers.md.
+   * Which competitions to keep, per provider. `badge` names a trimmed PNG in
+   * proxy/assets/leagues (built by scripts/build-badges.py) served by this proxy.
    */
   leagues: {
-    football: [{ id: 2, name: "UEFA Champions League", short: "UCL", logo: "https://r2.thesportsdb.com/images/media/league/badge/facv1u1742998896.png" }],
-    nfl: [{ id: 1, name: "NFL", short: "NFL", logo: "https://r2.thesportsdb.com/images/media/league/badge/g85fqz1662057187.png" }],
-    nba: [{ id: "standard", name: "NBA", short: "NBA", logo: "https://r2.thesportsdb.com/images/media/league/badge/frdjqy1536585083.png" }],
-    f1: [{ id: "f1", name: "Formula 1", short: "F1", logo: "https://r2.thesportsdb.com/images/media/league/badge/g8cofl1513623681.png" }],
-    motogp: [{ id: "motogp", name: "MotoGP", short: "MotoGP", logo: "https://r2.thesportsdb.com/images/media/league/badge/gg3c201768486075.png" }],
+    football: [{ id: 2, name: "UEFA Champions League", short: "UCL", badge: "ucl" }],
+    nfl: [{ id: 1, name: "NFL", short: "NFL", badge: "nfl" }],
+    nba: [{ id: "standard", name: "NBA", short: "NBA", badge: "nba" }],
+    f1: [{ id: "f1", name: "Formula 1", short: "F1", badge: "f1" }],
+    motogp: [{ id: "motogp", name: "MotoGP", short: "MotoGP", badge: "motogp" }],
     tennis: [
-      { id: "atp", name: "ATP Tour", short: "ATP", logo: "https://r2.thesportsdb.com/images/media/league/badge/q7aej51769857150.png" },
-      { id: "wta", name: "WTA Tour", short: "WTA", logo: "https://r2.thesportsdb.com/images/media/league/badge/bddhun1768230678.png" },
+      { id: "atp", name: "ATP Tour", short: "ATP", badge: "atp" },
+      { id: "wta", name: "WTA Tour", short: "WTA", badge: "wta" },
     ],
   },
   /** Display order of sports on the scoreboard. */

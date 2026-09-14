@@ -26,9 +26,9 @@ test("buckets follow the viewer's time zone", () => {
 
 test("league logo is attached from config at serve time", () => {
   const sb = buildScoreboard([ev("a", "2026-09-13T19:00:00Z", "football", "live")], {
-    now: Date.UTC(2026, 8, 13, 20), leagues: { football: [{ id: 2, logo: "https://x/2.png" }] },
+    now: Date.UTC(2026, 8, 13, 20), leagues: { football: [{ id: 2, badge: "ucl" }] }, publicBase: "https://p/tvscores",
   });
-  assert.equal(sb.days.today[0].league.logo, "https://x/2.png");
+  assert.equal(sb.days.today[0].league.logo, "https://p/tvscores/v1/assets/leagues/ucl.png");
 });
 
 test("stale is per sport", () => {

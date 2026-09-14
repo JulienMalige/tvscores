@@ -1,4 +1,9 @@
 import { createServer } from "node:http";
+import { readFileSync, statSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const ASSETS = join(dirname(fileURLToPath(import.meta.url)), "..", "assets");
 import { buildScoreboard, localDate } from "./scoreboard.js";
 
 function send(res, status, body, extra = {}) {
@@ -25,13 +30,24 @@ export function createApp({ store, config, startedAt = Date.now() }) {
     }
 
     if (path === "/v1/scoreboard") {
-      return send(res, 200, buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues }));
+      return send(res, 200, buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase }));
     }
     if (path === "/v1/fixtures") {
       const date = url.searchParams.get("date");
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date || "")) return send(res, 400, { error: "date=YYYY-MM-DD required" });
       const events = store.all().filter((e) => localDate(e.start, tz) === date);
       return send(res, 200, { date, tz, events });
+    }
+    const asset = path.match(/^\/v1\/assets\/leagues\/([a-z0-9-]+)\.png$/);
+    if (asset) {
+      const file = join(ASSETS, "leagues", `${asset[1]}.png`);
+      try {
+        statSync(file);
+      } catch {
+        return send(res, 404, { error: "no such badge" });
+      }
+      res.writeHead(200, { "content-type": "image/png", "cache-control": "public, max-age=86400", "access-control-allow-origin": "*" });
+      return res.end(readFileSync(file));
     }
     if (path === "/v1/health" || path === "/") {
       return send(res, 200, {
