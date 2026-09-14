@@ -3,17 +3,19 @@ import { STATE } from "./model.js";
 
 const MIN = 60e3;
 const STANDINGS_EVERY = 6 * 3600e3;
+const STANDINGS_VERSION = 2; // bump when row shape changes (e.g. fullName added) to force a refetch
 
 /** Shared: refresh a provider's standings every 6 h when it offers them. */
 async function refreshStandings(self, now) {
   if (!self.p.standings) return;
   const last = self.meta.lastStandings ? Date.parse(self.meta.lastStandings) : 0;
-  if (now - last < STANDINGS_EVERY) return;
+  if (now - last < STANDINGS_EVERY && self.meta.standingsVersion === STANDINGS_VERSION) return;
   if (self.quota && self.quota.spendable(now) < 2) return;
   const data = await self.p.standings();
   if (data && data.tables) self.store.setStandings(self.p.sport, self.p.sport, data);
   else for (const [leagueId, d] of Object.entries(data || {})) self.store.setStandings(self.p.sport, leagueId, d);
   self.meta.lastStandings = new Date(now).toISOString();
+  self.meta.standingsVersion = STANDINGS_VERSION;
 }
 
 function dateOffset(offset, now = Date.now()) {

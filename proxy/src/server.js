@@ -64,11 +64,14 @@ export function createApp({ store, config, startedAt = Date.now(), photos }) {
         uptimeSeconds: Math.round((Date.now() - startedAt) / 1000),
         events: store.events.size,
         photos: { cached: Object.keys(store.photos || {}).length, pending: photos ? photos.pending().length : undefined },
-        quota: Object.fromEntries(Object.entries(store.meta).map(([sport, m]) => [sport, {
-          day: m.calls?.day, used: m.calls?.used ?? 0, limit: config.schedule.dailyQuota,
-          remaining: Math.max(0, config.schedule.dailyQuota - (m.calls?.used ?? 0)),
-          lastOk: m.lastOk, lastError: m.lastError,
-        }])),
+        quota: Object.fromEntries(Object.entries(store.meta).map(([sport, m]) => {
+          const limit = ["f1", "motogp"].includes(sport) ? config.schedule.ocbDailyQuota : config.schedule.dailyQuota;
+          return [sport, {
+            day: m.calls?.day, used: m.calls?.used ?? 0, limit,
+            remaining: Math.max(0, limit - (m.calls?.used ?? 0)),
+            lastOk: m.lastOk, lastError: m.lastError,
+          }];
+        })),
       }, { "cache-control": "no-store" });
     }
     send(res, 404, { error: "not found" });

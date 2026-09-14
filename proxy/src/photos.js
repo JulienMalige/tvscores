@@ -4,6 +4,31 @@ const BASE = "https://www.thesportsdb.com/api/v1/json";
 const TTL_OK = 30 * 86400e3;
 const TTL_MISS = 3 * 86400e3;
 const SPORT_HINT = { f1: "Motorsport", motogp: "Motorsport", tennis: "Tennis", football: "Soccer", nfl: "American Football", nba: "Basketball" };
+const CACHE_VERSION = 3; // bump when the matching rule changes so stale picks are re-resolved
+
+/** "Marc Márquez" -> "marc marquez" for exact, accent-insensitive comparison. */
+export function normalise(name) {
+  return String(name || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z ]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+/**
+ * Same sport and a cutout, then: the exact name, or else the single candidate whose
+ * name contains every word of ours ("Kimi Antonelli" ⊂ "Andrea Kimi Antonelli").
+ * Two such candidates, or none, means no photo: a wrong face is worse than a monogram.
+ */
+export function pickPlayer(players, name, sport) {
+  const want = normalise(name);
+  const words = want.split(" ");
+  const hint = SPORT_HINT[sport];
+  const pool = players.filter((p) => p.strCutout && (!hint || p.strSport === hint));
+  const exact = pool.find((p) => normalise(p.strPlayer) === want);
+  if (exact) return exact;
+  const superset = pool.filter((p) => {
+    const theirs = normalise(p.strPlayer).split(" ");
+    return words.every((w) => theirs.includes(w));
+  });
+  return superset.length === 1 ? superset[0] : null;
+}
 
 /**
  * Resolves a head-and-shoulders cutout per athlete from TheSportsDB, one lookup
@@ -11,12 +36,15 @@ const SPORT_HINT = { f1: "Motorsport", motogp: "Motorsport", tennis: "Tennis", f
  * never waits on it; rows carry `photo` only once known.
  */
 export class PhotoResolver {
-  constructor({ store, key = "3", log = () => {}, perMinute = 20 }) {
+  constructor({ store, key = "3", log = () => {}, perMinute = 25 }) {
     this.store = store;
     this.key = key;
     this.log = log;
     this.interval = Math.ceil(60000 / perMinute);
-    store.photos ??= {};
+    if (store.photosVersion !== CACHE_VERSION) {
+      store.photos = {};
+      store.photosVersion = CACHE_VERSION;
+    }
   }
 
   cached(name) {
@@ -31,7 +59,7 @@ export class PhotoResolver {
   pending() {
     const wanted = new Map();
     for (const e of this.store.events.values()) {
-      for (const r of e.results || []) if (r.fullName) wanted.set(r.fullName, e.sport);
+      for (const r of e.results || []) if (r.fullName) wanted.set(r.fullName, e.sport); // abbreviated names never searched
       if (e.sport === "tennis") for (const side of ["home", "away"]) if (e[side]?.name) wanted.set(e[side].name, "tennis");
     }
     for (const [key, s] of Object.entries(this.store.standings)) {
@@ -43,9 +71,7 @@ export class PhotoResolver {
 
   async lookup(name, sport) {
     const { body } = await getJson(`${BASE}/${this.key}/searchplayers.php?p=${encodeURIComponent(name)}`);
-    const players = body.player || [];
-    const hint = SPORT_HINT[sport];
-    const pick = players.find((p) => p.strCutout && (!hint || p.strSport === hint)) || players.find((p) => p.strCutout);
+    const pick = pickPlayer(body.player || [], name, sport);
     return pick ? pick.strCutout : null;
   }
 

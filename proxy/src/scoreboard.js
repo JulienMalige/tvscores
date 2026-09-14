@@ -34,7 +34,7 @@ function groupByLeague(events, sportOrder, leagues = {}, publicBase = "", standi
 export function withPhotos(e, photoFor) {
   if (!photoFor) return e;
   const out = { ...e };
-  if (e.results) out.results = e.results.map((r) => ({ ...r, photo: photoFor(r.fullName || r.driver) }));
+  if (e.results) out.results = e.results.map((r) => ({ ...r, photo: r.fullName ? photoFor(r.fullName) : undefined }));
   if (e.sport === "tennis") for (const side of ["home", "away"]) if (e[side]) out[side] = { ...e[side], photo: photoFor(e[side].name) };
   return out;
 }

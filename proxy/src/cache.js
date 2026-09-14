@@ -12,6 +12,7 @@ export class Store {
     this.events = new Map();
     this.standings = {}; // "sport:leagueId" -> { updatedAt, tables }
     this.photos = {}; // athlete name -> { url|null, at }
+    this.photosVersion = 0;
     this.meta = {}; // per sport: { lastDaily, lastLive, lastOk, lastError, calls: { day, used } }
     mkdirSync(dir, { recursive: true });
     this.load();
@@ -23,6 +24,7 @@ export class Store {
       for (const e of raw.events || []) this.events.set(e.id, e);
       this.standings = raw.standings || {};
       this.photos = raw.photos || {};
+      this.photosVersion = raw.photosVersion || 0;
       this.meta = raw.meta || {};
     } catch {
       /* first run */
@@ -31,7 +33,7 @@ export class Store {
 
   save() {
     const tmp = this.file + ".tmp";
-    writeFileSync(tmp, JSON.stringify({ events: [...this.events.values()], standings: this.standings, photos: this.photos, meta: this.meta }));
+    writeFileSync(tmp, JSON.stringify({ events: [...this.events.values()], standings: this.standings, photos: this.photos, photosVersion: this.photosVersion, meta: this.meta }));
     renameSync(tmp, this.file);
   }
 
@@ -51,7 +53,8 @@ export class Store {
 
   hasResults(id) {
     const e = this.events.get(id);
-    return Boolean(e && e.status.state === "final" && e.results && e.results.length);
+    // Podiums cached without full names (before photo support) are refetched once.
+    return Boolean(e && e.status.state === "final" && e.results && e.results.length && e.results.every((r) => r.fullName));
   }
 
   /** Drop events older than 3 days so the file does not grow forever. */

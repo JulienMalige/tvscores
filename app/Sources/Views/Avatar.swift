@@ -43,6 +43,12 @@ struct Avatar: View {
         .frame(width: size, height: size)
     }
 
+    /// "M. Marquez" -> "MAR", "Jannik Sinner" -> "SIN": first letters of the surname.
+    static func monogram(for name: String) -> String {
+        let surname = name.split(separator: " ").last.map(String.init) ?? name
+        return String(surname.prefix(3)).uppercased()
+    }
+
     private var monogramText: some View {
         Text(monogram)
             .font(.system(size: size * 0.3, weight: .heavy, design: .rounded))

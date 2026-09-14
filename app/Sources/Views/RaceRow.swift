@@ -36,7 +36,7 @@ private struct RaceContent: View {
                         HStack(spacing: 14) {
                             Text("\(r.pos)")
                                 .font(.system(size: 34, weight: .bold, design: .rounded))
-                            Avatar(photo: r.photo, flag: r.flag, color: Color(hex: r.teamColor), monogram: r.code ?? String(r.driver.suffix(3)).uppercased(), size: 64)
+                            Avatar(photo: r.photo, flag: r.flag, color: Color(hex: r.teamColor), monogram: r.code ?? Avatar.monogram(for: r.driver), size: 64)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(r.driver).font(.callout.weight(.semibold))
                                 Text(r.gap ?? r.team ?? "").font(.footnote).foregroundStyle(.secondary)
