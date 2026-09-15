@@ -16,7 +16,9 @@ From the repository root:
 node scripts/audit.mjs
 ```
 
-It exits non-zero on any finding and covers: exports and modules nothing
+It exits non-zero on any finding. The coverage figure it prints is the proxy
+only; the app has no test target at all, which is a known and deliberate gap
+rather than something to report every day. It covers: exports and modules nothing
 imports, Swift types declared and never used, eight identical lines in two
 places, naming drift, files past 260 lines, leftover markers and commented-out
 code, documents naming files that do not exist, routes served but undocumented

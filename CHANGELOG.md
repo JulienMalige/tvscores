@@ -8,6 +8,10 @@ notes when a version ships.
 
 ## Unreleased
 
+Nothing yet.
+
+## 1.0 build 11 — 15 September 2026
+
 - The icon sits on flat black now, the way the artwork was drawn, instead of
   the vignette I had put behind it. The board is a dark charcoal lit from
   above rather than a black hole, and the dots carry a touch more halo than

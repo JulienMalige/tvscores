@@ -27,7 +27,8 @@ Packages/
 
 # Proxy runtime
 proxy/node_modules/
-proxy/__pycache__/
+__pycache__/
+*.pyc
 proxy/.venv/
 proxy/cache/
 

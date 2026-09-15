@@ -6,7 +6,7 @@
  *
  *   node scripts/testflight.mjs <build number> [--group "Internal"]
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { asc } from "./asc.mjs";
@@ -15,6 +15,13 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const APP_ID = "6811973076";
 const LOCALE = "en-US";
 const MAX_NOTE = 4000;
+
+/** Rewrite the Unreleased heading as the build that just took it. */
+export function closeSection(markdown, version, today = new Date()) {
+  const date = today.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const marketing = (markdown.match(/^## ([\d.]+) build /m) || [])[1] || "1.0";
+  return markdown.replace(/^## Unreleased\s*$/m, `## ${marketing} build ${version} — ${date}`);
+}
 
 /** One section of the changelog: the newest, or the first whose heading matches. */
 export function section(markdown, match) {
@@ -83,8 +90,16 @@ if (process.argv[1] && process.argv[1].endsWith("testflight.mjs")) {
   }
   try {
     const build = await waitForBuild(version);
-    await setNote(build.id, topSection(readFileSync(join(ROOT, "CHANGELOG.md"), "utf8")));
+    const path = join(ROOT, "CHANGELOG.md");
+    const markdown = readFileSync(path, "utf8");
+    await setNote(build.id, topSection(markdown));
     await addToGroup(build.id, group);
+    // Close the section this build just took, or the next one sends it again.
+    const closed = closeSection(markdown, version);
+    if (closed !== markdown) {
+      writeFileSync(path, closed);
+      console.log(`CHANGELOG.md: Unreleased is now build ${version}`);
+    }
     console.log(`build ${version} is ready for testers`);
   } catch (err) {
     console.error(err.message);

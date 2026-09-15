@@ -60,9 +60,11 @@ gh workflow run testflight.yml --repo JulienMalige/tvscores
 ```
 
 The job finishes by waiting for Apple to process the build, giving it the top
-section of `CHANGELOG.md` as its "What to Test" note, and adding it to the
-`Internal` group. So the only thing to do by hand before a release is write
-that changelog entry.
+section of `CHANGELOG.md` as its "What to Test" note, adding it to the
+`Internal` group, and renaming that `## Unreleased` heading to the build that
+just took it. Leaving it open sent the same note to two builds in a row before
+the job did this itself. So the only thing to do by hand before a release is
+write the entry.
 
 The build number is the workflow run number, so every run is unique. The
 marketing version comes from `MARKETING_VERSION` in `app/project.yml`; bump it

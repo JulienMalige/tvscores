@@ -78,5 +78,5 @@ if (!process.argv.includes("--quiet")) {
   }
 }
 const { coverage } = state;
-console.log(`\n${findings.length} finding${findings.length === 1 ? "" : "s"}${coverage === null ? "" : `, coverage ${coverage}%`}`);
+console.log(`\n${findings.length} finding${findings.length === 1 ? "" : "s"}${coverage === null ? "" : `, proxy coverage ${coverage}%`}`);
 process.exit(findings.length ? 1 : 0);

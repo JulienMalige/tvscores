@@ -38,11 +38,6 @@ actor ImagePrefetcher {
             }
         }
     }
-
-    /// Forget what has been fetched, so a later board can warm the cache again.
-    func reset() {
-        done.removeAll()
-    }
 }
 
 extension Scoreboard {
