@@ -10,6 +10,9 @@ notes when a version ships.
 
 - The race result page now lights up the driver you are on, like every
   other list in the app.
+- Tennis shows the events worth watching: the four majors, the 1000-level
+  tournaments and the season finals. Challengers, ITF weeks and qualifying
+  draws no longer fill the list.
 - Scores now refresh every 30 minutes rather than every couple of minutes.
   This is a "what is on today" app, not a live-timing one, and the slower
   pace leaves room to follow more competitions.

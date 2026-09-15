@@ -68,18 +68,62 @@ export function normaliseMatch(m) {
   };
 }
 
+/** A month: tournament identity is stable across seasons, so the catalogue is nearly static. */
+const CATALOGUE_TTL = 30 * 86400e3;
+
+/**
+ * Keeps only the matches of a tournament whose category is one we want.
+ *
+ * A tournament the feed could not label carries `null`, which it documents as
+ * "never derived from the name" — so an unknown tournament is dropped rather
+ * than guessed at. That errs towards showing too little, which on a television
+ * is the right way to be wrong.
+ */
+export function bigEventFilter({ byId, categories, includeQualifying }) {
+  const wanted = new Set(categories);
+  return (m) => {
+    if (!includeQualifying && m.is_qualifying) return false;
+    return wanted.has(byId[String(m.tournament_id)]);
+  };
+}
+
 /**
  * livetennisapi.com free tier: 100 calls/day, 30/min, `status=live|upcoming` only.
  * daily() = the upcoming picture (1 call); live() = matches in play (1 call).
  */
-export function tennisProvider({ key, quota, log = () => {} }) {
+export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }) {
   const headers = { authorization: `Bearer ${key}` };
+  /**
+   * `tournament_id` -> category, for the two tours we show. The endpoint has no
+   * category filter, so the tours are paged once and kept: a few calls a month
+   * against a 100-a-day budget.
+   */
+  async function catalogue() {
+    const held = meta.tournaments;
+    if (held && Date.now() - new Date(held.at).getTime() < CATALOGUE_TTL) return held.byId;
+    const byId = {};
+    for (const tour of ["atp", "wta"]) {
+      for (let offset = 0; ; ) {
+        const { body } = await getJson(`${BASE}/tournaments?tour=${tour}&limit=200&offset=${offset}`, { headers });
+        quota.record(undefined);
+        for (const t of body.data || []) byId[String(t.id)] = t.category;
+        if (!body.meta?.has_more) break;
+        offset += body.data?.length || 200;
+      }
+    }
+    meta.tournaments = { at: new Date().toISOString(), byId };
+    log(`GET tennis tournaments -> ${Object.keys(byId).length} catalogued`);
+    return byId;
+  }
+
   async function list(status) {
     if (!key) throw new Error("Live Tennis API key missing");
+    const byId = await catalogue();
     const { body } = await getJson(`${BASE}/matches?status=${status}&limit=200`, { headers });
     quota.record(undefined);
-    const rows = (body.data || []).map(normaliseMatch).filter(Boolean);
-    log(`GET tennis ${status} -> ${body.data?.length ?? 0} matches, ${rows.length} ATP/WTA singles`);
+    const big = bigEventFilter({ byId, categories: tennis.categories, includeQualifying: tennis.includeQualifying });
+    const rows = (body.data || []).filter(big).map(normaliseMatch).filter(Boolean);
+    log(`GET tennis ${status} -> ${body.data?.length ?? 0} matches, ${rows.length} in ${tennis.categories.join("/")}`);
     return rows;
   }
   /** Top 25 per tour built from the ranked player list (1 call; /rankings is a paid tier). */

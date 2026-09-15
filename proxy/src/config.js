@@ -21,8 +21,8 @@ export const config = {
   apiSportsKey: readKey("TVSCORES_APISPORTS_KEY", "api-sports.key"),
   liveTennisKey: readKey("TVSCORES_LIVETENNIS_KEY", "livetennisapi.key"),
   ocBlacktopKey: readKey("TVSCORES_OCBLACKTOP_KEY", "ocblacktop.key"),
-  /** TheSportsDB key for athlete cutouts; "3" is the public test key, swap for the paid one before release. */
-  theSportsDbKey: env.TVSCORES_TSDB_KEY || "3",
+  /** TheSportsDB key for athlete cutouts and schedules; "3" is the public test key, capped so hard it is unusable for anything but a demo. */
+  theSportsDbKey: readKey("TVSCORES_TSDB_KEY", "thesportsdb.key") || "3",
   /** Optional URL prefix the reverse proxy leaves on the path (Tailscale serve --set-path). */
   pathPrefix: env.TVSCORES_PATH_PREFIX || "/tvscores",
   /** Public base the app reaches us at; used for asset URLs in responses. */
@@ -44,6 +44,19 @@ export const config = {
       { id: "atp", name: "ATP Tour", short: "ATP", badge: "atp" },
       { id: "wta", name: "WTA Tour", short: "WTA", badge: "wta" },
     ],
+  },
+  /**
+   * Tennis plays somewhere every week of the year, most of it in front of
+   * nobody. These are the events worth a television: the four majors, the
+   * 1000-level fields and the season finals. The feed labels a tournament's
+   * category only where its own catalogues agree on an exact-name join and
+   * never guesses from the name, so an unlabelled tournament is left out
+   * rather than assumed to be big.
+   */
+  tennis: {
+    categories: ["grand_slam", "masters_1000", "tour_finals", "wta_1000"],
+    /** Qualifying draws are the same tournament but not the part you watch. */
+    includeQualifying: false,
   },
   /** Display order of sports on the scoreboard. */
   sportOrder: ["football", "f1", "motogp", "tennis", "nba", "nfl"],

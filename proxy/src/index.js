@@ -42,7 +42,7 @@ if (config.ocBlacktopKey) {
 {
   const meta = store.sportMeta("tennis");
   const quota = new Quota(meta, config.schedule);
-  schedulers.push(new TeamSportScheduler({ provider: tennisProvider({ key: config.liveTennisKey, quota, log }), store, cfg: config.schedule, log }));
+  schedulers.push(new TeamSportScheduler({ provider: tennisProvider({ key: config.liveTennisKey, quota, meta, tennis: config.tennis, log }), store, cfg: config.schedule, log }));
 }
 
 const photos = new PhotoResolver({ store, key: config.theSportsDbKey, log });

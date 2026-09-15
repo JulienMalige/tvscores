@@ -182,3 +182,24 @@ slot, points, laps and the fastest lap, plus the drivers who did not finish
 (no position, outcome shown as DNF/DNS/DSQ). The scoreboard row still shows
 three; the race page shows the rest. Portrait lookups stay podium-first so the
 scoreboard fills before the detail pages do.
+
+## Tennis is filtered by category (2026-09-15)
+
+Julien: "on tennis, can we filter only slam and master 1000?" The feed can,
+and it says so itself: `/tournaments` carries a `category` from the enum
+`grand_slam, masters_1000, tour_finals, atp_500, atp_250, wta_1000, wta_500,
+wta_250, wta_125, challenger, itf, juniors, null`, and `tournament_id` on a
+match joins to it. `config.tennis.categories` keeps the first, the second, the
+third and `wta_1000`; qualifying draws are dropped unless
+`includeQualifying` is set.
+
+Two things the provider's own documentation makes clear and the code respects:
+`category` is filled "only where our catalogues agree unambiguously on an
+exact-name join — null otherwise, never derived from the name", so an
+unlabelled tournament is dropped rather than guessed at. `ATP Acapulco`, a
+500, is one of the unlabelled ones, which is the shape of what we lose. The
+catalogue has no category filter, so both tours are paged once and cached for
+a month in the sport's meta: a handful of calls against 100 a day.
+
+The free tier's 100 calls a day is now the binding constraint on tennis, not
+the data. Their BASIC tier is $9.99/mo for 1,000/day.

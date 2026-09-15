@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { normaliseMatch, liveClock, setsLine } from "../src/providers/livetennis.js";
+import { normaliseMatch, liveClock, setsLine, bigEventFilter } from "../src/providers/livetennis.js";
 
 const raw = JSON.parse(readFileSync(new URL("./fixtures/tennis.json", import.meta.url))).data[0];
 
@@ -55,4 +55,30 @@ test("helpers", () => {
   assert.equal(liveClock({ games: [] }), undefined);
   assert.equal(liveClock(null), undefined);
   assert.equal(setsLine(null), undefined);
+});
+
+const CATALOGUE = { 1238: "grand_slam", 2129: null, 3226: "atp_250", 7001: "masters_1000", 8002: "wta_1000", 9003: "challenger", 9004: "itf" };
+const big = (over = {}) =>
+  bigEventFilter({ byId: CATALOGUE, categories: ["grand_slam", "masters_1000", "tour_finals", "wta_1000"], includeQualifying: false, ...over });
+
+test("only the majors, the 1000s and the finals reach the television", () => {
+  const keep = big();
+  assert.equal(keep({ tournament_id: 1238 }), true, "Australian Open");
+  assert.equal(keep({ tournament_id: 7001 }), true, "a Masters 1000");
+  assert.equal(keep({ tournament_id: 8002 }), true, "a WTA 1000");
+  assert.equal(keep({ tournament_id: 3226 }), false, "an ATP 250");
+  assert.equal(keep({ tournament_id: 9003 }), false, "a Challenger");
+  assert.equal(keep({ tournament_id: 9004 }), false, "an ITF");
+});
+
+test("a tournament the feed could not label is dropped, not guessed at", () => {
+  // The provider documents `category` as null wherever its catalogues do not
+  // agree on an exact name, and says it never derives one from the name.
+  assert.equal(big()({ tournament_id: 2129 }), false);
+  assert.equal(big()({ tournament_id: 404404 }), false, "and an id we have never seen");
+});
+
+test("qualifying is the same tournament but not the part you watch", () => {
+  assert.equal(big()({ tournament_id: 1238, is_qualifying: true }), false);
+  assert.equal(big({ includeQualifying: true })({ tournament_id: 1238, is_qualifying: true }), true);
 });
