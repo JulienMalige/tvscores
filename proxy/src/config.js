@@ -52,7 +52,13 @@ export const config = {
     dayOffsets: [-1, 0, 1],
     dailyRefreshHourUtc: 4,
     idleRefreshMinutes: 180,
-    liveIntervalSeconds: 150,
+    /**
+     * How often a sport with a game in progress is polled. Julien's brief
+     * (2026-09-15): this is a "what is on today" app, not a live-timing one —
+     * every 30 minutes now, perhaps 10 later. The quota stretches this floor
+     * further when the day's budget would not survive it.
+     */
+    liveIntervalSeconds: 1800,
     /** Never spend the last N calls of a sport's daily quota. */
     quotaReserve: 8,
     dailyQuota: 100,

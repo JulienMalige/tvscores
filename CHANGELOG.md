@@ -10,6 +10,9 @@ notes when a version ships.
 
 - The race result page now lights up the driver you are on, like every
   other list in the app.
+- Scores now refresh every 30 minutes rather than every couple of minutes.
+  This is a "what is on today" app, not a live-timing one, and the slower
+  pace leaves room to follow more competitions.
 - League tables have room to breathe: the constructor and team badges no
   longer crowd the edges of their line, and every list in the app now spaces
   its rows the same way.
