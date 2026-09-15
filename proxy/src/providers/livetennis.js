@@ -79,11 +79,13 @@ const CATALOGUE_TTL = 30 * 86400e3;
  * than guessed at. That errs towards showing too little, which on a television
  * is the right way to be wrong.
  */
-export function bigEventFilter({ byId, categories, includeQualifying }) {
+export function bigEventFilter({ byId, categories, includeQualifying, alsoBig = [] }) {
   const wanted = new Set(categories);
+  const pinned = new Set(alsoBig.map(String));
   return (m) => {
     if (!includeQualifying && m.is_qualifying) return false;
-    return wanted.has(byId[String(m.tournament_id)]);
+    const id = String(m.tournament_id);
+    return pinned.has(id) || wanted.has(byId[id]);
   };
 }
 
@@ -121,7 +123,7 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
     const byId = await catalogue();
     const { body } = await getJson(`${BASE}/matches?status=${status}&limit=200`, { headers });
     quota.record(undefined);
-    const big = bigEventFilter({ byId, categories: tennis.categories, includeQualifying: tennis.includeQualifying });
+    const big = bigEventFilter({ byId, ...tennis });
     const rows = (body.data || []).filter(big).map(normaliseMatch).filter(Boolean);
     log(`GET tennis ${status} -> ${body.data?.length ?? 0} matches, ${rows.length} in ${tennis.categories.join("/")}`);
     return rows;

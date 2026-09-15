@@ -57,6 +57,25 @@ export const config = {
     categories: ["grand_slam", "masters_1000", "tour_finals", "wta_1000"],
     /** Qualifying draws are the same tournament but not the part you watch. */
     includeQualifying: false,
+    /**
+     * The 1000s their catalogue misses or mislabels, pinned by id because a
+     * name match is what mislabelled them: Madrid and Rome come back as `itf`
+     * (both cities host an ITF week of the same name) and the rest as `null`.
+     * Each tournament has two ids, one per event type, and both are listed.
+     * Checked 2026-09-15; ATP Doha and ATP Beijing are 500s and stay out.
+     */
+    alsoBig: [
+      1262, 1970, // Monte Carlo
+      1269, 2004, // Madrid (ATP)
+      1270, 2011, // Rome (ATP)
+      1667, 8656, // Shanghai
+      2078, 7607, // Montreal (ATP, alternates with Toronto)
+      1268, 2003, // Madrid (WTA)
+      1271, 2010, // Rome (WTA)
+      1651, 8654, // Beijing (WTA)
+      1241, 1853, // Doha (WTA)
+      1517, 1533, // Montreal (WTA)
+    ],
   },
   /** Display order of sports on the scoreboard. */
   sportOrder: ["football", "f1", "motogp", "tennis", "nba", "nfl"],

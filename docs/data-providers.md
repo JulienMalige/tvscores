@@ -201,5 +201,17 @@ unlabelled tournament is dropped rather than guessed at. `ATP Acapulco`, a
 catalogue has no category filter, so both tours are paged once and cached for
 a month in the sport's meta: a handful of calls against 100 a day.
 
+Their catalogue leaves 513 of 847 ATP/WTA tournaments unlabelled and gets two
+wrong, so `config.tennis.alsoBig` pins the missing 1000s by `tournament_id`:
+Monte Carlo, Madrid, Rome, Shanghai and Montreal on the ATP side; Madrid,
+Rome, Beijing, Doha and Montreal on the WTA side. Madrid and Rome come back as
+`itf` because each city also hosts an ITF week of the same name — pinning by id
+rather than name is the point. Every tournament has two ids, one per event
+type, and both are listed; all twenty were checked against the live catalogue
+on 2026-09-15. ATP Doha and ATP Beijing are 500s and deliberately left out.
+
+Consequence to expect: outside the majors and the 1000s, tennis disappears
+from the scoreboard for weeks at a time. That is the filter working.
+
 The free tier's 100 calls a day is now the binding constraint on tennis, not
 the data. Their BASIC tier is $9.99/mo for 1,000/day.
