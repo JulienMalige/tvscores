@@ -82,14 +82,22 @@ export function sportsDbFootball({ key, leagues, window: win, quota, log = () =>
       .map((r) => normaliseEvent(r, byId.get(String(r.idLeague))))
       .filter(Boolean);
 
-  async function daily() {
+  /**
+   * One date. The scheduler asks for this when a match it was watching leaves
+   * the live feed: the livescore endpoint only lists games in progress, so a
+   * match that ends simply vanishes from it, and its final score has to be
+   * read back from the day's fixtures.
+   */
+  async function byDate(date) {
     if (!key) throw new Error("TheSportsDB key missing");
+    const { body } = await getJson(`${V1}/${key}/eventsday.php?d=${date}&s=Soccer`);
+    quota.record(undefined);
+    return mine(body.events || []);
+  }
+
+  async function daily() {
     const out = [];
-    for (const date of datesAround(win)) {
-      const { body } = await getJson(`${V1}/${key}/eventsday.php?d=${date}&s=Soccer`);
-      quota.record(undefined);
-      out.push(...mine(body.events || []));
-    }
+    for (const date of datesAround(win)) out.push(...(await byDate(date)));
     log(`GET sportsdb football ${win.back + win.ahead + 1} days -> ${out.length} matches`);
     return out;
   }
@@ -104,5 +112,5 @@ export function sportsDbFootball({ key, leagues, window: win, quota, log = () =>
     return rows;
   }
 
-  return { sport: "football", daily, live };
+  return { sport: "football", daily, live, byDate };
 }

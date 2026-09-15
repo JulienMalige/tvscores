@@ -47,15 +47,25 @@ export class TeamSportScheduler {
     return this.store.all().filter((e) => e.sport === this.p.sport);
   }
 
-  /** Any tracked game that could be in progress right now? */
+  /**
+   * Any tracked game that could be in progress right now?
+   *
+   * A game already reported live gets twice the window, because the cap is
+   * sized for when a game is likely to have *started*, and some go long: a
+   * five-set match or an overtime game outlives four hours. But the cap
+   * applies to it all the same. A game left at "live" by a provider that
+   * dropped it would otherwise hold the window open for ever, which costs a
+   * call every interval and, worse, blocks the daily refresh: that one waits
+   * for the window to close.
+   */
   hasLiveWindow(now = Date.now()) {
     const before = 10 * MIN;
     const after = this.cfg.liveWindowHours * 3600e3;
     return this.events().some((e) => {
-      if (e.status.state === STATE.live) return true;
-      if (e.status.state !== STATE.scheduled) return false;
+      const live = e.status.state === STATE.live;
+      if (!live && e.status.state !== STATE.scheduled) return false;
       const t = Date.parse(e.start);
-      return now >= t - before && now <= t + after;
+      return now >= t - before && now <= t + (live ? 2 * after : after);
     });
   }
 
