@@ -65,11 +65,15 @@ avatar the app draws. Anything unasked-for for 60 days is pruned.
 
 ## Providers and quota
 
-| Sport | Source | Calls per day |
-|---|---|---|
-| football (8 competitions), nfl, nba | TheSportsDB, Single Developer key | 9 daily (yesterday + seven days) + live polling, for **all** leagues of that sport at once |
-| f1, motogp | Orange Cat Blacktop (free key, 7,500/month), Jolpica fallback for F1 without a key | 1 calendar call + 1 per newly finished race, every 30 min; F1 flags from 1 Jolpica call/day |
-| tennis (ATP, WTA singles) | livetennisapi.com free key, 100/day | 1 upcoming call daily + live polling inside match windows |
+| Sport | Provider & plan | Cap | Schedule batch | Live poll | Source's own freshness | Worst-case day | Licensed for release? |
+|---|---|---|---|---|---|---|---|
+| football (8 competitions) | TheSportsDB, Single Developer ($9/mo) | 100/min | 9 calls, once per UTC day after 04:00 (or 3 h stale) | 60 s inside a window, 1 call | ~2 min | ~750 | yes, confirm wording |
+| nfl | TheSportsDB, same key | shared | 9 calls, same | 60 s, 1 call | ~2 min | ~400 | yes |
+| nba | TheSportsDB, same key | shared | 9 calls, same | 60 s, 1 call | ~2 min | ~400 | yes |
+| tennis (ATP/WTA, majors and 1000s) | livetennisapi, free | **100/day** | 1 call daily + catalogue once a month | 30 min, 1 call | seconds | ~55 | free tier only |
+| f1, motogp | Orange Cat Blacktop, free | 7,500/month | calendar every 6 h; 30 min within 6 h of a session | — (results, not live timing) | post-session | ~10 each | **no — non-commercial** |
+| portraits | TheSportsDB, same key | 25/min, soft 1,000/day | once per athlete, kept a month | — | static | ~120 on a new sport | yes |
+| crests, badges | mirrored on this proxy | none after first fetch | on first sight | — | static | ~0 | trademark risk accepted |
 
 TheSportsDB is capped per **minute** (100 on the paid tier), not per day, which
 is what lets the team sports poll a minute apart. Two consequences worth
