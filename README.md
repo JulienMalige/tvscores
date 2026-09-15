@@ -80,8 +80,12 @@ Static checks over the whole repository: exports and modules nothing imports,
 Swift types declared and never used, blocks of eight identical lines, naming
 that has drifted, files grown past 260 lines, leftover markers and
 commented-out code, documents naming files that no longer exist, routes served
-but undocumented or documented but gone, line coverage under 70 percent, and
-any credential that wandered out of `proxy/src/config.js`.
+but undocumented or documented but gone, a change to the app or the proxy with
+nothing written in `CHANGELOG.md`, line coverage under 70 percent, and any
+credential that wandered out of `proxy/src/config.js`.
+
+The checks live one family per file under `scripts/audit`, so adding one means
+writing a function and listing it.
 
 It runs on every push and once a day. A scheduled failure leaves a single
 GitHub issue and closes it when the audit is clean again. Everything it reports

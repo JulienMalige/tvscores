@@ -20,7 +20,12 @@ None of these directories exist yet. Create them as the work needs them, not up 
 4. **No odds, betting, or streaming links** anywhere in the app.
 5. **Crests come from the proxy** (`team.logo`, API-Sports media CDN), decided by Julien on 2026-09-14 knowing the trademark risk; the monogram stays as the fallback. Never bundle logo files in the app.
 6. **Do not commit** `.xcodeproj` contents, `DerivedData`, `xcuserdata`, `.env`, or any secret. The `.gitignore` covers these; keep it that way.
-7. **Apple credentials stay out of the repo.** Enrollment is done and the App Store Connect API key is in
+7. **Every change a tester could notice goes in `CHANGELOG.md`** under
+   `## Unreleased`, in the same commit. It is written for whoever installs the
+   app, not for whoever wrote it, and the release job sends it to TestFlight as
+   the build's "What to Test" note. Tooling and internal refactors do not
+   belong there.
+8. **Apple credentials stay out of the repo.** Enrollment is done and the App Store Connect API key is in
    `~/.config/tvscores/asc.env` plus GitHub secrets. Never commit a `.p8`, and never print a key. Releases go
    through the `TestFlight` workflow; see `docs/release.md`.
 
