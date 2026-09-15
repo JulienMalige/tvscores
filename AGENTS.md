@@ -6,11 +6,13 @@ You are working on a tvOS app plus a small caching proxy. Read this file before 
 
 ```
 app/          tvOS app (SwiftUI). Xcode project generated from app/project.yml with XcodeGen.
-proxy/        caching proxy that runs on Julien's VPS. Owns the sports API key.
-docs/         decisions, data licence, App Store notes. One markdown file per topic.
+proxy/        caching proxy that runs on Julien's VPS. Owns every provider key.
+docs/         decisions, provider terms, release notes. One markdown file per topic.
+scripts/      repository tooling: the audit, the brand assets, the App Store Connect client.
+design/       source artwork the build scripts read. Not bundled in the app.
+CHANGELOG.md  what each TestFlight build changed, for whoever installs it.
+.claude/      the source-hygiene skill. Personal settings there are gitignored.
 ```
-
-None of these directories exist yet. Create them as the work needs them, not up front.
 
 ## Hard rules
 
@@ -54,19 +56,25 @@ Julien watches from Brazil (America/Sao_Paulo): capture `Resources/sample-scoreb
 ## Conventions
 
 - Swift, SwiftUI, Swift Concurrency (`async/await`). No Combine unless a framework forces it.
-- Minimum tvOS: the current major version minus one.
+- Minimum tvOS 18.0 (`app/project.yml`). Raise it only for a feature worth losing a TV over.
 - **Four languages from day one: French, English, Portuguese, Spanish.** Development language is English. Every user-facing string goes through a String Catalog (`Localizable.xcstrings`) with all four translations filled in before a feature is called done; no hard-coded strings in views. Store listing (name, subtitle, keywords, screenshots) is localised for the same four. Default store locales: fr-FR, en-US, pt-BR, es-ES; add pt-PT and es-MX as copies later if wanted.
 - Dates, times and team names are locale-aware: kickoff times in the viewer's time zone, day names via `Date.FormatStyle`, never hand-formatted.
 - Product name **TV Scores**, bundle id `com.julienmalige.tvscores`, Xcode scheme and target `TVScores`.
 - One feature per commit, with a message that says what changed for the user.
 - Every decision that is not derivable from the code goes into `docs/` as a dated note.
+- **Review the diff before pushing**, and fix what the review finds. Run
+  `node scripts/audit.mjs`, which has to be clean.
+- **Look at the CI screenshots before building for TestFlight.** The workflow
+  renders the app against live data; judge the build on those images, not on
+  the diff. Releases then go out through the `TestFlight` workflow.
 
 ## Proxy
 
 Built 2026-09-13 in `proxy/` (Node 22, no dependencies, see `proxy/README.md`).
 Runs on Julien's VPS as a systemd user service, public at
 `https://srv1822832.tailf78112.ts.net/tvscores/v1/scoreboard?tz=<IANA tz>`.
-The app reads only `/v1/scoreboard` (and `/v1/health` for a debug screen).
+The app reads `/v1/scoreboard` and `/v1/standings/{sport}/{league}`, and loads
+images from `/v1/img/...` and `/v1/assets/...` which the scoreboard hands it.
 Rules: polling on a schedule, never per request; per-sport daily budget with a
 reserve; last good cache served with `stale` flags when upstream fails; the
 `/v1/health` endpoint exposes quota use per sport.
@@ -77,13 +85,24 @@ Follow `docs/design-reference.md` (Apple Sports layout adapted to tvOS) for ever
 
 ## Open decisions (ask Julien, do not guess)
 
-- Which leagues are in the MVP: currently Champions League, F1, MotoGP, ATP/WTA, NBA, NFL. Rugby is available on the API-Sports plan if Julien wants it.
-- Data provider: decided, API-Sports free plans + Jolpica for F1 (see `docs/data-providers.md`).
-- Proxy language: decided, Node 22 plain JS.
-- Whether the repo stays private.
+- **Paid data tiers before any public release.** The motorsport source is free
+  for non-commercial use only, the photo source runs on a public test key, and
+  the badges under `proxy/assets` are other people's trademarks in a public
+  repository. This is the real gate on shipping to the store.
+- **A seven-day Upcoming for football** needs a source with date ranges; the
+  free plan serves yesterday to tomorrow only. See `docs/data-providers.md`.
+- **Where the proxy lives** once people other than Julien install the app. Its
+  address is baked into every build, and the current tunnel is not meant for
+  an audience.
+- Leagues in the MVP: Premier League, Champions League, NFL, NBA, F1, MotoGP,
+  ATP/WTA. Rugby is available on the same plan if Julien wants it.
 
 ## Working with Julien
 
-- Julien is usually on an iPad, driving this Mac session through Remote Control. Keep replies short and send images for anything visual.
-- Never say "open it on your laptop"; you are on the laptop.
+- **There is no Mac.** This session runs on a Linux VPS. The app is built,
+  screenshotted and signed on GitHub Actions macOS runners; that is the only
+  place Xcode exists. Never suggest opening something locally in Xcode.
+- Julien is usually on an iPad. Keep replies short and send images for anything
+  visual: he judges the work on the picture, not on the description.
 - If a step needs `sudo`, an Apple ID login, or an App Store purchase, stop and ask.
+- Run the `source-hygiene` skill when asked to check the state of the source.
