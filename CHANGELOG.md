@@ -9,7 +9,8 @@ notes when a version ships.
 ## Unreleased
 
 - The icon sits on flat black now, the way the artwork was drawn, instead of
-  the faint vignette I had put behind it, and the dots carry a little more
+  the vignette I had put behind it. The board now catches a little light from
+  above, falling away to black at the foot, and the dots carry a touch more
   halo than the last build gave them.
 
 ## 1.0 build 9 — 15 September 2026

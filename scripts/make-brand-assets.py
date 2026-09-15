@@ -28,6 +28,7 @@ BRAND = CATALOG / "App Icon & Top Shelf Image.brandassets"
 MARK_WIDTH = 0.74     # of the canvas; leaves the safe margin the layers need
 BLOOM = (255, 40, 30)
 BLOOM_STRENGTH = 0.45  # enough for the dots to float above when focused
+TOP_LIGHT = (30, 27, 30)  # the board catches a little light from above
 
 
 def mark() -> Image.Image:
@@ -44,10 +45,16 @@ def mark() -> Image.Image:
 
 
 def ground(size: tuple[int, int]) -> Image.Image:
-    """The unlit board: flat black, as the artwork has it, and opaque as the
-    bottom layer must be. No vignette. A dot-matrix board is not lit between
-    its lamps, and the dots stay crisper against nothing."""
-    return Image.new("RGBA", size, (0, 0, 0, 255))
+    """The unlit board, lit from above and falling away to black at the foot,
+    the way Apple's own dark icons are lit. Opaque, as the bottom layer must
+    be, and never bright enough to lift the dots off it."""
+    w, h = size
+    strip = Image.new("RGB", (1, 64))
+    px = strip.load()
+    for y in range(64):
+        t = (1 - y / 63) ** 1.7
+        px[0, y] = tuple(round(c * t) for c in TOP_LIGHT)
+    return strip.resize((w, h), Image.LANCZOS).convert("RGBA")
 
 
 def placed(size: tuple[int, int], art: Image.Image) -> Image.Image:
