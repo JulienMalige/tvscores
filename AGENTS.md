@@ -99,6 +99,11 @@ reserve; last good cache served with `stale` flags when upstream fails; the
 
 Follow `docs/design-reference.md` (Apple Sports layout adapted to tvOS) for every screen. Judge each build on the screenshot against that note.
 
+The code behind it is named in `docs/design-system.md`: four levels — screen,
+section, row, element — each with its folder under `app/Sources/Views` and its
+name ending. Every measurement lives in `Views/Metrics.swift`; a view that
+writes its own number is a bug, and rows all use `rowSurface(focused:)`.
+
 ## Open decisions (ask Julien, do not guess)
 
 - **Paid data tiers before any public release.** The motorsport source is free

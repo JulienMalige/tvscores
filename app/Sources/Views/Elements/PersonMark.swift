@@ -1,13 +1,13 @@
 import SwiftUI
 
-/// Apple Sports-style athlete avatar: coloured disc, cutout photo clipped inside,
-/// round flag badge at the bottom-right. Falls back to a monogram.
-struct Avatar: View {
+/// The mark for a person: coloured disc, cutout photo clipped inside, round flag
+/// badge at the bottom-right. Falls back to a monogram when there is no photo.
+struct PersonMark: View {
     let photo: URL?
     let flag: String?
     var color: Color? = nil
     var monogram: String = ""
-    var size: CGFloat = 72
+    var size: CGFloat = Metrics.mark
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {

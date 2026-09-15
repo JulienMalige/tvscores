@@ -75,10 +75,10 @@ struct Standings: Decodable {
 
 struct StandingsTable: Decodable, Identifiable {
     let id: String   // drivers | constructors | teams | rankings
-    let rows: [StandingsRow]
+    let rows: [StandingsEntry]
 }
 
-struct StandingsRow: Decodable, Identifiable {
+struct StandingsEntry: Decodable, Identifiable {
     let pos: Int
     let name: String
     let sub: String?

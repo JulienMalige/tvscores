@@ -10,6 +10,9 @@ notes when a version ships.
 
 - The race result page now lights up the driver you are on, like every
   other list in the app.
+- League tables have room to breathe: the constructor and team badges no
+  longer crowd the edges of their line, and every list in the app now uses
+  rows of the same height.
 
 ## 1.0 build 11 — 15 September 2026
 

@@ -6,18 +6,18 @@ struct RaceRow: View {
 
     var body: some View {
         NavigationLink(value: event) {
-            RaceContent(event: event)
+            RaceRowContent(event: event)
         }
         .buttonStyle(.plain)
     }
 }
 
-private struct RaceContent: View {
+private struct RaceRowContent: View {
     let event: Event
     @Environment(\.isFocused) private var isFocused
 
     var body: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: Metrics.headingGap) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(event.name ?? "")
@@ -27,7 +27,7 @@ private struct RaceContent: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                StatusView(status: event.status, start: event.start)
+                StatusLabel(status: event.status, start: event.start)
             }
             let podium = (event.results ?? []).filter(\.finished).prefix(3)
             if !podium.isEmpty {
@@ -36,7 +36,8 @@ private struct RaceContent: View {
                         HStack(spacing: 14) {
                             Text("\(r.pos ?? 0)")
                                 .font(.system(size: 34, weight: .bold, design: .rounded))
-                            Avatar(photo: r.photo, flag: r.flag, color: Color(hex: r.teamColor), monogram: r.code ?? Avatar.monogram(for: r.driver), size: 64)
+                            PersonMark(photo: r.photo, flag: r.flag, color: Color(hex: r.teamColor),
+                                       monogram: r.code ?? PersonMark.monogram(for: r.driver), size: Metrics.mark)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(r.driver).font(.callout.weight(.semibold))
                                 Text(r.gap ?? r.team ?? "").font(.footnote).foregroundStyle(.secondary)
@@ -47,8 +48,6 @@ private struct RaceContent: View {
                 }
             }
         }
-        .padding(.vertical, 22)
-        .padding(.horizontal, 28)
         .rowSurface(focused: isFocused)
     }
 }

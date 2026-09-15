@@ -61,4 +61,5 @@ to carry an audience. Those are tracked as open decisions in
 | [proxy/README.md](proxy/README.md) | the proxy's endpoints, providers, quotas and caches |
 | [docs/data-providers.md](docs/data-providers.md) | who the data comes from and on what terms |
 | [docs/design-reference.md](docs/design-reference.md) | the layout every screen is judged against |
+| [docs/design-system.md](docs/design-system.md) | what the pieces of the interface are called |
 | [docs/release.md](docs/release.md) | signing and the road to TestFlight |

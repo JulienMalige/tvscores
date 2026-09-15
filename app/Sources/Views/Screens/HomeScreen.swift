@@ -1,6 +1,7 @@
 import SwiftUI
 
-struct HomeView: View {
+/// The app's front page: one day of every league the proxy follows.
+struct HomeScreen: View {
     @State private var store = ScoreboardStore()
     @State private var day: Day = Self.initialDay()
     @State private var path = NavigationPath()
@@ -13,19 +14,19 @@ struct HomeView: View {
                 // pinned bar saves no input, since reaching the tabs means
                 // moving focus up there anyway, and the focus engine brings
                 // them back on screen when it does.
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: Metrics.sectionGap / 2) {
                     header
                     DayTabs(selected: $day)
                     content
                 }
-                .padding(.horizontal, 80)
-                .padding(.top, 48)
-                .padding(.bottom, 80)
+                .padding(.horizontal, Metrics.screenMargin)
+                .padding(.top, Metrics.screenTop)
+                .padding(.bottom, Metrics.screenBottom)
             }
             .navigationDestination(for: LeagueRef.self) { ref in
-                LeagueView(ref: ref, store: store, day: day)
+                LeagueScreen(ref: ref, store: store, day: day)
             }
-            .navigationDestination(for: Event.self) { RaceDetailView(eventId: $0.id, fallback: $0, store: store) }
+            .navigationDestination(for: Event.self) { RaceScreen(eventId: $0.id, fallback: $0, store: store) }
         }
         .task { store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
@@ -85,7 +86,7 @@ struct HomeView: View {
             if groups.isEmpty {
                 EmptyDay()
             } else {
-                LazyVStack(alignment: .leading, spacing: 48) {
+                LazyVStack(alignment: .leading, spacing: Metrics.sectionGap) {
                     ForEach(groups) { group in
                         LeagueSection(group: group, linkToLeague: true)
                     }
@@ -112,59 +113,6 @@ struct HomeView: View {
     }
 }
 
-struct DayTabs: View {
-    @Binding var selected: Day
-    @FocusState private var focused: Day?
-
-    var body: some View {
-        HStack(spacing: 24) {
-            ForEach(Day.allCases) { d in
-                Button {
-                    selected = d
-                } label: {
-                    Text(title(d))
-                        .fontWeight(selected == d ? .bold : .regular)
-                }
-                .buttonStyle(.bordered)
-                .focused($focused, equals: d)
-            }
-            Spacer()
-        }
-        .defaultFocus($focused, selected, priority: .userInitiated)
-        .focusSection()
-        .task {
-            // The focus engine settles after the first layout pass, and inside a
-            // safe-area inset that happens later than onAppear. Re-assert once so
-            // the highlight starts on the selected day, not the leading tab.
-            focused = selected
-            await Task.yield()
-            focused = selected
-        }
-    }
-
-    private func title(_ d: Day) -> LocalizedStringKey {
-        switch d {
-        case .yesterday: "tab.yesterday"
-        case .today: "tab.today"
-        case .upcoming: "tab.upcoming"
-        }
-    }
-}
-
-struct EmptyDay: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "sportscourt")
-                .font(.system(size: 64))
-                .foregroundStyle(.secondary)
-            Text("home.empty")
-                .font(.title3)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, minHeight: 500)
-    }
-}
-
 #Preview {
-    HomeView()
+    HomeScreen()
 }
