@@ -95,6 +95,40 @@ Rules: polling on a schedule, never per request; per-sport daily budget with a
 reserve; last good cache served with `stale` flags when upstream fails; the
 `/v1/health` endpoint exposes quota use per sport.
 
+### When the proxy fetches
+
+This is the mechanic to preserve; `proxy/src/scheduler.js` owns it and
+`proxy/test/scheduler.test.js` pins it down.
+
+| What | When | Cost per round |
+|---|---|---|
+| Schedules (`daily`) | once per UTC day after `dailyRefreshHourUtc`, or after `idleRefreshMinutes` — but never while a game could be in progress | football 9 calls (a day each), NFL/NBA 3 |
+| Scores (`live`) | only inside a live window, then every `liveIntervalSeconds` (30 min) | 1 call per sport |
+| Standings | every 6 hours | 1 per league |
+| Portraits | once per athlete, kept a month | background, 25/min |
+| Crests, badges | mirrored once, served with a month-long header | none after the first |
+
+A **live window** opens 10 minutes before a stored kickoff and closes
+`liveWindowHours` (4 h) after it — twice that for a game already reported
+live, because five-setters and overtime run long. Outside a window the
+scheduler wakes every 5 minutes and makes **no request at all**.
+
+Invariants worth keeping:
+
+- **Nothing polls on a blind timer.** If you add a fetch, hang it off the
+  window or the daily pass, not a `setInterval`.
+- **A live game must be able to stop being live.** A provider's live feed
+  lists only games in progress, so a finished match disappears from it; the
+  scheduler refetches that match's own UTC date through `provider.byDate` to
+  learn the final score. A provider with a `live()` needs a `byDate()`.
+- **Failures back off**: each consecutive one doubles the wait to a one-hour
+  ceiling, cleared by a single good answer.
+- **Answers carry an `ETag`** and honour `If-None-Match` with a bodyless 304.
+  The board is ~48 KB and the television asks every minute during a game.
+- **Swapping a provider changes event ids**, so bump `SCHEMA_VERSION` in
+  `proxy/src/cache.js`: it empties the events and the daily stamps, and the
+  next tick refills. Without it the same match shows twice, once per id.
+
 ## Design
 
 Follow `docs/design-reference.md` (Apple Sports layout adapted to tvOS) for every screen. Judge each build on the screenshot against that note.
