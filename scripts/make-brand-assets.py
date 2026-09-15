@@ -27,7 +27,7 @@ BRAND = CATALOG / "App Icon & Top Shelf Image.brandassets"
 
 MARK_WIDTH = 0.74     # of the canvas; leaves the safe margin the layers need
 BLOOM = (255, 40, 30)
-BLOOM_STRENGTH = 0.28  # enough for the dots to float above when focused
+BLOOM_STRENGTH = 0.45  # enough for the dots to float above when focused
 
 
 def mark() -> Image.Image:

@@ -9,7 +9,8 @@ notes when a version ships.
 ## Unreleased
 
 - The icon sits on flat black now, the way the artwork was drawn, instead of
-  the faint vignette I had put behind it.
+  the faint vignette I had put behind it, and the dots carry a little more
+  halo than the last build gave them.
 
 ## 1.0 build 9 — 15 September 2026
 
