@@ -69,3 +69,20 @@ Prerequisites on the Mac: current Xcode from the App Store, `brew install xcodeg
 - `app/`: Yesterday / Today / Upcoming scoreboard reading the proxy (or a bundled sample with `-TVScoresDemo`), Apple Sports row layout, en/fr/pt/es. Built and screenshotted on every push by the GitHub Actions workflow (`.github/workflows/tvos.yml`).
 - `proxy/`: live on the VPS with Champions League, NFL, NBA (API-Sports free plans), Formula 1 and MotoGP (Orange Cat Blacktop, results and calendar), ATP/WTA tennis (livetennisapi.com); quota-aware polling, disk cache, public HTTPS via Tailscale Funnel.
 - Next: match detail screen, favourites, Top Shelf and app icon, then the Apple Developer enrollment for a TestFlight build on the real Apple TV.
+
+## Keeping the source honest
+
+```sh
+node scripts/audit.mjs
+```
+
+Static checks over the whole repository: exports and modules nothing imports,
+Swift types declared and never used, blocks of eight identical lines, naming
+that has drifted, files grown past 260 lines, leftover markers and
+commented-out code, documents naming files that no longer exist, routes served
+but undocumented or documented but gone, line coverage under 70 percent, and
+any credential that wandered out of `proxy/src/config.js`.
+
+It runs on every push and once a day. A scheduled failure leaves a single
+GitHub issue and closes it when the audit is clean again. Everything it reports
+is a fact rather than a matter of taste, so a finding is worth acting on.

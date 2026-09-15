@@ -1,0 +1,58 @@
+name: Source audit
+
+# Once a day, and on every push, check the things that rot quietly: dead code,
+# duplication, naming drift, oversized files, stale documentation, test
+# coverage, and any credential that wandered out of the config.
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    name: Audit the source
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Audit
+        id: audit
+        run: |
+          set -o pipefail
+          node scripts/audit.mjs 2>&1 | tee audit.txt
+
+      # A push shows the failure in the run itself. A scheduled run has nobody
+      # watching, so it leaves one issue behind and keeps it up to date.
+      - name: Report
+        if: failure() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Source audit"
+          body=$'The daily audit found something. Run `node scripts/audit.mjs` locally to see it live.\n\n```\n'"$(cat audit.txt)"$'\n```'
+          existing=$(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
+
+      - name: Close the issue when the audit is clean
+        if: success() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          number=$(gh issue list --state open --search "Source audit in:title" --json number --jq '.[0].number')
+          [ -n "$number" ] && gh issue close "$number" --comment "Clean again." || true

@@ -49,11 +49,6 @@ private struct RaceContent: View {
         }
         .padding(.vertical, 22)
         .padding(.horizontal, 28)
-        .background(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(isFocused ? Color.white.opacity(0.14) : Color.white.opacity(0.04))
-        )
-        .scaleEffect(isFocused ? 1.02 : 1)
-        .animation(.easeOut(duration: 0.15), value: isFocused)
+        .rowSurface(focused: isFocused)
     }
 }

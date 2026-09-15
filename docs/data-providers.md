@@ -167,7 +167,7 @@ viewer's own local days (`schedule.upcomingDays`). Consequence worth knowing:
 Formula 1 and MotoGP race roughly every two weeks, so Upcoming often holds one
 race or none, and the older "next ten rounds per series" cap rarely bites.
 
-**Images are mirrored locally** (`src/images.js`, served at `/v1/img/<sha1>`).
+**Images are mirrored locally** (`proxy/src/images.js`, served at `/v1/img/<sha1>`).
 Crests and portraits live on two other CDNs and almost never change, so the
 television now fetches them from this proxy once, with a month-long cache
 header, instead of opening connections to three hosts. A URL is registered the

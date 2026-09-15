@@ -160,11 +160,6 @@ private struct ResultContent: View {
         .minimumScaleFactor(0.7)
         .padding(.vertical, 14)
         .padding(.horizontal, 28)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(isFocused ? Color.white.opacity(0.14) : Color.white.opacity(0.04))
-        )
-        .scaleEffect(isFocused ? 1.01 : 1)
-        .animation(.easeOut(duration: 0.15), value: isFocused)
+        .rowSurface(focused: isFocused, radius: 18, scale: 1.01)
     }
 }

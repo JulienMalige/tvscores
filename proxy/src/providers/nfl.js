@@ -1,3 +1,4 @@
+import { dailyAndLive } from "./apisports.js";
 import { STATE, team } from "../model.js";
 
 const BASE = "https://v1.american-football.api-sports.io";
@@ -30,13 +31,5 @@ export function normaliseGame(g, league) {
 export function nflProvider(client, leagues) {
   const byId = new Map(leagues.map((l) => [l.id, l]));
   const keep = (rows) => rows.filter((g) => byId.has(g.league.id)).map((g) => normaliseGame(g, byId.get(g.league.id)));
-  return {
-    sport: "nfl",
-    async byDate(date) {
-      return keep(await client.get(BASE, "/games", { date }));
-    },
-    async live() {
-      return keep(await client.get(BASE, "/games", { live: "all" }));
-    },
-  };
+  return dailyAndLive({ sport: "nfl", client, base: BASE, path: "/games", keep });
 }

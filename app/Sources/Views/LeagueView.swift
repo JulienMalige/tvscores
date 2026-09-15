@@ -152,9 +152,7 @@ private struct StandingsRowView: View {
         }
         .padding(.vertical, 10)
         .padding(.horizontal, 24)
-        .background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(Color.white.opacity(isFocused ? 0.14 : 0.04)))
-        .scaleEffect(isFocused ? 1.01 : 1)
-        .animation(.easeOut(duration: 0.15), value: isFocused)
+        .rowSurface(focused: isFocused, radius: 16, scale: 1.01)
     }
 }
 

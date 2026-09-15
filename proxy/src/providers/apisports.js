@@ -22,3 +22,19 @@ export class ApiSports {
     return body.response || [];
   }
 }
+
+/**
+ * Every API-Sports sport is fetched the same way: one call for a date, one for
+ * whatever is live. Only the endpoint and how rows are kept differ.
+ */
+export function dailyAndLive({ sport, client, base, path, keep }) {
+  return {
+    sport,
+    async byDate(date) {
+      return keep(await client.get(base, path, { date }));
+    },
+    async live() {
+      return keep(await client.get(base, path, { live: "all" }));
+    },
+  };
+}

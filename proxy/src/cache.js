@@ -2,7 +2,7 @@ import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 /** Bump when a cached shape changes; load() then drops derived caches (photos, standings stamps). */
-export const SCHEMA_VERSION = 4;
+const SCHEMA_VERSION = 4;
 
 /**
  * Event store persisted to disk so a restart or an upstream outage

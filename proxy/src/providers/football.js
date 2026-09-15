@@ -1,3 +1,4 @@
+import { dailyAndLive } from "./apisports.js";
 import { STATE, team } from "../model.js";
 
 const BASE = "https://v3.football.api-sports.io";
@@ -39,13 +40,5 @@ function detailFor(short) {
 export function footballProvider(client, leagues) {
   const byId = new Map(leagues.map((l) => [l.id, l]));
   const keep = (rows) => rows.filter((f) => byId.has(f.league.id)).map((f) => normaliseFixture(f, byId.get(f.league.id)));
-  return {
-    sport: "football",
-    async byDate(date) {
-      return keep(await client.get(BASE, "/fixtures", { date }));
-    },
-    async live() {
-      return keep(await client.get(BASE, "/fixtures", { live: "all" }));
-    },
-  };
+  return dailyAndLive({ sport: "football", client, base: BASE, path: "/fixtures", keep });
 }

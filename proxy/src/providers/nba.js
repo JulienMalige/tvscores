@@ -1,3 +1,4 @@
+import { dailyAndLive } from "./apisports.js";
 import { STATE, team } from "../model.js";
 
 const BASE = "https://v2.nba.api-sports.io";
@@ -33,13 +34,5 @@ function ordinal(n) {
 export function nbaProvider(client, leagues) {
   const byId = new Map(leagues.map((l) => [l.id, l]));
   const keep = (rows) => rows.filter((g) => byId.has(g.league)).map((g) => normaliseGame(g, byId.get(g.league)));
-  return {
-    sport: "nba",
-    async byDate(date) {
-      return keep(await client.get(BASE, "/games", { date }));
-    },
-    async live() {
-      return keep(await client.get(BASE, "/games", { live: "all" }));
-    },
-  };
+  return dailyAndLive({ sport: "nba", client, base: BASE, path: "/games", keep });
 }
