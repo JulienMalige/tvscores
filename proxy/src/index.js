@@ -23,7 +23,11 @@ const schedulers = [];
 // yesterday-to-tomorrow. NFL and NBA stay on API-Sports.
 {
   const meta = store.sportMeta("football");
-  const quota = new Quota(meta, { ...config.schedule, dailyQuota: config.schedule.sportsDbDailyQuota });
+  // One config for both budgets: the scheduler builds its own Quota from the
+  // cfg it is handed, so a ceiling set only on the provider's copy would look
+  // effective in config and not be.
+  const cfg = { ...config.schedule, dailyQuota: config.schedule.sportsDbDailyQuota };
+  const quota = new Quota(meta, cfg);
   const provider = sportsDbFootball({
     key: config.theSportsDbKey,
     leagues: config.leagues.football,
@@ -31,7 +35,7 @@ const schedulers = [];
     quota,
     log,
   });
-  schedulers.push(new TeamSportScheduler({ provider, store, cfg: config.schedule, log }));
+  schedulers.push(new TeamSportScheduler({ provider, store, cfg, log }));
 }
 for (const [sport, make] of [
   ["nfl", nflProvider],
