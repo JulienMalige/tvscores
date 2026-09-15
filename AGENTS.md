@@ -118,6 +118,10 @@ Invariants worth keeping:
 
 - **Nothing polls on a blind timer.** If you add a fetch, hang it off the
   window or the daily pass, not a `setInterval`.
+- **Poll no faster than the source changes, and measure that rather than
+  believing the plan's wording.** Watch a live match's `updated` stamp for a
+  few minutes; TheSportsDB advertises "2 min" and delivers 60 s, and the
+  interval was nearly halved on the strength of the advert.
 - **A live game must be able to stop being live.** A provider's live feed
   lists only games in progress, so a finished match disappears from it; the
   scheduler refetches that match's own UTC date through `provider.byDate` to
