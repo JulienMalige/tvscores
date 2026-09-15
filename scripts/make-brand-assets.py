@@ -15,7 +15,6 @@ layer because the layers shift, and a fully opaque bottom layer.
 from __future__ import annotations
 
 import json
-import math
 import pathlib
 import shutil
 
@@ -26,9 +25,9 @@ SOURCE = ROOT / "design" / "icon-scoreboard.png"
 CATALOG = ROOT / "app" / "Resources" / "Assets.xcassets"
 BRAND = CATALOG / "App Icon & Top Shelf Image.brandassets"
 
-MARK_WIDTH = 0.74   # of the canvas; leaves the safe margin the layers need
-GROUND = (9, 7, 8)  # near-black, opaque: the unlit board
+MARK_WIDTH = 0.74     # of the canvas; leaves the safe margin the layers need
 BLOOM = (255, 40, 30)
+BLOOM_STRENGTH = 0.28  # enough for the dots to float above when focused
 
 
 def mark() -> Image.Image:
@@ -45,16 +44,10 @@ def mark() -> Image.Image:
 
 
 def ground(size: tuple[int, int]) -> Image.Image:
-    """An opaque board with a little life in it, never a flat void."""
-    w, h = size
-    small = Image.new("RGB", (64, 64))
-    px = small.load()
-    for y in range(64):
-        for x in range(64):
-            edge = math.hypot(x / 63 - 0.5, y / 63 - 0.5) / 0.707
-            t = 1 - 0.55 * edge ** 2
-            px[x, y] = tuple(max(0, round(c * t)) for c in (GROUND[0] + 9, GROUND[1] + 7, GROUND[2] + 8))
-    return small.resize((w, h), Image.LANCZOS).convert("RGBA")
+    """The unlit board: flat black, as the artwork has it, and opaque as the
+    bottom layer must be. No vignette. A dot-matrix board is not lit between
+    its lamps, and the dots stay crisper against nothing."""
+    return Image.new("RGBA", size, (0, 0, 0, 255))
 
 
 def placed(size: tuple[int, int], art: Image.Image) -> Image.Image:
@@ -79,7 +72,10 @@ def middle_layer(size):
     """The bloom the dots throw onto the board."""
     art = placed(size, mark())
     glow = Image.new("RGBA", size, BLOOM + (0,))
-    glow.putalpha(art.getchannel("A").filter(ImageFilter.GaussianBlur(max(3, min(size) * 0.055))).point(lambda v: int(v * 0.85)))
+    # Faint on purpose: the dots already carry their own halo, and this layer
+    # exists so there is something for them to float above when focused.
+    blurred = art.getchannel("A").filter(ImageFilter.GaussianBlur(max(3, min(size) * 0.055)))
+    glow.putalpha(blurred.point(lambda v: int(v * BLOOM_STRENGTH)))
     return glow
 
 

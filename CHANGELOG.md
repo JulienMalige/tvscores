@@ -8,6 +8,11 @@ notes when a version ships.
 
 ## Unreleased
 
+- The icon sits on flat black now, the way the artwork was drawn, instead of
+  the faint vignette I had put behind it.
+
+## 1.0 build 9 — 15 September 2026
+
 - New app icon: a dot-matrix scoreboard reading 2-1. On the Apple TV home
   screen the lit dots float above their own glow when you focus it.
 - The source is checked once a day for dead code, duplication, naming drift,
