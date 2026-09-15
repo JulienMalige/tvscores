@@ -87,6 +87,12 @@ credential that wandered out of `proxy/src/config.js`.
 The checks live one family per file under `scripts/audit`, so adding one means
 writing a function and listing it.
 
-It runs on every push and once a day. A scheduled failure leaves a single
-GitHub issue and closes it when the audit is clean again. Everything it reports
-is a fact rather than a matter of taste, so a finding is worth acting on.
+Everything it reports is a fact rather than a matter of taste, so a finding is
+worth acting on.
+
+It is run by a scheduled Claude session rather than by continuous integration,
+because half of what we want checked cannot be decided by a script: whether a
+comment earns its place, whether a file still has one job, whether a document
+says something true rather than merely naming files that exist. The schedule
+lives in the session that created it, so it needs re-creating when that session
+ends. Run the command yourself any time in between.
