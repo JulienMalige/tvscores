@@ -59,6 +59,11 @@ Run the **TestFlight** workflow from the Actions tab, or:
 gh workflow run testflight.yml --repo JulienMalige/tvscores
 ```
 
+The job finishes by waiting for Apple to process the build, giving it the top
+section of `CHANGELOG.md` as its "What to Test" note, and adding it to the
+`Internal` group. So the only thing to do by hand before a release is write
+that changelog entry.
+
 The build number is the workflow run number, so every run is unique. The
 marketing version comes from `MARKETING_VERSION` in `app/project.yml`; bump it
 there for a new version. Processing in App Store Connect takes a few minutes,

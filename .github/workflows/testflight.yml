@@ -152,6 +152,12 @@ jobs:
             2>&1 | tee "$RUNNER_TEMP/export.log" | grep -E "error:|Upload|EXPORT" || true
           grep -q "EXPORT SUCCEEDED" "$RUNNER_TEMP/export.log"
 
+      # A tester who opens TestFlight should see what changed, not just a number.
+      - name: Send the release note and hand the build to the testers
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: node ../scripts/testflight.mjs "$BUILD_NUMBER"
+
       - name: Remove the key and the keychain
         if: always()
         run: |
