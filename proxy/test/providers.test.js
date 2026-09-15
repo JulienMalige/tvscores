@@ -1,42 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { normaliseGame as nflGame } from "../src/providers/nfl.js";
-import { normaliseGame as nbaGame } from "../src/providers/nba.js";
 import { normaliseRace } from "../src/providers/jolpica.js";
 import { shortName, team } from "../src/model.js";
 
 const fx = (n) => JSON.parse(readFileSync(new URL(`./fixtures/${n}.json`, import.meta.url)));
-
-test("nfl final game", () => {
-  const g = nflGame(fx("nfl").response[0], { id: 1, name: "NFL", short: "NFL" });
-  assert.equal(g.status.state, "final");
-  assert.ok(g.home.logo.startsWith("https://"));
-  assert.equal(g.kind, "match");
-  assert.equal(g.score.home + g.score.away > 0, true);
-});
-
-test("nfl live clock composes period and timer", () => {
-  const raw = structuredClone(fx("nfl").response[0]);
-  raw.game.status = { short: "Q3", long: "3rd Quarter", timer: "2:37" };
-  const g = nflGame(raw, { id: 1, name: "NFL", short: "NFL" });
-  assert.equal(g.status.state, "live");
-  assert.equal(g.status.clock, "3rd 2:37");
-});
-
-test("nba shapes from the documented v2 structure", () => {
-  const raw = {
-    id: 1, league: "standard", season: 2026, date: { start: "2026-10-22T23:30:00.000Z" }, stage: 2,
-    status: { clock: "7:02", halftime: false, short: 2, long: "In Play" }, periods: { current: 3, total: 4 },
-    teams: { home: { name: "Green Bay Packers", code: "GB" }, visitors: { name: "Minnesota", code: "MIN" } },
-    scores: { home: { points: 19 }, visitors: { points: 10 } },
-  };
-  const g = nbaGame(raw, { id: "standard", name: "NBA", short: "NBA" });
-  assert.equal(g.status.state, "live");
-  assert.equal(g.status.clock, "3rd 7:02");
-  assert.equal(g.home.short, "GB");
-  assert.equal(g.score.away, 10);
-});
 
 test("f1 race with results is final and keeps the podium", () => {
   const { races, last } = fx("f1");

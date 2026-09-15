@@ -18,7 +18,6 @@ export const config = {
   host: env.TVSCORES_HOST || "127.0.0.1",
   port: Number(env.TVSCORES_PORT || 8787),
   cacheDir: env.TVSCORES_CACHE_DIR || join(homedir(), ".local/state/tvscores"),
-  apiSportsKey: readKey("TVSCORES_APISPORTS_KEY", "api-sports.key"),
   liveTennisKey: readKey("TVSCORES_LIVETENNIS_KEY", "livetennisapi.key"),
   ocBlacktopKey: readKey("TVSCORES_OCBLACKTOP_KEY", "ocblacktop.key"),
   /** TheSportsDB key for athlete cutouts and schedules; "3" is the public test key, capped so hard it is unusable for anything but a demo. */
@@ -48,8 +47,8 @@ export const config = {
       { id: 4501, name: "Copa Libertadores", short: "LIB", badge: "libertadores" },
       { id: 4351, name: "Brasileirão", short: "BRA", badge: "brasileirao" },
     ],
-    nfl: [{ id: 1, name: "NFL", short: "NFL", badge: "nfl" }],
-    nba: [{ id: "standard", name: "NBA", short: "NBA", badge: "nba" }],
+    nfl: [{ id: 4391, name: "NFL", short: "NFL", badge: "nfl" }],
+    nba: [{ id: 4387, name: "NBA", short: "NBA", badge: "nba" }],
     f1: [{ id: "f1", name: "Formula 1", short: "F1", badge: "f1" }],
     motogp: [{ id: "motogp", name: "MotoGP", short: "MotoGP", badge: "motogp" }],
     tennis: [
@@ -92,22 +91,22 @@ export const config = {
   /** Display order of sports on the scoreboard. */
   sportOrder: ["football", "f1", "motogp", "tennis", "nba", "nfl"],
   schedule: {
-    /** API-Sports free plan: dates yesterday..tomorrow only, 100 calls/day per sport. */
-    dayOffsets: [-1, 0, 1],
     /**
-     * Football comes from TheSportsDB instead, one call per date, so its
-     * window is the one the Upcoming tab actually shows.
+     * The days every team sport is fetched for, one call each: yesterday for
+     * last night's finals, and the seven the Upcoming tab shows.
      */
     footballWindow: { back: 1, ahead: 7 },
     dailyRefreshHourUtc: 4,
     idleRefreshMinutes: 180,
     /**
-     * How often a sport with a game in progress is polled. Julien's brief
-     * (2026-09-15): this is a "what is on today" app, not a live-timing one —
-     * every 30 minutes now, perhaps 10 later. The quota stretches this floor
+     * How often a sport with a game in progress is polled, per sport, because
+     * their budgets are not alike. The three on TheSportsDB share a key capped
+     * per *minute*, so a minute apart costs them nothing: a full twelve-hour
+     * Saturday is 720 calls against a ceiling of 100 a minute. Tennis is still
+     * on a 100-a-day key and stays slow. The quota stretches any of these
      * further when the day's budget would not survive it.
      */
-    liveIntervalSeconds: 1800,
+    liveIntervalSeconds: { default: 1800, football: 60, nfl: 60, nba: 60, tennis: 1800 },
     /** Never spend the last N calls of a sport's daily quota. */
     quotaReserve: 8,
     dailyQuota: 100,

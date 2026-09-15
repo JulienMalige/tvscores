@@ -24,7 +24,7 @@ CHANGELOG.md  what each TestFlight build changed, for whoever installs it.
 2. **Native SwiftUI for tvOS only.** No React Native, Flutter, or web views.
 3. **Licensed data only.** Do not add code that scrapes a website or calls an undocumented endpoint. If a provider is proposed, record its terms in `docs/data-providers.md` first.
 4. **No odds, betting, or streaming links** anywhere in the app.
-5. **Crests come from the proxy** (`team.logo`, API-Sports media CDN), decided by Julien on 2026-09-14 knowing the trademark risk; the monogram stays as the fallback. Never bundle logo files in the app.
+5. **Crests come from the proxy** (`team.logo`, mirrored from TheSportsDB), decided by Julien on 2026-09-14 knowing the trademark risk; the monogram stays as the fallback. Never bundle logo files in the app.
 6. **Do not commit** `.xcodeproj` contents, `DerivedData`, `xcuserdata`, `.env`, or any secret. The `.gitignore` covers these; keep it that way.
 7. **Every change a tester could notice goes in `CHANGELOG.md`** under
    `## Unreleased`, in the same commit. It is written for whoever installs the
@@ -102,9 +102,10 @@ This is the mechanic to preserve; `proxy/src/scheduler.js` owns it and
 
 | What | When | Cost per round |
 |---|---|---|
-| Schedules (`daily`) | once per UTC day after `dailyRefreshHourUtc`, or after `idleRefreshMinutes` — but never while a game could be in progress | football 9 calls (a day each), NFL/NBA 3 |
-| Scores (`live`) | only inside a live window, then every `liveIntervalSeconds` (30 min) | 1 call per sport |
+| Schedules (`daily`) | once per UTC day after `dailyRefreshHourUtc`, or after `idleRefreshMinutes` — but never while a game could be in progress | 9 calls per team sport, one per day of the window |
+| Scores (`live`) | only inside a live window, then every `liveIntervalSeconds` — 60 s for the sports on the paid key, 30 min for tennis | 1 call per sport |
 | Standings | every 6 hours | 1 per league |
+| Motorsport calendar | every 6 hours, or every 30 min within 6 h of a session | 1 + one per newly finished race |
 | Portraits | once per athlete, kept a month | background, 25/min |
 | Crests, badges | mirrored once, served with a month-long header | none after the first |
 

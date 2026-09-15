@@ -2,10 +2,7 @@ import { join } from "node:path";
 import { config } from "./config.js";
 import { Store } from "./cache.js";
 import { Quota } from "./quota.js";
-import { ApiSports } from "./providers/apisports.js";
-import { sportsDbFootball } from "./providers/sportsdb.js";
-import { nflProvider } from "./providers/nfl.js";
-import { nbaProvider } from "./providers/nba.js";
+import { sportsDbSport } from "./providers/sportsdb.js";
 import { f1Provider, f1Nationalities } from "./providers/jolpica.js";
 import { motorsportProvider } from "./providers/ocblacktop.js";
 import { tennisProvider } from "./providers/livetennis.js";
@@ -18,33 +15,19 @@ const log = (msg) => console.log(`${new Date().toISOString()} ${msg}`);
 const store = new Store(config.cacheDir);
 
 const schedulers = [];
-// Football comes from TheSportsDB: it carries the leagues API-Sports' free
-// plan cannot reach and, more to the point, real dates rather than
-// yesterday-to-tomorrow. NFL and NBA stay on API-Sports.
-{
-  const meta = store.sportMeta("football");
-  // One config for both budgets: the scheduler builds its own Quota from the
-  // cfg it is handed, so a ceiling set only on the provider's copy would look
-  // effective in config and not be.
-  const cfg = { ...config.schedule, dailyQuota: config.schedule.sportsDbDailyQuota };
-  const quota = new Quota(meta, cfg);
-  const provider = sportsDbFootball({
-    key: config.theSportsDbKey,
-    leagues: config.leagues.football,
-    window: config.schedule.footballWindow,
-    quota,
-    log,
-  });
+// The three team sports come from TheSportsDB on one paid key: it carries the
+// leagues API-Sports' free plan cannot reach, real dates rather than
+// yesterday-to-tomorrow, and a limit counted per minute rather than per day —
+// which is what lets these poll every minute instead of every half hour.
+for (const sport of ["football", "nfl", "nba"]) {
+  const cfg = {
+    ...config.schedule,
+    dailyQuota: config.schedule.sportsDbDailyQuota,
+    liveIntervalSeconds: config.schedule.liveIntervalSeconds[sport] ?? config.schedule.liveIntervalSeconds.default,
+  };
+  const quota = new Quota(store.sportMeta(sport), cfg);
+  const provider = sportsDbSport({ sport, key: config.theSportsDbKey, leagues: config.leagues[sport], window: config.schedule.footballWindow, quota, log });
   schedulers.push(new TeamSportScheduler({ provider, store, cfg, log }));
-}
-for (const [sport, make] of [
-  ["nfl", nflProvider],
-  ["nba", nbaProvider],
-]) {
-  const meta = store.sportMeta(sport);
-  const quota = new Quota(meta, config.schedule);
-  const client = new ApiSports({ key: config.apiSportsKey, quota, log });
-  schedulers.push(new TeamSportScheduler({ provider: make(client, config.leagues[sport]), store, cfg: config.schedule, log }));
 }
 if (config.ocBlacktopKey) {
   for (const [sport, leagueKey] of [["formula1", "f1"], ["moto-gp", "motogp"]]) {
@@ -59,8 +42,9 @@ if (config.ocBlacktopKey) {
 }
 {
   const meta = store.sportMeta("tennis");
-  const quota = new Quota(meta, config.schedule);
-  schedulers.push(new TeamSportScheduler({ provider: tennisProvider({ key: config.liveTennisKey, quota, meta, tennis: config.tennis, log }), store, cfg: config.schedule, log }));
+  const cfg = { ...config.schedule, liveIntervalSeconds: config.schedule.liveIntervalSeconds.tennis ?? config.schedule.liveIntervalSeconds.default };
+  const quota = new Quota(meta, cfg);
+  schedulers.push(new TeamSportScheduler({ provider: tennisProvider({ key: config.liveTennisKey, quota, meta, tennis: config.tennis, log }), store, cfg, log }));
 }
 
 const photos = new PhotoResolver({ store, key: config.theSportsDbKey, log });

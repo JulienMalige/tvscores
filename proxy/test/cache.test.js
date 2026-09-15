@@ -18,7 +18,7 @@ function oldStore(schemaVersion) {
 }
 
 test("a store written by this version is read back whole", () => {
-  const store = new Store(oldStore(5));
+  const store = new Store(oldStore(6));
   assert.equal(store.all().length, 1);
   assert.equal(Object.keys(store.photos).length, 1);
   assert.equal(store.sportMeta("football").lastDaily, "2026-09-15T10:00:00.000Z");
@@ -27,7 +27,7 @@ test("a store written by this version is read back whole", () => {
 test("an older store is emptied so a provider swap cannot double up", () => {
   // The events were keyed by the previous provider's ids. Keeping them would
   // show the same match twice, once under each provider's id.
-  const store = new Store(oldStore(4));
+  const store = new Store(oldStore(5));
   assert.equal(store.all().length, 0);
   assert.deepEqual(store.photos, {});
   assert.equal(store.sportMeta("football").lastDaily, undefined, "and today's fetch stamp goes too, or nothing refills for hours");

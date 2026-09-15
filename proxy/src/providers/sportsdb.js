@@ -4,13 +4,28 @@ import { STATE, team } from "../model.js";
 const V1 = "https://www.thesportsdb.com/api/v1/json";
 const V2 = "https://www.thesportsdb.com/api/v2/json";
 
-const LIVE = new Set(["1H", "2H", "HT", "ET", "BT", "P"]);
-const FINAL = new Set(["FT", "AET", "PEN"]);
+const FINAL = new Set(["FT", "AET", "PEN", "AOT"]);
+const NOT_PLAYED = new Set(["PPD", "POSTP", "CANC", "ABD"]);
 
 /** The English detail strings the app's string catalogue already knows. */
 const DETAIL = {
   HT: "Half-time", ET: "Extra time", BT: "Break", P: "Penalties",
-  AET: "After extra time", PEN: "After penalties",
+  AET: "After extra time", PEN: "After penalties", AOT: "After overtime",
+  PPD: "Postponed", POSTP: "Postponed", CANC: "Cancelled", ABD: "Abandoned",
+};
+
+/** Quarters read as they do on a scoreboard; a football minute reads as "67'". */
+const PERIOD = { Q1: "1st", Q2: "2nd", Q3: "3rd", Q4: "4th", OT: "OT" };
+
+/**
+ * One entry per sport we take from this provider: the name its schedule
+ * endpoint wants, the path its livescore endpoint lives at, and whether its
+ * teams are known by nickname ("Lions") or in full ("Manchester City").
+ */
+const SPORTS = {
+  football: { feed: "Soccer", live: "soccer", nick: false },
+  nfl: { feed: "American Football", live: "americanfootball", nick: true },
+  nba: { feed: "Basketball", live: "basketball", nick: true },
 };
 
 /**
@@ -28,31 +43,47 @@ export function startOf(row) {
 /** "0" and 0 are scores; "" and null are not. A drawn game really is 0-0. */
 const score = (v) => (v === null || v === undefined || v === "" ? null : Number(v));
 
-export function normaliseEvent(row, league) {
+/**
+ * Anything playing that is not a known ending is live.
+ *
+ * Written that way round on purpose: the status vocabularies differ by sport
+ * and are not documented in full, so a quarter label we have never seen must
+ * read as a game in progress rather than quietly as "scheduled".
+ */
+export function stateOf(row) {
+  const short = row.strStatus || "";
+  if (row.strPostponed === "yes" || NOT_PLAYED.has(short)) return STATE.other;
+  if (!short || short === "NS") return STATE.scheduled;
+  if (FINAL.has(short)) return STATE.final;
+  return STATE.live;
+}
+
+export function normaliseEvent(row, league, sport = "football") {
   const start = startOf(row);
   if (!start) return null;
   const short = row.strStatus || "";
-  let state = STATE.other;
-  if (row.strPostponed === "yes") state = STATE.other;
-  else if (!short || short === "NS") state = STATE.scheduled;
-  else if (LIVE.has(short)) state = STATE.live;
-  else if (FINAL.has(short)) state = STATE.final;
-  // `strProgress` is the minute of a game in play, and is meaningless at the interval.
-  const minute = row.strProgress && !["HT", "BT", "P"].includes(short) ? `${row.strProgress}'` : undefined;
+  const state = stateOf(row);
+  const { nick } = SPORTS[sport];
+  // `strProgress` is where the game is: a minute in football, the period clock
+  // elsewhere. Neither means anything while the teams are off the pitch.
+  const stopped = ["HT", "BT", "P"].includes(short);
+  const clock = state !== STATE.live || stopped
+    ? undefined
+    : nick
+      ? [PERIOD[short], row.strProgress].filter(Boolean).join(" ") || undefined
+      : row.strProgress
+        ? `${row.strProgress}'`
+        : undefined;
   return {
-    id: `football:tsdb:${row.idEvent}`,
-    sport: "football",
+    id: `${sport}:tsdb:${row.idEvent}`,
+    sport,
     league: { id: league.id, name: league.name, short: league.short },
     kind: "match",
     start,
     round: row.intRound ? `Round ${row.intRound}` : undefined,
-    status: {
-      state,
-      clock: state === STATE.live ? minute : undefined,
-      detail: row.strPostponed === "yes" ? "Postponed" : DETAIL[short],
-    },
-    home: team(row.strHomeTeam, undefined, { logo: row.strHomeTeamBadge || undefined }),
-    away: team(row.strAwayTeam, undefined, { logo: row.strAwayTeamBadge || undefined }),
+    status: { state, clock, detail: row.strPostponed === "yes" ? "Postponed" : DETAIL[short] },
+    home: team(row.strHomeTeam, undefined, { nick, logo: row.strHomeTeamBadge || undefined }),
+    away: team(row.strAwayTeam, undefined, { nick, logo: row.strAwayTeamBadge || undefined }),
     score: { home: score(row.intHomeScore), away: score(row.intAwayScore) },
   };
 }
@@ -69,17 +100,18 @@ export function datesAround({ back, ahead }, now = new Date()) {
 }
 
 /**
- * Football from TheSportsDB: one call per day of the window, filtered to the
- * competitions we show. The paid key returns up to 1,500 events for a date,
- * which is why a seven-day Upcoming costs eight calls rather than a season
- * fixture list per league.
+ * A team sport from TheSportsDB: one call per day of the window, filtered to
+ * the competitions we show. The paid key returns up to 1,500 events for a
+ * date, which is why a seven-day Upcoming costs one call per day rather than
+ * a season fixture list per league — and why a competition costs nothing.
  */
-export function sportsDbFootball({ key, leagues, window: win, quota, log = () => {} }) {
+export function sportsDbSport({ sport, key, leagues, window: win, quota, log = () => {} }) {
+  const { feed, live: livePath } = SPORTS[sport];
   const byId = new Map(leagues.map((l) => [String(l.id), l]));
   const mine = (rows) =>
     rows
       .filter((r) => byId.has(String(r.idLeague)))
-      .map((r) => normaliseEvent(r, byId.get(String(r.idLeague))))
+      .map((r) => normaliseEvent(r, byId.get(String(r.idLeague)), sport))
       .filter(Boolean);
 
   /**
@@ -90,7 +122,7 @@ export function sportsDbFootball({ key, leagues, window: win, quota, log = () =>
    */
   async function byDate(date) {
     if (!key) throw new Error("TheSportsDB key missing");
-    const { body } = await getJson(`${V1}/${key}/eventsday.php?d=${date}&s=Soccer`);
+    const { body } = await getJson(`${V1}/${key}/eventsday.php?d=${date}&s=${encodeURIComponent(feed)}`);
     quota.record(undefined);
     return mine(body.events || []);
   }
@@ -98,19 +130,19 @@ export function sportsDbFootball({ key, leagues, window: win, quota, log = () =>
   async function daily() {
     const out = [];
     for (const date of datesAround(win)) out.push(...(await byDate(date)));
-    log(`GET sportsdb football ${win.back + win.ahead + 1} days -> ${out.length} matches`);
+    log(`GET sportsdb ${sport} ${win.back + win.ahead + 1} days -> ${out.length} matches`);
     return out;
   }
 
   /** V2 carries the minute and the running score; V1 only catches up at the whistle. */
   async function live() {
     if (!key) throw new Error("TheSportsDB key missing");
-    const { body } = await getJson(`${V2}/livescore/soccer`, { headers: { "X-API-KEY": key } });
+    const { body } = await getJson(`${V2}/livescore/${livePath}`, { headers: { "X-API-KEY": key } });
     quota.record(undefined);
     const rows = mine(body.livescore || []);
-    log(`GET sportsdb livescore -> ${rows.length} of ours in play`);
+    log(`GET sportsdb livescore ${livePath} -> ${rows.length} of ours in play`);
     return rows;
   }
 
-  return { sport: "football", daily, live, byDate };
+  return { sport, daily, live, byDate, dailyCost: win.back + win.ahead + 1 };
 }

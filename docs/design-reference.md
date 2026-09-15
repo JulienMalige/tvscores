@@ -31,7 +31,7 @@ TV Scores. The screenshots stay on his device; this note records what to copy.
 
 - Formula 1: event name, "Race · Final" status, then the top three drivers
   with position, nationality, total time / gap. Reuse the same group header.
-- Tennis: not in the MVP unless a provider is picked (API-Sports has none).
+- Tennis: shipped, from livetennisapi (TheSportsDB has no structured sets).
 
 ## tvOS adaptation
 
@@ -44,7 +44,7 @@ TV Scores. The screenshots stay on his device; this note records what to copy.
 - Dark green tinted background is Apple's; we use our own dark neutral and
   the league's accent colour on the header only.
 - Logos: Apple licenses crests. Julien decided on 2026-09-14 to show the
-  crests API-Sports serves (`team.logo`), accepting the trademark risk noted
+  crests the proxy mirrors (`team.logo`), accepting the trademark risk noted
   in `docs/data-providers.md`; the coloured monogram remains the fallback
   while an image loads or is missing. F1 drivers get a nationality flag.
 

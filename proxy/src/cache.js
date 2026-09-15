@@ -8,7 +8,7 @@ import { join } from "node:path";
  * keyed by the old provider's ids would otherwise sit alongside the new ones
  * and show the same match twice.
  */
-const SCHEMA_VERSION = 5;
+const SCHEMA_VERSION = 6;
 
 /**
  * Event store persisted to disk so a restart or an upstream outage

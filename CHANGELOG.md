@@ -10,6 +10,9 @@ notes when a version ships.
 
 - The race result page now lights up the driver you are on, like every
   other list in the app.
+- Scores update every minute while a game is on, instead of every half hour.
+- NFL and NBA now come from the same source as football, which is why they
+  keep pace with it and show a full week ahead too.
 - A match that has finished now shows its final score, instead of staying
   stuck on the last minute it was seen playing.
 - The app re-downloads the scoreboard only when it has actually changed,

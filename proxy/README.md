@@ -67,32 +67,31 @@ avatar the app draws. Anything unasked-for for 60 days is pruned.
 
 | Sport | Source | Calls per day |
 |---|---|---|
-| football (Premier League, Champions League) | API-Sports v3, free plan | 3 daily (yesterday, today, tomorrow) + live polling, for **all** leagues at once |
-| nfl | API-Sports american-football, free | same |
-| nba | API-Sports v2 nba, free | same |
+| football (8 competitions), nfl, nba | TheSportsDB, Single Developer key | 9 daily (yesterday + seven days) + live polling, for **all** leagues of that sport at once |
 | f1, motogp | Orange Cat Blacktop (free key, 7,500/month), Jolpica fallback for F1 without a key | 1 calendar call + 1 per newly finished race, every 30 min; F1 flags from 1 Jolpica call/day |
 | tennis (ATP, WTA singles) | livetennisapi.com free key, 100/day | 1 upcoming call daily + live polling inside match windows |
 
-API-Sports free plan facts learned 2026-09-13: 100 calls/day per sport, only the
-dates **yesterday..tomorrow**, no `season` or `next` parameters for the current
-season. Two consequences worth remembering:
+TheSportsDB is capped per **minute** (100 on the paid tier), not per day, which
+is what lets the team sports poll a minute apart. Two consequences worth
+remembering:
 
-- Adding another football league is free, because fixtures are fetched per date
-  and filtered by league id locally. Adding another *sport* is not.
-- "Upcoming" holds tomorrow only for anything from API-Sports. The motorsport
-  calendar is complete because Orange Cat Blacktop gives the whole season. A
-  real seven-day Upcoming for football needs a source with date ranges:
-  football-data.org's free tier, or a paid API-Sports or TheSportsDB plan.
+- Adding another competition is free: fixtures are fetched per date and
+  filtered by league id locally, and the livescore call covers every league of
+  a sport at once. Adding another *sport* costs one call per day of the window.
+- The motorsport calendar comes whole from Orange Cat Blacktop, whose free tier
+  is 7,500 a **month**, so F1 and MotoGP are polled every six hours except
+  within six hours of a session.
 
-Live polling (`?live=all`, 1 call) runs only while a tracked game is inside its
-window (10 min before kickoff to 4 h after). The interval is at least 150 s and
-is stretched so the remaining calls of the day are never exhausted, keeping a
-reserve of 8. `src/quota.js` holds that logic and its tests.
+Live polling runs only while a tracked game is inside its window (10 min before
+kickoff, to 4 h after — 8 h for one already reported live). The interval is the
+per-sport floor in `schedule.liveIntervalSeconds`, stretched so the remaining
+calls of the day are never exhausted, keeping a reserve of 8. `src/quota.js`
+holds that logic and its tests.
 
 ## Running
 
 ```bash
-# key: env TVSCORES_APISPORTS_KEY or file ~/.config/tvscores/api-sports.key
+# keys: files under ~/.config/tvscores/ (thesportsdb.key, ocblacktop.key, livetennisapi.key)
 npm start                      # http://127.0.0.1:8787
 ./deploy/install.sh            # systemd --user service + Tailscale Funnel mount
 journalctl --user -u tvscores-proxy -f

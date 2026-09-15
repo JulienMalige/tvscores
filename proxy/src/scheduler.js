@@ -5,8 +5,20 @@ const MIN = 60e3;
 const STANDINGS_EVERY = 6 * 3600e3;
 /** However badly upstream is doing, look again within the hour. */
 const MAX_BACKOFF = 60 * 60e3;
-/** A season calendar and its finished results: nothing changes fast. */
-const CALENDAR_EVERY = 30 * MIN;
+
+/**
+ * The wait after `failures` consecutive errors: the normal interval doubled
+ * per failure, up to an hour. The ceiling applies to the *growth*, never to
+ * the interval itself — a loop that already waits six hours between polls is
+ * not made hungrier by failing.
+ */
+function backoff(base, failures = 0) {
+  return Math.min(base * 2 ** Math.min(failures, 10), Math.max(base, MAX_BACKOFF));
+}
+/** A race weekend: worth asking about every half hour. */
+const CALENDAR_LIVE = 30 * MIN;
+/** Every other day of the fortnight: the calendar is not going to move. */
+const CALENDAR_IDLE = 6 * 60 * MIN;
 
 /** Shared: refresh a provider's standings every 6 h when it offers them. */
 async function refreshStandings(self, now) {
@@ -26,13 +38,9 @@ async function refreshStandings(self, now) {
   self.store.touch();
 }
 
-function dateOffset(offset, now = Date.now()) {
-  return new Date(now + offset * 86400e3).toISOString().slice(0, 10);
-}
-
 /**
  * One scheduler per team-sport provider. Two loops:
- *  - daily: fetch yesterday/today/tomorrow (3 calls) once per UTC day, or when stale.
+ *  - daily: fetch the whole window once per UTC day, or when stale.
  *  - live: while a tracked game is inside its live window, poll the live endpoint at an
  *    interval that provably fits the remaining daily quota.
  */
@@ -81,16 +89,11 @@ export class TeamSportScheduler {
   }
 
   async daily(now = Date.now()) {
-    const need = this.p.daily ? 1 : this.cfg.dayOffsets.length;
+    // A provider that fetches a week of dates spends a call per day, and must
+    // not start the round with three calls left in the budget.
+    const need = this.p.dailyCost ?? 1;
     if (this.quota.spendable(now) < need) return this.log(`${this.p.sport}: skip daily, quota ${this.quota.remaining(now)} left`);
-    if (this.p.daily) {
-      this.store.upsert(await this.p.daily());
-    } else {
-      for (const off of this.cfg.dayOffsets) {
-        const rows = await this.p.byDate(dateOffset(off, now));
-        this.store.upsert(rows);
-      }
-    }
+    this.store.upsert(await this.p.daily());
     this.meta.lastDaily = new Date(now).toISOString();
     this.meta.lastOk = this.meta.lastDaily;
   }
@@ -127,7 +130,7 @@ export class TeamSportScheduler {
    */
   nextDelay(now = Date.now()) {
     const base = this.hasLiveWindow(now) ? this.quota.liveInterval(this.cfg.liveIntervalSeconds, now) * 1000 : 5 * MIN;
-    return Math.min(base * 2 ** Math.min(this.meta.failures || 0, 10), MAX_BACKOFF);
+    return backoff(base, this.meta.failures);
   }
 
   async tick() {
@@ -169,9 +172,18 @@ export class CalendarScheduler {
     this.meta = store.sportMeta(provider.sport);
   }
 
-  /** A calendar moves slowly; on failure it is asked about even more slowly. */
-  nextDelay() {
-    return Math.min(CALENDAR_EVERY * 2 ** Math.min(this.meta.failures || 0, 10), MAX_BACKOFF);
+  /**
+   * F1 and MotoGP race roughly every other weekend, so polling a season
+   * calendar every half hour spends most of a month's free allowance on days
+   * when nothing happens. Half-hourly around a session, six-hourly otherwise.
+   */
+  nextDelay(now = Date.now()) {
+    const near = this.store.all().some((e) => {
+      if (e.sport !== this.p.sport) return false;
+      const t = Date.parse(e.start);
+      return now > t - 6 * 3600e3 && now < t + 6 * 3600e3;
+    });
+    return backoff(near ? CALENDAR_LIVE : CALENDAR_IDLE, this.meta.failures);
   }
 
   async tick() {

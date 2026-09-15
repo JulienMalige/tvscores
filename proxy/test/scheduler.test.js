@@ -4,10 +4,9 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Store } from "../src/cache.js";
-import { TeamSportScheduler } from "../src/scheduler.js";
+import { TeamSportScheduler, CalendarScheduler } from "../src/scheduler.js";
 
 const CFG = {
-  dayOffsets: [-1, 0, 1],
   dailyRefreshHourUtc: 4,
   idleRefreshMinutes: 180,
   liveIntervalSeconds: 1800,
@@ -118,4 +117,15 @@ test("backoff stops at an hour, however long the outage", () => {
   const s = scheduler(fake({}));
   s.meta.failures = 40;
   assert.equal(s.nextDelay(KICKOFF), 60 * 60e3);
+});
+
+test("a race weekend is watched; the fortnight between is not", () => {
+  const store = new Store(mkdtempSync(join(tmpdir(), "tvscores-")));
+  const s = new CalendarScheduler({ provider: { sport: "f1" }, store, log: () => {}, quota: null });
+  const race = Date.parse("2026-09-20T13:00:00Z");
+  store.upsert([{ id: "f1:1", sport: "f1", kind: "race", start: new Date(race).toISOString(), status: { state: "scheduled" } }]);
+
+  assert.equal(s.nextDelay(race - 2 * 3600e3), 30 * 60e3, "two hours before the lights");
+  assert.equal(s.nextDelay(race + 3 * 3600e3), 30 * 60e3, "and while the results are settling");
+  assert.equal(s.nextDelay(race - 3 * 86400e3), 6 * 3600e3, "but three days out, six-hourly");
 });

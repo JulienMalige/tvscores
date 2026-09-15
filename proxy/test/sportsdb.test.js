@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { normaliseEvent, startOf, datesAround } from "../src/providers/sportsdb.js";
+import { normaliseEvent, startOf, datesAround, stateOf } from "../src/providers/sportsdb.js";
 
 const events = JSON.parse(readFileSync(new URL("./fixtures/sportsdb-football.json", import.meta.url))).events;
 const SERIE_A = { id: 4332, name: "Serie A", short: "SA" };
@@ -60,4 +60,39 @@ test("the window is yesterday plus the seven days Upcoming shows", () => {
   assert.equal(days.length, 9);
   assert.equal(days[0], "2026-09-14");
   assert.equal(days.at(-1), "2026-09-22");
+});
+
+const US = JSON.parse(readFileSync(new URL("./fixtures/sportsdb-us.json", import.meta.url))).events;
+const NFL = { id: 4391, name: "NFL", short: "NFL" };
+const NBA = { id: 4387, name: "NBA", short: "NBA" };
+
+test("American teams are known by their nickname", () => {
+  const e = normaliseEvent(US.find((x) => x.strLeague === "NFL"), NFL, "nfl");
+  assert.equal(e.sport, "nfl");
+  assert.equal(e.id.startsWith("nfl:tsdb:"), true, "and ids are namespaced per sport");
+  assert.equal(e.home.nick, "Giants", "which is the label the row shows");
+  assert.equal(e.home.name, "New York Giants", "with the full name kept alongside");
+  assert.equal(e.away.nick, "Cowboys");
+  assert.equal(e.status.state, "final");
+  assert.deepEqual([e.score.home, e.score.away], [28, 20]);
+});
+
+test("a quarter reads as a quarter, a football minute as a minute", () => {
+  const nfl = US.find((x) => x.strLeague === "NFL");
+  assert.equal(normaliseEvent({ ...nfl, strStatus: "Q3", strProgress: "2:37" }, NFL, "nfl").status.clock, "3rd 2:37");
+  assert.equal(normaliseEvent({ ...nfl, strStatus: "OT", strProgress: "1:12" }, NFL, "nfl").status.clock, "OT 1:12");
+  const soccer = events.find((e) => e.strEvent === "Torino vs Roma");
+  assert.equal(normaliseEvent({ ...soccer, strStatus: "2H", strProgress: "67" }, SERIE_A).status.clock, "67'");
+});
+
+test("an ending we have never seen reads as live, not as scheduled", () => {
+  // The status vocabularies differ per sport and are not documented in full.
+  // A game showing an unknown label is being played; calling it "scheduled"
+  // would put a match in progress under tomorrow's fixtures.
+  const nba = US.find((x) => x.strLeague === "NBA");
+  assert.equal(stateOf({ ...nba, strStatus: "Q4" }), "live");
+  assert.equal(stateOf({ ...nba, strStatus: "SOMETHING-NEW" }), "live");
+  assert.equal(stateOf({ ...nba, strStatus: "NS" }), "scheduled");
+  assert.equal(stateOf({ ...nba, strStatus: "FT" }), "final");
+  assert.equal(stateOf({ ...nba, strStatus: "PPD" }), "other");
 });
