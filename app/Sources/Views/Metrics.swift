@@ -32,7 +32,9 @@ enum Metrics {
     static let rowGap: CGFloat = 10
 
     /// The identity image in a row — crest, constructor badge or portrait. One
-    /// size for all three: a row is as tall as its mark plus the inset.
+    /// size for all three. A row is as tall as the tallest thing inside it plus
+    /// the inset: 100 points where that is the mark, more where a second line
+    /// of text or a scoreline is taller than it.
     static let mark: CGFloat = 64
     /// The same thing blown up for a podium, where it is the subject.
     static let markHero: CGFloat = 110

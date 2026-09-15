@@ -43,9 +43,14 @@ writes a measurement of its own.
 | `markHero` | 110 | the same on a podium, where it is the subject |
 | `leagueMark` | 52 | competition mark height; width up to 2.5× for wordmarks |
 
-A row is therefore `mark + 2 × rowInsetV` = **100 points tall**, everywhere in
-the app, and `rowSurface(focused:)` applies the inset, the corner and the focus
-highlight so a row cannot drift from that.
+`rowSurface(focused:)` applies the inset, the corner and the focus highlight, so
+what every row shares is the rhythm rather than one fixed number: a row is as
+tall as the tallest thing in it plus `2 × rowInsetV`. Where that is the mark —
+a standings line, say — the row measures 100 points. A race result row is taller
+because on tvOS the driver's name and team stacked together are taller than a
+64-point portrait, and a match row is taller because of the score. Measured on
+the CI render, standings rows now repeat every 110 points (100 + `rowGap`); they
+used to be 76 with a 2-point gap, which is what crowded the badges.
 
 ## Working on a screen
 
