@@ -28,7 +28,10 @@ BRAND = CATALOG / "App Icon & Top Shelf Image.brandassets"
 MARK_WIDTH = 0.74     # of the canvas; leaves the safe margin the layers need
 BLOOM = (255, 40, 30)
 BLOOM_STRENGTH = 0.45  # enough for the dots to float above when focused
-TOP_LIGHT = (30, 27, 30)  # the board catches a little light from above
+# Sampled from Apple's own Fitness icon: lit to 53 at the top, never falling
+# past 18 at the foot. A dark icon, not a black hole.
+TOP_LIGHT = (52, 52, 54)
+FLOOR = (19, 19, 20)
 
 
 def mark() -> Image.Image:
@@ -45,15 +48,15 @@ def mark() -> Image.Image:
 
 
 def ground(size: tuple[int, int]) -> Image.Image:
-    """The unlit board, lit from above and falling away to black at the foot,
-    the way Apple's own dark icons are lit. Opaque, as the bottom layer must
-    be, and never bright enough to lift the dots off it."""
+    """The unlit board, lit from above and falling away at the foot, the way
+    Apple's own dark icons are lit. Opaque, as the bottom layer must be, and
+    never bright enough to lift the dots off it."""
     w, h = size
     strip = Image.new("RGB", (1, 64))
     px = strip.load()
     for y in range(64):
-        t = (1 - y / 63) ** 1.7
-        px[0, y] = tuple(round(c * t) for c in TOP_LIGHT)
+        t = (1 - y / 63) ** 1.4
+        px[0, y] = tuple(round(f + (c - f) * t) for c, f in zip(TOP_LIGHT, FLOOR))
     return strip.resize((w, h), Image.LANCZOS).convert("RGBA")
 
 
