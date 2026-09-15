@@ -1,6 +1,10 @@
 # Agent brief — tvscores
 
-You are working on a tvOS app plus a small caching proxy. Read this file before touching anything. The README describes the product; this file describes how to work on it.
+You are working on a tvOS app plus a small caching proxy. Read this file before
+touching anything. The [README](README.md) is the tour for a human arriving at
+the repository; this file is how the work is actually done. Keep it that way:
+if a thing is a command, a rule or a convention it belongs here and nowhere
+else.
 
 ## Layout
 
@@ -30,6 +34,18 @@ CHANGELOG.md  what each TestFlight build changed, for whoever installs it.
 8. **Apple credentials stay out of the repo.** Enrollment is done and the App Store Connect API key is in
    `~/.config/tvscores/asc.env` plus GitHub secrets. Never commit a `.p8`, and never print a key. Releases go
    through the `TestFlight` workflow; see `docs/release.md`.
+
+## Building and checking
+
+Every check the repository runs, in the order you need them:
+
+```sh
+node scripts/audit.mjs   # must be clean before a push
+cd proxy && npm test     # 54 tests
+```
+
+The `source-hygiene` skill wraps the audit and adds the judgement a script
+cannot make. Run it when asked about the state of the source.
 
 ## Building the app
 

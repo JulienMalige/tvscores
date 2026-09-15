@@ -1,98 +1,64 @@
 # TV Scores
 
-A small, fast Apple TV app that answers one question: **what games are on today and this week, and what is the score?**
+A small, fast Apple TV app that answers one question: **what games are on, and
+what is the score?**
 
-Think Apple Sports or Flashscore, reduced to the essentials and designed for the couch: big type, remote-friendly navigation, no clutter.
+Think Apple Sports reduced to the essentials and designed for the couch: big
+type, remote-friendly navigation, no clutter.
 
-## MVP scope
+> Working on this repository? Read [AGENTS.md](AGENTS.md). It has the commands,
+> the rules and the conventions. This file is the tour.
 
-- One or two leagues (decided in `AGENTS.md`), expandable later.
-- Screens: **Yesterday / Today / Upcoming** grouped by league, and a **Match** detail (score, status, kickoff time, minute). Layout follows Apple Sports, see `docs/design-reference.md`.
-- Favourite teams filter, stored on-device.
-- Team crests from the data provider, monogram fallback (decision 2026-09-14; trademark risk noted in `docs/`).
-- No odds, no betting links, no streaming links.
+## What it does
 
-## Architecture
+**Yesterday, Today, Upcoming**, grouped by competition, in French, English,
+Portuguese and Spanish. Opening a competition gives its own page and its
+standings; opening a race gives the full classification.
+
+Premier League, Champions League, NFL, NBA, Formula 1, MotoGP and the ATP and
+WTA tours. No odds, no betting, no streaming links.
+
+## How it works
 
 ```
-Apple TV (SwiftUI, tvOS)  ──HTTPS──▶  proxy on the VPS  ──scheduled──▶  licensed sports API
-        reads cached JSON              caches + hides key           paid per request
+Apple TV (SwiftUI, tvOS)  ──HTTPS──▶  proxy on the VPS  ──scheduled──▶  sports APIs
+        reads cached JSON              caches, holds every key        paid per request
 ```
 
-- **`app/`** — the tvOS app. Native SwiftUI, no cross-platform layer. Project generated from `project.yml` with XcodeGen so the Xcode project is reproducible from text.
-- **`proxy/`** — a tiny Node service on the VPS that polls the sports APIs on a schedule, caches results, and serves plain JSON to the app. The API key lives here only. Cost is fixed regardless of user count. See `proxy/README.md`.
+The app never holds a credential and never calls a provider. The proxy polls on
+a schedule, so the cost is the same whether one person watches or a thousand.
+It also mirrors crests and portraits locally, so the television talks to one
+host. See [proxy/README.md](proxy/README.md) for its endpoints and budget.
 
-## Development setup
+There is no Mac in this picture. The app is built, screenshotted and signed on
+GitHub Actions macOS runners, which is the only place Xcode exists.
 
-tvOS only builds with Xcode, so app work happens on the MacBook. Everything else (proxy, docs, planning) can happen anywhere.
+## Store identity
 
-On the Mac:
-
-```bash
-git clone git@github.com:JulienMalige/tvscores.git
-cd tvscores
-claude            # accept workspace trust once
-claude remote-control   # then drive it from the Claude app on the iPad
-```
-
-Prerequisites on the Mac: current Xcode from the App Store, `brew install xcodegen`, Claude Code signed in with a claude.ai account.
-
-## Running on a real Apple TV
-
-| Goal | Needs |
-|---|---|
-| tvOS simulator | nothing beyond Xcode |
-| Your own Apple TV, from Xcode over Wi-Fi | free Apple ID, Mac and TV on the same network, 7-day expiry |
-| TestFlight, or any install away from the Mac | paid Apple Developer Program |
-| App Store | paid program, privacy policy URL, data licence you can show a reviewer |
-
-## App Store guardrails
-
-- Use only a data provider whose terms allow display in a consumer app. Keep the licence text in `docs/`.
-- No scraping of ESPN, Flashscore or similar.
-- Enough native tvOS structure (focus engine, top shelf, sections) to clear the "minimum functionality" bar.
-
-## Name and store listing
-
-- Product name: **TV Scores** (checked 2026-09-13: no App Store app uses the exact name; "Scores TV", "ScoreTV" and "Scores and Odds TV" exist, so the subtitle must differentiate).
-- Bundle id: `com.julienmalige.tvscores`.
-- Launch languages: **French, English, Portuguese, Spanish**. App UI and store listing in all four from the first release.
-- Subtitle carries the rest, per storefront:
-  - fr: "Matchs du jour et résultats"
-  - en: "Today's games, live"
-  - pt: "Jogos de hoje, ao vivo"
-  - es: "Partidos de hoy, en directo"
-- Keywords field (100 chars, per language) holds the rest: football, ligue 1, résultats, match, ce soir, live, calendrier, fixtures, tv.
+- Product name **TV Scores**, bundle id `com.julienmalige.tvscores`. Checked
+  2026-09-13: no App Store app uses the exact name, though "Scores TV" and
+  "ScoreTV" exist, so the subtitle has to differentiate.
+- Launch languages French, English, Portuguese, Spanish, app and listing both.
+- Subtitles: "Matchs du jour et résultats", "Today's games, live", "Jogos de
+  hoje, ao vivo", "Partidos de hoy, en directo".
 
 ## Status
 
-- `app/`: Yesterday / Today / Upcoming scoreboard reading the proxy (or a bundled sample with `-TVScoresDemo`), Apple Sports row layout, en/fr/pt/es. Built and screenshotted on every push by the GitHub Actions workflow (`.github/workflows/tvos.yml`).
-- `proxy/`: live on the VPS with Champions League, NFL, NBA (API-Sports free plans), Formula 1 and MotoGP (Orange Cat Blacktop, results and calendar), ATP/WTA tennis (livetennisapi.com); quota-aware polling, disk cache, public HTTPS via Tailscale Funnel.
-- Next: match detail screen, favourites, Top Shelf and app icon, then the Apple Developer enrollment for a TestFlight build on the real Apple TV.
+On TestFlight, installable on a real Apple TV. What each build changed is in
+[CHANGELOG.md](CHANGELOG.md).
 
-## Keeping the source honest
+Before it can go to the store: paid tiers for the motorsport and photo sources,
+a football source with real date ranges, and a home for the proxy that is meant
+to carry an audience. Those are tracked as open decisions in
+[AGENTS.md](AGENTS.md).
 
-```sh
-node scripts/audit.mjs
-```
+## Where things are
 
-Static checks over the whole repository: exports and modules nothing imports,
-Swift types declared and never used, blocks of eight identical lines, naming
-that has drifted, files grown past 260 lines, leftover markers and
-commented-out code, documents naming files that no longer exist, routes served
-but undocumented or documented but gone, a change to the app or the proxy with
-nothing written in `CHANGELOG.md`, line coverage under 70 percent, and any
-credential that wandered out of `proxy/src/config.js`.
-
-The checks live one family per file under `scripts/audit`, so adding one means
-writing a function and listing it.
-
-Everything it reports is a fact rather than a matter of taste, so a finding is
-worth acting on.
-
-It is run by a scheduled Claude session rather than by continuous integration,
-because half of what we want checked cannot be decided by a script: whether a
-comment earns its place, whether a file still has one job, whether a document
-says something true rather than merely naming files that exist. The schedule
-lives in the session that created it, so it needs re-creating when that session
-ends. Run the command yourself any time in between.
+| | |
+|---|---|
+| [AGENTS.md](AGENTS.md) | how to work here: commands, hard rules, conventions, open decisions |
+| [CHANGELOG.md](CHANGELOG.md) | what each build changed, written for whoever installs it |
+| [proxy/README.md](proxy/README.md) | the proxy's endpoints, providers, quotas and caches |
+| [docs/data-providers.md](docs/data-providers.md) | who the data comes from and on what terms |
+| [docs/design-reference.md](docs/design-reference.md) | the layout every screen is judged against |
+| [docs/release.md](docs/release.md) | signing and the road to TestFlight |
