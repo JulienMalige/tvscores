@@ -42,4 +42,31 @@ function changelog({ root, git }, report) {
   for (const commit of since) report("changelog", "CHANGELOG.md", `nothing written for ${commit}`);
 }
 
-export const checks = [paths, routes, changelog];
+/**
+ * The README is the tour for a human arriving at the repository; AGENTS.md is
+ * the commands, rules and conventions. A fact written in both goes stale in
+ * one of them, which is how the README ended up still claiming the app is
+ * built on a MacBook.
+ */
+function noDoubleTelling({ root, read }, report) {
+  const sentences = (file) => {
+    const prose = read(join(root, file))
+      .replace(/```[\s\S]*?```/g, "\n\n")   // code blocks are meant to repeat
+      .split("\n")
+      .filter((line) => !/^\s*(#|\||>)/.test(line))  // headings, tables, quotes
+      .map((line) => line.replace(/^\s*(?:[-*+]|\d+\.)\s+/, ""))
+      .join("\n");
+    return prose
+      .split(/\n\s*\n/)
+      // Emphasis comes off before the split, or "**Rule.** Next" never parts.
+      .flatMap((para) => para.replace(/[`*_]/g, "").replace(/\s+/g, " ").split(/(?<=[.!?])\s+/))
+      .map((s) => s.trim().toLowerCase())
+      .filter((s) => s.length >= 60);
+  };
+  const brief = new Set(sentences("AGENTS.md"));
+  for (const line of sentences("README.md")) {
+    if (brief.has(line)) report("docs", "README.md", `says what AGENTS.md already says: "${line.slice(0, 70)}..."`);
+  }
+}
+
+export const checks = [paths, routes, changelog, noDoubleTelling];

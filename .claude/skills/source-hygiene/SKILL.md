@@ -49,6 +49,14 @@ Read the diff of the files it names, and judge:
 - **Documentation.** Prose that is well-formed but no longer true. Behaviour
   that changed without its documentation following. The audit only checks that
   named paths and routes exist, never that a sentence is still honest.
+- **Which document a thing belongs in.** `README.md` is the tour for a human
+  arriving at the repository: what this is, how it fits together, where to
+  look. `AGENTS.md` is how the work is done: commands, hard rules, conventions,
+  directory responsibilities, open decisions. Anything said in both will go
+  stale in one of them, which is how the README came to claim for days that the
+  app is built on a MacBook. The audit catches sentences repeated verbatim;
+  you have to catch the same fact told twice in different words, and material
+  sitting in the wrong file.
 - **Tests.** Assertions pinned to the implementation rather than the
   behaviour, and behaviour that shipped with no test at all. Coverage counts
   lines, not meaning.
