@@ -12,7 +12,7 @@ function tooling({ root, run }, report) {
     run("node", ["--test", ...suite], root);
   } catch (err) {
     const failures = String(err.stdout || err.message).split("\n").filter((l) => l.startsWith("not ok")).slice(0, 3).join("; ");
-    report("tests", "scripts", `the tooling tests did not pass: ${failures || "see node --test scripts/test/"}`);
+    report("tests", "scripts", `the tooling tests did not pass: ${failures || `see node --test ${suite.join(" ")}`}`);
   }
 }
 

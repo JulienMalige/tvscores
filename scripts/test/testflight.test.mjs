@@ -56,3 +56,9 @@ test("closing twice changes nothing the second time", () => {
   const once = closeSection(CHANGELOG, "12", new Date("2026-09-16T12:00:00Z"));
   assert.equal(closeSection(once, "13", new Date("2026-09-17T12:00:00Z")), once);
 });
+
+test("an empty Unreleased section is left open", () => {
+  const empty = "# Changelog\n\n## Unreleased\n\n## 1.0 build 9 — 15 September 2026\n\n- New app icon.\n";
+  assert.equal(closeSection(empty, "12", new Date("2026-09-16T12:00:00Z")), empty);
+  assert.equal(topSection(empty), "", "and it sends no note rather than a placeholder");
+});

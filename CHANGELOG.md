@@ -8,8 +8,6 @@ notes when a version ships.
 
 ## Unreleased
 
-Nothing yet.
-
 ## 1.0 build 11 — 15 September 2026
 
 - The icon sits on flat black now, the way the artwork was drawn, instead of

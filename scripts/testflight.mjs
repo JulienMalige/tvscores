@@ -18,6 +18,9 @@ const MAX_NOTE = 4000;
 
 /** Rewrite the Unreleased heading as the build that just took it. */
 export function closeSection(markdown, version, today = new Date()) {
+  // An empty section stays open: a build that changed nothing a tester could
+  // notice does not deserve a heading of its own.
+  if (!section(markdown, /^## Unreleased/)) return markdown;
   const date = today.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
   const marketing = (markdown.match(/^## ([\d.]+) build /m) || [])[1] || "1.0";
   return markdown.replace(/^## Unreleased\s*$/m, `## ${marketing} build ${version} — ${date}`);
