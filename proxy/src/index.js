@@ -3,7 +3,7 @@ import { config } from "./config.js";
 import { Store } from "./cache.js";
 import { Quota } from "./quota.js";
 import { ApiSports } from "./providers/apisports.js";
-import { footballProvider } from "./providers/football.js";
+import { sportsDbFootball } from "./providers/sportsdb.js";
 import { nflProvider } from "./providers/nfl.js";
 import { nbaProvider } from "./providers/nba.js";
 import { f1Provider, f1Nationalities } from "./providers/jolpica.js";
@@ -18,8 +18,22 @@ const log = (msg) => console.log(`${new Date().toISOString()} ${msg}`);
 const store = new Store(config.cacheDir);
 
 const schedulers = [];
+// Football comes from TheSportsDB: it carries the leagues API-Sports' free
+// plan cannot reach and, more to the point, real dates rather than
+// yesterday-to-tomorrow. NFL and NBA stay on API-Sports.
+{
+  const meta = store.sportMeta("football");
+  const quota = new Quota(meta, { ...config.schedule, dailyQuota: config.schedule.sportsDbDailyQuota });
+  const provider = sportsDbFootball({
+    key: config.theSportsDbKey,
+    leagues: config.leagues.football,
+    window: config.schedule.footballWindow,
+    quota,
+    log,
+  });
+  schedulers.push(new TeamSportScheduler({ provider, store, cfg: config.schedule, log }));
+}
 for (const [sport, make] of [
-  ["football", footballProvider],
   ["nfl", nflProvider],
   ["nba", nbaProvider],
 ]) {

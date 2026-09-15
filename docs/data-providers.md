@@ -215,3 +215,29 @@ from the scoreboard for weeks at a time. That is the filter working.
 
 The free tier's 100 calls a day is now the binding constraint on tennis, not
 the data. Their BASIC tier is $9.99/mo for 1,000/day.
+
+## Football moved to TheSportsDB (2026-09-15)
+
+Julien subscribed to the $9 Single Developer tier, and football moved onto it
+whole: `proxy/src/providers/sportsdb.js` fetches one `eventsday` call per date
+for `schedule.footballWindow` (yesterday plus seven days) and filters to the
+eight competitions in `config.leagues.football`, with the V2 `livescore/soccer`
+endpoint for matches in play. Eight leagues, nine calls a cycle.
+
+Why the swap: API-Sports' free plan answers only yesterday-to-tomorrow, so the
+seven-day Upcoming was impossible at any league count, and unlocking it cost
+$19 per sport per month. TheSportsDB's paid key returns up to 1,500 events for
+a date, which makes a competition a config line and a badge rather than a
+subscription. The API-Sports football adapter was deleted rather than left
+dormant; `git revert` brings it back if the test month disappoints. NFL and NBA
+stay on API-Sports, whose free tier covers their whole schedules.
+
+League ids came from the live catalogue, not from the website: 4328 Premier
+League, 4335 La Liga, 4332 Serie A, 4331 Bundesliga, 4334 Ligue 1, 4480
+Champions League, 4501 Copa Libertadores, 4351 Brasileirão. `strTimestamp` is
+UTC without a zone marker and has to be tagged before parsing, or every kickoff
+shifts by the server's own offset.
+
+The store's `SCHEMA_VERSION` went to 5 for this, which empties the events and
+the daily stamps on first load. Events keyed by the old provider's ids would
+otherwise sit beside the new ones and show the same match twice.

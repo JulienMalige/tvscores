@@ -13,6 +13,12 @@ BADGES = {
     "motogp": "https://r2.thesportsdb.com/images/media/league/badge/gg3c201768486075.png",
     "atp": "https://r2.thesportsdb.com/images/media/league/badge/q7aej51769857150.png",
     "wta": "https://r2.thesportsdb.com/images/media/league/badge/bddhun1768230678.png",
+    "laliga": "https://r2.thesportsdb.com/images/media/league/badge/ja4it51687628717.png",
+    "seriea": "https://r2.thesportsdb.com/images/media/league/badge/67q3q21679951383.png",
+    "bundesliga": "https://r2.thesportsdb.com/images/media/league/badge/teqh1b1679952008.png",
+    "ligue1": "https://r2.thesportsdb.com/images/media/league/badge/9f7z9d1742983155.png",
+    "libertadores": "https://r2.thesportsdb.com/images/media/league/badge/9shr931685425181.png",
+    "brasileirao": "https://r2.thesportsdb.com/images/media/league/badge/lywv7t1766787179.png",
 }
 OUT = os.path.join(os.path.dirname(__file__), "..", "assets", "leagues")
 HEIGHT = 160  # px; the app scales down, Retina-safe

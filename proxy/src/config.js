@@ -32,9 +32,21 @@ export const config = {
    * proxy/assets/leagues (built by scripts/build-badges.py) served by this proxy.
    */
   leagues: {
+    /**
+     * TheSportsDB league ids (2026-09-15). Football is fetched one call per
+     * date and filtered here, so a competition costs a line and a badge, not
+     * a subscription. Ids verified against the live catalogue, and the
+     * ordering is the order they appear on the scoreboard.
+     */
     football: [
-      { id: 39, name: "Premier League", short: "PL", badge: "epl" },
-      { id: 2, name: "UEFA Champions League", short: "UCL", badge: "ucl" },
+      { id: 4328, name: "Premier League", short: "PL", badge: "epl" },
+      { id: 4335, name: "La Liga", short: "LIGA", badge: "laliga" },
+      { id: 4332, name: "Serie A", short: "SA", badge: "seriea" },
+      { id: 4331, name: "Bundesliga", short: "BUN", badge: "bundesliga" },
+      { id: 4334, name: "Ligue 1", short: "L1", badge: "ligue1" },
+      { id: 4480, name: "UEFA Champions League", short: "UCL", badge: "ucl" },
+      { id: 4501, name: "Copa Libertadores", short: "LIB", badge: "libertadores" },
+      { id: 4351, name: "Brasileirão", short: "BRA", badge: "brasileirao" },
     ],
     nfl: [{ id: 1, name: "NFL", short: "NFL", badge: "nfl" }],
     nba: [{ id: "standard", name: "NBA", short: "NBA", badge: "nba" }],
@@ -80,8 +92,13 @@ export const config = {
   /** Display order of sports on the scoreboard. */
   sportOrder: ["football", "f1", "motogp", "tennis", "nba", "nfl"],
   schedule: {
-    /** Free plan: dates yesterday..tomorrow only, 100 calls/day per sport. */
+    /** API-Sports free plan: dates yesterday..tomorrow only, 100 calls/day per sport. */
     dayOffsets: [-1, 0, 1],
+    /**
+     * Football comes from TheSportsDB instead, one call per date, so its
+     * window is the one the Upcoming tab actually shows.
+     */
+    footballWindow: { back: 1, ahead: 7 },
     dailyRefreshHourUtc: 4,
     idleRefreshMinutes: 180,
     /**
@@ -98,6 +115,8 @@ export const config = {
     upcomingDays: 7,
     /** A game counts as "maybe live" from 10 min before kickoff until this long after. */
     liveWindowHours: 4,
+    /** TheSportsDB paid tiers cap requests per minute, not per day; this is a sanity ceiling. */
+    sportsDbDailyQuota: 2000,
     /** Orange Cat Blacktop free tier is 7,500/month; keep a day well under that. */
     ocbDailyQuota: 200,
   },

@@ -10,6 +10,11 @@ notes when a version ships.
 
 - The race result page now lights up the driver you are on, like every
   other list in the app.
+- Seven more competitions: La Liga, Serie A, Bundesliga, Ligue 1, Copa
+  Libertadores and the Brasileirão join the Premier League and the Champions
+  League, each with its own badge and league page.
+- Upcoming really does look seven days ahead for football now, instead of
+  stopping at tomorrow.
 - Tennis shows the events worth watching: the four majors, every 1000-level
   tournament — Monte Carlo, Madrid, Rome, Shanghai, Beijing and the rest —
   and the season finals. Challengers, ITF weeks and qualifying draws no

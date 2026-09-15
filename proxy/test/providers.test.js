@@ -1,30 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { normaliseFixture } from "../src/providers/football.js";
 import { normaliseGame as nflGame } from "../src/providers/nfl.js";
 import { normaliseGame as nbaGame } from "../src/providers/nba.js";
 import { normaliseRace } from "../src/providers/jolpica.js";
 import { shortName, team } from "../src/model.js";
 
 const fx = (n) => JSON.parse(readFileSync(new URL(`./fixtures/${n}.json`, import.meta.url)));
-const UCL = { id: 2, name: "UEFA Champions League", short: "UCL" };
-
-test("football statuses map to live / half-time / final / scheduled", () => {
-  const [live, ht, ft, ns] = fx("football").response.map((f) => normaliseFixture(f, UCL));
-  assert.equal(live.status.state, "live");
-  assert.match(live.status.clock, /^\d+(\+\d+)?'$/);
-  assert.equal(ht.status.state, "live");
-  assert.equal(ht.status.clock, undefined);
-  assert.equal(ht.status.detail, "Half-time");
-  assert.equal(ft.status.state, "final");
-  assert.equal(typeof ft.score.home, "number");
-  assert.equal(ns.status.state, "scheduled");
-  assert.equal(ns.score.home, null);
-  assert.equal(live.league.short, "UCL");
-  assert.match(live.home.logo, /^https:\/\/media\.api-sports\.io\//);
-  assert.ok(live.start.endsWith("Z"));
-});
 
 test("nfl final game", () => {
   const g = nflGame(fx("nfl").response[0], { id: 1, name: "NFL", short: "NFL" });

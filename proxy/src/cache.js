@@ -1,8 +1,14 @@
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-/** Bump when a cached shape changes; load() then drops derived caches (photos, standings stamps). */
-const SCHEMA_VERSION = 4;
+/**
+ * Bump when a cached shape changes. load() then drops the events, the derived
+ * caches and the "fetched today" stamps, so every provider refills from
+ * scratch on the next tick. That is what makes a provider swap safe: events
+ * keyed by the old provider's ids would otherwise sit alongside the new ones
+ * and show the same match twice.
+ */
+const SCHEMA_VERSION = 5;
 
 /**
  * Event store persisted to disk so a restart or an upstream outage
@@ -29,8 +35,13 @@ export class Store {
       this.photos = raw.photos || {};
       this.meta = raw.meta || {};
       if (raw.schemaVersion !== SCHEMA_VERSION) {
+        this.events.clear();
         this.photos = {};
-        for (const m of Object.values(this.meta)) delete m.lastStandings;
+        for (const m of Object.values(this.meta)) {
+          delete m.lastStandings;
+          delete m.lastDaily;
+          delete m.lastToday;
+        }
         this.dirty = true;
       }
     } catch {
