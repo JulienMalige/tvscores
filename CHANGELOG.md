@@ -8,6 +8,8 @@ notes when a version ships.
 
 ## Unreleased
 
+- New app icon: a dot-matrix scoreboard reading 2-1. On the Apple TV home
+  screen the lit dots float above their own glow when you focus it.
 - The source is checked once a day for dead code, duplication, naming drift,
   stale documentation, test coverage and stray credentials. Nothing visible in
   the app.
