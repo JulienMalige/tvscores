@@ -106,24 +106,13 @@ struct RaceDetailView: View {
     }
 }
 
-/// tvOS puts `\.isFocused` into the environment *below* the view that becomes
-/// focusable, so the row that reads it has to be the child of the one that
-/// declares it. Reading it in the same body leaves it stuck at false: focus
-/// moves and clicks, but nothing lights up.
+/// A plain `.focusable()` view takes focus — the page scrolls, the TV clicks —
+/// but it does not publish `\.isFocused` to its own body the way a button
+/// publishes it to its label, so the highlight never appeared. `@FocusState`
+/// is told directly instead, which works inside a single view.
 private struct RaceResultRow: View {
     let result: RaceResult
-
-    var body: some View {
-        ResultContent(result: result)
-            // tvOS scrolls by moving focus. Without this the page would be
-            // stuck at the top and most of the field unreachable.
-            .focusable()
-    }
-}
-
-private struct ResultContent: View {
-    let result: RaceResult
-    @Environment(\.isFocused) private var isFocused
+    @FocusState private var isFocused: Bool
 
     var body: some View {
         HStack(spacing: 0) {
@@ -161,5 +150,9 @@ private struct ResultContent: View {
         .padding(.vertical, 14)
         .padding(.horizontal, 28)
         .rowSurface(focused: isFocused, radius: 18, scale: 1.01)
+        // tvOS scrolls by moving focus. Without this the page would be stuck
+        // at the top and most of the field unreachable.
+        .focusable()
+        .focused($isFocused)
     }
 }
