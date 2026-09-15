@@ -93,3 +93,29 @@ test("the daily fetch waits while a game could be in progress", () => {
   assert.equal(s.needsDaily(KICKOFF + 3600e3), false, "not while something is live");
   assert.equal(s.needsDaily(KICKOFF + 9 * 3600e3), true, "once the window has closed");
 });
+
+test("a failing upstream is asked less and less often, then forgiven", async () => {
+  const angry = { sport: "football", daily: async () => { throw new Error("HTTP 429"); }, live: async () => [] };
+  const s = scheduler(angry);
+  const base = 5 * 60e3; // nothing live: the idle tick
+
+  assert.equal(s.nextDelay(KICKOFF), base, "no failures yet");
+  await s.tick();
+  assert.equal(s.meta.failures, 1);
+  assert.equal(s.nextDelay(KICKOFF), 2 * base, "one failure doubles it");
+  await s.tick();
+  assert.equal(s.nextDelay(KICKOFF), 4 * base);
+
+  assert.ok(s.meta.lastError.message.includes("429"), "and the reason is kept for /v1/health");
+
+  s.p.daily = async () => [];
+  await s.tick();
+  assert.equal(s.meta.failures, 0, "one good answer clears it");
+  assert.equal(s.nextDelay(KICKOFF), base);
+});
+
+test("backoff stops at an hour, however long the outage", () => {
+  const s = scheduler(fake({}));
+  s.meta.failures = 40;
+  assert.equal(s.nextDelay(KICKOFF), 60 * 60e3);
+});

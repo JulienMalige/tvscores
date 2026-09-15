@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { createHash } from "node:crypto";
 import { readFileSync, statSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,12 +11,25 @@ import { slug } from "./model.js";
 /** Crests and portraits change once in a blue moon; let the TV keep them. */
 const IMAGE_CACHE = "public, max-age=2592000, immutable";
 
-function send(res, status, body, extra = {}) {
+/**
+ * JSON with an ETag, and a bodyless 304 when the caller already has it.
+ *
+ * The scoreboard is ~50 KB and a television asks for it every minute while a
+ * game is on, but it only actually changes when a poll brings something new.
+ * The tag is the body's own hash, so "changed" means changed.
+ */
+function send(res, status, body, extra = {}, req) {
   const json = JSON.stringify(body);
+  const etag = `"${createHash("sha1").update(json).digest("base64url")}"`;
+  if (status === 200 && req?.headers["if-none-match"] === etag) {
+    res.writeHead(304, { etag, "cache-control": "public, max-age=30", "access-control-allow-origin": "*", ...extra });
+    return res.end();
+  }
   res.writeHead(status, {
     "content-type": "application/json; charset=utf-8",
     "cache-control": "public, max-age=30",
     "access-control-allow-origin": "*",
+    etag,
     ...extra,
   });
   res.end(json);
@@ -52,16 +66,16 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
 
     if (path === "/v1/scoreboard") {
       const hit = memo.get(tz);
-      if (hit && Date.now() - hit.at < MEMO_MS) return send(res, 200, hit.body);
+      if (hit && Date.now() - hit.at < MEMO_MS) return send(res, 200, hit.body, {}, req);
       const body = buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, mirror, activeSports, upcomingDays: config.schedule.upcomingDays });
       memo.set(tz, { at: Date.now(), body });
-      return send(res, 200, body);
+      return send(res, 200, body, {}, req);
     }
     if (path === "/v1/fixtures") {
       const date = url.searchParams.get("date");
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date || "")) return send(res, 400, { error: "date=YYYY-MM-DD required" });
       const events = store.all().filter((e) => localDate(e.start, tz) === date);
-      return send(res, 200, { date, tz, events });
+      return send(res, 200, { date, tz, events }, {}, req);
     }
     if (path === "/v1/standings") {
       return send(res, 200, { standings: Object.fromEntries(Object.entries(store.standings).map(([k, v]) => [k, withTablePhotos(v, photoFor, mirror, badgeFor(k.split(":")[0]))])) });
@@ -69,7 +83,7 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
     const one = path.match(/^\/v1\/standings\/([a-z0-9-]+)\/([a-z0-9-]+)$/);
     if (one) {
       const data = store.standings[`${one[1]}:${one[2]}`];
-      return data ? send(res, 200, withTablePhotos(data, photoFor, mirror, badgeFor(one[1]))) : send(res, 404, { error: "no standings for this league" });
+      return data ? send(res, 200, withTablePhotos(data, photoFor, mirror, badgeFor(one[1])), {}, req) : send(res, 404, { error: "no standings for this league" });
     }
     const img = path.match(/^\/v1\/img\/([0-9a-f]{40})$/);
     if (img && images) {

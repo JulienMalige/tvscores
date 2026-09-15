@@ -10,6 +10,10 @@ notes when a version ships.
 
 - The race result page now lights up the driver you are on, like every
   other list in the app.
+- A match that has finished now shows its final score, instead of staying
+  stuck on the last minute it was seen playing.
+- The app re-downloads the scoreboard only when it has actually changed,
+  which is gentler on a slow line.
 - Seven more competitions: La Liga, Serie A, Bundesliga, Ligue 1, Copa
   Libertadores and the Brasileirão join the Premier League and the Champions
   League, each with its own badge and league page.

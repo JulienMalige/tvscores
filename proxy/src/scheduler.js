@@ -3,6 +3,10 @@ import { STATE } from "./model.js";
 
 const MIN = 60e3;
 const STANDINGS_EVERY = 6 * 3600e3;
+/** However badly upstream is doing, look again within the hour. */
+const MAX_BACKOFF = 60 * 60e3;
+/** A season calendar and its finished results: nothing changes fast. */
+const CALENDAR_EVERY = 30 * MIN;
 
 /** Shared: refresh a provider's standings every 6 h when it offers them. */
 async function refreshStandings(self, now) {
@@ -115,6 +119,17 @@ export class TeamSportScheduler {
     this.meta.lastOk = this.meta.lastLive;
   }
 
+  /**
+   * How long to wait before looking again: the normal interval, doubled per
+   * consecutive failure. An upstream that is down, rate-limiting us or
+   * throwing 500s gets asked less often rather than hammered at full rate —
+   * and today's exhausted quotas are the reason that matters here.
+   */
+  nextDelay(now = Date.now()) {
+    const base = this.hasLiveWindow(now) ? this.quota.liveInterval(this.cfg.liveIntervalSeconds, now) * 1000 : 5 * MIN;
+    return Math.min(base * 2 ** Math.min(this.meta.failures || 0, 10), MAX_BACKOFF);
+  }
+
   async tick() {
     const now = Date.now();
     try {
@@ -122,15 +137,16 @@ export class TeamSportScheduler {
       if (this.hasLiveWindow(now)) await this.live(now);
       await refreshStandings(this, now);
       this.meta.lastError = undefined;
+      this.meta.failures = 0;
     } catch (err) {
+      this.meta.failures = (this.meta.failures || 0) + 1;
       this.meta.lastError = { at: new Date(now).toISOString(), message: String(err.message || err) };
-      this.log(`${this.p.sport}: ${err.message}`);
+      this.log(`${this.p.sport}: ${err.message} (failure ${this.meta.failures})`);
     }
     this.store.prune(now);
     this.store.touch(); // meta (quota counters, timestamps) changed
     this.store.save();
-    const next = this.hasLiveWindow(now) ? this.quota.liveInterval(this.cfg.liveIntervalSeconds, now) * 1000 : 5 * MIN;
-    this.timer = setTimeout(() => this.tick(), next);
+    this.timer = setTimeout(() => this.tick(), this.nextDelay(now));
     this.timer.unref?.();
   }
 
@@ -143,7 +159,7 @@ export class TeamSportScheduler {
   }
 }
 
-/** Calendar sports (F1, MotoGP): season list + results of finished races, every 30 min. */
+/** Calendar sports (F1, MotoGP): season list + results of finished races. */
 export class CalendarScheduler {
   constructor({ provider, store, log, quota }) {
     this.p = provider;
@@ -151,6 +167,11 @@ export class CalendarScheduler {
     this.log = log;
     this.quota = quota;
     this.meta = store.sportMeta(provider.sport);
+  }
+
+  /** A calendar moves slowly; on failure it is asked about even more slowly. */
+  nextDelay() {
+    return Math.min(CALENDAR_EVERY * 2 ** Math.min(this.meta.failures || 0, 10), MAX_BACKOFF);
   }
 
   async tick() {
@@ -163,13 +184,15 @@ export class CalendarScheduler {
       await refreshStandings(this, now);
       this.meta.lastOk = new Date(now).toISOString();
       this.meta.lastError = undefined;
+      this.meta.failures = 0;
     } catch (err) {
+      this.meta.failures = (this.meta.failures || 0) + 1;
       this.meta.lastError = { at: new Date(now).toISOString(), message: String(err.message || err) };
-      this.log(`${this.p.sport}: ${err.message}`);
+      this.log(`${this.p.sport}: ${err.message} (failure ${this.meta.failures})`);
     }
     this.store.touch();
     this.store.save();
-    this.timer = setTimeout(() => this.tick(), 30 * MIN);
+    this.timer = setTimeout(() => this.tick(), this.nextDelay());
     this.timer.unref?.();
   }
 

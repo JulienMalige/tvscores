@@ -241,3 +241,27 @@ shifts by the server's own offset.
 The store's `SCHEMA_VERSION` went to 5 for this, which empties the events and
 the daily stamps on first load. Events keyed by the old provider's ids would
 otherwise sit beside the new ones and show the same match twice.
+
+## Polling manners (2026-09-15)
+
+Checked our scheduler against the published advice for livescore backends.
+The shape matches: fetch upstream once centrally rather than per client,
+separate the static images from the moving scores, and poll hard only while
+a game is actually on. The one deliberate difference is the interval — the
+advice says 30 seconds, we say 30 minutes, because this app answers "what is
+on today", not "what is the score this second".
+
+Two gaps that advice named and we had, now closed:
+
+- **Conditional GET.** The scoreboard is ~48 KB and a television asks every
+  60 seconds while a game is on. Responses now carry an `ETag` of the body's
+  own hash and answer `If-None-Match` with a bodyless 304. The app needed no
+  change: URLSession revalidates on its own once `max-age` lapses and hands
+  the cached body back, so a 304 never reaches our code.
+- **Backoff.** A failing upstream was retried at full rate for ever. Each
+  consecutive failure now doubles the wait, capped at an hour, and one good
+  answer clears it.
+
+Not done, deliberately: conditional GET *upstream*. TheSportsDB does send
+`last-modified`, but a 304 still counts as a request against the quota, and
+requests are what we are capped on — it would save bytes we are not short of.
