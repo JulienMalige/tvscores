@@ -23,12 +23,12 @@ struct SidebarRow: View {
                 }
             }
         } icon: {
-            LeagueMark(sport: league.sport, logo: league.logo)
-                // Fit inside the disc, never filled to it: a wide wordmark
-                // keeps its proportions and a square badge keeps its size.
-                .padding(Self.disc * 0.14)
+            // The mark is given the square itself: left to its own devices it
+            // takes the width a wordmark wants — 130 points for Bundesliga —
+            // and lands on top of the name beside it.
+            LeagueMark(sport: league.sport, logo: league.logo, square: Self.disc * 0.62)
                 .frame(width: Self.disc, height: Self.disc)
-                .background(Circle().fill(Color.white.opacity(0.10)))
+                .background(Circle().fill(Color.white.opacity(0.14)))
         }
     }
 }
@@ -45,9 +45,11 @@ struct FadingText: View {
     var body: some View {
         Text(text)
             .lineLimit(1)
-            // Lay the whole line out and let the row clip it, so the mask has
-            // something to fade; truncation would have eaten the tail first.
-            .fixedSize(horizontal: true, vertical: false)
+            .truncationMode(.tail)
+            // `fixedSize` was tried first, to lay the whole line out and let
+            // the row clip it. The sidebar re-proposes its own width and the
+            // name wrapped to two lines instead, so the line is truncated and
+            // the mask fades the last of it — the ellipsis included.
             .mask(
                 LinearGradient(
                     stops: [.init(color: .black, location: 0.86), .init(color: .clear, location: 1)],

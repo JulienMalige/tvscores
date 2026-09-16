@@ -4,6 +4,9 @@ import SwiftUI
 struct LeagueMark: View {
     let sport: String
     let logo: URL?
+    /// A square to fit inside. Left out, the mark takes the width a wordmark
+    /// needs, which is right in a heading and wrong in a list of icons.
+    var square: CGFloat? = nil
 
     var body: some View {
         Group {
@@ -13,8 +16,22 @@ struct LeagueMark: View {
                 symbol
             }
         }
-        // Wide marks (F1, MotoGP, ATP) get room; square badges stay compact.
-        .frame(maxWidth: Metrics.leagueMark * 2.5, minHeight: Metrics.leagueMark, maxHeight: Metrics.leagueMark)
+        .modifier(Box(square: square))
+    }
+
+    /// Two shapes, one mark: a heading gives a wordmark its width; a sidebar
+    /// gives every competition the same square, whatever shape its mark is.
+    private struct Box: ViewModifier {
+        let square: CGFloat?
+
+        func body(content: Content) -> some View {
+            if let square {
+                content.frame(width: square, height: square)
+            } else {
+                // Wide marks (F1, MotoGP, ATP) get room; square badges stay compact.
+                content.frame(maxWidth: Metrics.leagueMark * 2.5, minHeight: Metrics.leagueMark, maxHeight: Metrics.leagueMark)
+            }
+        }
     }
 
     private var symbol: some View {
