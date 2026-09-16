@@ -22,18 +22,15 @@ struct Sidebar: View {
 
     var body: some View {
         TabView(selection: $selection) {
-            Tab(value: .home) {
+            Tab(value: Selection.home) {
                 HomeScreen(store: store, day: $day)
             } label: {
                 Label("tab.home", systemImage: "house")
             }
 
-            ForEach(store.board?.leagues ?? []) { league in
-                Tab(value: .league(key(league))) {
-                    NavigationStack {
-                        LeagueScreen(ref: LeagueRef(league), store: store, day: day)
-                            .navigationDestination(for: Event.self) { RaceScreen(eventId: $0.id, fallback: $0, store: store) }
-                    }
+            ForEach(leagues) { league in
+                Tab(value: Selection.league(key(league))) {
+                    LeaguePage(league: league, store: store, day: day)
                 } label: {
                     SidebarLabel(league: league)
                 }
@@ -44,6 +41,8 @@ struct Sidebar: View {
         .onDisappear { store.stopAutoRefresh() }
         .onChange(of: store.board?.leagues.count ?? 0) { _, _ in openRequestedLeague() }
     }
+
+    private var leagues: [LeagueSummary] { store.board?.leagues ?? [] }
 
     private func key(_ league: LeagueSummary) -> String { "\(league.sport):\(league.id.raw)" }
 
@@ -65,6 +64,23 @@ struct Sidebar: View {
     private static func initialDay() -> Day {
         guard let raw = argument("-TVScoresTab"), let day = Day(rawValue: raw) else { return .today }
         return day
+    }
+}
+
+/// One competition's page, with its own navigation so a race opened from it
+/// comes back to it rather than to Home.
+private struct LeaguePage: View {
+    let league: LeagueSummary
+    let store: ScoreboardStore
+    let day: Day
+
+    var body: some View {
+        NavigationStack {
+            LeagueScreen(ref: LeagueRef(league), store: store, day: day)
+                .navigationDestination(for: Event.self) { event in
+                    RaceScreen(eventId: event.id, fallback: event, store: store)
+                }
+        }
     }
 }
 
