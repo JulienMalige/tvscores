@@ -10,6 +10,12 @@ notes when a version ships.
 
 - The race result page now lights up the driver you are on, like every
   other list in the app.
+- Crests, badges and riders' faces stay on screen once they have loaded.
+  They no longer blink back to initials when a list refreshes, when you
+  scroll back up, or when you switch between the drivers and teams tabs.
+- MotoGP team standings show each team's marque — Aprilia, Ducati, KTM,
+  Yamaha, Honda and the rest — the way the Formula 1 constructors do,
+  instead of three initials on a coloured disc.
 - League tables are back, and real: the Premier League, La Liga, Serie A,
   Bundesliga, Ligue 1 and the Brasileirão each show their table on the
   league page, updated within ten minutes of a final whistle.

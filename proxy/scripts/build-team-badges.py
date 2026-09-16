@@ -30,13 +30,18 @@ COLOURS = {
         "Haas F1 Team": (0xde, 0xe1, 0xe2), "Audi": (0xff, 0x2d, 0x00), "Williams": (0x18, 0x68, 0xdb),
         "Aston Martin": (0x22, 0x99, 0x71), "Cadillac": (0xaa, 0xaa, 0xad),
     },
-    # MotoGP's badges are sponsor collages with no marque to cut out of them
-    # (Aprilia, Gresini, Pramac are wordmarks; the rest are a manufacturer's
-    # logo that is not the team's identity). Those rows keep their initials.
-    "motogp": {},
+    "motogp": {
+        "Aprilia Racing": (0x5f, 0x25, 0x9f), "Ducati Lenovo Team": (0xad, 0x00, 0x00),
+        "SuperFile Trackhouse MotoGP Team": (0x26, 0x26, 0x26), "Red Bull KTM Factory Racing": (0xff, 0x7e, 0x27),
+        "Pertamina Enduro VR46 Racing Team": (0x26, 0x26, 0x26), "BK8 Gresini Racing MotoGP": (0x9b, 0xae, 0xe4),
+        "Honda HRC Castrol": (0xe5, 0x00, 0x00), "Red Bull KTM Tech3": (0x26, 0x26, 0x26),
+        "LCR Honda": (0xfa, 0xfa, 0xfa), "Prima Pramac Yamaha MotoGP": (0x26, 0x26, 0x26),
+        # The results feed reports no colour for Yamaha; their own blue it is.
+        "Monster Energy Yamaha MotoGP Team": (0x0d, 0x1f, 0x6b),
+    },
 }
 
-# our standings name -> (TheSportsDB team name, crop box, keep colours?)
+# our standings name -> (TheSportsDB team name, crop box, keep colours?, source)
 #
 # The badges are sponsor lockups, so the marque has to be cut out of them. The
 # box is a fraction of the trimmed badge (left, top, right, bottom); None means
@@ -57,10 +62,26 @@ TEAMS = {
         "Cadillac": ("Cadillac Formula 1 Team", (0.14, 0.00, 0.86, 0.54), True),
         # Alpine and Williams: their lockups carry only a sponsor mark.
     },
-    # MotoGP's badges are sponsor collages with no marque to cut out of them
-    # (Aprilia, Gresini, Pramac are wordmarks; the rest are a manufacturer's
-    # logo that is not the team's identity). Those rows keep their initials.
-    "motogp": {},
+    # MotoGP teams are sponsor lockups too, but most carry the marque that
+    # actually identifies them, and `strLogo` is often the marque on its own
+    # where `strBadge` is the collage — or the other way round, which is why
+    # each entry names its source. Red Bull's two teams are the awkward pair:
+    # their logo *is* Red Bull, which identifies a drink and both of them, so
+    # KTM and TECH3 are cut out instead, one from the badge and one from the
+    # logo, so the factory team and the satellite team do not come out alike.
+    "motogp": {
+        "Aprilia Racing": ("Aprilia Racing", None, None, "logo"),
+        "Ducati Lenovo Team": ("Ducati Lenovo Team", None, None, "logo"),
+        "SuperFile Trackhouse MotoGP Team": ("Trackhouse Racing", (0.28, 0.00, 0.72, 0.62), None, "badge"),
+        "Red Bull KTM Factory Racing": ("Red Bull KTM Factory Racing", (0.02, 0.54, 0.98, 0.80), True, "badge"),
+        "Pertamina Enduro VR46 Racing Team": ("Pertamina Enduro VR46 Racing Team", None, True, "logo"),
+        "BK8 Gresini Racing MotoGP": ("BK8 Gresini Racing", None, None, "logo"),
+        "Honda HRC Castrol": ("Honda HRC Castrol", None, None, "badge"),
+        "Red Bull KTM Tech3": ("Red Bull KTM Tech3", (0.50, 0.00, 1.00, 1.00), True, "logo"),
+        "LCR Honda": ("LCR Honda Idemitsu Castrol", None, None, "logo"),
+        "Monster Energy Yamaha MotoGP Team": ("Monster Energy Yamaha MotoGP", (0.04, 0.70, 0.96, 0.97), True, "badge"),
+        "Prima Pramac Yamaha MotoGP": ("Prima Pramac Racing", (0.04, 0.52, 0.96, 0.92), True, "badge"),
+    },
 }
 
 
@@ -79,19 +100,19 @@ def league_teams(league):
     url = f"https://www.thesportsdb.com/api/v1/json/{KEY}/search_all_teams.php?l={urllib.parse.quote(league)}"
     with urllib.request.urlopen(url, timeout=25) as r:
         teams = json.load(r).get("teams") or []
-    return {(t.get("strTeam") or "").strip(): t.get("strBadge") for t in teams}
+    return {(t.get("strTeam") or "").strip(): t for t in teams}
 
 
-def badge_url(name, league, listing):
-    if name.strip() in listing:
-        return listing[name.strip()]
-    url = f"https://www.thesportsdb.com/api/v1/json/{KEY}/searchteams.php?t={urllib.parse.quote(name)}"
-    with urllib.request.urlopen(url, timeout=25) as r:
-        teams = json.load(r).get("teams") or []
-    for t in teams:
-        if (t.get("strTeam") or "").strip() == name.strip() and (t.get("strLeague") or "") == league:
-            return t.get("strBadge")
-    return None
+def art_url(name, league, listing, source="badge"):
+    """`strBadge` is the team lockup; `strLogo` is often the marque alone."""
+    field = "strLogo" if source == "logo" else "strBadge"
+    team = listing.get(name.strip())
+    if not team:
+        url = f"https://www.thesportsdb.com/api/v1/json/{KEY}/searchteams.php?t={urllib.parse.quote(name)}"
+        with urllib.request.urlopen(url, timeout=25) as r:
+            teams = json.load(r).get("teams") or []
+        team = next((t for t in teams if (t.get("strTeam") or "").strip() == name.strip() and (t.get("strLeague") or "") == league), None)
+    return (team or {}).get(field) or (team or {}).get("strBadge")
 
 
 def trim(im):
@@ -153,7 +174,8 @@ for sport, mapping in TEAMS.items():
     for ours, entry in mapping.items():
         theirs, box = entry[0], entry[1]
         style = entry[2] if len(entry) > 2 else None  # True = keep colours, "white" = force white
-        url = badge_url(theirs, LEAGUE[sport], listing)
+        source = entry[3] if len(entry) > 3 else "badge"
+        url = art_url(theirs, LEAGUE[sport], listing, source)
         if not url:
             print(f"{sport}/{slug(ours)}: no badge for {theirs!r}")
             continue
