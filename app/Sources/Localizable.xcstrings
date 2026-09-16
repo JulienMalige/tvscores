@@ -345,6 +345,34 @@
         }
       }
     },
+    "sidebar.noGames": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No games this week"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien cette semaine"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada esta semana"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada esta semana"
+          }
+        }
+      }
+    },
     "standings.constructors": {
       "localizations": {
         "en": {
@@ -1100,6 +1128,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Walkover"
+          }
+        }
+      }
+    },
+    "tab.home": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Home"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accueil"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Início"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inicio"
           }
         }
       }

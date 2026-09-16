@@ -28,6 +28,36 @@ function groupByLeague(events, sportOrder, leagues = {}, publicBase = "", standi
 }
 
 /**
+ * Every competition we follow, in display order, whether or not it is playing.
+ *
+ * The day buckets only carry leagues with something in them, so a fortnightly
+ * series vanishes from the app between races — which is how the Formula 1
+ * page became unreachable for eleven days at a time. This list is what a menu
+ * is built from, and `playing` says which of them have anything this week.
+ */
+function everyLeague(sportOrder, leagues = {}, publicBase = "", standings = {}, days = {}) {
+  const playing = new Set(
+    Object.values(days).flatMap((groups) => groups.map((g) => `${g.sport}:${g.league.id}`)),
+  );
+  const order = (s) => (sportOrder.indexOf(s) + 1 || 99);
+  return Object.entries(leagues)
+    .flatMap(([sport, list]) => list.map((l) => ({ sport, cfg: l })))
+    .sort((a, b) => order(a.sport) - order(b.sport) || a.cfg.name.localeCompare(b.cfg.name))
+    .map(({ sport, cfg }) => {
+      const key = `${sport}:${cfg.id}`;
+      return {
+        sport,
+        id: cfg.id,
+        name: cfg.name,
+        short: cfg.short,
+        logo: cfg.badge ? `${publicBase}/v1/assets/leagues/${cfg.badge}.png` : cfg.logo,
+        hasStandings: Boolean(standings[key]),
+        playing: playing.has(key),
+      };
+    });
+}
+
+/**
  * Buckets: yesterday, today, upcoming (tomorrow onwards, F1 calendar included),
  * computed in the viewer's time zone so "today" means their evening.
  */
@@ -106,11 +136,13 @@ export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrd
   const stale = Object.fromEntries(
     Object.entries(meta).filter(([sport]) => active.has(sport)).map(([sport, m]) => [sport, !m.lastOk || now - Date.parse(m.lastOk) > 6 * 3600e3]),
   );
+  const grouped = Object.fromEntries(Object.entries(days).map(([k, v]) => [k, groupByLeague(v, sportOrder, leagues, publicBase, standings)]));
   return {
     generatedAt: new Date(now).toISOString(),
     tz,
     stale,
     live: events.filter((e) => e.status.state === STATE.live).length,
-    days: Object.fromEntries(Object.entries(days).map(([k, v]) => [k, groupByLeague(v, sportOrder, leagues, publicBase, standings)])),
+    leagues: everyLeague(sportOrder, leagues, publicBase, standings, grouped),
+    days: grouped,
   };
 }

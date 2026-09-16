@@ -6,6 +6,9 @@ struct Scoreboard: Decodable, Equatable {
     let tz: String
     let stale: [String: Bool]
     let live: Int
+    /// Every competition we follow, playing this week or not. The day buckets
+    /// only carry what has fixtures, so this is what the menu is built from.
+    let leagues: [LeagueSummary]
     let days: Days
 
     struct Days: Decodable, Equatable {
@@ -46,6 +49,18 @@ struct League: Decodable, Equatable {
 }
 
 /// Identifies a league page; Hashable so it can be a navigation value.
+/// One entry of the sidebar: a competition, whether or not it is on this week.
+struct LeagueSummary: Decodable, Equatable, Identifiable, Hashable {
+    let sport: String
+    let id: FlexibleID
+    let name: String
+    let short: String
+    let logo: URL?
+    let hasStandings: Bool
+    /// False when nothing of this competition falls inside the week we show.
+    let playing: Bool
+}
+
 struct LeagueRef: Hashable {
     let sport: String
     let leagueId: String
@@ -53,6 +68,15 @@ struct LeagueRef: Hashable {
     let short: String
     let logo: URL?
     let hasStandings: Bool
+
+    init(_ summary: LeagueSummary) {
+        sport = summary.sport
+        leagueId = summary.id.raw
+        name = summary.name
+        short = summary.short
+        logo = summary.logo
+        hasStandings = summary.hasStandings
+    }
 
     init(group: LeagueGroup) {
         sport = group.sport
