@@ -50,3 +50,21 @@ test("the tag follows the content, not the clock", async () => {
     await s.close();
   }
 });
+
+test("a competition's badge is served in both shapes, and nothing else is", async () => {
+  const s = await serve();
+  try {
+    const wide = await s.get("/v1/assets/leagues/f1.png");
+    assert.equal(wide.status, 200, "the wordmark, at its own proportions");
+    const round = await s.get("/v1/assets/leagues/disc/f1.png");
+    assert.equal(round.status, 200, "and the round icon the sidebar uses");
+    assert.equal(round.headers.get("content-type"), "image/png");
+
+    assert.equal((await s.get("/v1/assets/leagues/nope.png")).status, 404);
+    assert.equal((await s.get("/v1/assets/leagues/disc/nope.png")).status, 404);
+    // The path is an alternative, not a free one: no walking out of assets/.
+    assert.equal((await s.get("/v1/assets/leagues/../../package.png")).status, 404);
+  } finally {
+    await s.close();
+  }
+});

@@ -109,9 +109,11 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
       res.writeHead(200, { "content-type": "image/png", "cache-control": IMAGE_CACHE, "access-control-allow-origin": "*" });
       return res.end(readFileSync(join(ASSETS, "teams", team[1], `${team[2]}.png`)));
     }
-    const asset = path.match(/^\/v1\/assets\/leagues\/([a-z0-9-]+)\.png$/);
+    // `disc/` is the round icon of the same competition; the alternative is
+    // spelled out rather than a free path, so nothing can walk out of assets/.
+    const asset = path.match(/^\/v1\/assets\/leagues\/(disc\/)?([a-z0-9-]+)\.png$/);
     if (asset) {
-      const file = join(ASSETS, "leagues", `${asset[1]}.png`);
+      const file = join(ASSETS, "leagues", asset[1] ? "disc" : "", `${asset[2]}.png`);
       try {
         statSync(file);
       } catch {

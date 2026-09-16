@@ -23,12 +23,11 @@ struct SidebarRow: View {
                 }
             }
         } icon: {
-            // The mark is given the square itself: left to its own devices it
-            // takes the width a wordmark wants — 130 points for Bundesliga —
-            // and lands on top of the name beside it.
-            LeagueMark(sport: league.sport, logo: league.logo, square: Self.disc * 0.62)
-                .frame(width: Self.disc, height: Self.disc)
-                .background(Circle().fill(Color.white.opacity(0.14)))
+            // The proxy composes this one: a square icon with the mark already
+            // centred on its own ground. tvOS lays sidebar icons out itself and
+            // discards the frame we put round them — a wide wordmark sent as-is
+            // came out towering over the crest beside it and over its own name.
+            LeagueMark(sport: league.sport, logo: league.icon ?? league.logo, square: Self.disc)
         }
     }
 }

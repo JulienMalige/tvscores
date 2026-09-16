@@ -1,8 +1,21 @@
 #!/usr/bin/env python3
-"""Download league badges, trim transparent borders, write proxy/assets/leagues/<id>.png.
+"""Download league badges into proxy/assets/leagues/.
+
+Two shapes per competition, because they are read in two places:
+
+  <id>.png        trimmed to its own proportions, for a heading where a
+                  wordmark deserves its width
+  disc/<id>.png   the same mark centred on a round, dark icon, for the
+                  sidebar — where tvOS lays icons out itself and a wide
+                  wordmark would tower over a crest beside it
+
 Re-run when a league is added. Sources listed in docs/data-providers.md."""
 import io, os, sys, urllib.request
+
 from PIL import Image
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from discs import disc, trim
 
 BADGES = {
     "ucl": "https://r2.thesportsdb.com/images/media/league/badge/facv1u1742998896.png",
@@ -22,6 +35,9 @@ BADGES = {
 }
 OUT = os.path.join(os.path.dirname(__file__), "..", "assets", "leagues")
 HEIGHT = 160  # px; the app scales down, Retina-safe
+# The sidebar sits on glass over whatever is behind it, so the icon carries its
+# own ground rather than borrowing one: near-black, like a tvOS app icon.
+DISC_GROUND = (0x1c, 0x1c, 0x1e)
 
 for name, url in BADGES.items():
     data = urllib.request.urlopen(url, timeout=20).read()
@@ -31,4 +47,8 @@ for name, url in BADGES.items():
     im = im.crop(box) if box else im
     im = im.resize((max(1, round(im.width * HEIGHT / im.height)), HEIGHT), Image.LANCZOS)
     im.save(os.path.join(OUT, f"{name}.png"), optimize=True)
-    print(f"{name}: {im.width}x{im.height}")
+    os.makedirs(os.path.join(OUT, "disc"), exist_ok=True)
+    # `True` keeps the mark's own colours: a competition's mark is the brand,
+    # and unlike a constructor lockup there is no sponsor to strip out of it.
+    disc(trim(im), DISC_GROUND, True).save(os.path.join(OUT, "disc", f"{name}.png"), optimize=True)
+    print(f"{name}: {im.width}x{im.height} + disc")

@@ -51,6 +51,10 @@ function everyLeague(sportOrder, leagues = {}, publicBase = "", standings = {}, 
         name: cfg.name,
         short: cfg.short,
         logo: cfg.badge ? `${publicBase}/v1/assets/leagues/${cfg.badge}.png` : cfg.logo,
+        // The same mark as a round icon. The sidebar needs one square shape per
+        // competition, because tvOS lays its icons out itself and a wordmark
+        // given its own proportions dwarfs the crest under it.
+        icon: cfg.badge ? `${publicBase}/v1/assets/leagues/disc/${cfg.badge}.png` : undefined,
         hasStandings: Boolean(standings[key]),
         playing: playing.has(key),
       };

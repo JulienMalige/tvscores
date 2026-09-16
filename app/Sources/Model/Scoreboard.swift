@@ -56,6 +56,8 @@ struct LeagueSummary: Decodable, Equatable, Identifiable, Hashable {
     let name: String
     let short: String
     let logo: URL?
+    /// The same mark as a round icon, for the sidebar.
+    let icon: URL?
     let hasStandings: Bool
     /// False when nothing of this competition falls inside the week we show.
     let playing: Bool
