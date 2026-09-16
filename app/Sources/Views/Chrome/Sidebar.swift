@@ -41,7 +41,7 @@ struct Sidebar: View {
                 Tab(value: Selection.league(key(league))) {
                     LeaguePage(league: league, store: store, day: day)
                 } label: {
-                    SidebarLabel(league: league)
+                    SidebarRow(league: league)
                 }
             }
         }
@@ -86,28 +86,6 @@ private struct LeaguePage: View {
                 .navigationDestination(for: Event.self) { event in
                     RaceScreen(eventId: event.id, fallback: event, store: store)
                 }
-        }
-    }
-}
-
-/// A competition in the sidebar: its mark, its name, and a quiet word when
-/// there is nothing on — the way Apple Sports says "Offseason" under the NBA.
-private struct SidebarLabel: View {
-    let league: LeagueSummary
-
-    var body: some View {
-        Label {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(league.name)
-                if !league.playing {
-                    Text("sidebar.noGames")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        } icon: {
-            LeagueMark(sport: league.sport, logo: league.logo)
-                .frame(width: Metrics.leagueMark, height: Metrics.leagueMark)
         }
     }
 }

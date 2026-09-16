@@ -145,6 +145,16 @@ export function motorsportProvider({ sport, league, key, quota, log = () => {}, 
       const drivers = await get("/standings/drivers");
       const teams = await get(teamTable.path);
       const rows = (x) => (Array.isArray(x) ? x : x.data || []);
+      // A constructors table reads better with its drivers under the marque,
+      // the way Apple Sports writes "G. Russell, K. Antonelli" under Mercedes.
+      // They are already in the drivers table, in championship order.
+      const lineups = new Map();
+      for (const d of rows(drivers)) {
+        const team = d.teams?.[0]?.shortName || d.teams?.[0]?.name;
+        if (!team) continue;
+        const name = `${(d.firstName || "?")[0]}. ${d.lastName || "?"}`;
+        lineups.set(team, [...(lineups.get(team) || []), name]);
+      }
       return {
         updatedAt: new Date().toISOString(),
         tables: [
@@ -163,7 +173,18 @@ export function motorsportProvider({ sport, league, key, quota, log = () => {}, 
           },
           {
             id: teamTable.id,
-            rows: rows(teams).map((t) => ({ pos: t.position, name: t.shortName || t.name, code: shortName(t.shortName || t.name), value: Math.round(Number(t.points)), color: t.color || undefined, kind: "team" })),
+            rows: rows(teams).map((t) => {
+              const name = t.shortName || t.name;
+              return {
+                pos: t.position,
+                name,
+                sub: lineups.get(name)?.slice(0, 3).join(", "),
+                code: shortName(name),
+                value: Math.round(Number(t.points)),
+                color: t.color || undefined,
+                kind: "team",
+              };
+            }),
           },
         ],
       };

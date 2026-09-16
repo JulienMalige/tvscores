@@ -8,6 +8,15 @@ notes when a version ships.
 
 ## Unreleased
 
+- Constructor and team standings name the drivers under each marque, the way
+  the championship is actually read: "K. Antonelli, G. Russell" under
+  Mercedes, "M. Marquez, F. Bagnaia" under Ducati.
+- Every competition in the sidebar sits in the same round badge, so a
+  wordmark no longer towers over a crest, and a name too long for the row
+  fades out instead of ending in three dots.
+- Pictures no longer flash a monogram on their way in. Nothing is drawn
+  until the app has its competition marks, behind a brief loader.
+
 ## 1.0 build 12 — 16 September 2026
 
 - A sidebar lists every competition, so each one has a page of its own that
