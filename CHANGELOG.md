@@ -13,9 +13,11 @@ notes when a version ships.
 - Constructor and team standings name the drivers under each marque, the way
   the championship is actually read: "K. Antonelli, G. Russell" under
   Mercedes, "M. Marquez, F. Bagnaia" under Ducati.
-- Every competition in the sidebar wears the same round badge, so the
-  Bundesliga wordmark no longer towers over the Premier League crest, and a
-  name too long for the row fades out rather than ending in three dots.
+- Every competition in the sidebar wears the same round badge, carrying its
+  mark alone — the Ligue 1 numeral, the Serie A tile, the Champions League
+  starball — rather than a lockup whose printed name is a smudge at that
+  size. The Bundesliga wordmark no longer towers over the Premier League
+  crest, and the row names fit on one line.
 - Pictures no longer flash a monogram on their way in. Nothing is drawn
   until the app has its competition marks, behind a brief loader.
 
