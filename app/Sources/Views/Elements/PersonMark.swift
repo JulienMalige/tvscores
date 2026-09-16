@@ -14,17 +14,9 @@ struct PersonMark: View {
             ZStack {
                 Circle().fill(color ?? Color.white.opacity(0.18))
                 if let photo {
-                    AsyncImage(url: photo) { phase in
-                        if let image = phase.image {
-                            image
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: size, height: size)
-                                .offset(y: size * 0.06)
-                        } else {
-                            monogramText
-                        }
-                    }
+                    CachedImage(url: photo, contentMode: .fill) { monogramText }
+                        .frame(width: size, height: size)
+                        .offset(y: size * 0.06)
                 } else {
                     monogramText
                 }

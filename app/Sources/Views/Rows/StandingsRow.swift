@@ -46,14 +46,8 @@ private struct StandingsRowContent: View {
     @ViewBuilder
     private var mark: some View {
         if let logo = entry.logo {
-            AsyncImage(url: logo) { phase in
-                if let image = phase.image {
-                    image.resizable().scaledToFit()
-                } else {
-                    Color.clear
-                }
-            }
-            .frame(width: Metrics.mark, height: Metrics.mark)
+            CachedImage(url: logo) { Color.clear }
+                .frame(width: Metrics.mark, height: Metrics.mark)
         } else {
             PersonMark(photo: entry.photo, flag: entry.flag, color: Color(hex: entry.color),
                        monogram: entry.code ?? PersonMark.monogram(for: entry.name), size: Metrics.mark)

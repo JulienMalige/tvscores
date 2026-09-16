@@ -31,6 +31,7 @@ struct StandingsSection: View {
         .task {
             standings = await store.standings(for: ref)
             loaded = true
+            if let standings { await ImagePrefetcher.shared.prefetch(standings.imageURLs) }
             // `-TVScoresTable constructors` opens that table (CI screenshots).
             let args = ProcessInfo.processInfo.arguments
             if let i = args.firstIndex(of: "-TVScoresTable"), i + 1 < args.count,

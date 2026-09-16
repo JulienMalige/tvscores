@@ -9,13 +9,8 @@ struct TeamMark: View {
     var body: some View {
         Group {
             if let logo {
-                AsyncImage(url: logo) { phase in
-                    if let image = phase.image {
-                        image.resizable().scaledToFit().padding(6)
-                    } else {
-                        monogram
-                    }
-                }
+                CachedImage(url: logo) { monogram }
+                    .padding(6)
             } else {
                 monogram
             }

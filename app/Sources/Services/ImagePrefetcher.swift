@@ -1,21 +1,17 @@
 import Foundation
 
-/// Warms the shared URL cache with every crest, badge and portrait in a board.
+/// Decodes every crest, badge and portrait in a board before a row asks for it.
 ///
-/// `AsyncImage` only starts downloading when its row scrolls into view, and it
-/// shows the fallback monogram until the bytes arrive, so a list that has just
-/// appeared looks like it is missing its logos. Fetching them as soon as the
-/// board lands means the cache answers those requests immediately.
+/// A row only starts loading its image when it appears, and shows the fallback
+/// monogram until then, so a list that has just arrived looks like it is
+/// missing its logos. Warming `ImageCache` as soon as the board lands means the
+/// first draw already has the picture — the bytes are not enough on their own,
+/// because the decode is the part that happens after the row is on screen.
 actor ImagePrefetcher {
     static let shared = ImagePrefetcher()
 
     private var done: Set<URL> = []
-    private let session: URLSession
     private let parallel = 4
-
-    init(session: URLSession = .shared) {
-        self.session = session
-    }
 
     func prefetch(_ urls: [URL?]) async {
         let wanted = urls.compactMap { $0 }.filter { !done.contains($0) }
@@ -28,12 +24,7 @@ actor ImagePrefetcher {
         }) {
             await withTaskGroup(of: Void.self) { group in
                 for url in chunk {
-                    group.addTask { [session] in
-                        var req = URLRequest(url: url)
-                        req.timeoutInterval = 20
-                        req.cachePolicy = .returnCacheDataElseLoad
-                        _ = try? await session.data(for: req)
-                    }
+                    group.addTask { _ = await ImageCache.shared.load(url) }
                 }
             }
         }
@@ -58,5 +49,13 @@ extension Scoreboard {
             }
         }
         return marks + rest
+    }
+}
+
+extension Standings {
+    /// A league table's portraits and badges, warmed when the table lands so
+    /// that switching between drivers and teams draws them straight away.
+    var imageURLs: [URL?] {
+        tables.flatMap { $0.rows.flatMap { [$0.photo, $0.logo] } }
     }
 }

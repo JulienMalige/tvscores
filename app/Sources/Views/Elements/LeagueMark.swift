@@ -8,13 +8,7 @@ struct LeagueMark: View {
     var body: some View {
         Group {
             if let logo {
-                AsyncImage(url: logo) { phase in
-                    if let image = phase.image {
-                        image.resizable().scaledToFit()
-                    } else {
-                        symbol
-                    }
-                }
+                CachedImage(url: logo) { symbol }
             } else {
                 symbol
             }
