@@ -67,7 +67,7 @@ avatar the app draws. Anything unasked-for for 60 days is pruned.
 
 | Sport | Provider & plan | Cap | Schedule batch | Live poll | Source's own freshness | Worst-case day | Licensed for release? |
 |---|---|---|---|---|---|---|---|
-| football (8 competitions) | TheSportsDB, Single Developer ($9/mo) | 100/min | 9 calls, once per UTC day after 04:00 (or 3 h stale) | 60 s inside a window, 1 call | 60 s (measured) | ~750 | yes, confirm wording |
+| football (8 competitions) | TheSportsDB, Single Developer ($9/mo) | 100/min | 9 calls, once per UTC day after 04:00 (or 3 h stale) | 60 s inside a window, 1 call | 60 s (measured) | ~790 incl. tables | yes, confirm wording |
 | nfl | TheSportsDB, same key | shared | 9 calls, same | 60 s, 1 call | 60 s (assumed, as football) | ~400 | yes |
 | nba | TheSportsDB, same key | shared | 9 calls, same | 60 s, 1 call | 60 s (assumed, as football) | ~400 | yes |
 | tennis (ATP/WTA, majors and 1000s) | livetennisapi, free | **100/day** | 1 call daily + catalogue once a month | 30 min, 1 call | seconds | ~55 | free tier only |
@@ -88,6 +88,15 @@ remembering:
 - The motorsport calendar comes whole from Orange Cat Blacktop, whose free tier
   is 7,500 a **month**, so F1 and MotoGP are polled every six hours except
   within six hours of a session.
+
+League tables come from `lookuptable.php`, one call per competition, every six
+hours and again within ten minutes of a final whistle in that competition — a
+table nobody sees move is what makes an app feel dead. Only providers whose
+table is made of results opt in to that second trigger: tennis rankings move
+weekly whatever happens on court, and chasing them would spend a 100-a-day
+budget on an unchanged number. A cup with no table, or a season that has not
+begun, answers with an empty body; that is an answer, not an error, and it is
+retried in 30 minutes rather than buying six hours of silence.
 
 Live polling runs only while a tracked game is inside its window (10 min before
 kickoff, to 4 h after — 8 h for one already reported live). The interval is the

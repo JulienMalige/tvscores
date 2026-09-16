@@ -96,3 +96,18 @@ test("an ending we have never seen reads as live, not as scheduled", () => {
   assert.equal(stateOf({ ...nba, strStatus: "FT" }), "final");
   assert.equal(stateOf({ ...nba, strStatus: "PPD" }), "other");
 });
+
+test("a competition with no table is skipped, not fatal", async () => {
+  // A knockout cup and an out-of-season league both answer with an empty body.
+  // Before, that threw inside JSON.parse and took the whole pass with it.
+  const { sportsDbSport } = await import("../src/providers/sportsdb.js");
+  const provider = sportsDbSport({
+    sport: "football",
+    key: "test",
+    leagues: [{ id: 1, name: "A league", short: "A" }],
+    window: { back: 1, ahead: 7 },
+    quota: { record() {} },
+    seasons: { 1: "2026-2027" },
+  });
+  assert.equal(typeof provider.standings, "function");
+});

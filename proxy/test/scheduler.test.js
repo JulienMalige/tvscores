@@ -129,3 +129,15 @@ test("a race weekend is watched; the fortnight between is not", () => {
   assert.equal(s.nextDelay(race + 3 * 3600e3), 30 * 60e3, "and while the results are settling");
   assert.equal(s.nextDelay(race - 3 * 86400e3), 6 * 3600e3, "but three days out, six-hourly");
 });
+
+test("a result marks its league's table stale, and only where results make the table", async () => {
+  const done = match({ status: { state: "final" }, score: { home: 2, away: 1 } });
+  const s = scheduler({ ...fake({ live: [done] }), standingsFollowResults: true });
+  await s.live(KICKOFF + 2 * 3600e3);
+  assert.deepEqual([...s.dirtyLeagues], ["4335"], "the league that just finished a game");
+
+  // Tennis: the rankings move weekly, not when a match ends.
+  const t = scheduler(fake({ live: [done] }));
+  await t.live(KICKOFF + 2 * 3600e3);
+  assert.equal(t.dirtyLeagues.size, 0);
+});

@@ -3,6 +3,10 @@ import { STATE } from "./model.js";
 
 const MIN = 60e3;
 const STANDINGS_EVERY = 6 * 3600e3;
+/** A final whistle moves the table; do not make anyone wait six hours to see it. */
+const STANDINGS_AFTER_GAME = 10 * MIN;
+/** Nothing came back: a season between campaigns, or a provider having a bad day. */
+const STANDINGS_RETRY = 30 * MIN;
 /** However badly upstream is doing, look again within the hour. */
 const MAX_BACKOFF = 60 * 60e3;
 
@@ -20,19 +24,30 @@ const CALENDAR_LIVE = 30 * MIN;
 /** Every other day of the fortnight: the calendar is not going to move. */
 const CALENDAR_IDLE = 6 * 60 * MIN;
 
-/** Shared: refresh a provider's standings every 6 h when it offers them. */
+/**
+ * Refresh a provider's standings: every 6 h, and within ten minutes of a final
+ * whistle in a league whose table just changed. A table nobody can see move is
+ * the thing that makes an app feel dead, and it costs one call per league.
+ */
 async function refreshStandings(self, now) {
   if (!self.p.standings) return;
   const last = self.meta.lastStandings ? Date.parse(self.meta.lastStandings) : 0;
-  if (now - last < STANDINGS_EVERY) return;
+  const dirty = self.dirtyLeagues?.size ? new Set(self.dirtyLeagues) : null;
+  // An attempt that found no table at all must not buy six hours of silence:
+  // the season may start tomorrow, or the provider may simply have been down.
+  const due = now - last >= (self.meta.standingsEmpty ? STANDINGS_RETRY : STANDINGS_EVERY);
+  if (!due && !(dirty && now - last >= STANDINGS_AFTER_GAME)) return;
   if (self.quota && self.quota.spendable(now) < 2) return;
-  const data = await self.p.standings();
+  const data = await self.p.standings(due ? undefined : dirty);
+  self.dirtyLeagues?.clear();
   const nonEmpty = (d) => d && d.tables && d.tables.some((t) => t.rows && t.rows.length);
   if (data && data.tables) {
     if (nonEmpty(data)) self.store.setStandings(self.p.sport, self.p.sport, data);
     else return self.log(`${self.p.sport}: empty standings ignored, keeping the previous table`);
   } else {
-    for (const [leagueId, d] of Object.entries(data || {})) if (nonEmpty(d)) self.store.setStandings(self.p.sport, leagueId, d);
+    const found = Object.entries(data || {}).filter(([, d]) => nonEmpty(d));
+    for (const [leagueId, d] of found) self.store.setStandings(self.p.sport, leagueId, d);
+    self.meta.standingsEmpty = found.length === 0;
   }
   self.meta.lastStandings = new Date(now).toISOString();
   self.store.touch();
@@ -52,6 +67,8 @@ export class TeamSportScheduler {
     this.log = log;
     this.meta = store.sportMeta(provider.sport);
     this.quota = new Quota(this.meta, cfg);
+    /** Leagues whose table a result has just changed. */
+    this.dirtyLeagues = new Set();
     this.timer = null;
   }
 
@@ -98,10 +115,22 @@ export class TeamSportScheduler {
     this.meta.lastOk = this.meta.lastDaily;
   }
 
+  /**
+   * A finished game moves a league table — but only where the table is a
+   * table of results. Tennis rankings move once a week whatever happens on
+   * court, so chasing them after every match would spend a 100-a-day budget
+   * on a number that has not changed. Providers opt in.
+   */
+  noteResults(rows) {
+    if (!this.p.standingsFollowResults) return;
+    for (const e of rows) if (e.status.state === STATE.final) this.dirtyLeagues.add(String(e.league.id));
+  }
+
   async live(now = Date.now()) {
     if (this.quota.spendable(now) <= 0) return this.log(`${this.p.sport}: skip live, quota exhausted`);
     const rows = await this.p.live();
     this.store.upsert(rows);
+    this.noteResults(rows);
     // Games that should have started but are not in the live feed: they ended or were
     // postponed. Refresh today at most every 20 min to learn their final state.
     const liveIds = new Set(rows.map((r) => r.id));
@@ -115,7 +144,9 @@ export class TeamSportScheduler {
     if (orphan && now - lastToday > 20 * MIN && this.quota.spendable(now) > 0) {
       // Refetch the orphan's own UTC date: a game that started before midnight is not in "today".
       const date = new Date(orphans[0].start).toISOString().slice(0, 10);
-      this.store.upsert(await this.p.byDate(date));
+      const back = await this.p.byDate(date);
+      this.store.upsert(back);
+      this.noteResults(back);
       this.meta.lastToday = new Date(now).toISOString();
     }
     this.meta.lastLive = new Date(now).toISOString();

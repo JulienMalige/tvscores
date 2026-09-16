@@ -108,8 +108,8 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
       for (let offset = 0; ; ) {
         const { body } = await getJson(`${BASE}/tournaments?tour=${tour}&limit=200&offset=${offset}`, { headers });
         quota.record(undefined);
-        for (const t of body.data || []) byId[String(t.id)] = t.category;
-        if (!body.meta?.has_more) break;
+        for (const t of body?.data || []) byId[String(t.id)] = t.category;
+        if (!body?.meta?.has_more) break;
         offset += body.data?.length || 200;
       }
     }
@@ -125,7 +125,7 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
     quota.record(undefined);
     const big = bigEventFilter({ byId, ...tennis });
     const rows = (body.data || []).filter(big).map(normaliseMatch).filter(Boolean);
-    log(`GET tennis ${status} -> ${body.data?.length ?? 0} matches, ${rows.length} in ${tennis.categories.join("/")}`);
+    log(`GET tennis ${status} -> ${body?.data?.length ?? 0} matches, ${rows.length} in ${tennis.categories.join("/")}`);
     return rows;
   }
   /** Top 25 per tour built from the ranked player list (1 call; /rankings is a paid tier). */
@@ -134,7 +134,7 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
     const { body } = await getJson(`${BASE}/players?limit=200`, { headers });
     quota.record(undefined);
     const byTour = { atp: [], wta: [] };
-    for (const p of body.data || []) {
+    for (const p of body?.data || []) {
       if (p.is_doubles_team || !p.ranking || !byTour[p.tour]) continue;
       byTour[p.tour].push({ pos: p.ranking, name: p.name, sub: p.country?.toUpperCase(), value: p.ranking_points, extra: p.ranking_movement, flag: flagIso3(p.country) });
     }

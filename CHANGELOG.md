@@ -10,6 +10,9 @@ notes when a version ships.
 
 - The race result page now lights up the driver you are on, like every
   other list in the app.
+- League tables are back, and real: the Premier League, La Liga, Serie A,
+  Bundesliga, Ligue 1 and the Brasileirão each show their table on the
+  league page, updated within ten minutes of a final whistle.
 - Scores update every minute while a game is on, instead of every half hour.
 - NFL and NBA now come from the same source as football, which is why they
   keep pace with it and show a full week ahead too.

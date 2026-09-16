@@ -26,7 +26,18 @@ for (const sport of ["football", "nfl", "nba"]) {
     liveIntervalSeconds: config.schedule.liveIntervalSeconds[sport] ?? config.schedule.liveIntervalSeconds.default,
   };
   const quota = new Quota(store.sportMeta(sport), cfg);
-  const provider = sportsDbSport({ sport, key: config.theSportsDbKey, leagues: config.leagues[sport], window: config.schedule.footballWindow, quota, log });
+  const provider = sportsDbSport({
+    sport,
+    key: config.theSportsDbKey,
+    leagues: config.leagues[sport],
+    window: config.schedule.footballWindow,
+    quota,
+    // Seasons are learned from the fixtures and written straight into the
+    // sport's meta, which the store persists: a restart can read a table
+    // before it has seen a fixture.
+    seasons: (store.sportMeta(sport).seasons ??= {}),
+    log,
+  });
   schedulers.push(new TeamSportScheduler({ provider, store, cfg, log }));
 }
 if (config.ocBlacktopKey) {

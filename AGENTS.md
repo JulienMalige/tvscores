@@ -104,7 +104,7 @@ This is the mechanic to preserve; `proxy/src/scheduler.js` owns it and
 |---|---|---|
 | Schedules (`daily`) | once per UTC day after `dailyRefreshHourUtc`, or after `idleRefreshMinutes` — but never while a game could be in progress | 9 calls per team sport, one per day of the window |
 | Scores (`live`) | only inside a live window, then every `liveIntervalSeconds` — 60 s for the sports on the paid key, 30 min for tennis | 1 call per sport |
-| Standings | every 6 hours | 1 per league |
+| Standings | every 6 hours, and within 10 min of a final whistle in that league | 1 per league |
 | Motorsport calendar | every 6 hours, or every 30 min within 6 h of a session | 1 + one per newly finished race |
 | Portraits | once per athlete, kept a month | background, 25/min |
 | Crests, badges | mirrored once, served with a month-long header | none after the first |
