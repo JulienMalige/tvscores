@@ -15,7 +15,7 @@ struct SidebarRow: View {
     var body: some View {
         Label {
             VStack(alignment: .leading, spacing: 2) {
-                FadingText(league.name)
+                FadingText(league.menu)
                 if !league.playing {
                     Text("sidebar.noGames")
                         .font(.caption)

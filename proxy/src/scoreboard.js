@@ -49,6 +49,7 @@ function everyLeague(sportOrder, leagues = {}, publicBase = "", standings = {}, 
         sport,
         id: cfg.id,
         name: cfg.name,
+        menu: cfg.menu || cfg.name,
         short: cfg.short,
         logo: cfg.badge ? `${publicBase}/v1/assets/leagues/${cfg.badge}.png` : cfg.logo,
         // The same mark as a round icon. The sidebar needs one square shape per

@@ -54,6 +54,8 @@ struct LeagueSummary: Decodable, Equatable, Identifiable, Hashable {
     let sport: String
     let id: FlexibleID
     let name: String
+    /// The name a sidebar row has room for; the full one everywhere else.
+    let menu: String
     let short: String
     let logo: URL?
     /// The same mark as a round icon, for the sidebar.

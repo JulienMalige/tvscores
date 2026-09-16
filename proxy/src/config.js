@@ -43,7 +43,10 @@ export const config = {
       { id: 4332, name: "Serie A", short: "SA", badge: "seriea" },
       { id: 4331, name: "Bundesliga", short: "BUN", badge: "bundesliga" },
       { id: 4334, name: "Ligue 1", short: "L1", badge: "ligue1" },
-      { id: 4480, name: "UEFA Champions League", short: "UCL", badge: "ucl" },
+      // `menu` is the name where a sidebar row is too narrow for the full one.
+      // tvOS lays those rows out itself and wraps rather than truncating, so a
+      // long name costs a second line; this is cheaper than fighting it.
+      { id: 4480, name: "UEFA Champions League", menu: "Champions League", short: "UCL", badge: "ucl" },
       { id: 4501, name: "Copa Libertadores", short: "LIB", badge: "libertadores" },
       { id: 4351, name: "Brasileirão", short: "BRA", badge: "brasileirao" },
     ],
