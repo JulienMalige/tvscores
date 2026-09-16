@@ -21,6 +21,15 @@ struct Sidebar: View {
     }
 
     var body: some View {
+        Group {
+            if store.ready { tabs } else { LaunchLoader() }
+        }
+        .task { store.startAutoRefresh() }
+        .onDisappear { store.stopAutoRefresh() }
+        .onChange(of: store.board?.leagues.count ?? 0) { _, _ in openRequestedLeague() }
+    }
+
+    private var tabs: some View {
         TabView(selection: $selection) {
             Tab(value: Selection.home) {
                 HomeScreen(store: store, day: $day)
@@ -37,9 +46,6 @@ struct Sidebar: View {
             }
         }
         .tabViewStyle(.sidebarAdaptable)
-        .task { store.startAutoRefresh() }
-        .onDisappear { store.stopAutoRefresh() }
-        .onChange(of: store.board?.leagues.count ?? 0) { _, _ in openRequestedLeague() }
     }
 
     private var leagues: [LeagueSummary] { store.board?.leagues ?? [] }
@@ -101,6 +107,7 @@ private struct SidebarLabel: View {
             }
         } icon: {
             LeagueMark(sport: league.sport, logo: league.logo)
+                .frame(width: Metrics.leagueMark, height: Metrics.leagueMark)
         }
     }
 }

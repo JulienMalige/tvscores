@@ -23,6 +23,11 @@ final class ScoreboardStore {
     private(set) var board: Scoreboard?
     private(set) var error: String?
     private(set) var loading = false
+    /// False until the first board has arrived *and* its competition marks are
+    /// decoded. The app shows a loader until then, because a screen drawn
+    /// before its pictures shows fallbacks and then swaps them — which reads
+    /// as a glitch rather than as loading.
+    private(set) var ready = false
     let source: ScoreboardSource
     private var task: Task<Void, Never>?
 
@@ -37,11 +42,33 @@ final class ScoreboardStore {
             let fresh = try await load()
             if fresh != board { board = fresh } // avoid re-rendering an unchanged board
             error = nil
-            let urls = fresh.imageURLs
-            Task.detached(priority: .utility) { await ImagePrefetcher.shared.prefetch(urls) }
+            await warm(fresh)
         } catch {
             self.error = error.localizedDescription
         }
+    }
+
+    /// Decode the pictures before the screen wants them.
+    ///
+    /// The marks go first and are waited for: there are a dozen or so, they
+    /// head every section and fill the sidebar, and a second of loader beats a
+    /// sidebar full of soccerballs that turn into badges. Everything else — a
+    /// few hundred crests and portraits — carries on behind the screen.
+    private func warm(_ board: Scoreboard) async {
+        let marks = board.leagues.map(\.logo)
+        if !ready {
+            // A slow line must not hold the app shut: show what we have after
+            // this long whether the marks arrived or not.
+            await withTaskGroup(of: Void.self) { group in
+                group.addTask { await ImagePrefetcher.shared.prefetch(marks) }
+                group.addTask { try? await Task.sleep(for: .seconds(4)) }
+                await group.next()
+                group.cancelAll()
+            }
+            ready = true
+        }
+        let rest = board.imageURLs
+        Task.detached(priority: .utility) { await ImagePrefetcher.shared.prefetch(rest) }
     }
 
     /// The proxy polls live feeds every 150 s at most, so 60 s while live / 3 min idle is plenty. Idempotent.
