@@ -23,7 +23,8 @@ notes when a version ships.
 - League tables are back, and real: the Premier League, La Liga, Serie A,
   Bundesliga, Ligue 1 and the Brasileirão each show their table on the
   league page, updated within ten minutes of a final whistle.
-- Scores update every minute while a game is on, instead of every half hour.
+- Scores update about once a minute while a game is on, and the app sits
+  quiet when nothing is being played.
 - NFL and NBA now come from the same source as football, which is why they
   keep pace with it and show a full week ahead too.
 - A match that has finished now shows its final score, instead of staying
@@ -39,9 +40,6 @@ notes when a version ships.
   tournament — Monte Carlo, Madrid, Rome, Shanghai, Beijing and the rest —
   and the season finals. Challengers, ITF weeks and qualifying draws no
   longer fill the list. Between those events, tennis rests.
-- Scores now refresh every 30 minutes rather than every couple of minutes.
-  This is a "what is on today" app, not a live-timing one, and the slower
-  pace leaves room to follow more competitions.
 - League tables have room to breathe: the constructor and team badges no
   longer crowd the edges of their line, and every list in the app now spaces
   its rows the same way.
