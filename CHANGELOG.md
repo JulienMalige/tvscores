@@ -8,6 +8,8 @@ notes when a version ships.
 
 ## Unreleased
 
+- The sidebar stays open when you open it. It was being shut by the page
+  behind it taking the focus back.
 - Constructor and team standings name the drivers under each marque, the way
   the championship is actually read: "K. Antonelli, G. Russell" under
   Mercedes, "M. Marquez, F. Bagnaia" under Ducati.
