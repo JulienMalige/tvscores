@@ -8,6 +8,10 @@ notes when a version ships.
 
 ## Unreleased
 
+- A sidebar lists every competition, so each one has a page of its own that
+  you can always reach — Formula 1 and MotoGP included, whose championship
+  tables used to disappear from the app between races. Competitions with
+  nothing on this week say so.
 - The race result page now lights up the driver you are on, like every
   other list in the app.
 - Crests, badges and riders' faces stay on screen once they have loaded.
