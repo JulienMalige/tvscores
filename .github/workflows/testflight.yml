@@ -19,6 +19,10 @@ concurrency:
   group: testflight
   cancel-in-progress: false
 
+# The job pushes one commit: the changelog section it just closed.
+permissions:
+  contents: write
+
 jobs:
   upload:
     name: Archive and upload
@@ -157,6 +161,19 @@ jobs:
         env:
           ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
         run: node ../scripts/testflight.mjs "$BUILD_NUMBER"
+
+      # closeSection rewrites CHANGELOG.md on the runner; without this the
+      # heading it just wrote is thrown away with the runner, and the next
+      # release sends the same notes again under a new build number.
+      - name: Commit the closed changelog section
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          git diff --quiet -- CHANGELOG.md && echo "nothing to close" && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "Close the changelog for build $BUILD_NUMBER"
+          git push
 
       - name: Remove the key and the keychain
         if: always()

@@ -8,6 +8,8 @@ notes when a version ships.
 
 ## Unreleased
 
+## 1.0 build 12 — 16 September 2026
+
 - A sidebar lists every competition, so each one has a page of its own that
   you can always reach — Formula 1 and MotoGP included, whose championship
   tables used to disappear from the app between races. Competitions with
