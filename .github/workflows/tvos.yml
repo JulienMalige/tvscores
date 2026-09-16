@@ -88,6 +88,13 @@ jobs:
           SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab today -TVScoresLeague f1 -TVScoresTable constructors -AppleLanguages "(en)"
           sleep 8
           xcrun simctl io "$UDID" screenshot shots/constructors-en.png
+          # The same page for MotoGP, to judge the two against each other.
+          for table in riders teams; do
+            xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab today -TVScoresLeague motogp -TVScoresTable "$table" -AppleLanguages "(en)"
+            sleep 8
+            xcrun simctl io "$UDID" screenshot "shots/motogp-$table-en.png"
+          done
           race en f1
           race en motogp
           race fr f1
