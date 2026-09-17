@@ -42,7 +42,9 @@ test("a note is capped so App Store Connect will take it", () => {
 test("shipping a build closes the section it took", () => {
   const closed = closeSection(CHANGELOG, "12", new Date("2026-09-16T12:00:00Z"));
   assert.match(closed, /^## 1\.0 build 12 — 16 September 2026$/m);
-  assert.doesNotMatch(closed, /^## Unreleased$/m);
+  // A fresh empty Unreleased is left open above it, so the next thing written
+  // and the release job's own commit do not fight over the same line.
+  assert.match(closed, /^## Unreleased$/m);
   // The entry itself survives; only the heading changes.
   assert.equal(section(closed, /build 12/), "- The icon sits on flat black now.\n- A second line.");
 });
@@ -61,4 +63,16 @@ test("an empty Unreleased section is left open", () => {
   const empty = "# Changelog\n\n## Unreleased\n\n## 1.0 build 9 — 15 September 2026\n\n- New app icon.\n";
   assert.equal(closeSection(empty, "12", new Date("2026-09-16T12:00:00Z")), empty);
   assert.equal(topSection(empty), "", "and it sends no note rather than a placeholder");
+});
+
+test("closing a section leaves an empty one open behind it", () => {
+  // The release job commits this file, and so does whoever is working while
+  // a build uploads. Both used to rewrite the same line.
+  const md = "# Changelog\n\n## Unreleased\n\n- Something visible.\n\n## 1.0 build 8 — 1 September 2026\n";
+  const closed = closeSection(md, "9", new Date("2026-09-17T12:00:00Z"));
+  assert.match(closed, /## Unreleased\n\n## 1\.0 build 9 — 17 September 2026/);
+  // The note is taken before the section is closed, so it is unaffected.
+  assert.equal(topSection(md), "- Something visible.");
+  assert.equal(section(closed, /build 9/), "- Something visible.", "and the entry sits under the build that shipped it");
+  assert.equal(closeSection(closed, "10", new Date("2026-09-17T12:00:00Z")), closed, "the empty one it left stays open");
 });
