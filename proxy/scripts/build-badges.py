@@ -31,6 +31,7 @@ BADGES = {
     "bundesliga": "https://r2.thesportsdb.com/images/media/league/badge/teqh1b1679952008.png",
     "ligue1": "https://r2.thesportsdb.com/images/media/league/badge/9f7z9d1742983155.png",
     "libertadores": "https://r2.thesportsdb.com/images/media/league/badge/9shr931685425181.png",
+    "uel": "https://r2.thesportsdb.com/images/media/league/badge/mlsr7d1718774547.png",
     "brasileirao": "https://r2.thesportsdb.com/images/media/league/badge/lywv7t1766787179.png",
 }
 OUT = os.path.join(os.path.dirname(__file__), "..", "assets", "leagues")
@@ -52,6 +53,7 @@ DISC_CROP = {
     "ligue1": (0.00, 0.00, 1.00, 0.70),        # the numeral, without LIGUE 1
     "seriea": (0.15, 0.04, 0.85, 0.76),        # the A on its tile
     "ucl": (0.15, 0.00, 0.85, 0.47),           # the starball
+    "uel": (0.00, 0.00, 1.00, 0.45),           # the trophy, without UEFA EUROPA LEAGUE
 }
 
 for name, url in BADGES.items():

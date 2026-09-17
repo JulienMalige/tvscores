@@ -47,6 +47,7 @@ export const config = {
       // tvOS lays those rows out itself and wraps rather than truncating, so a
       // long name costs a second line; this is cheaper than fighting it.
       { id: 4480, name: "UEFA Champions League", menu: "Champions League", short: "UCL", badge: "ucl" },
+      { id: 4481, name: "UEFA Europa League", menu: "Europa League", short: "UEL", badge: "uel" },
       { id: 4501, name: "Copa Libertadores", short: "LIB", badge: "libertadores" },
       { id: 4351, name: "Brasileirão", short: "BRA", badge: "brasileirao" },
     ],
