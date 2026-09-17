@@ -8,6 +8,10 @@ notes when a version ships.
 
 ## Unreleased
 
+- The day being shown is filled in, so it no longer looks as though you are
+  on Yesterday while today's matches are on screen. The bright pill is where
+  the remote is pointing; the filled one is the day you are reading.
+
 - The Europa League, with its own page and its own place in the menu.
 
 ## 1.0 build 15 — 17 September 2026
