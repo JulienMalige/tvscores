@@ -8,6 +8,12 @@ const ASSETS = join(dirname(fileURLToPath(import.meta.url)), "..", "assets");
 import { buildScoreboard, localDate, withTablePhotos } from "./scoreboard.js";
 import { slug } from "./model.js";
 
+/**
+ * Ten seconds, not thirty: a score in stoppage time is worth asking about
+ * again, and asking costs a header exchange when nothing changed.
+ */
+const SHORT_CACHE = "public, max-age=10";
+
 /** Crests and portraits change once in a blue moon; let the TV keep them. */
 const IMAGE_CACHE = "public, max-age=2592000, immutable";
 
@@ -22,7 +28,7 @@ function send(res, status, body, extra = {}, req) {
   const json = JSON.stringify(body);
   const etag = `"${createHash("sha1").update(json).digest("base64url")}"`;
   if (status === 200 && req?.headers["if-none-match"] === etag) {
-    res.writeHead(304, { etag, "cache-control": "public, max-age=30", "access-control-allow-origin": "*", ...extra });
+    res.writeHead(304, { etag, "cache-control": SHORT_CACHE, "access-control-allow-origin": "*", ...extra });
     return res.end();
   }
   res.writeHead(status, {

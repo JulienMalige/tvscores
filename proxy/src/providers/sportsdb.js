@@ -5,6 +5,15 @@ const V1 = "https://www.thesportsdb.com/api/v1/json";
 const V2 = "https://www.thesportsdb.com/api/v2/json";
 
 const FINAL = new Set(["FT", "AET", "PEN", "AOT"]);
+/**
+ * How long after kickoff a fixture still marked "not started" stops being
+ * believed. The data is crowd-sourced and some matches are simply never
+ * updated: Botafogo v Grêmio sat at "NS, no score" for four hours while the
+ * Libertadores match beside it ticked over every minute. Showing its kickoff
+ * time by then says the game is still to come, which is the one thing we know
+ * it is not.
+ */
+const BELIEVE_NS_FOR = 3 * 3600e3;
 const NOT_PLAYED = new Set(["PPD", "POSTP", "CANC", "ABD"]);
 
 /** The English detail strings the app's string catalogue already knows. */
@@ -50,19 +59,27 @@ const score = (v) => (v === null || v === undefined || v === "" ? null : Number(
  * and are not documented in full, so a quarter label we have never seen must
  * read as a game in progress rather than quietly as "scheduled".
  */
-export function stateOf(row) {
+export function stateOf(row, now = Date.now()) {
   const short = row.strStatus || "";
   if (row.strPostponed === "yes" || NOT_PLAYED.has(short)) return STATE.other;
-  if (!short || short === "NS") return STATE.scheduled;
+  if (!short || short === "NS") {
+    const start = Date.parse(startOf(row) || "");
+    return Number.isFinite(start) && now - start > BELIEVE_NS_FOR ? STATE.other : STATE.scheduled;
+  }
   if (FINAL.has(short)) return STATE.final;
   return STATE.live;
 }
 
-export function normaliseEvent(row, league, sport = "football") {
+export function normaliseEvent(row, league, sport = "football", now = Date.now()) {
   const start = startOf(row);
   if (!start) return null;
   const short = row.strStatus || "";
-  const state = stateOf(row);
+  const state = stateOf(row, now);
+  // Kicked off hours ago and still "not started": the provider lost track of
+  // it, and saying so is better than showing a kickoff time that has passed.
+  // A postponed match says "NS" as well, and it knows why — that wins.
+  const called = row.strPostponed === "yes" || NOT_PLAYED.has(short);
+  const lost = state === STATE.other && !called && (!short || short === "NS");
   const { nick } = SPORTS[sport];
   // `strProgress` is where the game is: a minute in football, the period clock
   // elsewhere. Neither means anything while the teams are off the pitch.
@@ -81,7 +98,7 @@ export function normaliseEvent(row, league, sport = "football") {
     kind: "match",
     start,
     round: row.intRound ? `Round ${row.intRound}` : undefined,
-    status: { state, clock, detail: row.strPostponed === "yes" ? "Postponed" : DETAIL[short] },
+    status: { state, clock, detail: lost ? "No update" : row.strPostponed === "yes" ? "Postponed" : DETAIL[short] },
     home: team(row.strHomeTeam, undefined, { nick, logo: row.strHomeTeamBadge || undefined }),
     away: team(row.strAwayTeam, undefined, { nick, logo: row.strAwayTeamBadge || undefined }),
     score: { home: score(row.intHomeScore), away: score(row.intAwayScore) },

@@ -109,7 +109,7 @@ export const config = {
      * on a 100-a-day key and stays slow. The quota stretches any of these
      * further when the day's budget would not survive it.
      */
-    liveIntervalSeconds: { default: 1800, football: 60, nfl: 60, nba: 60, tennis: 1800 },
+    liveIntervalSeconds: { default: 1800, football: 30, nfl: 30, nba: 30, tennis: 1800 },
     /** Never spend the last N calls of a sport's daily quota. */
     quotaReserve: 8,
     dailyQuota: 100,
@@ -118,7 +118,7 @@ export const config = {
     /** A game counts as "maybe live" from 10 min before kickoff until this long after. */
     liveWindowHours: 4,
     /** TheSportsDB paid tiers cap requests per minute, not per day; this is a sanity ceiling. */
-    sportsDbDailyQuota: 2000,
+    sportsDbDailyQuota: 5000,
     /** Orange Cat Blacktop free tier is 7,500/month; keep a day well under that. */
     ocbDailyQuota: 200,
   },

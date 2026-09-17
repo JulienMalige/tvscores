@@ -71,14 +71,19 @@ final class ScoreboardStore {
         Task.detached(priority: .utility) { await ImagePrefetcher.shared.prefetch(rest) }
     }
 
-    /// The proxy polls live feeds every 150 s at most, so 60 s while live / 3 min idle is plenty. Idempotent.
+    /// Every 30 s while a game is on, every 3 min otherwise. Idempotent.
+    ///
+    /// A score reaches the television through three waits — the provider's
+    /// feed moves every 60 s, the proxy polls it, and this polls the proxy —
+    /// and they add up. Asking more often costs almost nothing now that an
+    /// unchanged board comes back as a 304 with no body.
     func startAutoRefresh() {
         guard task == nil else { return }
         task = Task { [weak self] in
             while !Task.isCancelled {
                 await self?.refresh()
                 let live = (self?.board?.live ?? 0) > 0
-                try? await Task.sleep(for: .seconds(live ? 60 : 180))
+                try? await Task.sleep(for: .seconds(live ? 30 : 180))
             }
         }
     }

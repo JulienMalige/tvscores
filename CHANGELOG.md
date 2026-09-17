@@ -8,6 +8,13 @@ notes when a version ships.
 
 ## Unreleased
 
+- Scores arrive sooner: the proxy asks its source twice a minute now, and the
+  app asks the proxy twice a minute while a game is on.
+- A game that kicked off but whose scoreline never arrives is no longer shown
+  as though it were still to come. It says "No update" instead — some matches
+  are simply never updated by the data provider, and the kickoff time was the
+  one thing we knew to be wrong.
+
 - The sidebar stays open when you open it. It was being shut by the page
   behind it taking the focus back.
 - Constructor and team standings name the drivers under each marque, the way

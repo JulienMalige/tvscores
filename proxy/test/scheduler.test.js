@@ -141,3 +141,36 @@ test("a result marks its league's table stale, and only where results make the t
   await t.live(KICKOFF + 2 * 3600e3);
   assert.equal(t.dirtyLeagues.size, 0);
 });
+
+test("a game that kicked off but never appeared live is fetched again", async () => {
+  // The live feed carries games it knows about. One it never reports stays
+  // as we last saw it — "19:30, no score" — because the only other correction
+  // is the daily pass, and that waits for the live window to close.
+  const played = match({ status: { state: "final" }, score: { home: 1, away: 2 } });
+  const provider = fake({ live: [], byDate: [played] });
+  const s = scheduler(provider);
+  s.store.upsert([match()]); // still scheduled, kickoff two hours ago
+
+  await s.live(KICKOFF + 2 * 3600e3);
+
+  assert.equal(provider.calls.byDate, 1, "its own date is refetched");
+  assert.equal(s.store.all()[0].status.state, "final");
+  assert.deepEqual(s.store.all()[0].score, { home: 1, away: 2 });
+});
+
+test("a fixture still to come is left alone", async () => {
+  const provider = fake({ live: [] });
+  const s = scheduler(provider);
+  s.store.upsert([match()]);
+  await s.live(KICKOFF - 5 * 60e3);
+  assert.equal(provider.calls.byDate, 0, "five minutes before kickoff is not overdue");
+  await s.live(KICKOFF + 5 * 60e3);
+  assert.equal(provider.calls.byDate, 0, "and neither is five minutes after");
+});
+
+test("a provider with no byDate is not asked for one", async () => {
+  const provider = { sport: "tennis", live: async () => [], finalizeOrphans: true };
+  const s = scheduler(provider);
+  s.store.upsert([match({ id: "tennis:1", sport: "tennis" })]);
+  await s.live(KICKOFF + 3 * 3600e3); // would throw if it tried
+});

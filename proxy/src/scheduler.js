@@ -1,14 +1,16 @@
 import { Quota } from "./quota.js";
 import { STATE } from "./model.js";
+import { MIN } from "./clock.js";
+import { refreshStandings } from "./standings.js";
 
-const MIN = 60e3;
-const STANDINGS_EVERY = 6 * 3600e3;
-/** A final whistle moves the table; do not make anyone wait six hours to see it. */
-const STANDINGS_AFTER_GAME = 10 * MIN;
-/** Nothing came back: a season between campaigns, or a provider having a bad day. */
-const STANDINGS_RETRY = 30 * MIN;
+/** A kickoff this far past with nothing to show for it deserves a second look. */
+const OVERDUE = 15 * MIN;
 /** However badly upstream is doing, look again within the hour. */
 const MAX_BACKOFF = 60 * 60e3;
+/** A race weekend: worth asking about every half hour. */
+const CALENDAR_LIVE = 30 * MIN;
+/** Every other day of the fortnight: the calendar is not going to move. */
+const CALENDAR_IDLE = 6 * 60 * MIN;
 
 /**
  * The wait after `failures` consecutive errors: the normal interval doubled
@@ -18,39 +20,6 @@ const MAX_BACKOFF = 60 * 60e3;
  */
 function backoff(base, failures = 0) {
   return Math.min(base * 2 ** Math.min(failures, 10), Math.max(base, MAX_BACKOFF));
-}
-/** A race weekend: worth asking about every half hour. */
-const CALENDAR_LIVE = 30 * MIN;
-/** Every other day of the fortnight: the calendar is not going to move. */
-const CALENDAR_IDLE = 6 * 60 * MIN;
-
-/**
- * Refresh a provider's standings: every 6 h, and within ten minutes of a final
- * whistle in a league whose table just changed. A table nobody can see move is
- * the thing that makes an app feel dead, and it costs one call per league.
- */
-async function refreshStandings(self, now) {
-  if (!self.p.standings) return;
-  const last = self.meta.lastStandings ? Date.parse(self.meta.lastStandings) : 0;
-  const dirty = self.dirtyLeagues?.size ? new Set(self.dirtyLeagues) : null;
-  // An attempt that found no table at all must not buy six hours of silence:
-  // the season may start tomorrow, or the provider may simply have been down.
-  const due = now - last >= (self.meta.standingsEmpty ? STANDINGS_RETRY : STANDINGS_EVERY);
-  if (!due && !(dirty && now - last >= STANDINGS_AFTER_GAME)) return;
-  if (self.quota && self.quota.spendable(now) < 2) return;
-  const data = await self.p.standings(due ? undefined : dirty);
-  self.dirtyLeagues?.clear();
-  const nonEmpty = (d) => d && d.tables && d.tables.some((t) => t.rows && t.rows.length);
-  if (data && data.tables) {
-    if (nonEmpty(data)) self.store.setStandings(self.p.sport, self.p.sport, data);
-    else return self.log(`${self.p.sport}: empty standings ignored, keeping the previous table`);
-  } else {
-    const found = Object.entries(data || {}).filter(([, d]) => nonEmpty(d));
-    for (const [leagueId, d] of found) self.store.setStandings(self.p.sport, leagueId, d);
-    self.meta.standingsEmpty = found.length === 0;
-  }
-  self.meta.lastStandings = new Date(now).toISOString();
-  self.store.touch();
 }
 
 /**
@@ -139,11 +108,22 @@ export class TeamSportScheduler {
       // No terminal listing on this provider: a match gone from the live feed is over.
       this.store.upsert(orphans.map((e) => ({ ...e, status: { state: STATE.final, detail: e.status.detail?.startsWith("Set") ? undefined : e.status.detail } })));
     }
-    const orphan = orphans.length > 0 && !this.p.finalizeOrphans;
+    // A game that kicked off and never appeared in the live feed at all is
+    // nobody's business but ours: the daily pass would correct it, and the
+    // daily pass waits for the live window to close — which other games hold
+    // open all evening. Botafogo v Grêmio sat at "19:30, no score" for four
+    // hours that way.
+    const overdue = this.p.byDate
+      ? this.events().filter((e) => e.status.state === STATE.scheduled && now - Date.parse(e.start) > OVERDUE)
+      : [];
+    const needsLook = [...(this.p.finalizeOrphans ? [] : orphans), ...overdue].sort(
+      (a, b) => Date.parse(a.start) - Date.parse(b.start),
+    );
+    const orphan = needsLook.length > 0;
     const lastToday = this.meta.lastToday ? Date.parse(this.meta.lastToday) : 0;
     if (orphan && now - lastToday > 20 * MIN && this.quota.spendable(now) > 0) {
-      // Refetch the orphan's own UTC date: a game that started before midnight is not in "today".
-      const date = new Date(orphans[0].start).toISOString().slice(0, 10);
+      // Refetch its own UTC date: a game that started before midnight is not in "today".
+      const date = new Date(needsLook[0].start).toISOString().slice(0, 10);
       const back = await this.p.byDate(date);
       this.store.upsert(back);
       this.noteResults(back);

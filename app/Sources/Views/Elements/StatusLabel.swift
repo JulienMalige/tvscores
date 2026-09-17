@@ -75,6 +75,7 @@ struct StatusLabel: View {
         "Break": "status.break",
         "Awarded": "status.awarded",
         "Walkover": "status.walkover",
+        "No update": "status.noupdate",
     ]
 
     private func localizedDetail(_ d: String?) -> String? {

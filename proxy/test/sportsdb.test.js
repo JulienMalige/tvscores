@@ -6,6 +6,8 @@ import { normaliseEvent, startOf, datesAround, stateOf } from "../src/providers/
 const events = JSON.parse(readFileSync(new URL("./fixtures/sportsdb-football.json", import.meta.url))).events;
 const SERIE_A = { id: 4332, name: "Serie A", short: "SA" };
 const find = (name) => events.find((e) => e.strEvent === name);
+/** The fixtures were captured on this day; time-dependent rules need it. */
+const THEN = Date.parse("2026-09-16T12:00:00Z");
 
 test("a finished match carries its score and reads as final", () => {
   const e = normaliseEvent(find("Inter Milan vs Udinese"), SERIE_A);
@@ -17,7 +19,7 @@ test("a finished match carries its score and reads as final", () => {
 });
 
 test("a fixture not yet played has no score rather than a zero", () => {
-  const e = normaliseEvent(find("Barcelona vs Racing de Santander"), { id: 4335, name: "La Liga", short: "LIGA" });
+  const e = normaliseEvent(find("Barcelona vs Racing de Santander"), { id: 4335, name: "La Liga", short: "LIGA" }, "football", THEN);
   assert.equal(e.status.state, "scheduled");
   assert.equal(e.score.home, null);
   assert.equal(e.score.away, null);
@@ -50,7 +52,7 @@ test("a match in play shows the minute, and the interval does not", () => {
 });
 
 test("a postponed match is neither scheduled nor final", () => {
-  const e = normaliseEvent({ ...find("Botafogo vs Grêmio"), strPostponed: "yes" }, SERIE_A);
+  const e = normaliseEvent({ ...find("Botafogo vs Grêmio"), strPostponed: "yes" }, SERIE_A, "football", THEN);
   assert.equal(e.status.state, "other");
   assert.equal(e.status.detail, "Postponed");
 });
@@ -110,4 +112,16 @@ test("a competition with no table is skipped, not fatal", async () => {
     seasons: { 1: "2026-2027" },
   });
   assert.equal(typeof provider.standings, "function");
+});
+
+test("a fixture still 'not started' hours after kickoff is not shown as upcoming", () => {
+  // The provider never updated Botafogo v Grêmio. Showing its kickoff time
+  // four hours later says the match is still to come; it plainly is not.
+  const row = events.find((e) => e.strEvent === "Botafogo vs Grêmio");
+  const kickoff = Date.parse("2026-09-16T22:30:00Z");
+  assert.equal(stateOf(row, kickoff + 60 * 60e3), "scheduled", "an hour late is a late kickoff");
+  assert.equal(stateOf(row, kickoff + 4 * 3600e3), "other", "four hours late is a provider that stopped");
+  const e = normaliseEvent(row, { id: 4351, name: "Brasileirão", short: "BRA" }, "football", kickoff + 4 * 3600e3);
+  assert.equal(e.status.detail, "No update", "and it says why it stopped");
+  assert.equal(e.score.home, null, "without inventing a score");
 });
