@@ -109,7 +109,7 @@ struct CachedImage<Placeholder: View>: View {
     /// Nothing is coming: there is no URL, or the one we had came back empty.
     private var giveUp: Bool {
         guard let url else { return true }
-        return settled && ImageCache.shared.hasFailed(url)
+        return ImageCache.shared.hasFailed(url) || settled
     }
 
     var body: some View {
@@ -125,8 +125,12 @@ struct CachedImage<Placeholder: View>: View {
             }
         }
         .task(id: url) {
-            guard let url else { settled = true; return }
-            if ImageCache.shared.image(for: url) != nil { settled = true; return }
+            // A picture already in memory was drawn on the first frame, and
+            // nothing here may change state afterwards: a row of the sidebar
+            // is drawn by tvOS, and a state write inside it rebuilds the menu
+            // — which reads as the menu shutting a second after it opened.
+            // Only a picture that is not there yet has anything to record.
+            guard let url, ImageCache.shared.image(for: url) == nil else { return }
             loaded = await ImageCache.shared.load(url)
             settled = true
         }
