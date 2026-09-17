@@ -14,6 +14,9 @@ notes when a version ships.
 
 - The Europa League, with its own page and its own place in the menu.
 
+- Picking a day keeps the highlight on the day you picked, instead of
+  dropping it back onto Yesterday.
+
 ## 1.0 build 15 — 17 September 2026
 - The menu no longer rebuilds itself under you while you are reading it,
   which was making it hard to open and keep open.

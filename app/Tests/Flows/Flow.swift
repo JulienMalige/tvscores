@@ -50,12 +50,9 @@ enum Flow {
         return row.exists && row.frame.width > 0 && row.isEnabled
     }
 
-    /// Focus left from the page opens the sidebar.
-    ///
-    /// Asked about sparingly. Every read of a frame is an accessibility
-    /// snapshot of the whole hierarchy, and the flow that read one every
-    /// second watched the menu shut in its hands. The engine is not to be
-    /// interrogated at 1 Hz.
+    /// Focus left from the page opens the sidebar — for a moment. The
+    /// simulator shuts it again within a second or two (see NavigationFlow),
+    /// so whatever a flow does in the menu it does straight after this.
     static func openMenu(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
         for _ in 0..<3 {
             remote.press(.left)

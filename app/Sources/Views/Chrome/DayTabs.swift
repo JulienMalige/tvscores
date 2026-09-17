@@ -44,12 +44,20 @@ struct DayTabs: View {
         let pick: () -> Void
 
         var body: some View {
-            if isSelected {
-                Button(title, action: pick).buttonStyle(.borderedProminent)
-            } else {
-                Button(title, action: pick).buttonStyle(.bordered)
-            }
+            // One button whose style changes, not two buttons swapped: the
+            // swap destroyed the focused control, and focus fell to the
+            // leading pill — "Yesterday lit while Today's games are shown".
+            Button(title, action: pick)
+                .buttonStyle(isSelected ? DayStyle(.borderedProminent) : DayStyle(.bordered))
         }
+    }
+
+    /// Either system pill style behind one type, so the button keeps its
+    /// identity when the day it shows becomes the selected one.
+    private struct DayStyle: PrimitiveButtonStyle {
+        private let make: (Configuration) -> AnyView
+        init<S: PrimitiveButtonStyle>(_ style: S) { make = { AnyView(style.makeBody(configuration: $0)) } }
+        func makeBody(configuration: Configuration) -> some View { make(configuration) }
     }
 
     private func title(_ d: Day) -> LocalizedStringKey {
