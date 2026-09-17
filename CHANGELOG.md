@@ -6,8 +6,7 @@ build inside it. The release job sends the top section to TestFlight as that
 build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
-## Unreleased
-
+## 1.0 build 14 — 17 September 2026
 - A crest that fails to arrive is asked for again rather than replaced by
   initials for the rest of the session. One dropped request on a busy wifi
   used to cost that badge until the app was reopened.
