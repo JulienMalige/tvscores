@@ -13,6 +13,12 @@ enum Flow {
         app.launchArguments += extra
         app.launchEnvironment["TZ"] = "America/Sao_Paulo"
         app.launch()
+        // The app shows a loader until its first board and its competition
+        // marks are in; on a busy runner that can take a while. Every page
+        // has the day pills, so the pill for the tab asked for is the sign
+        // the page is up — waited for here, once, rather than hoped for in
+        // each test's first assertion.
+        XCTAssertTrue(app.buttons["day.\(tab)"].waitForExistence(timeout: 25), "the app finished loading and shows the \(tab) pill")
         return app
     }
 
