@@ -1,8 +1,7 @@
 import XCTest
 
 /// The front page: what it shows, and that the day pills change what it shows.
-final class HomeScreenFlow: XCTestCase {
-    override func setUp() { continueAfterFailure = false }
+final class HomeScreenFlow: FlowCase {
 
     func testMainScreenShowsTodayWithAtLeastOneLeague() {
         let app = Flow.launch(tab: "today")
@@ -20,10 +19,12 @@ final class HomeScreenFlow: XCTestCase {
         yesterday.appears()
         let seenYesterday = yesterday.identifier
 
-        // Move focus to the Upcoming pill and select it.
+        // Move focus to the Upcoming pill and select it. The list below is
+        // lazy, so a header far down does not exist yet; the first match does.
         XCTAssertTrue(Flow.walk(.right, until: app.buttons["day.upcoming"]), "the remote reaches the Upcoming pill")
         Flow.remote.press(.select)
-        app.buttons["league.football.4328"].appears()   // Premier League plays next week, not yesterday
+        let changed = NSPredicate(format: "identifier BEGINSWITH 'match.' AND identifier != %@", seenYesterday)
+        XCTAssertTrue(app.buttons.matching(changed).firstMatch.waitForExistence(timeout: 8), "Upcoming shows different matches")
         XCTAssertFalse(app.buttons[seenYesterday].exists, "yesterday's match is gone from Upcoming")
     }
 
@@ -43,6 +44,7 @@ final class HomeScreenFlow: XCTestCase {
         header.appears()
         XCTAssertTrue(Flow.walk(.down, until: header), "focus reaches the Libertadores header")
         Flow.remote.press(.select)
-        app.buttons["table.table"].appears(within: 10)   // a domestic league page; a cup shows standings.unavailable
+        // A cup has no table; what says "league page" is the Standings heading.
+        app.staticTexts["Standings"].appears(within: 10)
     }
 }

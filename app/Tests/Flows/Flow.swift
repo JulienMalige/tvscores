@@ -39,3 +39,26 @@ extension XCUIElement {
         return ok
     }
 }
+
+
+/// Every flow's base: when an assertion fails, the accessibility tree the
+/// remote was looking at goes into the log — the only window onto a simulator
+/// nobody is sitting in front of.
+class FlowCase: XCTestCase {
+    private var dumped = false
+
+    override func setUp() {
+        super.setUp()
+        continueAfterFailure = false
+    }
+
+    override func record(_ issue: XCTIssue) {
+        if !dumped {
+            dumped = true
+            print("=== ACCESSIBILITY TREE AT FAILURE ===")
+            print(XCUIApplication().debugDescription)
+            print("=== END TREE ===")
+        }
+        super.record(issue)
+    }
+}

@@ -5,17 +5,21 @@ import Observation
 /// switches to the bundled sample so CI screenshots and previews never hit the network.
 enum ScoreboardSource {
     case remote(URL)
-    case bundled
+    /// A board from the bundle. `-TVScoresSample race` picks `sample-race.json`
+    /// — a week that holds a classified race, whatever this week's calendar
+    /// holds — and the default is the board the screenshots use.
+    case bundled(String = "sample-scoreboard")
 
     static func resolve() -> ScoreboardSource {
         let args = ProcessInfo.processInfo.arguments
-        if args.contains("-TVScoresDemo") { return .bundled }
+        let sample = args.firstIndex(of: "-TVScoresSample").flatMap { args.indices.contains($0 + 1) ? "sample-\(args[$0 + 1])" : nil }
+        if args.contains("-TVScoresDemo") { return .bundled(sample ?? "sample-scoreboard") }
         // The app hosting a unit-test run is not a user: no proxy, no network.
-        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil { return .bundled }
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil { return .bundled() }
         if let s = Bundle.main.object(forInfoDictionaryKey: "TVScoresProxyURL") as? String, let url = URL(string: s) {
             return .remote(url)
         }
-        return .bundled
+        return .bundled()
     }
 }
 
@@ -130,8 +134,8 @@ final class ScoreboardStore {
     private func load() async throws -> Scoreboard {
         let data: Data
         switch source {
-        case .bundled:
-            guard let url = Bundle.main.url(forResource: "sample-scoreboard", withExtension: "json") else {
+        case .bundled(let name):
+            guard let url = Bundle.main.url(forResource: name, withExtension: "json") else {
                 throw URLError(.fileDoesNotExist)
             }
             data = try Data(contentsOf: url)

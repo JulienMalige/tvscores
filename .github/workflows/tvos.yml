@@ -106,7 +106,7 @@ jobs:
           }
           race() { # $1 lang, $2 series: opens that series' race result page
             xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
-            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab yesterday -TVScoresRace "$2" -AppleLanguages "($1)" -AppleLocale "$1"
+            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresSample race -TVScoresTab yesterday -TVScoresRace "$2" -AppleLanguages "($1)" -AppleLocale "$1"
             sleep 8
             xcrun simctl io "$UDID" screenshot "shots/race-$2-$1.png"
           }

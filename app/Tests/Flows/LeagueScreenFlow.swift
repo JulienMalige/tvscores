@@ -1,8 +1,7 @@
 import XCTest
 
 /// A competition's page: its own games, and the table under them.
-final class LeagueScreenFlow: XCTestCase {
-    override func setUp() { continueAfterFailure = false }
+final class LeagueScreenFlow: FlowCase {
 
     func testFormulaOneIsReachableWithNoRaceThisWeek() {
         // The whole reason the sidebar exists: F1 races every other weekend,
@@ -19,12 +18,12 @@ final class LeagueScreenFlow: XCTestCase {
         // Constructors carry their drivers under the marque.
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS ','")).firstMatch.exists,
                       "a constructor row names its drivers, comma separated")
-        // Switch to drivers by remote and confirm the table changed.
-        XCTAssertTrue(Flow.walk(.up, until: app.buttons["table.constructors"]))
-        Flow.remote.press(.left)
-        Flow.remote.press(.select)
-        app.buttons["standing.1"].appears()
-        XCTAssertTrue(app.staticTexts["Mercedes"].exists, "a driver row shows the team as its subtitle")
+    }
+
+    func testDriversTableShowsTheTeamUnderEachDriver() {
+        let app = Flow.launch(league: "f1", extra: ["-TVScoresTable", "drivers"])
+        app.buttons["standing.1"].appears(within: 10)
+        XCTAssertTrue(app.staticTexts["Mercedes"].firstMatch.exists, "a driver row shows the team as its subtitle")
     }
 
     func testMotoGPTeamsHaveTheirMarquesAndRiders() {
@@ -36,8 +35,12 @@ final class LeagueScreenFlow: XCTestCase {
     }
 
     func testADomesticLeagueShowsItsTable() {
-        let app = Flow.launch(league: "football")   // the first football league: Brasileirão in the sample
-        app.buttons["standing.1"].appears(within: 10)
-        app.buttons["standing.20"].appears()
+        // The first football league by name: Brasileirão in the sample. Its
+        // table sits under its games, so the remote has to walk down to it.
+        let app = Flow.launch(league: "football")
+        app.staticTexts["Standings"].appears(within: 10)
+        let leader = app.buttons["standing.1"]
+        XCTAssertTrue(Flow.walk(.down, until: leader, limit: 40), "focus walks down to the top of the table")
+        XCTAssertTrue(app.buttons["standing.20"].exists, "and the table has twenty rows")
     }
 }

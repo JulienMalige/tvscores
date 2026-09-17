@@ -11,7 +11,7 @@ struct ChromeTests {
         // The sidebar is built from this list. Handing it a fresh array twice a
         // minute rebuilt the menu under whoever was reading it — that was half
         // of "it opens and closes". Same competitions in, same array out.
-        let store = ScoreboardStore(source: .bundled, warmImages: false)
+        let store = ScoreboardStore(source: .bundled(), warmImages: false)
         await store.refresh()
         let first = store.leagues
         #expect(!first.isEmpty)
@@ -22,7 +22,7 @@ struct ChromeTests {
     @Test("the first board makes the app ready, and only the first")
     @MainActor
     func readyFlipsOnce() async {
-        let store = ScoreboardStore(source: .bundled, warmImages: false)
+        let store = ScoreboardStore(source: .bundled(), warmImages: false)
         #expect(!store.ready, "a loader stands in until the board lands")
         await store.refresh()
         #expect(store.ready)
@@ -32,7 +32,7 @@ struct ChromeTests {
     @Test("every league the menu lists can be opened as a page")
     @MainActor
     func leaguesBecomeRefs() async {
-        let store = ScoreboardStore(source: .bundled, warmImages: false)
+        let store = ScoreboardStore(source: .bundled(), warmImages: false)
         await store.refresh()
         for league in store.leagues {
             let ref = LeagueRef(league)

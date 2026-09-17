@@ -1,11 +1,11 @@
 import XCTest
 
 /// A race: the podium, then everyone, each row reachable by remote.
-final class RaceScreenFlow: XCTestCase {
-    override func setUp() { continueAfterFailure = false }
+final class RaceScreenFlow: FlowCase {
 
     func testClassificationListsFinishersInOrderAndIsScrollable() {
-        let app = Flow.launch(tab: "yesterday", extra: ["-TVScoresRace", "f1"])
+        // A week with a classified Grand Prix in it, whatever this week holds.
+        let app = Flow.launch(tab: "yesterday", extra: ["-TVScoresSample", "race", "-TVScoresRace", "f1"])
         let winner = app.otherElements["result.1"].firstMatch
         XCTAssertTrue(winner.waitForExistence(timeout: 12) || app.buttons["result.1"].waitForExistence(timeout: 2),
                       "the winner's row is on the page")
@@ -16,7 +16,7 @@ final class RaceScreenFlow: XCTestCase {
     }
 
     func testBackReturnsToWhereTheRaceWasOpened() {
-        let app = Flow.launch(tab: "yesterday", extra: ["-TVScoresRace", "f1"])
+        let app = Flow.launch(tab: "yesterday", extra: ["-TVScoresSample", "race", "-TVScoresRace", "f1"])
         XCTAssertTrue(app.descendants(matching: .any)["result.1"].waitForExistence(timeout: 12))
         Flow.remote.press(.menu)
         app.buttons["day.yesterday"].appears()
