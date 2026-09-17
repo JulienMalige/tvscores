@@ -68,6 +68,15 @@ television has. Rows and sections are covered through the screen that shows
 them; they do not exist on their own. Both run in CI before the screenshots,
 on the same simulator.
 
+One limit, learned over ten runs: whether the sidebar *stays* open cannot be
+observed from outside. tvOS draws it, and every accessibility read is a
+snapshot of the whole hierarchy that disturbs the focus engine enough to shut
+the menu. What the flows do assert about the menu is that it opens, lists its
+competitions and takes you to the one you pick. Two probe flows for the
+staying-open question exist in `SidebarFlow`, skipped unless
+`TVSCORES_MENU_PROBE=1`; the answer to that question comes from the
+television.
+
 ## Working on a screen
 
 - Adding a measurement means adding it here and in `Metrics`, not in the view.
