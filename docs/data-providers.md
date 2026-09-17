@@ -265,3 +265,27 @@ Two gaps that advice named and we had, now closed:
 Not done, deliberately: conditional GET *upstream*. TheSportsDB does send
 `last-modified`, but a 304 still counts as a request against the quota, and
 requests are what we are capped on — it would save bytes we are not short of.
+
+## Two matches that never got a score (2026-09-16)
+
+Botafogo v Grêmio and LDU Quito v Palmeiras were played and finished on the
+evening of the 16th. Six hours later both were still `NS` with no score, and
+both **TheSportsDB and API-Sports said exactly the same thing** — checked
+every ten minutes for an hour and a half, and again in each league's own
+results listing. Flashscore had 3-2 and 3-2 on penalties within minutes.
+
+What it is not: a broken subscription, or our pipeline. The Corinthians match
+the same night updated every minute and finished correctly, and every other
+Brasileirão and Libertadores fixture around those two carries its score. Two
+fixtures were simply stuck at both providers at once, which suggests they
+share an upstream for CONMEBOL and the Brasileirão.
+
+What the app does about it: a fixture still "not started" three hours after
+kickoff is no longer shown with its kickoff time, which reads as a game yet
+to come. It says "No update". The scheduler also refetches the date of any
+kickoff more than fifteen minutes past with nothing to show, so a score that
+does arrive late is picked up rather than waiting for the daily pass.
+
+Worth re-checking whether those two ever filled in. If late results are
+common the "No update" state will be seen often, and a second source for
+South America becomes worth its price; if this was a one-off, it is not.
