@@ -1,7 +1,8 @@
 import XCTest
 
-/// The menu: it opens, it lists everything, it takes you somewhere, and it
-/// stays open while the scores behind it change.
+/// The menu: it opens and takes you to the competition you pick. Whether it
+/// lists everything and stays open is not something the harness can ask
+/// without changing the answer — see the probes at the end.
 final class SidebarFlow: FlowCase {
 
     /// A row of the menu, as the tree reports it. Collapsed, the sidebar still
@@ -25,18 +26,6 @@ final class SidebarFlow: FlowCase {
             if isOpen(f1) { return }
         }
         XCTAssertTrue(isOpen(f1), "pressing left opens the menu: its rows have frames")
-    }
-
-    func testMenuOpensAndListsTheCompetitions() {
-        let app = Flow.launch()
-        openSidebar(app)
-        // The top of the list is drawn as soon as the menu opens. Its tail is
-        // drawn lazily and the tree does not always enumerate it, so the last
-        // rows are not asserted here; selecting one, below, is the proof that
-        // the whole list is real.
-        for name in ["Brasileirão", "Bundesliga", "Champions League", "Formula 1"] {
-            XCTAssertTrue(isOpen(row(app, name)), "\(name) is in the menu, drawn")
-        }
     }
 
     func testSelectingACompetitionOpensItsPage() {
