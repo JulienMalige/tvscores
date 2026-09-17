@@ -41,3 +41,46 @@ struct ChromeTests {
         }
     }
 }
+
+/// What the chrome is fed: the pictures, and in what order.
+@Suite("Chrome/Pictures")
+struct ChromePictureTests {
+    private static func board() throws -> Scoreboard {
+        let url = try #require(Bundle.main.url(forResource: "sample-scoreboard", withExtension: "json"))
+        return try ScoreboardDecoder.make().decode(Scoreboard.self, from: Data(contentsOf: url))
+    }
+
+    @Test("the competition marks are warmed before anything else, both shapes of them")
+    func marksComeFirst() throws {
+        // The sidebar is drawn from the icons. An icon that arrives after the
+        // menu is drawn changes a row's state, tvOS rebuilds the rows, and
+        // the menu shuts under its reader. So they head the list.
+        let board = try Self.board()
+        let urls = board.imageURLs.compactMap { $0 }
+        let marks = Set(board.leagues.flatMap { [$0.logo, $0.icon] }.compactMap { $0 })
+        #expect(Set(urls.prefix(marks.count)) == marks, "the first entries are exactly the marks")
+        #expect(urls.count > marks.count, "and the crests and portraits follow")
+    }
+
+    @Test("a board whose marks never arrive still lets the app in")
+    @MainActor
+    func readyDoesNotWaitForever() async {
+        // A slow line must not hold the app shut behind the loader: the marks
+        // get a few seconds, then the screen is shown with whatever came.
+        let store = ScoreboardStore(source: .bundled(), warmImages: true)
+        let began = Date()
+        await store.refresh()
+        #expect(store.ready)
+        #expect(Date().timeIntervalSince(began) < 8, "ready within the ceiling, marks or no marks")
+    }
+
+    @Test("a board that cannot be read is an error on screen, not a crash")
+    @MainActor
+    func missingBoardIsAnError() async {
+        let store = ScoreboardStore(source: .bundled("no-such-sample"), warmImages: false)
+        await store.refresh()
+        #expect(store.error != nil)
+        #expect(store.board == nil)
+        #expect(!store.ready, "the loader gives way to the error, not to an empty page")
+    }
+}

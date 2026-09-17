@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 import Testing
 @testable import TVScores
 
@@ -85,5 +86,17 @@ struct ElementsTests {
         #expect(cache.image(for: url) != nil, "read synchronously on the next frame")
         _ = await cache.load(url)
         #expect(calls == 1, "the second load never fetches")
+    }
+
+    // MARK: Colours
+
+    @Test("a team colour is six hex digits behind a hash, or nothing")
+    func hexColours() {
+        #expect(Color(hex: "#27f4d2") != nil)
+        #expect(Color(hex: "#FFFFFF") != nil, "either case")
+        #expect(Color(hex: "27f4d2") == nil, "no hash, no colour: the row falls back to its default")
+        #expect(Color(hex: "#fff") == nil, "short form is not accepted")
+        #expect(Color(hex: "#gggggg") == nil)
+        #expect(Color(hex: nil) == nil)
     }
 }

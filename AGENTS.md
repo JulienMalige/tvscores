@@ -49,7 +49,8 @@ cd proxy && npm test     # the proxy
 The app's tests run on the CI runner, since there is no Mac here:
 `xcodebuild test -scheme TVScores -destination 'platform=tvOS Simulator,name=Apple TV'`
 runs the `Unit` suites (Swift Testing, hosted in the app) and then the
-`Flows` (XCUITest, one per screen, driven by the remote). The workflow does
+`Flows` (XCUITest, one per screen plus the menu and the moves between
+screens, driven by the remote). The workflow does
 this before it takes the screenshots, and keeps `tests.xcresult` as an
 artifact when something fails.
 

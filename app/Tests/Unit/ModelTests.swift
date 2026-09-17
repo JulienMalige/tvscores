@@ -70,4 +70,42 @@ struct ModelTests {
             #expect(abs(e.start.timeIntervalSince(board.generatedAt)) < 9 * 86400, "\(e.id)")
         }
     }
+
+    @Test("a competition's page shows its own games and nothing else")
+    func leaguePagesFilterTheirOwnGames() throws {
+        let board = try ScoreboardDecoder.make().decode(Scoreboard.self, from: Self.sample("sample-scoreboard"))
+        let groups = Day.allCases.flatMap { board.groups(for: $0) }
+        for league in board.leagues {
+            let mine = groups.filter { LeagueRef(league).matches($0) }
+            #expect(mine.allSatisfy { $0.sport == league.sport && $0.league.id == league.id }, "\(league.name)")
+            // `playing` is what the menu greys a row on; it must agree with the buckets.
+            #expect(league.playing == !mine.isEmpty, "\(league.name) is marked playing exactly when it has games this week")
+        }
+        for group in groups {
+            let ref = LeagueRef(group: group)
+            #expect(groups.filter { ref.matches($0) }.allSatisfy { $0.id == group.id }, "\(group.id) matches only itself")
+        }
+    }
+
+    @Test("one stale sport makes the whole board say so")
+    func staleSurfaces() throws {
+        var json = try #require(JSONSerialization.jsonObject(with: Self.sample("sample-scoreboard")) as? [String: Any])
+        var stale = try #require(json["stale"] as? [String: Bool])
+        #expect(!stale.values.contains(true), "the sample was captured with every source answering")
+        stale["nfl"] = true
+        json["stale"] = stale
+        let board = try ScoreboardDecoder.make().decode(Scoreboard.self, from: JSONSerialization.data(withJSONObject: json))
+        #expect(board.isStale)
+    }
+
+    @Test("a row is known by its nickname when it has one, and a non-finisher by its outcome")
+    func rowIdentities() throws {
+        let lions = try JSONDecoder().decode(TeamRef.self, from: Data(#"{"name":"Detroit Lions","short":"DET","nick":"Lions"}"#.utf8))
+        #expect(lions.label == "Lions")
+        let inter = try JSONDecoder().decode(TeamRef.self, from: Data(#"{"name":"Inter Milan","short":"INT"}"#.utf8))
+        #expect(inter.label == "Inter Milan")
+        let dnf = try JSONDecoder().decode(RaceResult.self, from: Data(#"{"driver":"Lando Norris","gap":"Collision"}"#.utf8))
+        #expect(!dnf.finished)
+        #expect(dnf.id == "--Lando Norris", "a retirement has no position and must not collide with one that does")
+    }
 }

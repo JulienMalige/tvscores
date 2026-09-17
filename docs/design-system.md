@@ -62,9 +62,10 @@ used to be 76 with a 2-point gap, which is what crowded the badges.
 `Elements`, `Chrome` — and judges the code without a screen: the bundled
 sample decodes, every status has its four translations, the image cache
 retries and forgets, the menu's league list survives a refresh.
-`app/Tests/Flows` holds one XCUITest per screen plus one for the sidebar,
-each driving the app in demo mode with `XCUIRemote`, the only cursor a
-television has. Rows and sections are covered through the screen that shows
+`app/Tests/Flows` holds one XCUITest per screen, one for the sidebar, and
+`NavigationFlow` for what joins them — where focus lands, the menu opening
+and staying open, a press taking you somewhere and back — each driving the
+app in demo mode with `XCUIRemote`, the only cursor a television has. Rows and sections are covered through the screen that shows
 them; they do not exist on their own. Both run in CI before the screenshots,
 on the same simulator.
 

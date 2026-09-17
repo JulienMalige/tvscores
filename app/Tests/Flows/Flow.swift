@@ -38,6 +38,51 @@ enum Flow {
         }
         return element.exists && element.hasFocus
     }
+
+    // MARK: The system sidebar
+
+    /// A row of the menu, as the tree reports it. Collapsed, the sidebar still
+    /// lists every row — disabled, at 0×0 — so `exists` says nothing about
+    /// whether the menu is open. A row that is open has a frame.
+    static func menuRow(_ app: XCUIApplication, _ name: String = "Formula 1") -> XCUIElement { app.buttons[name].firstMatch }
+    static func menuIsOpen(_ app: XCUIApplication) -> Bool {
+        let row = menuRow(app)
+        return row.exists && row.frame.width > 0 && row.isEnabled
+    }
+
+    /// Focus left from the page opens the sidebar.
+    ///
+    /// Asked about sparingly. Every read of a frame is an accessibility
+    /// snapshot of the whole hierarchy, and the flow that read one every
+    /// second watched the menu shut in its hands. The engine is not to be
+    /// interrogated at 1 Hz.
+    static func openMenu(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
+        for _ in 0..<3 {
+            remote.press(.left)
+            sleep(2)
+            if menuIsOpen(app) { return }
+        }
+        XCTAssertTrue(menuIsOpen(app), "pressing left opens the menu: its rows have frames", file: file, line: line)
+    }
+
+    /// A page opened by launch argument arrives with focus still in the
+    /// sidebar — a person opens a page from a focused row and never lands
+    /// this way. Two presses right put focus on the page, as theirs would be.
+    static func focusThePage() {
+        for _ in 0..<2 {
+            remote.press(.right)
+            usleep(400_000)
+        }
+    }
+
+    /// Where focus is, for the log: the one fact that separates "the page
+    /// took focus back" from "the menu closed on its own". The heaviest
+    /// query there is; ask only once something has already gone wrong.
+    static func reportFocus(_ app: XCUIApplication, _ when: String) {
+        let focused = app.descendants(matching: .any).matching(NSPredicate(format: "hasFocus == 1")).allElementsBoundByIndex
+        let names = focused.prefix(3).map { "\($0.elementType.rawValue):\($0.identifier.isEmpty ? $0.label : $0.identifier)" }
+        print("TREE| focus \(when): \(names.isEmpty ? "nowhere" : names.joined(separator: ", "))")
+    }
 }
 
 extension XCUIElement {

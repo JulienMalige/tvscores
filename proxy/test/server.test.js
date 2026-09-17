@@ -8,12 +8,13 @@ import { createApp } from "../src/server.js";
 import { config } from "../src/config.js";
 
 /** Starts the app on an ephemeral port and returns a fetch bound to it. */
-async function serve() {
+async function serve(extra = {}) {
   const store = new Store(mkdtempSync(join(tmpdir(), "tvscores-")));
-  const app = createApp({ store, config });
+  const app = createApp({ store, config, ...extra });
   await new Promise((done) => app.listen(0, "127.0.0.1", done));
   const { port } = app.address();
   return {
+    store,
     get: (path, headers) => fetch(`http://127.0.0.1:${port}${config.pathPrefix}${path}`, { headers }),
     close: () => new Promise((done) => app.close(done)),
   };
@@ -79,6 +80,52 @@ test("every image says how long it is", async () => {
       assert.equal(res.status, 200, path);
       assert.ok(Number(res.headers.get("content-length")) > 0, `${path} has a content-length`);
     }
+  } finally {
+    await s.close();
+  }
+});
+
+test("one league's table is served, and a league without one says so", async () => {
+  const s = await serve();
+  try {
+    s.store.setStandings("football", "4335", { updatedAt: "2026-09-16T00:00:00Z", tables: [{ id: "table", rows: [{ pos: 1, name: "Real Madrid", value: 9 }] }] });
+    const hit = await s.get("/v1/standings/football/4335");
+    assert.equal(hit.status, 200);
+    const body = await hit.json();
+    assert.equal(body.tables[0].rows[0].name, "Real Madrid");
+    assert.ok(hit.headers.get("etag"), "a table carries an ETag like the board");
+    const miss = await s.get("/v1/standings/football/4480");
+    assert.equal(miss.status, 404, "a cup has no table; the app shows 'unavailable', not a blank page");
+    const all = await (await s.get("/v1/standings")).json();
+    assert.deepEqual(Object.keys(all.standings), ["football:4335"]);
+  } finally {
+    await s.close();
+  }
+});
+
+test("a time zone we cannot name is refused before it can mis-bucket a day", async () => {
+  const s = await serve();
+  try {
+    assert.equal((await s.get("/v1/scoreboard?tz=Mars/Olympus")).status, 400);
+    assert.equal((await s.get("/v1/fixtures?tz=UTC&date=yesterday")).status, 400, "and a date has one shape");
+    assert.equal((await s.get("/v1/nothing")).status, 404);
+  } finally {
+    await s.close();
+  }
+});
+
+test("health reports the day's spend against each sport's cap, and is never cached", async () => {
+  const s = await serve({ limits: { football: 5000 } });
+  try {
+    s.store.sportMeta("football").calls = { day: "2026-09-16", used: 12 };
+    s.store.sportMeta("f1").calls = { day: "2026-09-16", used: 3 };
+    const res = await s.get("/v1/health");
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get("cache-control"), "no-store");
+    const { ok, quota } = await res.json();
+    assert.equal(ok, true);
+    assert.deepEqual([quota.football.used, quota.football.limit, quota.football.remaining], [12, 5000, 4988]);
+    assert.equal(quota.f1.limit, null, "a sport with no known cap says so rather than inventing one");
   } finally {
     await s.close();
   }
