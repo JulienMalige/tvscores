@@ -78,7 +78,10 @@ final class ScoreboardStore {
         // sidebar row whose picture arrives after the menu is drawn changes
         // state, tvOS rebuilds its rows, and the menu shuts in the reader's
         // hands. The flow that watches the menu timed it at two seconds.
-        let marks = board.leagues.flatMap { [$0.logo, $0.icon] }
+        // Icons first: they are the smaller files and the ones the menu is
+        // drawn from, so if the ceiling below cuts the warm-up short it is a
+        // heading mark that arrives late, not a menu row.
+        let marks = board.leagues.flatMap { [$0.icon, $0.logo] }
         if !ready {
             // A slow line must not hold the app shut: show what we have after
             // this long whether the marks arrived or not.

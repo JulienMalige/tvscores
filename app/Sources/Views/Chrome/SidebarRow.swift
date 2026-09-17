@@ -3,14 +3,15 @@ import SwiftUI
 /// One competition in the sidebar, shaped the way tvOS shapes its own.
 ///
 /// Every entry of the system sidebar — Apple TV, MLS, Disney+ — puts its mark
-/// inside the same round container, so a wordmark and a crest sit on one
-/// vertical line and no logo is larger than its neighbour. Ours does the same,
-/// and it is the treatment the constructor badges already use.
+/// in the same square, so a wordmark and a crest sit on one vertical line and
+/// no logo is larger than its neighbour. The square comes composed from the
+/// proxy: tvOS lays sidebar icons out itself and discards any frame we put
+/// round them, so a wide wordmark sent as-is towered over the crest beside it.
 struct SidebarRow: View {
     let league: LeagueSummary
 
-    /// The container, matching the system's own sidebar icons.
-    private static let disc: CGFloat = 56
+    /// The icon's square, matching the system's own sidebar icons.
+    private static let icon: CGFloat = 56
 
     var body: some View {
         Label {
@@ -23,13 +24,37 @@ struct SidebarRow: View {
                 }
             }
         } icon: {
-            // The proxy composes this one: a square icon with the mark already
-            // centred on its own ground. tvOS lays sidebar icons out itself and
-            // discards the frame we put round them — a wide wordmark sent as-is
-            // came out towering over the crest beside it and over its own name.
-            LeagueMark(sport: league.sport, logo: league.icon ?? league.logo, square: Self.disc)
+            SidebarIcon(league: league, size: Self.icon)
         }
         .accessibilityIdentifier("tab.\(league.sport).\(league.id.raw)")
+    }
+}
+
+/// A competition's icon in the menu, drawn once and never touched again.
+///
+/// A row of the sidebar is drawn by tvOS, and any state that changes inside
+/// it after it appears makes tvOS rebuild the menu — which the reader sees as
+/// the menu shutting a second or three after it opened. `CachedImage` records
+/// its loading, so it cannot live here. This reads the cache at the moment
+/// the row is drawn and holds no state at all: the icon is there if it was
+/// warmed — the loader waits for exactly that — and the sport's symbol stands
+/// in if it was not, until the menu is next opened. A missing icon for one
+/// opening beats a menu that will not stay open.
+private struct SidebarIcon: View {
+    let league: LeagueSummary
+    let size: CGFloat
+
+    var body: some View {
+        Group {
+            if let url = league.icon ?? league.logo, let image = ImageCache.shared.image(for: url) {
+                Image(uiImage: image).resizable().scaledToFit()
+            } else {
+                Image(systemName: Sport.icon(for: league.sport))
+                    .font(.title3)
+                    .foregroundStyle(Sport.tint(for: league.sport))
+            }
+        }
+        .frame(width: size, height: size)
     }
 }
 
