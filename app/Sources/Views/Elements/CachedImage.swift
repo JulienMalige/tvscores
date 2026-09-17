@@ -19,30 +19,49 @@ final class ImageCache {
         return cache
     }()
 
-    /// URLs that came back as nothing. A picture that failed has a fallback;
-    /// a picture that is still coming does not, or the fallback is what people
-    /// see first and the real thing looks like a glitch replacing it.
-    private var failed: Set<URL> = []
+    /// When a URL last came back as nothing. A picture that failed has a
+    /// fallback; a picture that is still coming does not, or the fallback is
+    /// what people see first and the real thing looks like a glitch replacing
+    /// it. The time matters: a failure on a television's wifi is usually a
+    /// blip, and remembering it for ever is how a crest never appears again.
+    private var failedAt: [URL: Date] = [:]
+    private let forget: TimeInterval = 60
 
     func image(for url: URL) -> UIImage? {
         memory.object(forKey: url as NSURL)
     }
 
-    func hasFailed(_ url: URL) -> Bool { failed.contains(url) }
+    func hasFailed(_ url: URL) -> Bool {
+        guard let at = failedAt[url] else { return false }
+        if Date().timeIntervalSince(at) > forget {
+            failedAt[url] = nil
+            return false
+        }
+        return true
+    }
 
     /// The decoded image, from memory if it is there and from the proxy if not.
+    ///
+    /// Three attempts, because one dropped request used to cost a crest for
+    /// the life of the screen: the row had already fallen back to its monogram
+    /// and nothing asked again. A television shares its wifi with the rest of
+    /// the house and the app opens a few dozen of these at once.
     @discardableResult
     func load(_ url: URL) async -> UIImage? {
         if let hit = image(for: url) { return hit }
-        var request = URLRequest(url: url)
-        request.timeoutInterval = 20
-        guard let (data, _) = try? await URLSession.shared.data(for: request),
-              let image = UIImage(data: data) else {
-            failed.insert(url)
-            return nil
+        for attempt in 0..<3 {
+            if attempt > 0 { try? await Task.sleep(for: .milliseconds(400 << attempt)) }
+            var request = URLRequest(url: url)
+            request.timeoutInterval = 15
+            guard let (data, response) = try? await URLSession.shared.data(for: request) else { continue }
+            guard (response as? HTTPURLResponse).map({ (200..<300).contains($0.statusCode) }) ?? true,
+                  let image = UIImage(data: data) else { continue }
+            memory.setObject(image, forKey: url as NSURL, cost: data.count)
+            failedAt[url] = nil
+            return image
         }
-        memory.setObject(image, forKey: url as NSURL, cost: data.count)
-        return image
+        failedAt[url] = Date()
+        return nil
     }
 }
 

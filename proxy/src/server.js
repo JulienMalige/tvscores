@@ -112,8 +112,9 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
     }
     const team = path.match(/^\/v1\/assets\/teams\/([a-z0-9-]+)\/([a-z0-9-]+)\.png$/);
     if (team && teamBadges.has(`${team[1]}/${team[2]}`)) {
-      res.writeHead(200, { "content-type": "image/png", "cache-control": IMAGE_CACHE, "access-control-allow-origin": "*" });
-      return res.end(readFileSync(join(ASSETS, "teams", team[1], `${team[2]}.png`)));
+      const badge = readFileSync(join(ASSETS, "teams", team[1], `${team[2]}.png`));
+      res.writeHead(200, { "content-type": "image/png", "content-length": badge.length, "cache-control": IMAGE_CACHE, "access-control-allow-origin": "*" });
+      return res.end(badge);
     }
     // `disc/` is the round icon of the same competition; the alternative is
     // spelled out rather than a free path, so nothing can walk out of assets/.
@@ -125,8 +126,11 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
       } catch {
         return send(res, 404, { error: "no such badge" });
       }
-      res.writeHead(200, { "content-type": "image/png", "cache-control": "public, max-age=86400", "access-control-allow-origin": "*" });
-      return res.end(readFileSync(file));
+      const png = readFileSync(file);
+      // With a length the client knows what it is waiting for; chunked leaves
+      // it guessing, and a television that gives up shows a monogram for ever.
+      res.writeHead(200, { "content-type": "image/png", "content-length": png.length, "cache-control": "public, max-age=86400", "access-control-allow-origin": "*" });
+      return res.end(png);
     }
     if (path === "/v1/health" || path === "/") {
       return send(res, 200, {

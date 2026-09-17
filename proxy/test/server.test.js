@@ -68,3 +68,18 @@ test("a competition's badge is served in both shapes, and nothing else is", asyn
     await s.close();
   }
 });
+
+test("every image says how long it is", async () => {
+  // Without a length the response is chunked and the client is guessing. A
+  // television that gives up on a guess shows a monogram and never asks again.
+  const s = await serve();
+  try {
+    for (const path of ["/v1/assets/leagues/f1.png", "/v1/assets/leagues/disc/f1.png"]) {
+      const res = await s.get(path);
+      assert.equal(res.status, 200, path);
+      assert.ok(Number(res.headers.get("content-length")) > 0, `${path} has a content-length`);
+    }
+  } finally {
+    await s.close();
+  }
+});
