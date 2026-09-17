@@ -11,11 +11,18 @@ final class SidebarFlow: FlowCase {
     private func isOpen(_ row: XCUIElement) -> Bool { row.exists && row.frame.width > 0 && row.isEnabled }
 
     /// Focus left from the page opens the sidebar.
+    ///
+    /// Asked about sparingly. Every read of a frame is an accessibility
+    /// snapshot of the whole hierarchy, and the flow that read one every
+    /// second watched the menu shut in its hands while the flow that read
+    /// one every five seconds saw it stay open through a refresh, four runs
+    /// out of four. The engine is not to be interrogated at 1 Hz.
     private func openSidebar(_ app: XCUIApplication) {
         let f1 = row(app, "Formula 1")
-        for _ in 0..<6 where !isOpen(f1) {
+        for _ in 0..<3 {
             Flow.remote.press(.left)
-            usleep(500_000)
+            sleep(2)
+            if isOpen(f1) { return }
         }
         XCTAssertTrue(isOpen(f1), "pressing left opens the menu: its rows have frames")
     }
@@ -27,13 +34,20 @@ final class SidebarFlow: FlowCase {
         for name in ["Brasileirão", "Bundesliga", "Champions League", "Formula 1"] {
             XCTAssertTrue(isOpen(row(app, name)), "\(name) is in the menu, drawn")
         }
-        // …and the bottom is reached by walking, the way a person would.
-        let nfl = row(app, "NFL")
-        for _ in 0..<20 where !(isOpen(nfl) && nfl.frame.maxY < 1080) {
-            Flow.remote.press(.down)
-            usleep(150_000)
+        // …and the bottom is reached by walking, the way a person would: NFL
+        // is the last row, so walking to the end of the list must find it drawn
+        // on screen. The walk is counted, not watched, for the reason above.
+        let order = app.buttons.allElementsBoundByIndex.map(\.label)
+        guard let home = order.firstIndex(of: "Home"), let nfl = order.firstIndex(of: "NFL"), nfl > home else {
+            return XCTFail("the menu lists Home above NFL; it lists \(order)")
         }
-        XCTAssertTrue(isOpen(nfl) && nfl.frame.maxY < 1080, "NFL is in the menu, at the bottom, and walking reaches it")
+        for _ in 0..<(nfl - home) {
+            Flow.remote.press(.down)
+            usleep(200_000)
+        }
+        sleep(1)
+        let last = row(app, "NFL")
+        XCTAssertTrue(isOpen(last) && last.frame.maxY <= 1080, "NFL is in the menu, at the bottom, and walking reaches it")
     }
 
     func testSelectingACompetitionOpensItsPage() {
@@ -71,13 +85,14 @@ final class SidebarFlow: FlowCase {
         let app = Flow.launch()
         openSidebar(app)
         reportFocus(app, "just after opening")
-        // Watched second by second, so a failure says when it shut: at once
-        // is focus being taken; at thirty seconds is the refresh.
+        // Watched every five seconds — sparingly, see above — so a failure
+        // still says roughly when it shut: early is focus being taken; past
+        // thirty seconds is the refresh.
         let f1 = row(app, "Formula 1")
         var shutAt: Int?
-        for second in 1...40 {
-            sleep(1)
-            if !isOpen(f1) { shutAt = second; break }
+        for check in 1...8 {
+            sleep(5)
+            if !isOpen(f1) { shutAt = check * 5; break }
         }
         if let shutAt {
             print("TREE| the menu shut after \(shutAt)s")
