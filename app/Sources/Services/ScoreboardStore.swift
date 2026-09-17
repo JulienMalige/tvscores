@@ -73,7 +73,12 @@ final class ScoreboardStore {
     /// sidebar full of soccerballs that turn into badges. Everything else — a
     /// few hundred crests and portraits — carries on behind the screen.
     private func warm(_ board: Scoreboard) async {
-        let marks = board.leagues.map(\.logo)
+        // Both shapes of every competition's mark: the heading's, and the
+        // sidebar's square icon. The icon matters more than it looks — a
+        // sidebar row whose picture arrives after the menu is drawn changes
+        // state, tvOS rebuilds its rows, and the menu shuts in the reader's
+        // hands. The flow that watches the menu timed it at two seconds.
+        let marks = board.leagues.flatMap { [$0.logo, $0.icon] }
         if !ready {
             // A slow line must not hold the app shut: show what we have after
             // this long whether the marks arrived or not.

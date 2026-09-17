@@ -36,7 +36,7 @@ extension Scoreboard {
     /// section and are what the eye lands on while scrolling.
     var imageURLs: [URL?] {
         let groups = Day.allCases.flatMap { self.groups(for: $0) }
-        var marks: [URL?] = []
+        var marks: [URL?] = leagues.flatMap { [$0.logo, $0.icon] }
         var rest: [URL?] = []
         for group in groups {
             marks.append(group.league.logo)
