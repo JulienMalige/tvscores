@@ -8,6 +8,9 @@ notes when a version ships.
 
 ## Unreleased
 
+- The competition marks in the sidebar stand on their own — no disc behind
+  them, and Serie A without the white box its badge is printed on.
+
 - The time sits beside the date at the top of every page, and keeps itself
   up to date.
 

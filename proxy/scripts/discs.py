@@ -1,4 +1,4 @@
-"""Composing a mark into a disc: the Apple Sports shape.
+"""Composing a mark into an icon.
 
 Shared by the two badge builders — `build-badges.py` for competitions and
 `build-team-badges.py` for constructors and teams — because both need the same
@@ -58,4 +58,45 @@ def disc(mark, colour, style=None, size=DISC):
     elif style is not True and abs(luma(mean_colour(mark)) - luma(colour)) < 70:
         mark = silhouette(mark, (255, 255, 255) if luma(colour) < 150 else (18, 18, 20))
     out.alpha_composite(mark, ((size * ss - mark.width) // 2, (size * ss - mark.height) // 2))
+    return out.resize((size, size), Image.LANCZOS)
+
+
+def drop_background(im, tol=26):
+    """Clear the near-white ground a badge is printed on, from the edges in.
+
+    Flood-filled from the corners rather than keyed across the whole image, so
+    white *inside* a mark survives: the Serie A tile is a white square behind a
+    blue A, and the A keeps its own highlights.
+    """
+    im = im.convert("RGBA")
+    px = im.load()
+    w, h = im.size
+    near = lambda c: c[3] > 0 and min(c[0], c[1], c[2]) >= 255 - tol
+    seen = set()
+    stack = [(x, y) for x in range(w) for y in (0, h - 1)] + [(x, y) for y in range(h) for x in (0, w - 1)]
+    while stack:
+        x, y = stack.pop()
+        if (x, y) in seen or not (0 <= x < w and 0 <= y < h):
+            continue
+        seen.add((x, y))
+        if not near(px[x, y]):
+            continue
+        px[x, y] = (255, 255, 255, 0)
+        stack.extend(((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))
+    return im
+
+
+def icon(mark, size=DISC):
+    """The mark alone, centred on a transparent square.
+
+    Square because the sidebar lays icons out itself and a wide wordmark would
+    otherwise tower over a crest; transparent because the ground belongs to
+    whatever the icon is drawn on.
+    """
+    ss = 4
+    out = Image.new("RGBA", (size * ss, size * ss), (0, 0, 0, 0))
+    d = size * ss
+    scale = (0.92 * d) / math.hypot(mark.width, mark.height)
+    mark = mark.resize((max(1, round(mark.width * scale)), max(1, round(mark.height * scale))), Image.LANCZOS)
+    out.alpha_composite(mark, ((d - mark.width) // 2, (d - mark.height) // 2))
     return out.resize((size, size), Image.LANCZOS)

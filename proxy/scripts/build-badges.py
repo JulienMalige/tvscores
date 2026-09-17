@@ -5,8 +5,8 @@ Two shapes per competition, because they are read in two places:
 
   <id>.png        trimmed to its own proportions, for a heading where a
                   wordmark deserves its width
-  disc/<id>.png   the same mark centred on a round, dark icon, for the
-                  sidebar — where tvOS lays icons out itself and a wide
+  icon/<id>.png   the same mark alone, centred on a transparent square, for
+                  the sidebar — where tvOS lays icons out itself and a wide
                   wordmark would tower over a crest beside it
 
 Re-run when a league is added. Sources listed in docs/data-providers.md."""
@@ -15,7 +15,7 @@ import io, os, sys, urllib.request
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from discs import disc, trim
+from discs import drop_background, icon, trim
 
 BADGES = {
     "ucl": "https://r2.thesportsdb.com/images/media/league/badge/facv1u1742998896.png",
@@ -35,9 +35,9 @@ BADGES = {
 }
 OUT = os.path.join(os.path.dirname(__file__), "..", "assets", "leagues")
 HEIGHT = 160  # px; the app scales down, Retina-safe
-# The sidebar sits on glass over whatever is behind it, so the icon carries its
-# own ground rather than borrowing one: near-black, like a tvOS app icon.
-DISC_GROUND = (0x1c, 0x1c, 0x1e)
+# Badges printed on a solid ground, where that ground is the badge's box and
+# not part of the mark. Cleared from the edges in, so white inside a mark stays.
+DROP_GROUND = {"seriea"}
 
 # Most league lockups are a mark with the competition's name set under it. At
 # the size a sidebar draws an icon that name is an illegible smudge, so the
@@ -62,13 +62,13 @@ for name, url in BADGES.items():
     im = im.crop(box) if box else im
     im = im.resize((max(1, round(im.width * HEIGHT / im.height)), HEIGHT), Image.LANCZOS)
     im.save(os.path.join(OUT, f"{name}.png"), optimize=True)
-    os.makedirs(os.path.join(OUT, "disc"), exist_ok=True)
+    os.makedirs(os.path.join(OUT, "icon"), exist_ok=True)
     mark = trim(im)
     if name in DISC_CROP:
         box = DISC_CROP[name]
         w, h = mark.size
         mark = trim(mark.crop((round(box[0] * w), round(box[1] * h), round(box[2] * w), round(box[3] * h))))
-    # `True` keeps the mark's own colours: a competition's mark is the brand,
-    # and unlike a constructor lockup there is no sponsor to strip out of it.
-    disc(mark, DISC_GROUND, True).save(os.path.join(OUT, "disc", f"{name}.png"), optimize=True)
-    print(f"{name}: {im.width}x{im.height} + disc")
+    if name in DROP_GROUND:
+        mark = trim(drop_background(mark))
+    icon(mark).save(os.path.join(OUT, "icon", f"{name}.png"), optimize=True)
+    print(f"{name}: {im.width}x{im.height} + icon")

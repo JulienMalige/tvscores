@@ -56,12 +56,12 @@ test("a competition's badge is served in both shapes, and nothing else is", asyn
   try {
     const wide = await s.get("/v1/assets/leagues/f1.png");
     assert.equal(wide.status, 200, "the wordmark, at its own proportions");
-    const round = await s.get("/v1/assets/leagues/disc/f1.png");
-    assert.equal(round.status, 200, "and the round icon the sidebar uses");
+    const round = await s.get("/v1/assets/leagues/icon/f1.png");
+    assert.equal(round.status, 200, "and the bare mark the sidebar uses");
     assert.equal(round.headers.get("content-type"), "image/png");
 
     assert.equal((await s.get("/v1/assets/leagues/nope.png")).status, 404);
-    assert.equal((await s.get("/v1/assets/leagues/disc/nope.png")).status, 404);
+    assert.equal((await s.get("/v1/assets/leagues/icon/nope.png")).status, 404);
     // The path is an alternative, not a free one: no walking out of assets/.
     assert.equal((await s.get("/v1/assets/leagues/../../package.png")).status, 404);
   } finally {
@@ -74,7 +74,7 @@ test("every image says how long it is", async () => {
   // television that gives up on a guess shows a monogram and never asks again.
   const s = await serve();
   try {
-    for (const path of ["/v1/assets/leagues/f1.png", "/v1/assets/leagues/disc/f1.png"]) {
+    for (const path of ["/v1/assets/leagues/f1.png", "/v1/assets/leagues/icon/f1.png"]) {
       const res = await s.get(path);
       assert.equal(res.status, 200, path);
       assert.ok(Number(res.headers.get("content-length")) > 0, `${path} has a content-length`);

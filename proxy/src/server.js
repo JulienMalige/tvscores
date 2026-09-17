@@ -116,11 +116,11 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
       res.writeHead(200, { "content-type": "image/png", "content-length": badge.length, "cache-control": IMAGE_CACHE, "access-control-allow-origin": "*" });
       return res.end(badge);
     }
-    // `disc/` is the round icon of the same competition; the alternative is
+    // `icon/` is the same competition's mark on its own; the alternative is
     // spelled out rather than a free path, so nothing can walk out of assets/.
-    const asset = path.match(/^\/v1\/assets\/leagues\/(disc\/)?([a-z0-9-]+)\.png$/);
+    const asset = path.match(/^\/v1\/assets\/leagues\/(icon\/)?([a-z0-9-]+)\.png$/);
     if (asset) {
-      const file = join(ASSETS, "leagues", asset[1] ? "disc" : "", `${asset[2]}.png`);
+      const file = join(ASSETS, "leagues", asset[1] ? "icon" : "", `${asset[2]}.png`);
       try {
         statSync(file);
       } catch {
