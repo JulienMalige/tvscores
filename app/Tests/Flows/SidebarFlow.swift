@@ -38,17 +38,18 @@ final class SidebarFlow: FlowCase {
 
     func testSelectingACompetitionOpensItsPage() {
         let app = Flow.launch()
-        openSidebar(app)
-        // A system-drawn row does not report focus, so the walk is counted:
-        // the menu opens on the current entry, Home, and Formula 1 is as many
-        // presses down as there are drawn rows between them.
-        let rows = app.buttons.allElementsBoundByIndex.filter { $0.frame.width > 0 && $0.frame.minX < 40 }.map(\.label)
-        guard let home = rows.firstIndex(of: "Home"), let f1 = rows.firstIndex(of: "Formula 1"), f1 > home else {
-            return XCTFail("the open menu lists Home above Formula 1; it lists \(rows)")
+        // A system-drawn row does not report focus, so the walk is counted.
+        // The collapsed menu already lists every row in order, so the count is
+        // taken before opening — cheaply, and before anything can shut it —
+        // then the menu is opened and walked without pause.
+        let order = app.buttons.allElementsBoundByIndex.map(\.label)
+        guard let home = order.firstIndex(of: "Home"), let f1 = order.firstIndex(of: "Formula 1"), f1 > home else {
+            return XCTFail("the menu lists Home above Formula 1; it lists \(order)")
         }
+        openSidebar(app)
         for _ in 0..<(f1 - home) {
             Flow.remote.press(.down)
-            usleep(200_000)
+            usleep(120_000)
         }
         Flow.remote.press(.select)
         // The page opening is the proof; a selection that landed elsewhere fails here.
@@ -61,7 +62,15 @@ final class SidebarFlow: FlowCase {
         // reloads every 30 s while a live match is in it; 40 s covers one.
         let app = Flow.launch()
         openSidebar(app)
-        sleep(40)
-        XCTAssertTrue(isOpen(row(app, "Formula 1")), "the menu is still open after a refresh: its rows still have frames")
+        // Watched second by second, so a failure says when it shut: at once
+        // is focus being taken; at thirty seconds is the refresh.
+        let f1 = row(app, "Formula 1")
+        var shutAt: Int?
+        for second in 1...40 {
+            sleep(1)
+            if !isOpen(f1) { shutAt = second; break }
+        }
+        if let shutAt { print("TREE| the menu shut after \(shutAt)s") }
+        XCTAssertNil(shutAt, "the menu is still open after a refresh; it shut after \(shutAt ?? 0)s")
     }
 }
