@@ -6,7 +6,10 @@ import XCTest
 /// tvOS has no touch. Everything a person can do is a press on the Siri
 /// Remote, so that is what these tests do, through `XCUIRemote`.
 enum Flow {
-    static func launch(tab: String = "today", league: String? = nil, extra: [String] = []) -> XCUIApplication {
+    /// `ready` names what proves the page is up. The day pills are the default;
+    /// a flow that launches straight into a race passes the race page's own
+    /// heading instead, since the pills are underneath it by then.
+    static func launch(tab: String = "today", league: String? = nil, extra: [String] = [], ready: String? = nil) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments = ["-TVScoresDemo", "-TVScoresTab", tab, "-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         if let league { app.launchArguments += ["-TVScoresLeague", league] }
@@ -18,7 +21,8 @@ enum Flow {
         // has the day pills, so the pill for the tab asked for is the sign
         // the page is up — waited for here, once, rather than hoped for in
         // each test's first assertion.
-        XCTAssertTrue(app.buttons["day.\(tab)"].waitForExistence(timeout: 25), "the app finished loading and shows the \(tab) pill")
+        let sign = ready.map { app.staticTexts[$0] } ?? app.buttons["day.\(tab)"]
+        XCTAssertTrue(sign.waitForExistence(timeout: 25), "the app finished loading and shows \(ready ?? "the \(tab) pill")")
         return app
     }
 

@@ -16,7 +16,7 @@ final class RaceScreenFlow: FlowCase {
 
     func testClassificationListsFinishersInOrderAndIsScrollable() {
         // A week with a classified Grand Prix in it, whatever this week holds.
-        let app = Flow.launch(tab: "yesterday", extra: ["-TVScoresSample", "race", "-TVScoresRace", "f1"])
+        let app = Flow.launch(tab: "yesterday", extra: ["-TVScoresSample", "race", "-TVScoresRace", "f1"], ready: "Race Result")
         // A row's identifier sits on its texts; the row itself is a focusable
         // stack with no element of its own, so it is the winner's name we find.
         let winner = app.staticTexts.matching(identifier: "result.1").firstMatch
@@ -37,8 +37,7 @@ final class RaceScreenFlow: FlowCase {
     }
 
     func testBackReturnsToWhereTheRaceWasOpened() {
-        let app = Flow.launch(tab: "yesterday", extra: ["-TVScoresSample", "race", "-TVScoresRace", "f1"])
-        XCTAssertTrue(app.staticTexts["Race Result"].waitForExistence(timeout: 12), "the race page is open")
+        let app = Flow.launch(tab: "yesterday", extra: ["-TVScoresSample", "race", "-TVScoresRace", "f1"], ready: "Race Result")
         sleep(1) // let the push settle before asking to leave it
         focusThePage()
         Flow.remote.press(.menu)
