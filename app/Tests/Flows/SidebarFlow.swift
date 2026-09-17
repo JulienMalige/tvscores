@@ -37,11 +37,19 @@ final class SidebarFlow: FlowCase {
     func testSelectingACompetitionOpensItsPage() {
         let app = Flow.launch()
         openSidebar(app)
-        // Walk down to Formula 1 and select it. Whether focus is reported on
-        // a system-drawn row is not something to lean on; the page opening is
-        // the proof, and it fails plainly if the selection landed elsewhere.
-        _ = Flow.walk(.down, until: app.buttons["Formula 1"].firstMatch, limit: 20)
+        // A system-drawn row does not report focus, so the walk is counted:
+        // the menu opens on the current entry, Home, and Formula 1 is as many
+        // presses down as there are rows between them in the tree.
+        let rows = app.buttons.allElementsBoundByIndex.map(\.label)
+        guard let home = rows.firstIndex(of: "Home"), let f1 = rows.firstIndex(of: "Formula 1"), f1 > home else {
+            return XCTFail("the menu lists Home above Formula 1; it lists \(rows)")
+        }
+        for _ in 0..<(f1 - home) {
+            Flow.remote.press(.down)
+            usleep(200_000)
+        }
         Flow.remote.press(.select)
+        // The page opening is the proof; a selection that landed elsewhere fails here.
         app.buttons["table.drivers"].appears(within: 10)
     }
 
