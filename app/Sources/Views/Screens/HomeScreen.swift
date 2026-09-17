@@ -59,9 +59,7 @@ struct HomeScreen: View {
                     .font(.callout)
                     .foregroundStyle(.orange)
             }
-            Text(Date.now, format: .dateTime.weekday(.wide).day().month(.wide))
-                .font(.title3)
-                .foregroundStyle(.secondary)
+            ClockLabel()
         }
     }
 

@@ -27,9 +27,7 @@ struct LeagueScreen: View {
             Text(ref.name)
                 .font(.system(size: 48, weight: .bold))
             Spacer()
-            Text(Date.now, format: .dateTime.weekday(.wide).day().month(.wide))
-                .font(.title3)
-                .foregroundStyle(.secondary)
+            ClockLabel()
         }
     }
 
