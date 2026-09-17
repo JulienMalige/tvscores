@@ -8,6 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
+## 1.0 build 15 — 17 September 2026
 - The menu no longer rebuilds itself under you while you are reading it,
   which was making it hard to open and keep open.
 
