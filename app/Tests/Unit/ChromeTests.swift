@@ -67,6 +67,8 @@ struct ChromePictureTests {
     func readyDoesNotWaitForever() async {
         // A slow line must not hold the app shut behind the loader: the marks
         // get a few seconds, then the screen is shown with whatever came.
+        // (The app hosting this test has usually warmed them already, so this
+        // runs in a blink; the ceiling is what it pins when it does not.)
         let store = ScoreboardStore(source: .bundled(), warmImages: true)
         let began = Date()
         await store.refresh()

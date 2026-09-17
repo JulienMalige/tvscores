@@ -114,6 +114,7 @@ class FlowCase: XCTestCase {
             // tree is readable from the run's console without downloading a
             // result bundle.
             print("TREE| === accessibility tree at failure: \(name) ===")
+            Flow.reportFocus(XCUIApplication(), "at failure")
             for line in XCUIApplication().debugDescription.split(separator: "\n") { print("TREE| \(line)") }
             print("TREE| === end ===")
         }

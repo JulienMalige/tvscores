@@ -23,6 +23,11 @@ struct DayTabs: View {
         // pill, not this one, which is the engine re-seeding from nothing.
         .defaultFocus($focused, selected)
         .focusSection()
+        // Picking a day swaps the pill for its filled twin, and the focus
+        // engine loses the view it was on. Put it back on the day just
+        // picked — on a pick only, never on appearance, so the menu is never
+        // robbed of it.
+        .onChange(of: selected) { _, now in focused = now }
     }
 
     /// A day, filled when it is the one being shown.

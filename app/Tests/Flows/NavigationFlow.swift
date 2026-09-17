@@ -72,6 +72,32 @@ final class NavigationFlow: FlowCase {
         XCTAssertTrue(open, "the menu is still open forty seconds and one refresh later")
     }
 
+    func testTheMenuIsStillOpenSixSecondsIn() {
+        // A bracket for the test above: the earlier probes saw the menu shut
+        // between one and five seconds after opening. Green here and red
+        // above says the refresh; red here says something sooner.
+        let app = Flow.launch()
+        Flow.openMenu(app)
+        sleep(6)
+        let open = Flow.menuIsOpen(app)
+        if !open { Flow.reportFocus(app, "after the menu shut within six seconds") }
+        XCTAssertTrue(open, "the menu is still open six seconds after opening")
+    }
+
+    func testTheMenuStaysOpenOnceThePageHasSettled() {
+        // The crests and portraits behind the page keep arriving for some
+        // seconds after launch, each one redrawing its row. A menu opened
+        // after that has settled tells whether those arrivals are what shuts
+        // it: green here and red above says they are.
+        let app = Flow.launch()
+        sleep(30)
+        Flow.openMenu(app)
+        sleep(40)
+        let open = Flow.menuIsOpen(app)
+        if !open { Flow.reportFocus(app, "after the menu shut on a settled page") }
+        XCTAssertTrue(open, "the menu opened on a settled page is still open forty seconds later")
+    }
+
     // MARK: Between screens
 
     func testHomeFromTheMenuReturnsToTheFrontPage() {
