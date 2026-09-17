@@ -102,7 +102,10 @@ jobs:
             | jq -r '.devices | to_entries[] | select(.key | test("tvOS")) | .value[] | select(.name | test("^Apple TV( 4K)?")) | .udid' \
             | head -1)
           echo "Using simulator $UDID"
-          xcrun simctl boot "$UDID"
+          # The test step has usually booted it already; booting a booted
+          # device is an error, and under `set -e` it took the screenshots
+          # with it — which is why a failing run left no pictures behind.
+          xcrun simctl boot "$UDID" 2>/dev/null || true
           xcrun simctl bootstatus "$UDID" -b
           APP=$(find build/Build/Products -name 'TVScores.app' -maxdepth 2 | head -1)
           echo "App bundle: $APP"

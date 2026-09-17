@@ -4,27 +4,25 @@ import SwiftUI
 /// custom pill loses the focus behaviour people already know.
 struct DayTabs: View {
     @Binding var selected: Day
-    @FocusState private var focused: Day?
 
     var body: some View {
         HStack(spacing: 24) {
             ForEach(Day.allCases) { d in
                 DayPill(title: title(d), isSelected: selected == d) { selected = d }
-                    .focused($focused, equals: d)
                     .accessibilityIdentifier("day.\(d.rawValue)")
             }
             Spacer()
         }
-        // Plain `.defaultFocus`, and nothing that takes focus by hand.
+        // No claim on focus at all — no `.defaultFocus`, no `.focusSection`.
         //
-        // This used to assert focus in a `.task`, and to claim `.userInitiated`
-        // priority, because the pills were the only focusable chrome and the
-        // engine would otherwise start on the leading one. The sidebar changed
-        // that: a `.task` runs again every time the view reappears, so opening
-        // the sidebar — which reappears the page behind it — pulled focus
-        // straight back out of the menu, and the menu shut as it opened.
-        .defaultFocus($focused, selected)
-        .focusSection()
+        // The pills used to declare a default so the highlight would start on
+        // the selected day. The flows timed what that cost: a menu opened and
+        // then left alone shut itself within one to four seconds, and focus was
+        // found on the leading pill afterwards — the engine re-seeding from the
+        // page after the pills' claim pulled it out of the sidebar. A menu being
+        // navigated survived, which is why it only sometimes happened to a
+        // person. The selected day is filled in, so where the highlight starts
+        // no longer needs saying.
     }
 
     /// A day, filled when it is the one being shown.
