@@ -29,6 +29,13 @@ final class SidebarFlow: FlowCase {
 
     func testMenuOpensAndListsEveryCompetition() {
         let app = Flow.launch()
+        // The count to the last row is taken from the collapsed menu, which
+        // lists every row; the open one is drawn lazily and its last rows are
+        // not in the tree until reached.
+        let order = app.buttons.allElementsBoundByIndex.map(\.label)
+        guard let home = order.firstIndex(of: "Home"), let nfl = order.firstIndex(of: "NFL"), nfl > home else {
+            return XCTFail("the menu lists Home above NFL; it lists \(order)")
+        }
         openSidebar(app)
         // The top of the list is drawn as soon as the menu opens…
         for name in ["Brasileirão", "Bundesliga", "Champions League", "Formula 1"] {
@@ -37,10 +44,6 @@ final class SidebarFlow: FlowCase {
         // …and the bottom is reached by walking, the way a person would: NFL
         // is the last row, so walking to the end of the list must find it drawn
         // on screen. The walk is counted, not watched, for the reason above.
-        let order = app.buttons.allElementsBoundByIndex.map(\.label)
-        guard let home = order.firstIndex(of: "Home"), let nfl = order.firstIndex(of: "NFL"), nfl > home else {
-            return XCTFail("the menu lists Home above NFL; it lists \(order)")
-        }
         for _ in 0..<(nfl - home) {
             Flow.remote.press(.down)
             usleep(200_000)
@@ -84,7 +87,10 @@ final class SidebarFlow: FlowCase {
         // reloads every 30 s while a live match is in it; 40 s covers one.
         let app = Flow.launch()
         openSidebar(app)
-        reportFocus(app, "just after opening")
+        // No look at focus here: finding the focused element evaluates every
+        // element in the hierarchy, the heaviest interrogation there is, and
+        // the menu shut within five seconds of it every time. Focus is asked
+        // about only after the menu has shut, when there is nothing to disturb.
         // Watched every five seconds — sparingly, see above — so a failure
         // still says roughly when it shut: early is focus being taken; past
         // thirty seconds is the refresh.
