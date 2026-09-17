@@ -6,8 +6,7 @@ build inside it. The release job sends the top section to TestFlight as that
 build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
-## Unreleased
-
+## 1.0 build 13 — 17 September 2026
 - Scores arrive sooner: the proxy asks its source twice a minute now, and the
   app asks the proxy twice a minute while a game is on.
 - A game that kicked off but whose scoreline never arrives is no longer shown
