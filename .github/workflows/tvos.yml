@@ -71,7 +71,7 @@ jobs:
             -resultBundlePath tests.xcresult \
             -skipPackagePluginValidation \
             CODE_SIGNING_ALLOWED=NO \
-            test 2>&1 | tee test.log | grep -E "error:|Test Suite|Test Case|passed|failed|BUILD|\*\* TEST" || true
+            test 2>&1 | tee test.log | grep -E "error:|Test Suite|Test Case|passed|failed|BUILD|\*\* TEST|^TREE\|" || true
           grep -qE "TEST SUCCEEDED" test.log
 
       - name: Keep the test results
@@ -84,7 +84,10 @@ jobs:
             app/tests.xcresult
           if-no-files-found: ignore
 
+      # Even after a failing test: the pictures are the evidence a failure
+      # needs, and the job is red either way.
       - name: Run in simulator and take screenshots
+        if: success() || failure()
         run: |
           set -euo pipefail
           UDID=$(xcrun simctl list devices available -j \

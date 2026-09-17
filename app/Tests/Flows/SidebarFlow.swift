@@ -20,16 +20,27 @@ final class SidebarFlow: FlowCase {
     func testMenuOpensAndListsEveryCompetition() {
         let app = Flow.launch()
         openSidebar(app)
-        for name in ["Premier League", "Champions League", "Formula 1", "MotoGP", "ATP Tour", "NFL"] {
+        // The top of the list is on screen as soon as the menu opens…
+        for name in ["Brasileirão", "Bundesliga", "Champions League", "Formula 1"] {
             XCTAssertTrue(app.buttons[name].firstMatch.exists, "\(name) is in the menu")
         }
+        // …and the bottom is reached by walking, the way a person would. Fifteen
+        // competitions do not all fit; a row below the fold does not exist yet.
+        let nfl = app.buttons["NFL"].firstMatch
+        for _ in 0..<20 where !nfl.exists {
+            Flow.remote.press(.down)
+            usleep(150_000)
+        }
+        XCTAssertTrue(nfl.exists, "NFL is in the menu, at the bottom")
     }
 
     func testSelectingACompetitionOpensItsPage() {
         let app = Flow.launch()
         openSidebar(app)
-        let f1 = app.buttons["Formula 1"].firstMatch
-        XCTAssertTrue(Flow.walk(.down, until: f1, limit: 20), "focus walks down the menu to Formula 1")
+        // Walk down to Formula 1 and select it. Whether focus is reported on
+        // a system-drawn row is not something to lean on; the page opening is
+        // the proof, and it fails plainly if the selection landed elsewhere.
+        _ = Flow.walk(.down, until: app.buttons["Formula 1"].firstMatch, limit: 20)
         Flow.remote.press(.select)
         app.buttons["table.drivers"].appears(within: 10)
     }

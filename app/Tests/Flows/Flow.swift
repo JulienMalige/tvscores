@@ -55,9 +55,12 @@ class FlowCase: XCTestCase {
     override func record(_ issue: XCTIssue) {
         if !dumped {
             dumped = true
-            print("=== ACCESSIBILITY TREE AT FAILURE ===")
-            print(XCUIApplication().debugDescription)
-            print("=== END TREE ===")
+            // Each line carries a marker the CI log filter lets through, so the
+            // tree is readable from the run's console without downloading a
+            // result bundle.
+            print("TREE| === accessibility tree at failure: \(name) ===")
+            for line in XCUIApplication().debugDescription.split(separator: "\n") { print("TREE| \(line)") }
+            print("TREE| === end ===")
         }
         super.record(issue)
     }

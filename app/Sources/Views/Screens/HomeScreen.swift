@@ -28,19 +28,26 @@ struct HomeScreen: View {
             }
             .navigationDestination(for: Event.self) { RaceScreen(eventId: $0.id, fallback: $0, store: store) }
         }
-        .onChange(of: store.board == nil) { _, isNil in
-            // `-TVScoresRace f1` opens that series' latest classified race (CI screenshots).
-            guard !isNil, !openedInitialRace, let board = store.board, let wanted = Self.argument("-TVScoresRace") else { return }
-            let race = Day.allCases.flatMap { board.groups(for: $0) }
-                .filter { $0.sport == wanted }
-                .flatMap(\.events)
-                .first { !($0.results ?? []).isEmpty }
-            guard let race else { return }
-            var next = NavigationPath()
-            next.append(race)
-            path = next
-            openedInitialRace = true
-        }
+        // `-TVScoresRace f1` opens that series' latest classified race (CI
+        // screenshots and the race flow). Checked on appearance as well as on
+        // the board arriving: the loader in front of the sidebar means this
+        // screen is usually mounted after the board is already here, and a
+        // watcher for the arrival would then never fire.
+        .onAppear(perform: openRequestedRace)
+        .onChange(of: store.board == nil) { _, _ in openRequestedRace() }
+    }
+
+    private func openRequestedRace() {
+        guard !openedInitialRace, let board = store.board, let wanted = Self.argument("-TVScoresRace") else { return }
+        let race = Day.allCases.flatMap { board.groups(for: $0) }
+            .filter { $0.sport == wanted }
+            .flatMap(\.events)
+            .first { !($0.results ?? []).isEmpty }
+        guard let race else { return }
+        var next = NavigationPath()
+        next.append(race)
+        path = next
+        openedInitialRace = true
     }
 
     private static func argument(_ name: String) -> String? {
