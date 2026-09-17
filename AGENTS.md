@@ -30,7 +30,9 @@ CHANGELOG.md  what each TestFlight build changed, for whoever installs it.
    `## Unreleased`, in the same commit. It is written for whoever installs the
    app, not for whoever wrote it, and the release job sends it to TestFlight as
    the build's "What to Test" note. Tooling and internal refactors do not
-   belong there.
+   belong there: a commit that touches the source without changing anything a
+   tester could notice carries a `Changelog: none` trailer instead, which the
+   audit honours and a reviewer can see.
 8. **Apple credentials stay out of the repo.** Enrollment is done and the App Store Connect API key is in
    `~/.config/tvscores/asc.env` plus GitHub secrets. Never commit a `.p8`, and never print a key. Releases go
    through the `TestFlight` workflow; see `docs/release.md`.
@@ -41,8 +43,15 @@ Every check the repository runs, in the order you need them:
 
 ```sh
 node scripts/audit.mjs   # must be clean before a push
-cd proxy && npm test     # 54 tests
+cd proxy && npm test     # the proxy
 ```
+
+The app's tests run on the CI runner, since there is no Mac here:
+`xcodebuild test -scheme TVScores -destination 'platform=tvOS Simulator,name=Apple TV'`
+runs the `Unit` suites (Swift Testing, hosted in the app) and then the
+`Flows` (XCUITest, one per screen, driven by the remote). The workflow does
+this before it takes the screenshots, and keeps `tests.xcresult` as an
+artifact when something fails.
 
 The `source-hygiene` skill wraps the audit and adds the judgement a script
 cannot make. Run it when asked about the state of the source.
@@ -138,9 +147,9 @@ Invariants worth keeping:
 
 Follow `docs/design-reference.md` (Apple Sports layout adapted to tvOS) for every screen. Judge each build on the screenshot against that note.
 
-The code behind it is named in `docs/design-system.md`: four levels — screen,
-section, row, element — each with its folder under `app/Sources/Views` and its
-name ending. Every measurement lives in `Views/Metrics.swift`; a view that
+The code behind it is named in `docs/design-system.md`: five levels — screen,
+section, row, element, chrome — each with its folder under `app/Sources/Views`
+and its name ending, and the tests under `app/Tests` mirror them. Every measurement lives in `Views/Metrics.swift`; a view that
 writes its own number is a bug, and rows all use `rowSurface(focused:)`.
 
 ## Open decisions (ask Julien, do not guess)

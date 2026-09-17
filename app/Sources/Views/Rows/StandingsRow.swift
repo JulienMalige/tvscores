@@ -11,6 +11,7 @@ struct StandingsRow: View {
             StandingsRowContent(entry: entry)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("standing.\(entry.pos)")
     }
 }
 

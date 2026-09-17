@@ -92,11 +92,13 @@ test("an ending we have never seen reads as live, not as scheduled", () => {
   // A game showing an unknown label is being played; calling it "scheduled"
   // would put a match in progress under tomorrow's fixtures.
   const nba = US.find((x) => x.strLeague === "NBA");
-  assert.equal(stateOf({ ...nba, strStatus: "Q4" }), "live");
-  assert.equal(stateOf({ ...nba, strStatus: "SOMETHING-NEW" }), "live");
-  assert.equal(stateOf({ ...nba, strStatus: "NS" }), "scheduled");
-  assert.equal(stateOf({ ...nba, strStatus: "FT" }), "final");
-  assert.equal(stateOf({ ...nba, strStatus: "PPD" }), "other");
+  // Judged an hour into the game: a status is only believed once it could be true.
+  const tipoff = Date.parse(nba.strTimestamp + "Z") + 3600e3;
+  assert.equal(stateOf({ ...nba, strStatus: "Q4" }, tipoff), "live");
+  assert.equal(stateOf({ ...nba, strStatus: "SOMETHING-NEW" }, tipoff), "live");
+  assert.equal(stateOf({ ...nba, strStatus: "NS" }, tipoff), "scheduled");
+  assert.equal(stateOf({ ...nba, strStatus: "FT" }, tipoff), "final");
+  assert.equal(stateOf({ ...nba, strStatus: "PPD" }, tipoff), "other");
 });
 
 test("a competition with no table is skipped, not fatal", async () => {
@@ -124,4 +126,26 @@ test("a fixture still 'not started' hours after kickoff is not shown as upcoming
   const e = normaliseEvent(row, { id: 4351, name: "Brasileirão", short: "BRA" }, "football", kickoff + 4 * 3600e3);
   assert.equal(e.status.detail, "No update", "and it says why it stopped");
   assert.equal(e.score.home, null, "without inventing a score");
+});
+
+test("postponed in any of its spellings is not a game in progress", () => {
+  // `PST` was missing from the set, so it fell through to "unknown means
+  // live" — and a live game is bucketed into today whatever its date, so a
+  // match postponed yesterday turned up as today's live fixture.
+  const row = find("Botafogo vs Grêmio");
+  for (const status of ["PPD", "PST", "POST", "POSTP"]) {
+    const e = normaliseEvent({ ...row, strStatus: status }, SERIE_A, "football", THEN);
+    assert.equal(e.status.state, "other", status);
+    assert.equal(e.status.detail, "Postponed", status);
+  }
+  assert.equal(stateOf({ ...row, strStatus: "CANC" }, THEN), "other");
+  assert.equal(stateOf({ ...row, strStatus: "AWD" }, THEN), "other");
+});
+
+test("nothing is live before its kickoff, whatever the status says", () => {
+  const row = find("Botafogo vs Grêmio"); // kicks off 2026-09-16T22:30Z
+  const kickoff = Date.parse("2026-09-16T22:30:00Z");
+  const odd = { ...row, strStatus: "SOMETHING-NEW" };
+  assert.equal(stateOf(odd, kickoff - 3 * 3600e3), "scheduled", "three hours before");
+  assert.equal(stateOf(odd, kickoff + 30 * 60e3), "live", "half an hour in");
 });

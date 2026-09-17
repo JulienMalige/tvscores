@@ -17,8 +17,9 @@ node scripts/audit.mjs
 ```
 
 It exits non-zero on any finding. The coverage figure it prints is the proxy
-only; the app has no test target at all, which is a known and deliberate gap
-rather than something to report every day. It covers: exports and modules nothing
+only: the app's tests are Swift and run on the CI runner, not here. Check the
+latest `tvOS build` run passed its "Run the tests" step rather than reporting
+the app as untested. It covers: exports and modules nothing
 imports, Swift types declared and never used, eight identical lines in two
 places, naming drift, files past 260 lines, leftover markers and commented-out
 code, documents naming files that do not exist, routes served but undocumented

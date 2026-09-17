@@ -29,6 +29,7 @@ struct SidebarRow: View {
             // came out towering over the crest beside it and over its own name.
             LeagueMark(sport: league.sport, logo: league.icon ?? league.logo, square: Self.disc)
         }
+        .accessibilityIdentifier("tab.\(league.sport).\(league.id.raw)")
     }
 }
 

@@ -11,6 +11,7 @@ struct MatchRow: View {
             MatchRowContent(event: event)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("match.\(event.id)")
     }
 }
 

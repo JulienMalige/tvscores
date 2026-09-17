@@ -6,7 +6,7 @@ etc." Before this, five kinds of row each invented their own height, and the
 standings rows came out short enough that the constructor badges crowded the
 edges of their card.
 
-## The four levels
+## The five levels
 
 Every view file lives in the folder of its level and ends with the level's name,
 so a file says what it is before you open it.
@@ -16,10 +16,14 @@ so a file says what it is before you open it.
 | **Screen** | `app/Sources/Views/Screens` | the scroll view, the page margins, the navigation | `HomeScreen`, `LeagueScreen`, `RaceScreen` |
 | **Section** | `app/Sources/Views/Sections` | a heading and the list under it | `LeagueSection`, `StandingsSection`, `PodiumSection`, `ResultSection` |
 | **Row** | `app/Sources/Views/Rows` | one focusable line, on the shared row surface | `MatchRow`, `RaceRow`, `StandingsRow`, `ResultRow` |
-| **Element** | `app/Sources/Views/Elements` | the atoms a row is made of | `TeamMark`, `PersonMark`, `LeagueMark`, `StatusLabel`, `DayTabs`, `EmptyDay` |
+| **Element** | `app/Sources/Views/Elements` | the atoms a row is made of | `TeamMark`, `PersonMark`, `LeagueMark`, `StatusLabel`, `EmptyDay`, `CachedImage` |
+| **Chrome** | `app/Sources/Views/Chrome` | navigation that outlives any one screen | `Sidebar`, `SidebarRow`, `DayTabs`, `ClockLabel`, `LaunchLoader` |
 
 Sections stack inside a screen; they never nest. A row never reaches outside
-itself for a measurement, and a screen never draws a row's insides.
+itself for a measurement, and a screen never draws a row's insides. Chrome is
+the exception to "everything lives on a screen": the sidebar wraps every
+screen, and tvOS draws it — which is why nothing in `Chrome/` is worth a
+snapshot test, and why its rows are given square icons rather than sizes.
 
 A **mark** is the identity image of something: a crest (`TeamMark`), a portrait
 (`PersonMark`), a competition (`LeagueMark`). All three are the same size in a
@@ -51,6 +55,18 @@ because on tvOS the driver's name and team stacked together are taller than a
 64-point portrait, and a match row is taller because of the score. Measured on
 the CI render, standings rows now repeat every 110 points (100 + `rowGap`); they
 used to be 76 with a 2-point gap, which is what crowded the badges.
+
+## The tests mirror the levels
+
+`app/Tests/Unit` holds Swift Testing suites named for a level — `Model`,
+`Elements`, `Chrome` — and judges the code without a screen: the bundled
+sample decodes, every status has its four translations, the image cache
+retries and forgets, the menu's league list survives a refresh.
+`app/Tests/Flows` holds one XCUITest per screen plus one for the sidebar,
+each driving the app in demo mode with `XCUIRemote`, the only cursor a
+television has. Rows and sections are covered through the screen that shows
+them; they do not exist on their own. Both run in CI before the screenshots,
+on the same simulator.
 
 ## Working on a screen
 

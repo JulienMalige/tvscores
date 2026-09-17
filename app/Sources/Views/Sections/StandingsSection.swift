@@ -47,6 +47,7 @@ struct StandingsSection: View {
                 Button(title(t.id)) { table = i }
                     .buttonStyle(.bordered)
                     .fontWeight(table == i ? .bold : .regular)
+                    .accessibilityIdentifier("table.\(t.id)")
             }
             Spacer()
         }

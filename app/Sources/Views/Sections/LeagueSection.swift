@@ -12,6 +12,7 @@ struct LeagueSection: View {
                     LeagueHeader(group: group, chevron: true)
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("league.\(group.sport).\(group.league.id.raw)")
             } else if showHeader {
                 LeagueHeader(group: group, chevron: false)
             }

@@ -43,10 +43,42 @@ targets:
         TARGETED_DEVICE_FAMILY: "3"
         ENABLE_PREVIEWS: "YES"
         ASSETCATALOG_COMPILER_APPICON_NAME: App Icon & Top Shelf Image
+  # Unit tests run inside the app, so they see its bundle — the sample JSON
+  # and the string catalogue — and its internals through @testable.
+  TVScoresTests:
+    type: bundle.unit-test
+    platform: tvOS
+    sources:
+      - path: Tests/Unit
+    dependencies:
+      - target: TVScores
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: "YES"
+        PRODUCT_BUNDLE_IDENTIFIER: com.julienmalige.tvscores.tests
+  # Flow tests drive the app from outside with the Siri Remote, one per screen.
+  TVScoresFlows:
+    type: bundle.ui-testing
+    platform: tvOS
+    sources:
+      - path: Tests/Flows
+    dependencies:
+      - target: TVScores
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: "YES"
+        PRODUCT_BUNDLE_IDENTIFIER: com.julienmalige.tvscores.flows
 schemes:
   TVScores:
     build:
       targets:
         TVScores: all
+        TVScoresTests: [test]
+        TVScoresFlows: [test]
     run:
       config: Debug
+    test:
+      config: Debug
+      targets:
+        - TVScoresTests
+        - TVScoresFlows

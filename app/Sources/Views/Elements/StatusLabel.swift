@@ -37,7 +37,7 @@ struct StatusLabel: View {
     }
 
     /// Endings worth folding into the "Final" line rather than printing below it.
-    private static let finalCombined: [String: String] = [
+    static let finalCombined: [String: String] = [
         "After overtime": "status.final.ot",
         "After extra time": "status.final.aet",
         "After penalties": "status.final.pen",
@@ -58,7 +58,7 @@ struct StatusLabel: View {
 
     /// The proxy sends English detail strings; map the known ones to the catalog.
     /// Built once: a dictionary literal traps at runtime if a key is repeated.
-    private static let detailKeys: [String: String] = [
+    static let detailKeys: [String: String] = [
         "Half-time": "status.halftime",
         "Extra time": "status.extratime",
         "Penalties": "status.penalties",

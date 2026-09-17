@@ -10,6 +10,8 @@ enum ScoreboardSource {
     static func resolve() -> ScoreboardSource {
         let args = ProcessInfo.processInfo.arguments
         if args.contains("-TVScoresDemo") { return .bundled }
+        // The app hosting a unit-test run is not a user: no proxy, no network.
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil { return .bundled }
         if let s = Bundle.main.object(forInfoDictionaryKey: "TVScoresProxyURL") as? String, let url = URL(string: s) {
             return .remote(url)
         }
@@ -36,10 +38,14 @@ final class ScoreboardStore {
     /// as a glitch rather than as loading.
     private(set) var ready = false
     let source: ScoreboardSource
+    /// Whether a board's pictures are decoded ahead of the screen. A test of
+    /// the model has no screen and no wish to fetch three hundred crests.
+    private let warmsImages: Bool
     private var task: Task<Void, Never>?
 
-    init(source: ScoreboardSource = .resolve()) {
+    init(source: ScoreboardSource = .resolve(), warmImages: Bool = true) {
         self.source = source
+        self.warmsImages = warmImages
     }
 
     func refresh() async {
@@ -50,7 +56,7 @@ final class ScoreboardStore {
             if fresh != board { board = fresh } // avoid re-rendering an unchanged board
             if fresh.leagues != leagues { leagues = fresh.leagues }
             error = nil
-            await warm(fresh)
+            if warmsImages { await warm(fresh) } else { ready = true }
         } catch {
             self.error = error.localizedDescription
         }

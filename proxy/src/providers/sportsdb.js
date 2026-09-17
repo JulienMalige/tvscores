@@ -14,13 +14,18 @@ const FINAL = new Set(["FT", "AET", "PEN", "AOT"]);
  * it is not.
  */
 const BELIEVE_NS_FOR = 3 * 3600e3;
-const NOT_PLAYED = new Set(["PPD", "POSTP", "CANC", "ABD"]);
+// Every spelling of "this was not played" we have seen. `PST` cost us a
+// postponed match shown as live — and, because a live game is bucketed into
+// today whatever its date, yesterday's postponement appeared as today's game.
+const NOT_PLAYED = new Set(["PPD", "PST", "POST", "POSTP", "CANC", "CANCL", "ABD", "AWD", "WO"]);
 
 /** The English detail strings the app's string catalogue already knows. */
 const DETAIL = {
   HT: "Half-time", ET: "Extra time", BT: "Break", P: "Penalties",
   AET: "After extra time", PEN: "After penalties", AOT: "After overtime",
-  PPD: "Postponed", POSTP: "Postponed", CANC: "Cancelled", ABD: "Abandoned",
+  PPD: "Postponed", PST: "Postponed", POST: "Postponed", POSTP: "Postponed",
+  CANC: "Cancelled", CANCL: "Cancelled", ABD: "Abandoned",
+  AWD: "Awarded", WO: "Walkover",
 };
 
 /** Quarters read as they do on a scoreboard; a football minute reads as "67'". */
@@ -62,11 +67,14 @@ const score = (v) => (v === null || v === undefined || v === "" ? null : Number(
 export function stateOf(row, now = Date.now()) {
   const short = row.strStatus || "";
   if (row.strPostponed === "yes" || NOT_PLAYED.has(short)) return STATE.other;
+  const start = Date.parse(startOf(row) || "");
   if (!short || short === "NS") {
-    const start = Date.parse(startOf(row) || "");
     return Number.isFinite(start) && now - start > BELIEVE_NS_FOR ? STATE.other : STATE.scheduled;
   }
   if (FINAL.has(short)) return STATE.final;
+  // Treating an unknown status as live is deliberate — a quarter we have never
+  // seen is a game being played — but nothing is being played before kickoff.
+  if (Number.isFinite(start) && now < start - 15 * 60e3) return STATE.scheduled;
   return STATE.live;
 }
 

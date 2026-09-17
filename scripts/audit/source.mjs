@@ -20,7 +20,9 @@ function deadCode({ js, jsAll, swift, sources, rel, read }, report) {
     const imported = jsAll.some((other) => other !== file && read(other).includes(`/${name}"`));
     if (!imported) report("dead code", rel(file), "no module imports this file");
   }
-  for (const file of swift) {
+  // A test suite is found by the runner, never named by our code: it is an
+  // entry point, like @main, and it lives under app/Tests to say so.
+  for (const file of swift.filter((f) => !rel(f).startsWith("app/Tests/"))) {
     const text = read(file);
     // @main is named by the runtime, not by our code.
     const declared = [...text.matchAll(/^(?!@)(?:public\s+|private\s+|final\s+)*(?:struct|enum|actor|class)\s+([A-Z][\w]*)/gm)]

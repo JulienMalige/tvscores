@@ -32,14 +32,26 @@ function routes({ root, read }, report) {
   }
 }
 
-/** Anything a tester could notice is supposed to be written down as it lands. */
+/**
+ * Anything a tester could notice is supposed to be written down as it lands.
+ *
+ * A commit that changes the source without changing anything a tester could
+ * notice says so with a `Changelog: none` trailer — a declaration a reviewer
+ * can see and disagree with, rather than a line invented for the release
+ * note to keep this check quiet.
+ */
 function changelog({ root, git }, report) {
   const lastEntry = git("log", "-1", "--format=%H", "--", "CHANGELOG.md");
   if (!lastEntry) return;
-  const since = git("log", `${lastEntry}..HEAD`, "--format=%h %s", "--", "app/Sources", "proxy/src")
-    .split("\n")
-    .filter(Boolean);
-  for (const commit of since) report("changelog", "CHANGELOG.md", `nothing written for ${commit}`);
+  const commits = git("log", `${lastEntry}..HEAD`, "--format=%h %s%x1f%B%x1e", "--", "app/Sources", "proxy/src")
+    .split("\x1e")
+    .map((c) => c.trim())
+    .filter(Boolean)
+    .map((c) => c.split("\x1f"));
+  for (const [line, body] of commits) {
+    if (/^Changelog:\s*none\s*$/mi.test(body)) continue;
+    report("changelog", "CHANGELOG.md", `nothing written for ${line}`);
+  }
 }
 
 /**

@@ -11,6 +11,7 @@ struct DayTabs: View {
             ForEach(Day.allCases) { d in
                 DayPill(title: title(d), isSelected: selected == d) { selected = d }
                     .focused($focused, equals: d)
+                    .accessibilityIdentifier("day.\(d.rawValue)")
             }
             Spacer()
         }

@@ -9,6 +9,7 @@ struct RaceRow: View {
             RaceRowContent(event: event)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("race.\(event.id)")
     }
 }
 

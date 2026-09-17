@@ -52,6 +52,38 @@ jobs:
             build 2>&1 | tee build.log | grep -E "error:|warning:|BUILD" || true
           grep -q "BUILD SUCCEEDED" build.log
 
+      # The model and the elements first, in seconds and without a screen;
+      # then the flows, driven by the remote on the same simulator the
+      # screenshots use. A failing flow leaves its own screenshots behind.
+      - name: Run the tests
+        run: |
+          set -o pipefail
+          UDID=$(xcrun simctl list devices available -j \
+            | jq -r '.devices | to_entries[] | select(.key | test("tvOS")) | .value[] | select(.name | test("^Apple TV( 4K)?")) | .udid' \
+            | head -1)
+          xcrun simctl boot "$UDID" 2>/dev/null || true
+          xcrun simctl bootstatus "$UDID" -b
+          SIMCTL_CHILD_TZ=America/Sao_Paulo xcodebuild \
+            -project TVScores.xcodeproj \
+            -scheme TVScores \
+            -destination "id=$UDID" \
+            -derivedDataPath build \
+            -resultBundlePath tests.xcresult \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            test 2>&1 | tee test.log | grep -E "error:|Test Suite|Test Case|passed|failed|BUILD|\*\* TEST" || true
+          grep -qE "TEST SUCCEEDED" test.log
+
+      - name: Keep the test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            app/test.log
+            app/tests.xcresult
+          if-no-files-found: ignore
+
       - name: Run in simulator and take screenshots
         run: |
           set -euo pipefail

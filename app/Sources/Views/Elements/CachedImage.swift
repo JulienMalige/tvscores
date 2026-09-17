@@ -11,6 +11,18 @@ import UIKit
 final class ImageCache {
     static let shared = ImageCache()
 
+    typealias Fetch = (URLRequest) async throws -> (Data, URLResponse)
+    private let fetch: Fetch
+    /// How long a failure is held against a URL before it is asked for again.
+    private let forget: TimeInterval
+    /// Attempts made, for a test to count; nothing else reads it.
+    private(set) var attempts = 0
+
+    init(fetch: @escaping Fetch = { try await URLSession.shared.data(for: $0) }, forget: TimeInterval = 60) {
+        self.fetch = fetch
+        self.forget = forget
+    }
+
     private let memory: NSCache<NSURL, UIImage> = {
         let cache = NSCache<NSURL, UIImage>()
         // Crests and portraits are small; a board's worth is a few megabytes.
@@ -25,7 +37,6 @@ final class ImageCache {
     /// it. The time matters: a failure on a television's wifi is usually a
     /// blip, and remembering it for ever is how a crest never appears again.
     private var failedAt: [URL: Date] = [:]
-    private let forget: TimeInterval = 60
 
     func image(for url: URL) -> UIImage? {
         memory.object(forKey: url as NSURL)
@@ -53,7 +64,8 @@ final class ImageCache {
             if attempt > 0 { try? await Task.sleep(for: .milliseconds(400 << attempt)) }
             var request = URLRequest(url: url)
             request.timeoutInterval = 15
-            guard let (data, response) = try? await URLSession.shared.data(for: request) else { continue }
+            attempts += 1
+            guard let (data, response) = try? await fetch(request) else { continue }
             guard (response as? HTTPURLResponse).map({ (200..<300).contains($0.statusCode) }) ?? true,
                   let image = UIImage(data: data) else { continue }
             memory.setObject(image, forKey: url as NSURL, cost: data.count)

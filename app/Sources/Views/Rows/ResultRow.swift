@@ -52,5 +52,6 @@ struct ResultRow: View {
         // at the top and most of the field unreachable.
         .focusable()
         .focused($isFocused)
+        .accessibilityIdentifier("result.\(result.pos.map(String.init) ?? "dnf")")
     }
 }
