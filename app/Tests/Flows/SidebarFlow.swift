@@ -56,12 +56,21 @@ final class SidebarFlow: FlowCase {
         app.buttons["table.drivers"].appears(within: 10)
     }
 
+    /// Where focus is, for the log: the one fact that separates "the page
+    /// took focus back" from "the menu closed on its own".
+    private func reportFocus(_ app: XCUIApplication, _ when: String) {
+        let focused = app.descendants(matching: .any).matching(NSPredicate(format: "hasFocus == 1")).allElementsBoundByIndex
+        let names = focused.prefix(3).map { "\($0.elementType.rawValue):\($0.identifier.isEmpty ? $0.label : $0.identifier)" }
+        print("TREE| focus \(when): \(names.isEmpty ? "nowhere" : names.joined(separator: ", "))")
+    }
+
     func testMenuStaysOpenWhileTheBoardRefreshes() {
         // Both halves of "it opens and closes": focus being taken back by the
         // page, and the menu being rebuilt under a refresh. The demo board
         // reloads every 30 s while a live match is in it; 40 s covers one.
         let app = Flow.launch()
         openSidebar(app)
+        reportFocus(app, "just after opening")
         // Watched second by second, so a failure says when it shut: at once
         // is focus being taken; at thirty seconds is the refresh.
         let f1 = row(app, "Formula 1")
@@ -70,7 +79,25 @@ final class SidebarFlow: FlowCase {
             sleep(1)
             if !isOpen(f1) { shutAt = second; break }
         }
-        if let shutAt { print("TREE| the menu shut after \(shutAt)s") }
+        if let shutAt {
+            print("TREE| the menu shut after \(shutAt)s")
+            reportFocus(app, "after it shut")
+        }
         XCTAssertNil(shutAt, "the menu is still open after a refresh; it shut after \(shutAt ?? 0)s")
+    }
+
+    func testMenuStaysOpenWhileInUse() {
+        // A person in the menu is moving through it. Whatever closes an idle
+        // menu, one being used must survive a refresh: this walks up and down
+        // every few seconds across the 30 s reload and expects it drawn
+        // throughout.
+        let app = Flow.launch()
+        openSidebar(app)
+        let f1 = row(app, "Formula 1")
+        for step in 0..<8 {
+            Flow.remote.press(step % 2 == 0 ? .down : .up)
+            sleep(5)
+            XCTAssertTrue(isOpen(f1), "the menu is still drawn \((step + 1) * 5)s in, while in use")
+        }
     }
 }
