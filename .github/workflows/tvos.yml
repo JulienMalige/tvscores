@@ -74,6 +74,14 @@ jobs:
             test 2>&1 | tee test.log | grep -E "error:|Test Suite|Test Case|passed|failed|BUILD|\*\* TEST|^TREE\|" || true
           grep -qE "TEST SUCCEEDED" test.log
 
+      # A flow that loses its app has caught a crash. Keep the report before
+      # the screenshot step clears the folder for its own launch.
+      - name: Keep any crash the tests caused
+        if: always()
+        run: |
+          mkdir -p test-crashes
+          cp ~/Library/Logs/DiagnosticReports/TVScores*.ips test-crashes/ 2>/dev/null && ls test-crashes || echo "no crash report from the tests"
+
       - name: Keep the test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -81,7 +89,7 @@ jobs:
           name: test-results
           path: |
             app/test.log
-            app/tests.xcresult
+            app/test-crashes
           if-no-files-found: ignore
 
       # Even after a failing test: the pictures are the evidence a failure

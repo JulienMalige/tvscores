@@ -16,7 +16,8 @@ final class ImageCache {
     /// How long a failure is held against a URL before it is asked for again.
     private let forget: TimeInterval
     /// Attempts made, for a test to count; nothing else reads it.
-    private(set) var attempts = 0
+    private var attemptCount = 0
+    var attempts: Int { lock.withLock { attemptCount } }
 
     init(fetch: @escaping Fetch = { try await URLSession.shared.data(for: $0) }, forget: TimeInterval = 60) {
         self.fetch = fetch
@@ -36,19 +37,27 @@ final class ImageCache {
     /// what people see first and the real thing looks like a glitch replacing
     /// it. The time matters: a failure on a television's wifi is usually a
     /// blip, and remembering it for ever is how a crest never appears again.
+    ///
+    /// Behind a lock, because the prefetcher loads four at a time while rows
+    /// load their own: a Swift dictionary written from two tasks at once is
+    /// memory corruption, and the flows caught the app dying that way.
+    /// NSCache is safe on its own; this is the state around it that is not.
     private var failedAt: [URL: Date] = [:]
+    private let lock = NSLock()
 
     func image(for url: URL) -> UIImage? {
         memory.object(forKey: url as NSURL)
     }
 
     func hasFailed(_ url: URL) -> Bool {
-        guard let at = failedAt[url] else { return false }
-        if Date().timeIntervalSince(at) > forget {
-            failedAt[url] = nil
-            return false
+        lock.withLock {
+            guard let at = failedAt[url] else { return false }
+            if Date().timeIntervalSince(at) > forget {
+                failedAt[url] = nil
+                return false
+            }
+            return true
         }
-        return true
     }
 
     /// The decoded image, from memory if it is there and from the proxy if not.
@@ -64,15 +73,15 @@ final class ImageCache {
             if attempt > 0 { try? await Task.sleep(for: .milliseconds(400 << attempt)) }
             var request = URLRequest(url: url)
             request.timeoutInterval = 15
-            attempts += 1
+            lock.withLock { attemptCount += 1 }
             guard let (data, response) = try? await fetch(request) else { continue }
             guard (response as? HTTPURLResponse).map({ (200..<300).contains($0.statusCode) }) ?? true,
                   let image = UIImage(data: data) else { continue }
             memory.setObject(image, forKey: url as NSURL, cost: data.count)
-            failedAt[url] = nil
+            lock.withLock { failedAt[url] = nil }
             return image
         }
-        failedAt[url] = Date()
+        lock.withLock { failedAt[url] = Date() }
         return nil
     }
 }
