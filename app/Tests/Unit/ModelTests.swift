@@ -65,7 +65,7 @@ struct ModelTests {
         // A start decoded in the wrong zone lands hours from every other start
         // of the same fixture list; none is more than nine days from generation.
         for e in events {
-            #expect(abs(e.start.timeIntervalSince(board.generatedAt)) < 9 * 86400, e.id)
+            #expect(abs(e.start.timeIntervalSince(board.generatedAt)) < 9 * 86400, "\(e.id)")
         }
     }
 }
