@@ -26,7 +26,7 @@ struct Sidebar: View {
         }
         .task { store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
-        .onChange(of: store.board?.leagues.count ?? 0) { _, _ in openRequestedLeague() }
+        .onChange(of: store.leagues.count) { _, _ in openRequestedLeague() }
     }
 
     private var tabs: some View {
@@ -37,9 +37,12 @@ struct Sidebar: View {
                 Label("tab.home", systemImage: "house")
             }
 
+            // `day` is deliberately not passed from the binding: a league page
+            // takes it once, at creation, and reading the live value here would
+            // rebuild every tab in the menu each time the day pills are used.
             ForEach(leagues) { league in
                 Tab(value: Selection.league(key(league))) {
-                    LeaguePage(league: league, store: store, day: day)
+                    LeaguePage(league: league, store: store, day: Self.initialDay())
                 } label: {
                     SidebarRow(league: league)
                 }
@@ -48,14 +51,14 @@ struct Sidebar: View {
         .tabViewStyle(.sidebarAdaptable)
     }
 
-    private var leagues: [LeagueSummary] { store.board?.leagues ?? [] }
+    private var leagues: [LeagueSummary] { store.leagues }
 
     private func key(_ league: LeagueSummary) -> String { "\(league.sport):\(league.id.raw)" }
 
     /// `-TVScoresLeague f1` opens that competition (CI screenshots).
     private func openRequestedLeague() {
         guard let wanted = Self.argument("-TVScoresLeague"),
-              let hit = (store.board?.leagues ?? []).first(where: { $0.sport == wanted || $0.id.raw == wanted })
+              let hit = store.leagues.first(where: { $0.sport == wanted || $0.id.raw == wanted })
         else { return }
         selection = .league(key(hit))
     }

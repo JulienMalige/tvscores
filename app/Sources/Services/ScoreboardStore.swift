@@ -21,6 +21,13 @@ enum ScoreboardSource {
 @Observable
 final class ScoreboardStore {
     private(set) var board: Scoreboard?
+    /// The competitions, held apart from the board and replaced only when the
+    /// list itself changes.
+    ///
+    /// The board is replaced every time a score moves — twice a minute while
+    /// a game is on — and the sidebar is built from this. Handing it a fresh
+    /// array that often rebuilds the menu under whoever is reading it.
+    private(set) var leagues: [LeagueSummary] = []
     private(set) var error: String?
     private(set) var loading = false
     /// False until the first board has arrived *and* its competition marks are
@@ -41,6 +48,7 @@ final class ScoreboardStore {
         do {
             let fresh = try await load()
             if fresh != board { board = fresh } // avoid re-rendering an unchanged board
+            if fresh.leagues != leagues { leagues = fresh.leagues }
             error = nil
             await warm(fresh)
         } catch {

@@ -8,6 +8,9 @@ notes when a version ships.
 
 ## Unreleased
 
+- The menu no longer rebuilds itself under you while you are reading it,
+  which was making it hard to open and keep open.
+
 - The competition marks in the sidebar stand on their own — no disc behind
   them, and Serie A without the white box its badge is printed on.
 
