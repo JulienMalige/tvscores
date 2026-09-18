@@ -30,12 +30,16 @@ struct TopTabs: View {
     private var tabs: some View {
         TabView(selection: $page) {
             ForEach(Day.allCases) { day in
-                Tab(title(day), value: Page.day(day)) {
+                Tab(value: Page.day(day)) {
                     DayScreen(store: store, day: day)
+                } label: {
+                    Text(title(day))
                 }
             }
-            Tab("tab.competitions", value: Page.competitions) {
+            Tab(value: Page.competitions) {
                 CompetitionsScreen(store: store, day: Self.initialDay())
+            } label: {
+                Text("tab.competitions")
             }
         }
         .tabViewStyle(.tabBarOnly)
