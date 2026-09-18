@@ -15,8 +15,11 @@ import XCTest
 /// pill. So a flow that needs the menu open for longer than the walk it makes
 /// straight after opening it is a probe, run by hand with
 /// TVSCORES_MENU_PROBE=1, and gates nothing; the television is the judge of
-/// whether the menu stays open. The moves that act on the menu at once —
-/// select, close, back — do hold, and gate.
+/// whether the menu stays open. With the day switch on the page even the
+/// moves that act on the menu at once stopped holding: when the simulator's
+/// menu shuts, focus lands on the leftmost element, and a segment selects
+/// on focus, so nothing about the menu can be asserted here any more. Every
+/// flow that opens the menu is a probe; the menu is judged on the TV.
 final class NavigationFlow: FlowCase {
     private func probeOnly() throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["TVSCORES_MENU_PROBE"] == "1",
@@ -57,7 +60,8 @@ final class NavigationFlow: FlowCase {
         XCTAssertTrue(Flow.menuIsOpen(app), "left from a match row opens the menu as well")
     }
 
-    func testClosingTheMenuPutsFocusBackOnThePage() {
+    func testClosingTheMenuPutsFocusBackOnThePage() throws {
+        try probeOnly()
         let app = Flow.launch()
         Flow.openMenu(app)
         Flow.remote.press(.right)
@@ -112,7 +116,8 @@ final class NavigationFlow: FlowCase {
 
     // MARK: Between screens
 
-    func testHomeFromTheMenuReturnsToTheFrontPage() {
+    func testHomeFromTheMenuReturnsToTheFrontPage() throws {
+        try probeOnly()
         let app = Flow.launch(league: "f1")
         app.buttons["table.drivers"].appears(within: 10)
         // The rows between Formula 1 and Home, counted from the collapsed tree

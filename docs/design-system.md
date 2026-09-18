@@ -74,9 +74,10 @@ Both run in CI before the screenshots, on the same simulator.
 One thing the simulator cannot judge: whether the system sidebar stays open.
 Driven by `XCUIRemote` it shuts within a second of opening — for a bare
 three-tab `TabView` as much as for ours (settled 2026-09-17, eight CI runs
-bisecting every piece of the app). Flows that act on the menu at once —
-select, close, back — hold and gate; flows that need it held open are probes
-behind `TVSCORES_MENU_PROBE=1`, and the television is the judge.
+bisecting every piece of the app). Every flow that opens the menu is a probe
+behind `TVSCORES_MENU_PROBE=1`, and the television is the judge: with the
+day switch on the page, a menu that shuts drops focus onto a segment, which
+selects it, so not even "open and pick" can be asserted there.
 
 ## Working on a screen
 

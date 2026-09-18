@@ -1,10 +1,13 @@
 import XCTest
 
-/// The menu: it opens and takes you to the competition you pick. Whether it
-/// stays open is not something the simulator can say — see NavigationFlow.
+/// The menu: it opens and takes you to the competition you pick. Not
+/// something the simulator can say — see NavigationFlow — so this is a probe
+/// for the next time the menu is suspected, run by hand.
 final class SidebarFlow: FlowCase {
 
-    func testSelectingACompetitionOpensItsPage() {
+    func testSelectingACompetitionOpensItsPage() throws {
+        try XCTSkipUnless(ProcessInfo.processInfo.environment["TVSCORES_MENU_PROBE"] == "1",
+                          "the simulator cannot drive the menu; set TVSCORES_MENU_PROBE=1 to probe by hand")
         let app = Flow.launch()
         // A system-drawn row does not report focus, so the walk is counted.
         // The collapsed menu already lists every row in order, so the count is
