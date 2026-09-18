@@ -21,6 +21,17 @@ struct DayTabs: View {
         // re-ran on every reappearance and pulled focus around the page.
         .defaultFocus($focused, selected)
         .focusSection()
+        // Picking a day swaps the pill for its filled twin — two system
+        // styles, not one restyled, because a wrapped style loses the fill —
+        // and the focus engine loses the view it was on. Put focus back on
+        // the day just picked, a beat later so the new pill exists to take
+        // it. On a pick only, never on appearance.
+        .onChange(of: selected) { _, now in
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(80))
+                focused = now
+            }
+        }
     }
 
     /// A day, filled when it is the one being shown.
@@ -37,20 +48,12 @@ struct DayTabs: View {
         let pick: () -> Void
 
         var body: some View {
-            // One button whose style changes, not two buttons swapped: the
-            // swap destroyed the focused control, and focus fell to the
-            // leading pill — "Yesterday lit while Today's games are shown".
-            Button(title, action: pick)
-                .buttonStyle(isSelected ? DayStyle(.borderedProminent) : DayStyle(.bordered))
+            if isSelected {
+                Button(title, action: pick).buttonStyle(.borderedProminent)
+            } else {
+                Button(title, action: pick).buttonStyle(.bordered)
+            }
         }
-    }
-
-    /// Either system pill style behind one type, so the button keeps its
-    /// identity when the day it shows becomes the selected one.
-    private struct DayStyle: PrimitiveButtonStyle {
-        private let make: (Configuration) -> AnyView
-        init<S: PrimitiveButtonStyle>(_ style: S) { make = { AnyView(style.makeBody(configuration: $0)) } }
-        func makeBody(configuration: Configuration) -> some View { make(configuration) }
     }
 
     private func title(_ d: Day) -> LocalizedStringKey {
