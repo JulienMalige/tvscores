@@ -8,15 +8,10 @@ notes when a version ships.
 
 ## Unreleased
 
-- The menu is gone; in its place, tabs along the top — Yesterday, Today,
-  Upcoming and Competitions. Move up to reach them, left and right to switch,
-  down to read. The Competitions tab lists every competition we follow,
-  playing this week or not, each opening its own page as before.
-
-- The day pills now live only on a competition's page, and the day being
-  shown is in bold, as the standings picker already does. The fill promised
-  in build 15 never showed on a television: tvOS draws an unfocused filled
-  pill exactly like a plain one.
+- Yesterday, Today and Upcoming are now the system's own day switch — the
+  joined segments tvOS uses — under the title on the left. A day is chosen as
+  the remote reaches it, no click; the one you are on is white, the one
+  being shown stays grey once you move down into the list.
 
 - A competition's heading on a day page can be reached with the remote from
   the row beneath it and from the tabs above; it was being stepped over.

@@ -30,7 +30,7 @@ final class RaceScreenFlow: FlowCase {
         sleep(1) // let the push settle before asking to leave it
         Flow.focusThePage()
         Flow.remote.press(.menu)
-        XCTAssertTrue(app.staticTexts["page.yesterday"].waitForExistence(timeout: 8), "back lands on the day the race was opened from")
+        XCTAssertTrue(Flow.day(app, "yesterday").waitForExistence(timeout: 8), "back lands on the day the race was opened from")
         XCTAssertFalse(app.staticTexts["Race Result"].exists, "and the race page is gone")
     }
 }

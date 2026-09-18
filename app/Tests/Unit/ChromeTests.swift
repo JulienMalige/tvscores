@@ -2,15 +2,15 @@ import Foundation
 import Testing
 @testable import TVScores
 
-/// The chrome: what the Competitions list is built from, and what it is fed.
+/// The chrome: what the menu is built from, and what it is fed.
 @Suite("Chrome")
 struct ChromeTests {
     @Test("the league list survives a refresh that changed nothing but scores")
     @MainActor
     func leagueListIsStable() async {
-        // The Competitions list is built from this. A fresh array twice a
-        // minute would rebuild it under whoever is reading it. Same
-        // competitions in, same array out.
+        // The sidebar is built from this. A fresh array twice a minute would
+        // rebuild the menu under whoever is reading it. Same competitions in,
+        // same array out.
         let store = ScoreboardStore(source: .bundled(), warmImages: false)
         await store.refresh()
         let first = store.leagues
@@ -52,8 +52,8 @@ struct ChromePictureTests {
 
     @Test("the competition marks are warmed before anything else, both shapes of them")
     func marksComeFirst() throws {
-        // The headings and the Competitions list are drawn from them, and
-        // they are what the eye lands on first. So they head the list.
+        // The headings and the sidebar are drawn from them, and they are
+        // what the eye lands on first. So they head the list.
         let board = try Self.board()
         let urls = board.imageURLs.compactMap { $0 }
         let marks = Set(board.leagues.flatMap { [$0.logo, $0.icon] }.compactMap { $0 })

@@ -13,19 +13,20 @@ so a file says what it is before you open it.
 
 | Level | Folder | What it owns | Members |
 |---|---|---|---|
-| **Screen** | `app/Sources/Views/Screens` | the scroll view, the page margins, the navigation | `DayScreen`, `CompetitionsScreen`, `LeagueScreen`, `RaceScreen` |
+| **Screen** | `app/Sources/Views/Screens` | the scroll view, the page margins, the navigation | `HomeScreen`, `LeagueScreen`, `RaceScreen` |
 | **Section** | `app/Sources/Views/Sections` | a heading and the list under it | `LeagueSection`, `StandingsSection`, `PodiumSection`, `ResultSection` |
-| **Row** | `app/Sources/Views/Rows` | one focusable line, on the shared row surface | `MatchRow`, `RaceRow`, `StandingsRow`, `ResultRow`, `CompetitionRow` |
+| **Row** | `app/Sources/Views/Rows` | one focusable line, on the shared row surface | `MatchRow`, `RaceRow`, `StandingsRow`, `ResultRow` |
 | **Element** | `app/Sources/Views/Elements` | the atoms a row is made of | `TeamMark`, `PersonMark`, `LeagueMark`, `StatusLabel`, `EmptyDay`, `CachedImage` |
-| **Chrome** | `app/Sources/Views/Chrome` | navigation that outlives any one screen | `TopTabs`, `DayTabs`, `ClockLabel`, `LaunchLoader` |
+| **Chrome** | `app/Sources/Views/Chrome` | navigation that outlives any one screen | `Sidebar`, `SidebarRow`, `DayTabs`, `ClockLabel`, `LaunchLoader` |
 
 Sections stack inside a screen; they never nest. A row never reaches outside
 itself for a measurement, and a screen never draws a row's insides. Chrome is
-the exception to "everything lives on a screen": the tab bar holds every
-screen, and tvOS draws it — four entries, Yesterday · Today · Upcoming ·
-Competitions, which is what that bar was made for. It replaced a sixteen-row
-sidebar on 2026-09-18: tvOS 18's sidebar is documented to lose its focus past
-seven entries, and the simulator could not hold it open at all.
+the exception to "everything lives on a screen": the sidebar wraps every
+screen, and tvOS draws it — which is why nothing in `Chrome/` is worth a
+snapshot test, and why its rows are given square icons rather than sizes.
+`DayTabs` is the system's segmented control, not buttons of ours: tvOS chooses
+a segment as focus reaches it and keeps focus where it belongs (tried on
+2026-09-18 as a top tab bar with a Competitions tab; Julien wants the menu).
 
 A **mark** is the identity image of something: a crest (`TeamMark`), a portrait
 (`PersonMark`), a competition (`LeagueMark`). All three are the same size in a
@@ -64,15 +65,19 @@ used to be 76 with a 2-point gap, which is what crowded the badges.
 `Elements`, `Chrome` — and judges the code without a screen: the bundled
 sample decodes, every status has its four translations, the image cache
 retries and forgets, the menu's league list survives a refresh.
-`app/Tests/Flows` holds one XCUITest per screen and `NavigationFlow` for
-what joins them — the tab bar coming down on focus up and switching on focus,
+`app/Tests/Flows` holds one XCUITest per screen, one for the sidebar, and
+`NavigationFlow` for what joins them — where focus lands, the menu opening,
 a press taking you somewhere and back — each driving the app in demo mode
 with `XCUIRemote`, the only cursor a television has. Rows and sections are
 covered through the screen that shows them; they do not exist on their own.
-Both run in CI before the screenshots, on the same simulator. The tab bar
-reports focus and can be asserted from outside; the sidebar it replaced could
-not be (eight CI runs on 2026-09-17 showed a bare `TabView` sidebar shutting
-by itself under `XCUIRemote`), which is one of the reasons it went.
+Both run in CI before the screenshots, on the same simulator.
+
+One thing the simulator cannot judge: whether the system sidebar stays open.
+Driven by `XCUIRemote` it shuts within a second of opening — for a bare
+three-tab `TabView` as much as for ours (settled 2026-09-17, eight CI runs
+bisecting every piece of the app). Flows that act on the menu at once —
+select, close, back — hold and gate; flows that need it held open are probes
+behind `TVSCORES_MENU_PROBE=1`, and the television is the judge.
 
 ## Working on a screen
 

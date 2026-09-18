@@ -30,34 +30,6 @@
         }
       }
     },
-    "competitions.noGames": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No games this week"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rien cette semaine"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nada esta semana"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nada esta semana"
-          }
-        }
-      }
-    },
     "home.empty": {
       "localizations": {
         "en": {
@@ -369,6 +341,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Parrilla"
+          }
+        }
+      }
+    },
+    "sidebar.noGames": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No games this week"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien cette semaine"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada esta semana"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada esta semana"
           }
         }
       }
@@ -1160,30 +1160,58 @@
         }
       }
     },
-    "tab.competitions": {
+    "tab.day": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Competitions"
+            "value": "Day"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Compétitions"
+            "value": "Jour"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Competições"
+            "value": "Dia"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Competiciones"
+            "value": "Día"
+          }
+        }
+      }
+    },
+    "tab.home": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Home"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accueil"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Início"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inicio"
           }
         }
       }
