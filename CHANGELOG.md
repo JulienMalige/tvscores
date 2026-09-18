@@ -13,8 +13,8 @@ notes when a version ships.
   the remote reaches it, no click; the one you are on is white, the one
   being shown stays grey once you move down into the list.
 
-- A competition's heading on a day page can be reached with the remote from
-  the row beneath it and from the tabs above; it was being stepped over.
+- A competition's heading on the front page can be reached with the remote
+  from the row beneath it; it was being stepped over.
 
 ## 1.0 build 16 — 17 September 2026
 - The day being shown is filled in, so it no longer looks as though you are

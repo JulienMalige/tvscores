@@ -25,8 +25,7 @@ the exception to "everything lives on a screen": the sidebar wraps every
 screen, and tvOS draws it — which is why nothing in `Chrome/` is worth a
 snapshot test, and why its rows are given square icons rather than sizes.
 `DayTabs` is the system's segmented control, not buttons of ours: tvOS chooses
-a segment as focus reaches it and keeps focus where it belongs (tried on
-2026-09-18 as a top tab bar with a Competitions tab; Julien wants the menu).
+a segment as focus reaches it and keeps focus where it belongs.
 
 A **mark** is the identity image of something: a crest (`TeamMark`), a portrait
 (`PersonMark`), a competition (`LeagueMark`). All three are the same size in a
