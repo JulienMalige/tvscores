@@ -40,7 +40,8 @@ final class DayScreenFlow: FlowCase {
         let app = Flow.launch(tab: "today")
         let header = app.buttons["league.football.4501"]
         header.appears()
-        XCTAssertTrue(Flow.walk(.down, until: header), "focus reaches the Libertadores header")
+        // Focus starts on a row of the list; the header is above it.
+        XCTAssertTrue(Flow.walk(.up, until: header, limit: 6), "focus reaches the Libertadores header")
         Flow.remote.press(.select)
         // A cup has no table; what says "league page" is the Standings heading.
         app.staticTexts["Standings"].appears(within: 10)

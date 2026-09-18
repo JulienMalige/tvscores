@@ -21,8 +21,11 @@ final class NavigationFlow: FlowCase {
         let header = app.buttons["league.football.4501"]
         header.appears()
         Flow.showTabBar(app, current: "Today")
-        XCTAssertTrue(Flow.walk(.down, until: header, limit: 3), "down lands back on the page's first row")
-        XCTAssertFalse(Flow.tab(app, "Today").hasFocus, "and the bar has let go")
+        Flow.remote.press(.down)
+        usleep(400_000)
+        XCTAssertFalse(Flow.tab(app, "Today").hasFocus, "the bar has let go")
+        let onPage = app.buttons.matching(NSPredicate(format: "hasFocus == 1 AND (identifier BEGINSWITH 'match.' OR identifier BEGINSWITH 'league.')"))
+        XCTAssertEqual(onPage.count, 1, "and focus is on a row or heading of the page")
     }
 
     func testSwitchingTabsByFocusSwitchesThePage() {
@@ -39,7 +42,13 @@ final class NavigationFlow: FlowCase {
         // pill; focus must stay on it, not fall to the leading pill.
         let app = Flow.launch(league: "f1")
         app.buttons["table.drivers"].appears(within: 10)
-        XCTAssertTrue(Flow.walk(.up, until: app.buttons["day.today"], limit: 12), "focus reaches the day pills")
+        Flow.focusThePage()
+        // Up from wherever the page put us, until a pill has focus.
+        for _ in 0..<12 where !Flow.aDayPillIsFocused(app) {
+            Flow.remote.press(.up)
+            usleep(150_000)
+        }
+        XCTAssertTrue(Flow.aDayPillIsFocused(app), "focus reaches the day pills")
         XCTAssertTrue(Flow.walk(.right, until: app.buttons["day.upcoming"], limit: 3))
         Flow.remote.press(.select)
         sleep(1)

@@ -52,6 +52,22 @@ enum Flow {
         XCTAssertTrue(ok, "focus up reaches the \(current) tab", file: file, line: line)
     }
 
+    /// A page opened by launch argument arrives with focus still on the tab
+    /// bar — a person opens a page from a focused row and never lands this
+    /// way, and a Menu press on the bar leaves the app. Two presses down put
+    /// focus on the page, as theirs would be.
+    static func focusThePage() {
+        for _ in 0..<2 {
+            remote.press(.down)
+            usleep(400_000)
+        }
+    }
+
+    /// Whether any of the day pills on a competition's page has focus.
+    static func aDayPillIsFocused(_ app: XCUIApplication) -> Bool {
+        ["yesterday", "today", "upcoming"].contains { app.buttons["day.\($0)"].hasFocus }
+    }
+
     /// Where focus is, for the log: what separates "the page took focus"
     /// from "focus went nowhere". The heaviest query there is; ask only once
     /// something has already gone wrong.

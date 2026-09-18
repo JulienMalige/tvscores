@@ -17,6 +17,7 @@ final class RaceScreenFlow: FlowCase {
         let tenth = app.staticTexts.matching(identifier: "result.10").firstMatch
         XCTAssertTrue(tenth.exists, "the tenth finisher is in the list")
         XCTAssertGreaterThan(tenth.frame.minY, 1080, "and starts below the fold")
+        Flow.focusThePage()
         for _ in 0..<14 where tenth.frame.maxY > 1000 {
             Flow.remote.press(.down)
             usleep(250_000)
@@ -27,6 +28,7 @@ final class RaceScreenFlow: FlowCase {
     func testBackReturnsToWhereTheRaceWasOpened() {
         let app = Flow.launch(tab: "yesterday", extra: ["-TVScoresSample", "race", "-TVScoresRace", "f1"], ready: "Race Result")
         sleep(1) // let the push settle before asking to leave it
+        Flow.focusThePage()
         Flow.remote.press(.menu)
         XCTAssertTrue(app.staticTexts["page.yesterday"].waitForExistence(timeout: 8), "back lands on the day the race was opened from")
         XCTAssertFalse(app.staticTexts["Race Result"].exists, "and the race page is gone")
