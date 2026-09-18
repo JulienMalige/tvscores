@@ -429,6 +429,34 @@
         }
       }
     },
+    "standings.east": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "East"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Est"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este"
+          }
+        }
+      }
+    },
     "standings.rankings": {
       "localizations": {
         "en": {
@@ -537,6 +565,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "La clasificación aún no está disponible para esta competición."
+          }
+        }
+      }
+    },
+    "standings.west": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "West"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouest"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oeste"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oeste"
           }
         }
       }

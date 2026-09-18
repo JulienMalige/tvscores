@@ -93,7 +93,12 @@ cap. Two consequences worth remembering:
 
 League tables come from `lookuptable.php`, one call per competition, every six
 hours and again within ten minutes of a final whistle in that competition — a
-table nobody sees move is what makes an app feel dead. Only providers whose
+table nobody sees move is what makes an app feel dead. The feed has none for
+the NFL, the NBA, the Champions League or the Europa League (checked
+2026-09-18, this season and last), so for those `eventsseason.php` is fetched
+instead — one call for the whole season — and `src/tables.js` builds the
+table: a record by conference for the American leagues (`src/divisions.js`
+says who plays where), points for the cups' league phase. Only providers whose
 table is made of results opt in to that second trigger: tennis rankings move
 weekly whatever happens on court, and chasing them would spend a 100-a-day
 budget on an unchanged number. A cup with no table, or a season that has not

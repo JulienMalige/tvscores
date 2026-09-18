@@ -132,3 +132,17 @@ test("a season nobody has told us yet is looked up once and then remembered", as
   await p.standings();
   assert.equal(lookups(), 3, "Serie A's season is kept; only the league that answered nothing is asked again");
 });
+
+test("a competition the feed has no table for gets one built from its season's results", async (t) => {
+  const season = { events: [
+    { intRound: "1", strHomeTeam: "Inter", strAwayTeam: "Ajax", intHomeScore: "2", intAwayScore: "0", strStatus: "FT", strTimestamp: "2026-09-17T19:00:00" },
+  ] };
+  const calls = network(t, { "eventsseason.php?id=4480": season, "lookuptable.php": null });
+  const ucl = { id: 4480, name: "UEFA Champions League", short: "UCL", table: { rounds: [1, 8], scoring: "points" } };
+  const { p } = provider({ leagues: [ucl, SERIE_A], seasons: { 4480: "2026-2027", 4332: "2025-2026" } });
+  const tables = await p.standings();
+  assert.deepEqual(Object.keys(tables), ["4480"]);
+  assert.equal(tables[4480].tables[0].rows[0].name, "Inter");
+  assert.ok(calls.some((c) => c.url.includes("eventsseason.php?id=4480")), "the season, not the table, was asked for");
+  assert.ok(!calls.some((c) => c.url.includes("lookuptable.php?l=4480")), "and the table endpoint was not");
+});

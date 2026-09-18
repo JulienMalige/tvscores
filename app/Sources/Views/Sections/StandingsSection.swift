@@ -67,7 +67,9 @@ struct StandingsSection: View {
         case "constructors": "standings.constructors"
         case "teams": "standings.teams"
         case "rankings": "standings.rankings"
-        default: LocalizedStringKey(id)
+        case "east": "standings.east"
+        case "west": "standings.west"
+        default: LocalizedStringKey(id) // "AFC", "NFC": names, not words
         }
     }
 }

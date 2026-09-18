@@ -46,13 +46,18 @@ export const config = {
       // `menu` is the name where a sidebar row is too narrow for the full one.
       // tvOS lays those rows out itself and wraps rather than truncating, so a
       // long name costs a second line; this is cheaper than fighting it.
-      { id: 4480, name: "UEFA Champions League", menu: "Champions League", short: "UCL", badge: "ucl" },
-      { id: 4481, name: "UEFA Europa League", menu: "Europa League", short: "UEL", badge: "uel" },
+      // The feed has results for the cups but no table, so theirs is built
+      // from the league phase — rounds 1 to 8; qualifying is round 0.
+      { id: 4480, name: "UEFA Champions League", menu: "Champions League", short: "UCL", badge: "ucl", table: { rounds: [1, 8], scoring: "points" } },
+      { id: 4481, name: "UEFA Europa League", menu: "Europa League", short: "UEL", badge: "uel", table: { rounds: [1, 8], scoring: "points" } },
       { id: 4501, name: "Copa Libertadores", short: "LIB", badge: "libertadores" },
       { id: 4351, name: "Brasileirão", short: "BRA", badge: "brasileirao" },
     ],
-    nfl: [{ id: 4391, name: "NFL", short: "NFL", badge: "nfl" }],
-    nba: [{ id: 4387, name: "NBA", short: "NBA", badge: "nba" }],
+    // Records built from results, split by conference (src/divisions.js):
+    // the NFL's regular season is rounds 1 to 18, preseason and playoffs
+    // sit at 500 and 150+; the NBA numbers every regular-season game 0.
+    nfl: [{ id: 4391, name: "NFL", short: "NFL", badge: "nfl", table: { rounds: [1, 18], scoring: "record", groups: "nfl" } }],
+    nba: [{ id: 4387, name: "NBA", short: "NBA", badge: "nba", table: { rounds: [0, 0], scoring: "record", groups: "nba" } }],
     f1: [{ id: "f1", name: "Formula 1", short: "F1", badge: "f1" }],
     motogp: [{ id: "motogp", name: "MotoGP", short: "MotoGP", badge: "motogp" }],
     tennis: [

@@ -8,6 +8,11 @@ notes when a version ships.
 
 ## Unreleased
 
+- League tables for the NFL (by conference, with each team's division), the
+  Champions League and the Europa League (the league phase, all 36 teams).
+  The NBA's East and West follow once its season starts. The feed publishes
+  no table for these, so the proxy builds them from the results.
+
 ## 1.0 build 17 — 18 September 2026
 - Yesterday, Today and Upcoming are now the system's own day switch — the
   joined segments tvOS uses — under the title on the left. A day is chosen as

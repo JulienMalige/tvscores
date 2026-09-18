@@ -297,3 +297,16 @@ does arrive late is picked up rather than waiting for the daily pass.
 Worth re-checking whether those two ever filled in. If late results are
 common the "No update" state will be seen often, and a second source for
 South America becomes worth its price; if this was a one-off, it is not.
+
+## Tables built from results (2026-09-18)
+
+TheSportsDB's `lookuptable.php` answers with nothing for the NFL, the NBA,
+the Champions League, the Europa League and the Libertadores — this season and
+last. Its `eventsseason.php` has every game with its score, so the proxy
+builds those tables itself (`proxy/src/tables.js`): a record by conference for
+the American leagues, with the division beside it from our own list
+(`proxy/src/divisions.js`, the feed has no division field), and a points
+table for the cups' league phase (rounds 1–8; qualifying is round 0). One
+season call per league per refresh. Libertadores stays without a table: its
+group phase is over and the feed carries no group labels; a bracket is a later
+question.

@@ -1,5 +1,7 @@
 import { getJson } from "../http.js";
 import { STATE, team } from "../model.js";
+import { tableFromResults } from "../tables.js";
+import { DIVISIONS } from "../divisions.js";
 
 const V1 = "https://www.thesportsdb.com/api/v1/json";
 const V2 = "https://www.thesportsdb.com/api/v2/json";
@@ -206,6 +208,10 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
    * One league table per competition that has one. A knockout cup has no
    * table and a season that has not started has no rows: both come back
    * empty, and an empty table is dropped rather than shown as a blank page.
+   *
+   * A competition configured with `table` gets none from the feed at all —
+   * the NFL, the NBA, the European cups — and has its table built here from
+   * the season's results, one call for the whole season.
    */
   async function standings(only) {
     if (!key) throw new Error("TheSportsDB key missing");
@@ -214,6 +220,13 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
       if (only && !only.has(String(league.id))) continue;
       const season = seasons[String(league.id)] || (await currentSeason(league.id));
       if (!season) continue;
+      if (league.table) {
+        const { body } = await getJson(`${V1}/${key}/eventsseason.php?id=${league.id}&s=${encodeURIComponent(season)}`);
+        quota.record(undefined);
+        const built = tableFromResults(body?.events || [], { ...league.table, groups: DIVISIONS[league.table.groups] });
+        if (built) out[league.id] = { updatedAt: new Date().toISOString(), ...built };
+        continue;
+      }
       const { body } = await getJson(`${V1}/${key}/lookuptable.php?l=${league.id}&s=${encodeURIComponent(season)}`);
       quota.record(undefined);
       const rows = (body?.table || []).map(standingsRow);
