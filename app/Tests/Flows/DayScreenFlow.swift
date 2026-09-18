@@ -40,15 +40,10 @@ final class DayScreenFlow: FlowCase {
         let app = Flow.launch(tab: "today")
         let header = app.buttons["league.football.4501"]
         header.appears()
-        // From a known place — the tab bar — one press down lands on the
-        // page; the header is the first thing under the bar, or one row up.
-        Flow.reportFocus(app, "at launch")
+        // From the tab bar, one press down is the header: the first thing on
+        // the page, and wide enough that focus cannot step over it.
         Flow.showTabBar(app, current: "Today")
-        Flow.remote.press(.down)
-        usleep(400_000)
-        Flow.reportFocus(app, "one down from the tab bar")
-        let reached = Flow.walk(.down, until: header, limit: 2) || Flow.walk(.up, until: header, limit: 2)
-        XCTAssertTrue(reached, "focus reaches the Libertadores header")
+        XCTAssertTrue(Flow.walk(.down, until: header, limit: 1), "one press down from the tab bar is the Libertadores header")
         Flow.remote.press(.select)
         // A cup has no table; what says "league page" is the Standings heading.
         app.staticTexts["Standings"].appears(within: 10)

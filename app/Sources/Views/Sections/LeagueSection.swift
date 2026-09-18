@@ -8,8 +8,14 @@ struct LeagueSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Metrics.headingGap) {
             if linkToLeague {
+                // The focusable area spans the row width, not the words:
+                // tvOS moves focus in straight lines, and a heading that only
+                // covers the left edge is stepped over from the tab bar above
+                // and from the full-width row beneath. The highlight itself
+                // stays on the words.
                 NavigationLink(value: LeagueRef(group: group)) {
                     LeagueHeader(group: group, chevron: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("league.\(group.sport).\(group.league.id.raw)")
