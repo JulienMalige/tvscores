@@ -67,20 +67,22 @@ avatar the app draws. Anything unasked-for for 60 days is pruned.
 
 | Sport | Provider & plan | Cap | Schedule batch | Live poll | Source's own freshness | Worst-case day | Licensed for release? |
 |---|---|---|---|---|---|---|---|
-| football (8 competitions) | TheSportsDB, Single Developer ($9/mo) | 100/min | 9 calls, once per UTC day after 04:00 (or 3 h stale) | 60 s inside a window, 1 call | 60 s (measured) | ~790 incl. tables | yes, confirm wording |
-| nfl | TheSportsDB, same key | shared | 9 calls, same | 60 s, 1 call | 60 s (assumed, as football) | ~400 | yes |
-| nba | TheSportsDB, same key | shared | 9 calls, same | 60 s, 1 call | 60 s (assumed, as football) | ~400 | yes |
+| football (8 competitions) | TheSportsDB, Single Developer ($9/mo) | 100/min | 9 calls, once per UTC day after 04:00 (or 3 h stale) | 30 s inside a window, 1 call | 60 s (measured) | ~1,500 incl. tables | yes, confirm wording |
+| nfl | TheSportsDB, same key | shared | 9 calls, same | 30 s, 1 call | 60 s (assumed, as football) | ~800 | yes |
+| nba | TheSportsDB, same key | shared | 9 calls, same | 30 s, 1 call | 60 s (assumed, as football) | ~800 | yes |
 | tennis (ATP/WTA, majors and 1000s) | livetennisapi, free | **100/day** | 1 call daily + catalogue once a month | 30 min, 1 call | seconds | ~55 | free tier only |
 | f1, motogp | Orange Cat Blacktop, free | 7,500/month | calendar every 6 h; 30 min within 6 h of a session | — (results, not live timing) | post-session | ~10 each | **no — non-commercial** |
 | portraits | TheSportsDB, same key | 25/min, soft 1,000/day | once per athlete, kept a month | — | static | ~120 on a new sport | yes |
 | crests, badges | mirrored on this proxy | none after first fetch | on first sight | — | static | ~0 | trademark risk accepted |
 
 TheSportsDB is capped per **minute** (100 on the paid tier), not per day, which
-is what lets the team sports poll a minute apart. Their pricing page calls it a
-"2 min livescore"; watching one match for four minutes on 2026-09-15 showed the
-`updated` stamp moving every 60 s (23:06:31, 23:07:31, 23:08:30, 23:09:31,
-23:10:31), so 60 s polling is matched to the feed rather than wasted on it. Two consequences worth
-remembering:
+is what lets the team sports poll half a minute apart. Their pricing page calls
+it a "2 min livescore"; watching one match for four minutes on 2026-09-15 showed
+the `updated` stamp moving every 60 s (23:06:31, 23:07:31, 23:08:30, 23:09:31,
+23:10:31). Polling at 30 s — half that period — sees every change within 30 s
+of it whichever way the feed's minute falls against ours; polling at 60 s could
+sit just ahead of every update, and anything faster than 30 s only spends the
+cap. Two consequences worth remembering:
 
 - Adding another competition is free: fixtures are fetched per date and
   filtered by league id locally, and the livescore call covers every league of

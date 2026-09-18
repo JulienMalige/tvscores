@@ -45,11 +45,15 @@ final class ScoreboardStore {
     /// Whether a board's pictures are decoded ahead of the screen. A test of
     /// the model has no screen and no wish to fetch three hundred crests.
     private let warmsImages: Bool
+    /// What decodes them; a test hands in one that never finishes.
+    private let prefetch: ([URL?]) async -> Void
     private var task: Task<Void, Never>?
 
-    init(source: ScoreboardSource = .resolve(), warmImages: Bool = true) {
+    init(source: ScoreboardSource = .resolve(), warmImages: Bool = true,
+         prefetch: @escaping ([URL?]) async -> Void = { await ImagePrefetcher.shared.prefetch($0) }) {
         self.source = source
         self.warmsImages = warmImages
+        self.prefetch = prefetch
     }
 
     func refresh() async {
@@ -82,7 +86,7 @@ final class ScoreboardStore {
             // A slow line must not hold the app shut: show what we have after
             // this long whether the marks arrived or not.
             await withTaskGroup(of: Void.self) { group in
-                group.addTask { await ImagePrefetcher.shared.prefetch(marks) }
+                group.addTask { [prefetch] in await prefetch(marks) }
                 group.addTask { try? await Task.sleep(for: .seconds(4)) }
                 await group.next()
                 group.cancelAll()
@@ -90,7 +94,7 @@ final class ScoreboardStore {
             ready = true
         }
         let rest = board.imageURLs
-        Task.detached(priority: .utility) { await ImagePrefetcher.shared.prefetch(rest) }
+        Task.detached(priority: .utility) { [prefetch] in await prefetch(rest) }
     }
 
     /// Every 30 s while a game is on, every 3 min otherwise. Idempotent.

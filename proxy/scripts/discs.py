@@ -1,9 +1,9 @@
 """Composing a mark into an icon.
 
-Shared by the two badge builders — `build-badges.py` for competitions and
-`build-team-badges.py` for constructors and teams — because both need the same
-answer to "make this lockup into one round icon", and the two were about to
-have two copies of it.
+Shared by the two badge builders — `build-team-badges.py` puts a constructor
+or team on a coloured disc, `build-badges.py` trims a competition's mark to a
+bare square — because both need the same trimming, colour and silhouette
+arithmetic, and the two were about to have two copies of it.
 """
 import math
 

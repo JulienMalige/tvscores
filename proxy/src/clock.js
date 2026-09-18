@@ -1,2 +1,2 @@
-/** One minute in milliseconds, named because three modules count in them. */
+/** One minute in milliseconds, named so the schedulers' arithmetic reads. */
 export const MIN = 60e3;

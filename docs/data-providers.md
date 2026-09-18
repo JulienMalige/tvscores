@@ -139,7 +139,11 @@ see that the app pulls from a service whose terms allow it, which a paid plan
 (or football-data.org's free tier for non-commercial use) satisfies. Keep the
 subscription receipt and terms page in this folder before submission.
 
-## Decision (proposed, awaiting Julien)
+## Decision (proposed 2026-09-13 — superseded)
+
+Kept as the reasoning of the day. What actually happened: football, NFL and
+NBA moved to TheSportsDB on the paid key (see "Football moved to TheSportsDB",
+2026-09-15), and API-Sports is no longer used at all.
 
 - Backbone: **API-Sports**, one account. Start every sport on its free tier
   with the proxy polling only inside game windows (every 2–3 min while a game
@@ -220,7 +224,7 @@ the data. Their BASIC tier is $9.99/mo for 1,000/day.
 
 Julien subscribed to the $9 Single Developer tier, and football moved onto it
 whole: `proxy/src/providers/sportsdb.js` fetches one `eventsday` call per date
-for `schedule.footballWindow` (yesterday plus seven days) and filters to the
+for `schedule.teamSportWindow` (yesterday plus seven days) and filters to the
 eight competitions in `config.leagues.football`, with the V2 `livescore/soccer`
 endpoint for matches in play. Eight leagues, nine calls a cycle.
 
@@ -261,6 +265,10 @@ Two gaps that advice named and we had, now closed:
 - **Backoff.** A failing upstream was retried at full rate for ever. Each
   consecutive failure now doubles the wait, capped at an hour, and one good
   answer clears it.
+
+Since 2026-09-16 the live interval for the three team sports is 30 s, half the
+feed's measured period — the reasoning is in `proxy/README.md` and the rule in
+`AGENTS.md`; the "60 seconds" above is what it was when this was written.
 
 Not done, deliberately: conditional GET *upstream*. TheSportsDB does send
 `last-modified`, but a 304 still counts as a request against the quota, and

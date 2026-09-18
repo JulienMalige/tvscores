@@ -113,7 +113,7 @@ This is the mechanic to preserve; `proxy/src/scheduler.js` owns it and
 | What | When | Cost per round |
 |---|---|---|
 | Schedules (`daily`) | once per UTC day after `dailyRefreshHourUtc`, or after `idleRefreshMinutes` — but never while a game could be in progress | 9 calls per team sport, one per day of the window |
-| Scores (`live`) | only inside a live window, then every `liveIntervalSeconds` — 60 s for the sports on the paid key, 30 min for tennis | 1 call per sport |
+| Scores (`live`) | only inside a live window, then every `liveIntervalSeconds` — 30 s for the sports on the paid key, 30 min for tennis | 1 call per sport |
 | Standings | every 6 hours, and within 10 min of a final whistle in that league | 1 per league |
 | Motorsport calendar | every 6 hours, or every 30 min within 6 h of a session | 1 + one per newly finished race |
 | Portraits | once per athlete, kept a month | background, 25/min |
@@ -128,10 +128,12 @@ Invariants worth keeping:
 
 - **Nothing polls on a blind timer.** If you add a fetch, hang it off the
   window or the daily pass, not a `setInterval`.
-- **Poll no faster than the source changes, and measure that rather than
+- **Poll at half the source's period, and measure that period rather than
   believing the plan's wording.** Watch a live match's `updated` stamp for a
-  few minutes; TheSportsDB advertises "2 min" and delivers 60 s, and the
-  interval was nearly halved on the strength of the advert.
+  few minutes: TheSportsDB advertises "2 min" and delivers 60 s. Polling at
+  30 s means a change is seen within 30 s of it whichever way the two clocks
+  are phased; polling at the source's own period can sit just ahead of every
+  update, and anything faster than half only spends the cap.
 - **A live game must be able to stop being live.** A provider's live feed
   lists only games in progress, so a finished match disappears from it; the
   scheduler refetches that match's own UTC date through `provider.byDate` to

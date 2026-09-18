@@ -30,7 +30,7 @@ for (const sport of ["football", "nfl", "nba"]) {
     sport,
     key: config.theSportsDbKey,
     leagues: config.leagues[sport],
-    window: config.schedule.footballWindow,
+    window: config.schedule.teamSportWindow,
     quota,
     // Seasons are learned from the fixtures and written straight into the
     // sport's meta, which the store persists: a restart can read a table

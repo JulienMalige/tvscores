@@ -65,14 +65,16 @@ struct ChromePictureTests {
     @MainActor
     func readyDoesNotWaitForever() async {
         // A slow line must not hold the app shut behind the loader: the marks
-        // get a few seconds, then the screen is shown with whatever came.
-        // (The app hosting this test has usually warmed them already, so this
-        // runs in a blink; the ceiling is what it pins when it does not.)
-        let store = ScoreboardStore(source: .bundled(), warmImages: true)
+        // get a few seconds, then the screen is shown with whatever came. The
+        // warm-up here never finishes, so it is the ceiling that lets us in.
+        let store = ScoreboardStore(source: .bundled(), warmImages: true) { _ in
+            try? await Task.sleep(for: .seconds(60))
+        }
         let began = Date()
         await store.refresh()
+        let waited = Date().timeIntervalSince(began)
         #expect(store.ready)
-        #expect(Date().timeIntervalSince(began) < 8, "ready within the ceiling, marks or no marks")
+        #expect(waited >= 3 && waited < 8, "the marks were given their few seconds, and no more: \(waited)s")
     }
 
     @Test("a board that cannot be read is an error on screen, not a crash")

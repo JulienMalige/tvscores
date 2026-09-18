@@ -99,16 +99,17 @@ export const config = {
      * The days every team sport is fetched for, one call each: yesterday for
      * last night's finals, and the seven the Upcoming tab shows.
      */
-    footballWindow: { back: 1, ahead: 7 },
+    teamSportWindow: { back: 1, ahead: 7 },
     dailyRefreshHourUtc: 4,
     idleRefreshMinutes: 180,
     /**
      * How often a sport with a game in progress is polled, per sport, because
      * their budgets are not alike. The three on TheSportsDB share a key capped
-     * per *minute*, so a minute apart costs them nothing: a full twelve-hour
-     * Saturday is 720 calls against a ceiling of 100 a minute. Tennis is still
-     * on a 100-a-day key and stays slow. The quota stretches any of these
-     * further when the day's budget would not survive it.
+     * per *minute*, so half a minute apart — half the feed's own 60 s period,
+     * see proxy/README.md — costs them nothing: a full twelve-hour Saturday is
+     * 1,440 calls against a ceiling of 100 a minute. Tennis is still on a
+     * 100-a-day key and stays slow. The quota stretches any of these further
+     * when the day's budget would not survive it.
      */
     liveIntervalSeconds: { default: 1800, football: 30, nfl: 30, nba: 30, tennis: 1800 },
     /** Never spend the last N calls of a sport's daily quota. */

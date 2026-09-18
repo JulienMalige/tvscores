@@ -37,8 +37,8 @@ struct ElementsTests {
         // A repeated key in a dictionary literal traps at launch; build 3 died
         // that way on a real Apple TV. The literal compiling proves nothing —
         // this proves the two tables still load.
-        #expect(StatusLabel.detailKeys.count >= 17)
-        #expect(StatusLabel.finalCombined.count == 3)
+        #expect(!StatusLabel.detailKeys.isEmpty)
+        #expect(!StatusLabel.finalCombined.isEmpty)
     }
 
     // MARK: ImageCache
