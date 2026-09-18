@@ -60,10 +60,8 @@ enum Flow {
     /// simulator shuts it again within a second or two (see NavigationFlow),
     /// so whatever a flow does in the menu it does straight after this.
     static func openMenu(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
-        // Off the day switch first: left along it moves between its segments
-        // and picks them, which is not the menu. One row down, left is.
-        remote.press(.down)
-        usleep(400_000)
+        // Never called with focus on the day switch: left along it moves
+        // between its segments and picks them, which is not the menu.
         for _ in 0..<3 {
             remote.press(.left)
             sleep(2)
