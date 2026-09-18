@@ -13,7 +13,10 @@ notes when a version ships.
   down to read. The Competitions tab lists every competition we follow,
   playing this week or not, each opening its own page as before.
 
-- The day pills now live only on a competition's page.
+- The day pills now live only on a competition's page, and the day being
+  shown is in bold, as the standings picker already does. The fill promised
+  in build 15 never showed on a television: tvOS draws an unfocused filled
+  pill exactly like a plain one.
 
 - A competition's heading on a day page can be reached with the remote from
   the row beneath it and from the tabs above; it was being stepped over.

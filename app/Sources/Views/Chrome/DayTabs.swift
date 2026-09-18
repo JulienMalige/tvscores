@@ -21,38 +21,23 @@ struct DayTabs: View {
         // re-ran on every reappearance and pulled focus around the page.
         .defaultFocus($focused, selected)
         .focusSection()
-        // Picking a day swaps the pill for its filled twin — two system
-        // styles, not one restyled, because a wrapped style loses the fill —
-        // and the focus engine loses the view it was on. Put focus back on
-        // the day just picked, a beat later so the new pill exists to take
-        // it. On a pick only, never on appearance.
-        .onChange(of: selected) { _, now in
-            Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(80))
-                focused = now
-            }
-        }
     }
 
-    /// A day, filled when it is the one being shown.
-    ///
-    /// Selection used to be carried by the type weight alone, which is
-    /// invisible beside the focus ring: tvOS lights the pill the remote is
-    /// pointing at, and that read as "Yesterday is selected" while today's
-    /// matches were on screen. Both styles are the system's own — prominent
-    /// for the day being shown, plain for the others — so focus and selection
-    /// say different things.
+    /// A day, in bold when it is the one being shown — the way the standings
+    /// picker says it, and the only way tvOS shows: an unfocused prominent
+    /// button is drawn exactly like a plain one, so a fill never appeared.
+    /// One button whose weight changes, not two swapped: the swap destroyed
+    /// the focused control, and focus fell to the leading pill.
     private struct DayPill: View {
         let title: LocalizedStringKey
         let isSelected: Bool
         let pick: () -> Void
 
         var body: some View {
-            if isSelected {
-                Button(title, action: pick).buttonStyle(.borderedProminent)
-            } else {
-                Button(title, action: pick).buttonStyle(.bordered)
+            Button(action: pick) {
+                Text(title).fontWeight(isSelected ? .bold : .regular)
             }
+            .buttonStyle(.bordered)
         }
     }
 
