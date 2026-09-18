@@ -60,6 +60,10 @@ enum Flow {
     /// simulator shuts it again within a second or two (see NavigationFlow),
     /// so whatever a flow does in the menu it does straight after this.
     static func openMenu(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
+        // Off the day switch first: left along it moves between its segments
+        // and picks them, which is not the menu. One row down, left is.
+        remote.press(.down)
+        usleep(400_000)
         for _ in 0..<3 {
             remote.press(.left)
             sleep(2)
@@ -70,12 +74,12 @@ enum Flow {
 
     /// A page opened by launch argument arrives with focus still in the
     /// sidebar — a person opens a page from a focused row and never lands
-    /// this way. Two presses right put focus on the page, as theirs would be.
+    /// this way. A press right puts focus on the page, as theirs would be.
     static func focusThePage() {
-        for _ in 0..<2 {
-            remote.press(.right)
-            usleep(400_000)
-        }
+        // One press, not two: the second would move along the day switch
+        // and pick another day, and the page under test would change.
+        remote.press(.right)
+        usleep(400_000)
     }
 
     /// Where focus is, for the log: the one fact that separates "the page
