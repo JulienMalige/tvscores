@@ -8,6 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
+## 1.0 build 17 — 18 September 2026
 - Yesterday, Today and Upcoming are now the system's own day switch — the
   joined segments tvOS uses — under the title on the left. A day is chosen as
   the remote reaches it, no click; the one you are on is white, the one
