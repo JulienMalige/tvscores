@@ -4,8 +4,8 @@ import XCTest
 final class LeagueScreenFlow: FlowCase {
 
     func testFormulaOneIsReachableWithNoRaceThisWeek() {
-        // The whole reason the sidebar exists: F1 races every other weekend,
-        // and its page — and championship — used to vanish in between.
+        // The whole reason the Competitions tab exists: F1 races every other
+        // weekend, and its page — and championship — used to vanish in between.
         let app = Flow.launch(league: "f1")
         app.buttons["table.drivers"].appears(within: 10)
         app.buttons["table.constructors"].appears()

@@ -15,8 +15,10 @@ type, remote-friendly navigation, no clutter.
 Portuguese and Spanish. Opening a competition gives its own page and its
 standings; opening a race gives the full classification.
 
-Premier League, Champions League, NFL, NBA, Formula 1, MotoGP and the ATP and
-WTA tours. No odds, no betting, no streaming links.
+Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Brasileirão, Champions
+League, Europa League, Copa Libertadores, NFL, NBA, Formula 1, MotoGP and the
+ATP and WTA tours — the days along the top, every competition under its own
+tab. No odds, no betting, no streaming links.
 
 ## How it works
 

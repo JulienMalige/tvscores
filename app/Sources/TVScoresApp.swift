@@ -10,7 +10,7 @@ struct TVScoresApp: App {
 
     var body: some Scene {
         WindowGroup {
-            Sidebar()
+            TopTabs()
         }
     }
 }

@@ -127,6 +127,7 @@ jobs:
           for lang in en fr pt es; do shot "$lang" today; done
           shot en yesterday
           shot en upcoming
+          shot en competitions
           shot en today f1
           shot en upcoming tennis
           shot en yesterday football

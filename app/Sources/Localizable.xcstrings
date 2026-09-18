@@ -30,6 +30,34 @@
         }
       }
     },
+    "competitions.noGames": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No games this week"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien cette semaine"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada esta semana"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada esta semana"
+          }
+        }
+      }
+    },
     "home.empty": {
       "localizations": {
         "en": {
@@ -341,34 +369,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Parrilla"
-          }
-        }
-      }
-    },
-    "sidebar.noGames": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No games this week"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rien cette semaine"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nada esta semana"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nada esta semana"
           }
         }
       }
@@ -1160,30 +1160,30 @@
         }
       }
     },
-    "tab.home": {
+    "tab.competitions": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Home"
+            "value": "Competitions"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Accueil"
+            "value": "Compétitions"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Início"
+            "value": "Competições"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inicio"
+            "value": "Competiciones"
           }
         }
       }

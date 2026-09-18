@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// The three day pills. The system `.bordered` style is deliberate: on tvOS a
-/// custom pill loses the focus behaviour people already know.
+/// The three day pills on a competition's page. The system `.bordered` style
+/// is deliberate: on tvOS a custom pill loses the focus behaviour people
+/// already know.
 struct DayTabs: View {
     @Binding var selected: Day
     @FocusState private var focused: Day?
@@ -17,17 +18,9 @@ struct DayTabs: View {
         }
         // A plain default so the highlight starts on the selected day, and
         // nothing that takes focus by hand: a `.task` that asserted focus here
-        // re-ran on every reappearance and pulled focus out of the sidebar as
-        // it opened. This default was once suspected of the same and cleared
-        // — wrongly: when the menu lost focus, focus landed on the leading
-        // pill, not this one, which is the engine re-seeding from nothing.
+        // re-ran on every reappearance and pulled focus around the page.
         .defaultFocus($focused, selected)
         .focusSection()
-        // Picking a day swaps the pill for its filled twin, and the focus
-        // engine loses the view it was on. Put it back on the day just
-        // picked — on a pick only, never on appearance, so the menu is never
-        // robbed of it.
-        .onChange(of: selected) { _, now in focused = now }
     }
 
     /// A day, filled when it is the one being shown.

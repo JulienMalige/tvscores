@@ -125,11 +125,8 @@ struct CachedImage<Placeholder: View>: View {
             }
         }
         .task(id: url) {
-            // A picture already in memory was drawn on the first frame, and
-            // nothing here may change state afterwards: a row of the sidebar
-            // is drawn by tvOS, and a state write inside it rebuilds the menu
-            // — which reads as the menu shutting a second after it opened.
-            // Only a picture that is not there yet has anything to record.
+            // A picture already in memory was drawn on the first frame; only
+            // one that is not there yet has anything to record.
             guard let url, ImageCache.shared.image(for: url) == nil else { return }
             loaded = await ImageCache.shared.load(url)
             settled = true

@@ -1,32 +1,24 @@
 import SwiftUI
 
-/// The app's front page: one day of every league the proxy follows.
-struct HomeScreen: View {
+/// One day of every league the proxy follows: a tab's page.
+struct DayScreen: View {
     let store: ScoreboardStore
-    @Binding var day: Day
+    let day: Day
     @State private var path = NavigationPath()
     @State private var openedInitialRace = false
 
     var body: some View {
         NavigationStack(path: $path) {
             ScrollView {
-                // Title and tabs scroll away with the list. On a television a
-                // pinned bar saves no input, since reaching the tabs means
-                // moving focus up there anyway, and the focus engine brings
-                // them back on screen when it does.
+                // The title scrolls away with the list; the tab bar is the
+                // system's and comes down on its own when focus moves up.
                 VStack(alignment: .leading, spacing: Metrics.sectionGap / 2) {
                     header
-                    DayTabs(selected: $day)
                     content
                 }
-                .padding(.horizontal, Metrics.screenMargin)
-                .padding(.top, Metrics.screenTop)
-                .padding(.bottom, Metrics.screenBottom)
+                .pageMargins()
             }
-            .navigationDestination(for: LeagueRef.self) { ref in
-                LeagueScreen(ref: ref, store: store, day: day)
-            }
-            .navigationDestination(for: Event.self) { RaceScreen(eventId: $0.id, fallback: $0, store: store) }
+            .tabDestinations(store: store, day: day)
         }
         // `-TVScoresRace f1` opens that series' latest classified race (CI
         // screenshots and the race flow). Checked on appearance as well as on
@@ -60,6 +52,7 @@ struct HomeScreen: View {
         HStack(alignment: .firstTextBaseline) {
             Text("app.title")
                 .font(.system(size: 46, weight: .bold))
+                .accessibilityIdentifier("page.\(day.rawValue)")
             Spacer()
             if let board = store.board, board.isStale {
                 Label("home.stale", systemImage: "exclamationmark.triangle")
@@ -98,6 +91,3 @@ struct HomeScreen: View {
 
 }
 
-#Preview {
-    Sidebar()
-}

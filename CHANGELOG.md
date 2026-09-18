@@ -8,6 +8,13 @@ notes when a version ships.
 
 ## Unreleased
 
+- The menu is gone; in its place, tabs along the top — Yesterday, Today,
+  Upcoming and Competitions. Move up to reach them, left and right to switch,
+  down to read. The Competitions tab lists every competition we follow,
+  playing this week or not, each opening its own page as before.
+
+- The day pills now live only on a competition's page.
+
 ## 1.0 build 16 — 17 September 2026
 - The day being shown is filled in, so it no longer looks as though you are
   on Yesterday while today's matches are on screen. The bright pill is where

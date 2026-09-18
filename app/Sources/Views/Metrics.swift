@@ -57,3 +57,13 @@ extension View {
             .animation(.easeOut(duration: 0.15), value: focused)
     }
 }
+
+extension View {
+    /// A screen's margins: the app's left edge, and room above and below.
+    func pageMargins() -> some View {
+        self
+            .padding(.horizontal, Metrics.screenMargin)
+            .padding(.top, Metrics.screenTop)
+            .padding(.bottom, Metrics.screenBottom)
+    }
+}

@@ -74,13 +74,9 @@ final class ScoreboardStore {
     /// few hundred crests and portraits — carries on behind the screen.
     private func warm(_ board: Scoreboard) async {
         // Both shapes of every competition's mark: the heading's, and the
-        // sidebar's square icon. The icon matters more than it looks — a
-        // sidebar row whose picture arrives after the menu is drawn changes
-        // state, tvOS rebuilds its rows, and the menu shuts in the reader's
-        // hands. The flow that watches the menu timed it at two seconds.
-        // Icons first: they are the smaller files and the ones the menu is
-        // drawn from, so if the ceiling below cuts the warm-up short it is a
-        // heading mark that arrives late, not a menu row.
+        // square icon the Competitions list is drawn from. Icons first: they
+        // are the smaller files, so if the ceiling below cuts the warm-up
+        // short it is a heading mark that arrives late, not a whole list.
         let marks = board.leagues.flatMap { [$0.icon, $0.logo] }
         if !ready {
             // A slow line must not hold the app shut: show what we have after

@@ -2,15 +2,15 @@ import Foundation
 import Testing
 @testable import TVScores
 
-/// The chrome: what the menu is built from, and what it is fed.
+/// The chrome: what the Competitions list is built from, and what it is fed.
 @Suite("Chrome")
 struct ChromeTests {
-    @Test("the menu's league list survives a refresh that changed nothing but scores")
+    @Test("the league list survives a refresh that changed nothing but scores")
     @MainActor
     func leagueListIsStable() async {
-        // The sidebar is built from this list. Handing it a fresh array twice a
-        // minute rebuilt the menu under whoever was reading it — that was half
-        // of "it opens and closes". Same competitions in, same array out.
+        // The Competitions list is built from this. A fresh array twice a
+        // minute would rebuild it under whoever is reading it. Same
+        // competitions in, same array out.
         let store = ScoreboardStore(source: .bundled(), warmImages: false)
         await store.refresh()
         let first = store.leagues
@@ -29,7 +29,7 @@ struct ChromeTests {
         #expect(store.error == nil)
     }
 
-    @Test("every league the menu lists can be opened as a page")
+    @Test("every league the list holds can be opened as a page")
     @MainActor
     func leaguesBecomeRefs() async {
         let store = ScoreboardStore(source: .bundled(), warmImages: false)
@@ -37,7 +37,7 @@ struct ChromeTests {
         for league in store.leagues {
             let ref = LeagueRef(league)
             #expect(ref.leagueId == league.id.raw)
-            #expect(ref.name == league.name, "the page carries the full name, not the menu's")
+            #expect(ref.name == league.name, "the page carries the full name")
         }
     }
 }
@@ -52,9 +52,8 @@ struct ChromePictureTests {
 
     @Test("the competition marks are warmed before anything else, both shapes of them")
     func marksComeFirst() throws {
-        // The sidebar is drawn from the icons. An icon that arrives after the
-        // menu is drawn changes a row's state, tvOS rebuilds the rows, and
-        // the menu shuts under its reader. So they head the list.
+        // The headings and the Competitions list are drawn from them, and
+        // they are what the eye lands on first. So they head the list.
         let board = try Self.board()
         let urls = board.imageURLs.compactMap { $0 }
         let marks = Set(board.leagues.flatMap { [$0.logo, $0.icon] }.compactMap { $0 })

@@ -14,9 +14,7 @@ struct LeagueScreen: View {
                 games
                 StandingsSection(ref: ref, store: store)
             }
-            .padding(.horizontal, Metrics.screenMargin)
-            .padding(.top, Metrics.screenTop)
-            .padding(.bottom, Metrics.screenBottom)
+            .pageMargins()
         }
         .scrollClipDisabled()
     }

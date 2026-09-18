@@ -36,9 +36,7 @@ struct RaceScreen: View {
                     ResultSection(results: results)
                 }
             }
-            .padding(.horizontal, Metrics.screenMargin)
-            .padding(.top, Metrics.screenTop)
-            .padding(.bottom, Metrics.screenBottom)
+            .pageMargins()
         }
     }
 
