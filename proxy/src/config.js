@@ -47,9 +47,10 @@ export const config = {
       // tvOS lays those rows out itself and wraps rather than truncating, so a
       // long name costs a second line; this is cheaper than fighting it.
       // The feed has results for the cups but no table, so theirs is built
-      // from the league phase — rounds 1 to 8; qualifying is round 0.
-      { id: 4480, name: "UEFA Champions League", menu: "Champions League", short: "UCL", badge: "ucl", table: { rounds: [1, 8], scoring: "points" } },
-      { id: 4481, name: "UEFA Europa League", menu: "Europa League", short: "UEL", badge: "uel", table: { rounds: [1, 8], scoring: "points" } },
+      // from the league phase: the games from September, since the feed
+      // numbers the qualifiers 1 to 3 and the play-off 0 (knockouts are 100+).
+      { id: 4480, name: "UEFA Champions League", menu: "Champions League", short: "UCL", badge: "ucl", table: { rounds: [1, 99], after: "09-01", scoring: "points" } },
+      { id: 4481, name: "UEFA Europa League", menu: "Europa League", short: "UEL", badge: "uel", table: { rounds: [1, 99], after: "09-01", scoring: "points" } },
       { id: 4501, name: "Copa Libertadores", short: "LIB", badge: "libertadores" },
       { id: 4351, name: "Brasileirão", short: "BRA", badge: "brasileirao" },
     ],

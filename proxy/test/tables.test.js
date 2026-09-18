@@ -6,7 +6,8 @@ import { DIVISIONS } from "../src/divisions.js";
 const NOW = Date.parse("2026-09-18T12:00:00Z");
 const game = (round, home, away, h, a, over = {}) => ({
   intRound: String(round), strHomeTeam: home, strAwayTeam: away, intHomeScore: String(h), intAwayScore: String(a),
-  strStatus: "FT", strTimestamp: "2026-09-10T20:00:00", strHomeTeamBadge: `https://x/${home}.png`, ...over,
+  strStatus: "FT", strTimestamp: "2026-09-10T20:00:00", dateEvent: "2026-09-10", strSeason: "2026-2027",
+  strHomeTeamBadge: `https://x/${home}.png`, ...over,
 });
 
 test("a cup's league phase becomes one table on points, goal difference, then goals", () => {
@@ -15,9 +16,10 @@ test("a cup's league phase becomes one table on points, goal difference, then go
     game(1, "Bayern", "Chelsea", 3, 1),
     game(2, "Ajax", "Bayern", 1, 1),
     game(2, "Chelsea", "Inter", 0, 0),
-    game(0, "Qualifier FC", "Inter", 5, 0), // qualifying: not the league phase
+    game(0, "Qualifier FC", "Inter", 5, 0), // the play-off: not the league phase
+    game(2, "Qualifier FC", "Ajax", 4, 0, { dateEvent: "2026-08-05" }), // qualifying round 2: numbered like a matchday, played in August
   ];
-  const { tables } = tableFromResults(rows, { rounds: [1, 8], scoring: "points" }, NOW);
+  const { tables } = tableFromResults(rows, { rounds: [1, 99], after: "09-01", scoring: "points" }, NOW);
   assert.equal(tables.length, 1);
   assert.deepEqual(tables[0].rows.map((r) => [r.pos, r.name, r.value, r.sub]), [
     [1, "Bayern", 4, "2 · 1-1-0 · +2"], // level with Inter on points and difference; scored four to two
@@ -26,6 +28,7 @@ test("a cup's league phase becomes one table on points, goal difference, then go
     [4, "Chelsea", 1, "2 · 0-1-1 · -2"],
   ]);
   assert.ok(!tables[0].rows.some((r) => r.name === "Qualifier FC"), "a team that only played in qualifying is not listed");
+  assert.equal(tables[0].rows.find((r) => r.name === "Ajax").sub, "2 · 0-1-1 · -2", "and Ajax's August qualifier does not count against it");
   assert.equal(tables[0].rows[0].logo, "https://x/Bayern.png", "the crest the feed ships with the game");
 });
 

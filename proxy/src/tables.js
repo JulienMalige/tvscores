@@ -4,19 +4,22 @@
  * conference) and the European cups' league phase (points, one table of 36).
  *
  * Only finished games inside the rounds asked for count — the NFL's preseason
- * and playoffs and the cups' qualifiers sit in rounds of their own — and only
- * teams that played in those rounds appear, so a qualifier that went out in
- * August is not listed with nothing beside its name.
+ * and playoffs sit in rounds of their own — and only teams that played in
+ * those rounds appear. The cups' qualifiers share the low round numbers with
+ * the league phase (qualifying is rounds 1 to 3, the play-off 0, the first
+ * matchday 4), so for those the rule is the calendar: the league phase is
+ * what is played from September, `after` in the shape.
  */
 import { STATE } from "./model.js";
 import { stateOf } from "./providers/sportsdb.js";
 
 /**
  * @param rows   the season's events as the feed sends them
- * @param shape  { rounds: [first, last], scoring: "points" | "record", groups?: { team: { table, division } } }
+ * @param shape  { rounds: [first, last], scoring: "points" | "record", groups?: { team: { table, division } },
+ *                 after?: "MM-DD" — games before that day of the season's first year do not count }
  * @returns { tables: [{ id, rows }] } or null when nothing has been played
  */
-export function tableFromResults(rows, { rounds: [first, last], scoring, groups }, now = Date.now()) {
+export function tableFromResults(rows, { rounds: [first, last], scoring, groups, after }, now = Date.now()) {
   const teams = new Map();
   const team = (name, badge) => {
     if (!teams.has(name)) teams.set(name, { name, logo: badge || undefined, p: 0, w: 0, d: 0, l: 0, f: 0, a: 0 });
@@ -25,6 +28,7 @@ export function tableFromResults(rows, { rounds: [first, last], scoring, groups 
   for (const r of rows) {
     const round = Number(r.intRound);
     if (!(round >= first && round <= last)) continue;
+    if (after && !(r.dateEvent >= `${String(r.strSeason || "").slice(0, 4)}-${after}`)) continue;
     if (stateOf(r, now) !== STATE.final) continue;
     const h = Number(r.intHomeScore);
     const a = Number(r.intAwayScore);
