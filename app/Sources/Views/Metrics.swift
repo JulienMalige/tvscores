@@ -36,6 +36,12 @@ enum Metrics {
     /// the inset: 100 points where that is the mark, more where a second line
     /// of text or a scoreline is taller than it.
     static let mark: CGFloat = 64
+    /// A match row's team column — the crest with the name captioned under
+    /// it — and the score column beside it. The name gets the column's
+    /// width and shrinks a little before it truncates.
+    static let matchSide: CGFloat = 220
+    static let matchNameGap: CGFloat = 6
+    static let matchScore: CGFloat = 150
     /// The same thing blown up for a podium, where it is the subject.
     static let markHero: CGFloat = 110
     /// Competition marks are wordmarks as often as badges, so they get width.

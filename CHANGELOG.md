@@ -10,6 +10,8 @@ notes when a version ships.
 
 - Pressing left from the day switch opens the menu again. The switch keeps
   its look and changes only on click.
+- Match rows read like the Apple Sports app's: the crest with the team's
+  name captioned under it, the score beside it. Rows are a little taller.
 - The menu's first row is Home again, with a house for its mark. The name
   and Settings page of build 21 are gone: the Apple TV profile's name and
   picture are Apple's own, and typing a name into a scores app was not
