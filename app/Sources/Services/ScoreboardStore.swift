@@ -67,8 +67,10 @@ final class ScoreboardStore {
         defer { loading = false }
         do {
             let fresh = try await load()
-            if fresh != board { board = fresh } // avoid re-rendering an unchanged board
-            if fresh.leagues != leagues { leagues = fresh.leagues }
+            let boardMoved = fresh != board, menuMoved = fresh.leagues != leagues
+            if boardMoved { board = fresh } // avoid re-rendering an unchanged board
+            if menuMoved { leagues = fresh.leagues }
+            if boardMoved || menuMoved { Diagnostics.shared.note("refresh: board \(boardMoved ? "changed" : "same"), menu \(menuMoved ? "changed" : "same"), live \(fresh.live)") }
             error = nil
             if warmsImages { await warm(fresh) } else { ready = true }
         } catch {

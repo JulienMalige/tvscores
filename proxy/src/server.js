@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { createHash } from "node:crypto";
-import { readFileSync, statSync, readdirSync } from "node:fs";
+import { readFileSync, statSync, readdirSync, mkdirSync, appendFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -42,6 +42,24 @@ function send(res, status, body, extra = {}, req) {
 }
 
 /** @param limits per-source daily caps ({ football: 100, f1: 200, photos: 1000, ... }), supplied by index.js from the actual quotas. */
+const TRACE_CAP = 512 * 1024;
+
+/** Append trace lines to `<cacheDir>/traces/<device>.log`, halving it past the cap. */
+function appendTrace(cacheDir, device, lines) {
+  const dir = join(cacheDir, "traces");
+  mkdirSync(dir, { recursive: true });
+  const file = join(dir, `${device}.log`);
+  const stamp = new Date().toISOString();
+  const text = lines.slice(0, 500).map((l) => `${stamp} ${String(l).slice(0, 300)}\n`).join("");
+  appendFileSync(file, text);
+  try {
+    if (statSync(file).size > TRACE_CAP) {
+      const kept = readFileSync(file, "utf8");
+      writeFileSync(file, kept.slice(kept.length >> 1));
+    }
+  } catch { /* the file is a convenience; losing a line of it is fine */ }
+}
+
 export function createApp({ store, config, startedAt = Date.now(), photos, images, activeSports = [], limits = {} }) {
   const photoFor = photos ? (name) => photos.photoFor(name) : undefined;
   const mirror = images ? (url) => images.url(url) : undefined;
@@ -149,6 +167,29 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
       // it guessing, and a television that gives up shows a monogram for ever.
       res.writeHead(200, { "content-type": "image/png", "content-length": png.length, "cache-control": "public, max-age=86400", "access-control-allow-origin": "*" });
       return res.end(png);
+    }
+    // A television's trace, one file per anonymous device under the cache
+    // directory, capped so a chatty build cannot fill the disk. There is no
+    // Mac to read a television's console; this is the console.
+    if (path === "/v1/diag" && req.method === "POST") {
+      let raw = "";
+      req.on("data", (chunk) => {
+        raw += chunk;
+        if (raw.length > 64 * 1024) req.destroy();
+      });
+      req.on("end", () => {
+        let body;
+        try {
+          body = JSON.parse(raw);
+        } catch {
+          return send(res, 400, { error: "json body required" });
+        }
+        const device = String(body.device || "");
+        if (!/^[a-z0-9]{4,16}$/.test(device) || !Array.isArray(body.lines)) return send(res, 400, { error: "device and lines required" });
+        appendTrace(store.dir, device, body.lines);
+        send(res, 200, { ok: true });
+      });
+      return;
     }
     if (path === "/v1/health" || path === "/") {
       return send(res, 200, {

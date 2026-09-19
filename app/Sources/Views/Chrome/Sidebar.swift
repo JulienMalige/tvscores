@@ -29,8 +29,11 @@ struct Sidebar: View {
         Group {
             if store.ready { tabs } else { LaunchLoader() }
         }
-        .task { store.startAutoRefresh() }
+        .task { Diagnostics.shared.start(); store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
+        .onChange(of: selection) { old, new in Diagnostics.shared.note("menu \(old) -> \(new)") }
+        .onChange(of: store.iconsVersion) { _, v in Diagnostics.shared.note("icons version \(v)") }
+        .onChange(of: store.leagues.count) { _, n in Diagnostics.shared.note("menu rebuilt: \(n) competitions") }
         .onChange(of: store.leagues.count) { _, _ in openRequestedLeague() }
     }
 
@@ -76,7 +79,12 @@ struct Sidebar: View {
                         Text(section.title)
                             .font(.callout.weight(.semibold))
                             .foregroundStyle(.secondary)
-                            .padding(.leading, -Metrics.sidebarHeadingInset)
+                            // The sidebar is a list underneath; its heading
+                            // takes the row's insets, which is the indent
+                            // seen on the television. Padding on the text
+                            // did nothing; the row's insets are the lever.
+                            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
             }

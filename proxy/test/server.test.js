@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Store } from "../src/cache.js";
@@ -15,6 +15,7 @@ async function serve(extra = {}) {
   const { port } = app.address();
   return {
     store,
+    port,
     get: (path, headers) => fetch(`http://127.0.0.1:${port}${config.pathPrefix}${path}`, { headers }),
     close: () => new Promise((done) => app.close(done)),
   };
@@ -141,6 +142,22 @@ test("a country's flag is served flat and square, by its two-letter code only", 
     assert.equal((await s.get("/v1/assets/flags/qq.png")).status, 404, "a code we have no flag for");
     assert.equal((await s.get("/v1/assets/flags/gb-eng.png")).status, 404, "subdivisions are not served");
     assert.equal((await s.get("/v1/assets/flags/AZ.png")).status, 404, "lower-case only, as the app spells it");
+  } finally {
+    await s.close();
+  }
+});
+
+test("a television's trace is filed under its device, and junk is refused", async () => {
+  const s = await serve();
+  try {
+    const post = (body) => fetch(`http://127.0.0.1:${s.port}${config.pathPrefix}/v1/diag`, { method: "POST", body, headers: { "content-type": "application/json" } });
+    const ok = await post(JSON.stringify({ device: "abcd1234", lines: ["  0.100 app launched", "  1.200 focus left A -> B"] }));
+    assert.equal(ok.status, 200);
+    const trace = readFileSync(join(s.store.dir, "traces", "abcd1234.log"), "utf8");
+    assert.match(trace, /app launched/);
+    assert.match(trace, /focus left A -> B/);
+    assert.equal((await post("not json")).status, 400);
+    assert.equal((await post(JSON.stringify({ device: "../etc", lines: [] }))).status, 400, "a device is a token, not a path");
   } finally {
     await s.close();
   }

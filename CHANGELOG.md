@@ -11,6 +11,9 @@ notes when a version ships.
 - Pressing left from the day switch opens the menu again. The switch keeps
   its look and changes only on click; until a name is set, the menu's first
   row reads "Home", with a silhouette in place of the dot.
+- The app keeps a trace of the remote's moves and the menu's state, and
+  sends it to the proxy: it is how the menu's occasional open-and-shut can
+  be seen from here. Anonymous, no name or address in it.
 
 ## 1.0 build 21 — 19 September 2026
 - A Settings page, last in the menu, with one thing on it: your name. It
