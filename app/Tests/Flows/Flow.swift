@@ -18,7 +18,7 @@ enum Flow {
         app.launch()
         // The app shows a loader until its first board and its competition
         // marks are in; on a busy runner that can take a while. Every page
-        // has the day switch, so the segment for the tab asked for is the
+        // has the day switch, so the pill for the tab asked for is the
         // sign the page is up — waited for here, once, rather than hoped for
         // in each test's first assertion.
         // A competition's page may have no day switch — between seasons it

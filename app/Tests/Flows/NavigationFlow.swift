@@ -17,9 +17,10 @@ import XCTest
 /// TVSCORES_MENU_PROBE=1, and gates nothing; the television is the judge of
 /// whether the menu stays open. With the day switch on the page even the
 /// moves that act on the menu at once stopped holding: when the simulator's
-/// menu shuts, focus lands on the leftmost element, and a segment selects
-/// on focus, so nothing about the menu can be asserted here any more. Every
-/// flow that opens the menu is a probe; the menu is judged on the TV.
+/// menu shuts, focus lands on the leftmost element, and where that landed
+/// could not be told apart from the menu working, so nothing about the menu
+/// can be asserted here any more. Every flow that opens the menu is a probe;
+/// the menu is judged on the TV.
 final class NavigationFlow: FlowCase {
     private func probeOnly() throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["TVSCORES_MENU_PROBE"] == "1",
@@ -31,7 +32,7 @@ final class NavigationFlow: FlowCase {
     func testFocusStartsOnTheDayBeingShown() throws {
         try probeOnly()
         // Launched on Upcoming, the highlight starts on Upcoming. The leading
-        // segment instead is the engine re-seeding from nothing — the
+        // pill instead is the engine re-seeding from nothing — the
         // fingerprint of a menu that has just been shut from under its reader.
         let app = Flow.launch(tab: "upcoming")
         sleep(1)
@@ -67,8 +68,8 @@ final class NavigationFlow: FlowCase {
         Flow.remote.press(.right)
         sleep(1)
         XCTAssertFalse(Flow.menuIsOpen(app), "right shuts the menu")
-        let segments = ["yesterday", "today", "upcoming"].map { Flow.day(app, $0) }
-        XCTAssertTrue(segments.contains { $0.hasFocus }, "and focus is back on the page, on the day switch")
+        let pills = ["yesterday", "today", "upcoming"].map { Flow.day(app, $0) }
+        XCTAssertTrue(pills.contains { $0.hasFocus }, "and focus is back on the page, on the day switch")
     }
 
     func testTheMenuStaysOpenUntilDismissed() throws {
