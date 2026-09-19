@@ -15,9 +15,10 @@ notes when a version ships.
   read it. The clock stays beside the date on the page: a menu row cannot
   carry it.
 
-- The day switch and the table switches are the size of the system control
-  of build 18, without its dark track: bare words, the chosen one light, the
-  one the remote is on white, as in the Apple TV app; chosen on click.
+- The day switch and the table switches are the system control of build
+  18 again, and change only when you click: moving the remote across them
+  moves the highlight, not the page, and the highlight comes back to the
+  day being shown if you move on without clicking.
 
 - A race weekend is on every day it has a session: Saturday shows the
   qualifying and the sprint with their times, Sunday the race — instead of

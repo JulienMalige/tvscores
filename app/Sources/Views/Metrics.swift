@@ -45,10 +45,6 @@ enum Metrics {
     static let sidebarIcon: CGFloat = 34
     /// The round picture at the top of the menu, the Home row's.
     static let sidebarAvatar: CGFloat = 48
-    /// A pill of a switch, the size of tvOS's own segments: inset and gap.
-    static let pillInsetV: CGFloat = 10
-    static let pillInsetH: CGFloat = 26
-    static let pillGap: CGFloat = 18
     /// How far the system sets a section heading in from the icon column;
     /// undone so the heading sits on the column, as in the Apple TV app.
     static let sidebarHeadingInset: CGFloat = 24
