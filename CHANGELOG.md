@@ -8,6 +8,9 @@ notes when a version ships.
 
 ## Unreleased
 
+- The menu is grouped — Football, Motorsport, US sports, Tennis — with a
+  heading over each group, the way the Apple TV app lists its channels.
+
 - The day switch and the table switches change only when you click, not as
   the remote passes over them, and look like the Apple TV app's season
   switch: bare words, a light pill on the one being shown, white on the one

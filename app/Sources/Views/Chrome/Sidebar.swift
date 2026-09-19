@@ -40,24 +40,43 @@ struct Sidebar: View {
                 Label("tab.home", systemImage: "house")
             }
 
-            // `day` is deliberately not passed from the binding: a league page
-            // takes it once, at creation, and reading the live value here would
-            // rebuild every tab in the menu each time the day switch is used.
-            // A page opened from the front page takes that day instead, and is
-            // made afresh for it.
-            ForEach(leagues) { league in
-                Tab(value: Selection.league(key(league))) {
-                    LeaguePage(league: league, store: store, day: leagueDays[key(league)] ?? Self.initialDay())
-                        .id(leagueDays[key(league)])
-                } label: {
-                    // The version is what makes a row look at the cache again
-                    // once its icon has arrived; the rows hold no state.
-                    SidebarRow(league: league, iconsVersion: store.iconsVersion)
+            // One section per family of sport, the way the Apple TV app groups
+            // its channels: a heading over each, and the competitions under it.
+            ForEach(Self.sections, id: \.title) { section in
+                let mine = leagues.filter { section.sports.contains($0.sport) }
+                if !mine.isEmpty {
+                    TabSection(section.title) {
+                        // `day` is deliberately not passed from the binding: a
+                        // league page takes it once, at creation, and reading
+                        // the live value here would rebuild every tab in the
+                        // menu each time the day switch is used. A page opened
+                        // from the front page takes that day instead, and is
+                        // made afresh for it.
+                        ForEach(mine) { league in
+                            Tab(value: Selection.league(key(league))) {
+                                LeaguePage(league: league, store: store, day: leagueDays[key(league)] ?? Self.initialDay())
+                                    .id(leagueDays[key(league)])
+                            } label: {
+                                // The version is what makes a row look at the
+                                // cache again once its icon has arrived; the
+                                // rows hold no state.
+                                SidebarRow(league: league, iconsVersion: store.iconsVersion)
+                            }
+                        }
+                    }
                 }
             }
         }
         .tabViewStyle(.sidebarAdaptable)
     }
+
+    /// The menu's sections, in order. A sport not named here is not shown.
+    private static let sections: [(title: LocalizedStringKey, sports: [String])] = [
+        ("sidebar.football", ["football"]),
+        ("sidebar.motorsport", ["f1", "motogp"]),
+        ("sidebar.us", ["nfl", "nba"]),
+        ("sidebar.tennis", ["tennis"]),
+    ]
 
     private var leagues: [LeagueSummary] { store.leagues }
 

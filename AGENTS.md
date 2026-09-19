@@ -168,6 +168,10 @@ writes its own number is a bug, and rows all use `rowSurface(focused:)`.
   an audience.
 - Leagues in the MVP: Premier League, Champions League, NFL, NBA, F1, MotoGP,
   ATP/WTA. Rugby is available on the same plan if Julien wants it.
+- **Menu sections on the TV.** The sidebar is grouped with `TabSection`
+  since build 19. A tvOS 18 forum thread reported the back-swipe not
+  reopening a sidebar that has sections; if Julien sees that, drop the
+  sections (one `ForEach` in `Sidebar.swift`) — CI cannot judge the menu.
 - **Table zones are ours and drift by season.** `proxy/src/config.js` encodes
   this season's formats (Champions League places, relegation, the cups' 8 and
   24). Check them against each competition's regulations every August.
