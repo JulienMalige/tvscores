@@ -86,3 +86,26 @@ test("a competition with nothing this week says when it is next on", () => {
   assert.deepEqual(by.f1.next, { start: "2026-09-26T11:00:00.000Z" }, "the calendar's next round, beyond the window");
   assert.equal(by.nfl.next, undefined, "a competition playing this week has no next to speak of");
 });
+
+test("a race weekend is on every day it has a session, the race on the last of them", () => {
+  const weekend = {
+    id: "motogp:austria", sport: "motogp", kind: "race", start: "2026-09-20T12:00:00Z", status: { state: "scheduled" },
+    league: { id: "motogp", name: "MotoGP", short: "MotoGP" }, name: "Grand Prix of Austria",
+    sessions: [
+      { kind: "qualifying", name: "Qualifying", start: "2026-09-19T08:50:00Z" },
+      { kind: "sprint", name: "Sprint", start: "2026-09-19T13:00:00Z" },
+      { kind: "race", name: "Race", start: "2026-09-20T12:00:00Z" },
+    ],
+  };
+  const on = (day) => buildScoreboard([weekend], { now: Date.UTC(2026, 8, day, 15), tz: "UTC", upcomingDays: 7 }).days;
+  const saturday = on(19);
+  assert.equal(saturday.today.length, 1, "Saturday: the sprint is today");
+  assert.equal(saturday.upcoming.length, 1, "and the race is still to come");
+  assert.equal(saturday.yesterday.length, 0);
+  const sunday = on(20);
+  assert.equal(sunday.today.length, 1, "Sunday: race day");
+  assert.equal(sunday.yesterday.length, 1, "and the sprint was yesterday");
+  assert.equal(sunday.upcoming.length, 0);
+  const friday = on(18);
+  assert.deepEqual([friday.yesterday.length, friday.today.length, friday.upcoming.length], [0, 0, 1], "Friday: the whole weekend is ahead, once");
+});

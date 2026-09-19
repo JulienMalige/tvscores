@@ -1,53 +1,46 @@
 import SwiftUI
+import UIKit
 
 /// A choice between a few things — the day switch, the table switch under a
-/// competition — the way the Apple TV app switches seasons: bare words, a
-/// light pill on the one chosen, a white lifted pill on the one the remote
-/// is on. A pill is chosen on click, not as focus passes over it, and there
-/// is no track behind the row.
+/// competition — as tvOS's own segmented control, without the dark track it
+/// draws behind the segments. The segment the remote is on is white, the
+/// chosen one light, the rest bare words; a segment is chosen as focus
+/// reaches it, as in the Apple TV app's season switch.
 ///
-/// Not the system's segmented control, which draws a track it will not give
-/// up and chooses a segment the moment focus reaches it — on a page where
-/// pressing right moves *through* the switch, that changed the day under
-/// people's feet. Focus is read from the environment inside the label, the
-/// way the rows do it, so the pill lights up with the system's own timing.
-struct Segments<Value: Hashable>: View {
+/// UIKit's control, not SwiftUI's picker: the picker draws a track that no
+/// appearance setting reaches, and pills of our own on the plain button
+/// style came out larger and lost the system's focus feel. This is the same
+/// control as in builds 17 and 18, with its track cleared at creation.
+struct Segments<Value: Hashable>: UIViewRepresentable {
     @Binding var selection: Value
-    let options: [(value: Value, title: LocalizedStringKey)]
+    let options: [(value: Value, title: String)]
 
-    var body: some View {
-        HStack(spacing: Metrics.pillGap) {
-            ForEach(options, id: \.value) { option in
-                Button {
-                    selection = option.value
-                } label: {
-                    Pill(title: option.title, selected: selection == option.value)
-                }
-                // Borderless, not plain: the plain style lifts a platter of
-                // its own behind the label on focus, larger than the pill,
-                // and ignores `focusEffectDisabled`. The pill is the focus
-                // effect here.
-                .buttonStyle(.borderless)
-                .focusEffectDisabled()
-            }
-            Spacer()
-        }
+    func makeUIView(context: Context) -> UISegmentedControl {
+        let control = UISegmentedControl(items: options.map(\.title))
+        control.setBackgroundImage(UIImage(), for: .normal, barMetrics: .default)
+        control.setDividerImage(UIImage(), forLeftSegmentState: .normal, rightSegmentState: .normal, barMetrics: .default)
+        control.addTarget(context.coordinator, action: #selector(Coordinator.changed(_:)), for: .valueChanged)
+        control.setContentHuggingPriority(.required, for: .horizontal)
+        control.setContentCompressionResistancePriority(.required, for: .horizontal)
+        return control
     }
 
-    private struct Pill: View {
-        let title: LocalizedStringKey
-        let selected: Bool
-        @Environment(\.isFocused) private var isFocused
+    func updateUIView(_ control: UISegmentedControl, context: Context) {
+        context.coordinator.parent = self
+        let index = options.firstIndex { $0.value == selection } ?? 0
+        if control.selectedSegmentIndex != index { control.selectedSegmentIndex = index }
+    }
 
-        var body: some View {
-            Text(title)
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(isFocused ? Color.black : Color.white)
-                .padding(.vertical, Metrics.pillInsetV)
-                .padding(.horizontal, Metrics.pillInsetH)
-                .background(Capsule().fill(isFocused ? Color.white : Color.white.opacity(selected ? 0.32 : 0)))
-                .scaleEffect(isFocused ? 1.08 : 1)
-                .animation(.easeOut(duration: 0.15), value: isFocused)
+    func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
+
+    final class Coordinator {
+        var parent: Segments
+        init(parent: Segments) { self.parent = parent }
+
+        @objc func changed(_ control: UISegmentedControl) {
+            let index = control.selectedSegmentIndex
+            guard parent.options.indices.contains(index) else { return }
+            parent.selection = parent.options[index].value
         }
     }
 }

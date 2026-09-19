@@ -45,10 +45,6 @@ enum Metrics {
     static let sidebarIcon: CGFloat = 40
     /// One column of a table read as numbers — played, won, points.
     static let tableCell: CGFloat = 96
-    /// A pill of a switch: its inset, and the gap to the next.
-    static let pillInsetV: CGFloat = 14
-    static let pillInsetH: CGFloat = 32
-    static let pillGap: CGFloat = 28
 }
 
 extension View {

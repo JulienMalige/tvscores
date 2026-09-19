@@ -8,6 +8,14 @@ notes when a version ships.
 
 ## Unreleased
 
+- The day switch and the table switches are the system control of build
+  18 again — small and steady — with its dark track gone: bare words, the
+  chosen one light, the one the remote is on white, as in the Apple TV app.
+
+- A race weekend is on every day it has a session: Saturday shows the
+  qualifying and the sprint with their times, Sunday the race — instead of
+  "No games on this day" until race day.
+
 ## 1.0 build 19 — 19 September 2026
 - Crests and portraits no longer go missing for a minute after the menu
   redraws: a picture whose loading was interrupted is asked for again, not

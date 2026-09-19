@@ -157,6 +157,22 @@ struct Session: Decodable, Equatable, Identifiable {
     var id: String { "\(kind)-\(start.timeIntervalSince1970)" }
 }
 
+extension Event {
+    /// The weekend's sessions that fall on a day bucket — yesterday's or
+    /// today's — measured from `now` in the viewer's calendar. Upcoming has
+    /// none: a row there shows the race's own day, and the page the rest.
+    func sessions(on day: Day, now: Date = .now, calendar: Calendar = .current) -> [Session] {
+        guard let sessions else { return [] }
+        let reference: Date
+        switch day {
+        case .today: reference = now
+        case .yesterday: reference = calendar.date(byAdding: .day, value: -1, to: now) ?? now
+        case .upcoming: return []
+        }
+        return sessions.filter { calendar.isDate($0.start, inSameDayAs: reference) }
+    }
+}
+
 struct Status: Decodable, Equatable {
     let state: State
     let clock: String?

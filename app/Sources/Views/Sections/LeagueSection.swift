@@ -2,6 +2,9 @@ import SwiftUI
 
 struct LeagueSection: View {
     let group: LeagueGroup
+    /// The day the section is listed under, for a race weekend's rows.
+    let day: Day
+    var now: Date = .now
     /// On the front page, the heading opens the competition — in its own
     /// place in the menu, not as a page pushed over Home, so the menu says
     /// where you are whichever way you came.
@@ -30,7 +33,7 @@ struct LeagueSection: View {
                 ForEach(group.events) { event in
                     switch event.kind {
                     case .match: MatchRow(event: event)
-                    case .race: RaceRow(event: event)
+                    case .race: RaceRow(event: event, day: day, now: now)
                     }
                 }
             }

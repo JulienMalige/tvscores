@@ -42,8 +42,12 @@ struct StandingsSection: View {
     }
 
     private func tabs(_ standings: Standings) -> some View {
-        Segments(selection: $table, options: standings.tables.enumerated().map { ($0.offset, title($0.element.id)) })
-            .accessibilityIdentifier("table.switch")
+        HStack {
+            Segments(selection: $table, options: standings.tables.enumerated().map { ($0.offset, title($0.element.id)) })
+                .fixedSize()
+                .accessibilityIdentifier("table.switch")
+            Spacer()
+        }
     }
 
     private func rows(_ table: StandingsTable) -> some View {
@@ -126,15 +130,15 @@ struct StandingsSection: View {
             .accessibilityIdentifier("table.cut.\(style)")
     }
 
-    private func title(_ id: String) -> LocalizedStringKey {
+    private func title(_ id: String) -> String {
         switch id {
-        case "drivers": "standings.drivers"
-        case "constructors": "standings.constructors"
-        case "teams": "standings.teams"
-        case "rankings": "standings.rankings"
-        case "east": "standings.east"
-        case "west": "standings.west"
-        default: LocalizedStringKey(id) // "AFC", "NFC": names, not words
+        case "drivers": String(localized: "standings.drivers")
+        case "constructors": String(localized: "standings.constructors")
+        case "teams": String(localized: "standings.teams")
+        case "rankings": String(localized: "standings.rankings")
+        case "east": String(localized: "standings.east")
+        case "west": String(localized: "standings.west")
+        default: id // "AFC", "NFC": names, not words
         }
     }
 }

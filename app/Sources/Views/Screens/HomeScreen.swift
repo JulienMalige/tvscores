@@ -76,7 +76,7 @@ struct HomeScreen: View {
             } else {
                 LazyVStack(alignment: .leading, spacing: Metrics.sectionGap) {
                     ForEach(groups) { group in
-                        LeagueSection(group: group, openLeague: openLeague)
+                        LeagueSection(group: group, day: day, now: board.generatedAt, openLeague: openLeague)
                     }
                 }
                 .padding(.top, 4)

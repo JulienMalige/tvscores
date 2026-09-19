@@ -45,7 +45,7 @@ struct LeagueScreen: View {
                 .frame(maxWidth: .infinity)
         } else {
             ForEach(groups) { group in
-                LeagueSection(group: group, showHeader: false)
+                LeagueSection(group: group, day: day, now: store.board?.generatedAt ?? .now, showHeader: false)
             }
         }
     }

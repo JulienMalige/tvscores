@@ -25,14 +25,18 @@ struct SessionRow: View {
         .accessibilityIdentifier("session.\(session.kind)")
     }
 
+    private var title: LocalizedStringKey { session.title }
+}
+
+extension Session {
     /// The three a person looks for get their word in every language; a
     /// second qualifying or a shootout keeps the name the series gives it.
-    private var title: LocalizedStringKey {
-        switch session.kind {
-        case "qualifying" where session.name.lowercased() == "qualifying": "session.qualifying"
-        case "sprint" where session.name.lowercased() == "sprint": "session.sprint"
+    var title: LocalizedStringKey {
+        switch kind {
+        case "qualifying" where name.lowercased() == "qualifying": "session.qualifying"
+        case "sprint" where name.lowercased() == "sprint": "session.sprint"
         case "race": "session.race"
-        default: LocalizedStringKey(session.name)
+        default: LocalizedStringKey(name)
         }
     }
 }

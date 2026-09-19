@@ -134,11 +134,16 @@ export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrd
   const horizon = localDate(new Date(now + upcomingDays * 86400e3).toISOString(), tz);
   const days = { yesterday: [], today: [], upcoming: [] };
   for (const e of events) {
-    const d = localDate(e.start, tz);
+    // A match has its one day. A race weekend has every day with a session
+    // on it — qualifying on Saturday is what "today" means to someone who
+    // opens the app on Saturday, whatever day the race is — so it can sit
+    // in more than one bucket, with the race itself in the last of them.
+    const dates = new Set([localDate(e.start, tz), ...(e.sessions || []).map((s) => localDate(s.start, tz))]);
+    const live = e.status.state === STATE.live;
     // A game still in play belongs to "today" even if it kicked off before local midnight.
-    if (e.status.state === STATE.live || d === today) days.today.push(e);
-    else if (d === yesterday) days.yesterday.push(e);
-    else if (d > today && d <= horizon) days.upcoming.push(e);
+    if (live || dates.has(today)) days.today.push(e);
+    if (!live && dates.has(yesterday)) days.yesterday.push(e);
+    if ([...dates].some((d) => d > today && d <= horizon)) days.upcoming.push(e);
   }
   // Upcoming keeps at most the next 10 rounds per racing series; team sports are unlimited.
   const seen = new Map();

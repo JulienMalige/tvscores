@@ -4,10 +4,15 @@ import SwiftUI
 /// once the race is classified.
 struct RaceRow: View {
     let event: Event
+    /// The day this row is listed under: on a day with sessions but no
+    /// race, the row shows those sessions rather than the race's own time.
+    let day: Day
+    /// What "today" is — the board's clock, so a bundled board reads right.
+    var now: Date = .now
 
     var body: some View {
         NavigationLink(value: event) {
-            RaceRowContent(event: event)
+            RaceRowContent(event: event, sessions: event.status.state == .scheduled ? event.sessions(on: day, now: now) : [])
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("race.\(event.id)")
@@ -16,6 +21,8 @@ struct RaceRow: View {
 
 private struct RaceRowContent: View {
     let event: Event
+    /// This day's sessions when the race itself is another day's.
+    let sessions: [Session]
     @Environment(\.isFocused) private var isFocused
 
     var body: some View {
@@ -30,7 +37,22 @@ private struct RaceRowContent: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                StatusLabel(status: event.status, start: event.start)
+                if sessions.isEmpty || sessions.contains(where: { $0.kind == "race" }) {
+                    StatusLabel(status: event.status, start: event.start)
+                } else {
+                    // Qualifying and the sprint, with their times: what is
+                    // on this day of the weekend.
+                    VStack(alignment: .trailing, spacing: 4) {
+                        ForEach(sessions) { session in
+                            HStack(spacing: 12) {
+                                Text(session.title).font(.callout).foregroundStyle(.secondary)
+                                Text(session.start, format: .dateTime.hour().minute())
+                                    .font(.title3.weight(.semibold))
+                                    .monospacedDigit()
+                            }
+                        }
+                    }
+                }
             }
             let podium = (event.results ?? []).filter(\.finished).prefix(3)
             if !podium.isEmpty {

@@ -161,4 +161,25 @@ struct ModelTests {
             #expect(league.next == nil, "\(league.name) is on this week and has no next to speak of")
         }
     }
+
+    @Test("a weekend's sessions are read by the day they fall on")
+    func sessionsByDay() throws {
+        let json = #"""
+        {"id":"motogp:x","sport":"motogp","kind":"race","start":"2026-09-20T12:00:00Z","status":{"state":"scheduled"},
+         "name":"Grand Prix of Austria","sessions":[
+           {"kind":"qualifying","name":"Qualifying","start":"2026-09-19T08:50:00Z"},
+           {"kind":"sprint","name":"Sprint","start":"2026-09-19T13:00:00Z"},
+           {"kind":"race","name":"Race","start":"2026-09-20T12:00:00Z"}]}
+        """#
+        let race = try ScoreboardDecoder.make().decode(Event.self, from: Data(json.utf8))
+        var utc = Calendar(identifier: .gregorian)
+        utc.timeZone = TimeZone(identifier: "UTC")!
+        let saturday = Date(timeIntervalSince1970: 1_789_812_000) // 2026-09-19T10:00Z
+        #expect(race.sessions(on: .today, now: saturday, calendar: utc).map(\.kind) == ["qualifying", "sprint"], "Saturday: qualifying and the sprint")
+        #expect(race.sessions(on: .yesterday, now: saturday, calendar: utc).isEmpty)
+        #expect(race.sessions(on: .upcoming, now: saturday, calendar: utc).isEmpty, "upcoming shows the race's own day instead")
+        let sunday = saturday.addingTimeInterval(86_400)
+        #expect(race.sessions(on: .today, now: sunday, calendar: utc).map(\.kind) == ["race"])
+        #expect(race.sessions(on: .yesterday, now: sunday, calendar: utc).map(\.kind) == ["qualifying", "sprint"])
+    }
 }
