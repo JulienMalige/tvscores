@@ -26,7 +26,9 @@ struct InitialsMark: View {
 
     /// The disc's colour follows the name, so two people differ.
     static func colour(for initials: String?) -> UIColor {
-        guard let initials else { return UIColor.white.withAlphaComponent(0.22) }
+        // No name yet: a solid grey, so the disc reads on a white focused
+        // row as well as on the dark one.
+        guard let initials else { return UIColor(white: 0.55, alpha: 1) }
         let hues: [CGFloat] = [0.58, 0.02, 0.33, 0.75, 0.12, 0.48, 0.90]
         let index = Int(initials.unicodeScalars.reduce(0) { $0 &+ Int($1.value) }) % hues.count
         return UIColor(hue: hues[index], saturation: 0.55, brightness: 0.85, alpha: 1)
