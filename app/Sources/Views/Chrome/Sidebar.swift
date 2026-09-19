@@ -69,8 +69,9 @@ struct Sidebar: View {
         }
         .tabViewStyle(.sidebarAdaptable)
         // The slot at the top of the sidebar, where the Apple TV app shows
-        // the profile and the time. The profile is Apple's to show, not ours;
-        // the time is.
+        // its profile and the time. Every app draws its own header here —
+        // Disney+ and the like put their own account's profile in it — and
+        // we have no profiles, so ours carries the name and the time.
         .tabViewSidebarHeader {
             HStack {
                 Text("app.title")
