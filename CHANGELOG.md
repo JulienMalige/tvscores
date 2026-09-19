@@ -8,6 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
+## 1.0 build 18 — 19 September 2026
 - League tables read as columns — played, won, drawn, lost, goal difference,
   points — with a line under the Champions League places and a dashed one
   above relegation, and what the places mean written under the table. The
