@@ -72,7 +72,10 @@ struct StandingsSection: View {
             if let legend = table.legend, !legend.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {
                     ForEach(legend, id: \.key) { zone in
-                        Text("\(zone.from == zone.to ? "\(zone.from)" : "\(zone.from)–\(zone.to)"): ") + Text(LocalizedStringKey("zone.\(zone.key)"))
+                        // A key built from a value, not interpolated: inside
+                        // a LocalizedStringKey literal, "\(x)" is a format
+                        // argument, and the catalogue is asked for "zone.%@".
+                        Text(verbatim: "\(zone.from == zone.to ? "\(zone.from)" : "\(zone.from)–\(zone.to)"): ") + Text(LocalizedStringKey("zone." + zone.key))
                     }
                 }
                 .font(.callout)
@@ -95,7 +98,7 @@ struct StandingsSection: View {
     private func columnLabels(_ columns: [String]) -> some View {
         HStack(spacing: 20) {
             ForEach(columns, id: \.self) { column in
-                Text(LocalizedStringKey("col.\(column)"))
+                Text(LocalizedStringKey("col." + column))
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .frame(width: Metrics.tableCell, alignment: .trailing)
