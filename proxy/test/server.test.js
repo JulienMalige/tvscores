@@ -130,3 +130,18 @@ test("health reports the day's spend against each sport's cap, and is never cach
     await s.close();
   }
 });
+
+test("a country's flag is served flat and square, by its two-letter code only", async () => {
+  const s = await serve();
+  try {
+    const az = await s.get("/v1/assets/flags/az.png");
+    assert.equal(az.status, 200);
+    assert.equal(az.headers.get("content-type"), "image/png");
+    assert.ok(Number(az.headers.get("content-length")) > 500, "and says how long it is");
+    assert.equal((await s.get("/v1/assets/flags/qq.png")).status, 404, "a code we have no flag for");
+    assert.equal((await s.get("/v1/assets/flags/gb-eng.png")).status, 404, "subdivisions are not served");
+    assert.equal((await s.get("/v1/assets/flags/AZ.png")).status, 404, "lower-case only, as the app spells it");
+  } finally {
+    await s.close();
+  }
+});

@@ -52,9 +52,15 @@ extension Scoreboard {
             for event in group.events {
                 rest.append(event.home?.logo)
                 rest.append(event.home?.photo)
+                rest.append(Flags.icon(for: event.home?.flag))
                 rest.append(event.away?.logo)
                 rest.append(event.away?.photo)
-                for row in event.results ?? [] { rest.append(row.photo) }
+                rest.append(Flags.icon(for: event.away?.flag))
+                rest.append(Flags.icon(for: event.flag))
+                for row in event.results ?? [] {
+                    rest.append(row.photo)
+                    rest.append(Flags.icon(for: row.flag))
+                }
             }
         }
         return marks + rest
@@ -65,6 +71,6 @@ extension Standings {
     /// A league table's portraits and badges, warmed when the table lands so
     /// that switching between drivers and teams draws them straight away.
     var imageURLs: [URL?] {
-        tables.flatMap { $0.rows.flatMap { [$0.photo, $0.logo] } }
+        tables.flatMap { $0.rows.flatMap { [$0.photo, $0.logo, Flags.icon(for: $0.flag)] } }
     }
 }

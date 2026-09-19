@@ -121,6 +121,19 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
       res.writeHead(200, { "content-type": "image/png", "content-length": badge.length, "cache-control": IMAGE_CACHE, "access-control-allow-origin": "*" });
       return res.end(badge);
     }
+    // A country's flag, flat and square, for the app to clip into a circle.
+    const flag = path.match(/^\/v1\/assets\/flags\/([a-z]{2})\.png$/);
+    if (flag) {
+      const file = join(ASSETS, "flags", `${flag[1]}.png`);
+      try {
+        statSync(file);
+      } catch {
+        return send(res, 404, { error: "no such flag" });
+      }
+      const png = readFileSync(file);
+      res.writeHead(200, { "content-type": "image/png", "content-length": png.length, "cache-control": "public, max-age=2592000", "access-control-allow-origin": "*" });
+      return res.end(png);
+    }
     // `icon/` is the same competition's mark on its own; the alternative is
     // spelled out rather than a free path, so nothing can walk out of assets/.
     const asset = path.match(/^\/v1\/assets\/leagues\/(icon\/)?([a-z0-9-]+)\.png$/);

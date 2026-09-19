@@ -8,6 +8,9 @@ notes when a version ships.
 
 ## Unreleased
 
+- Flags are flat and fill their circle — on a race, and on a driver's or
+  player's portrait — the way Apple Sports draws them, instead of the emoji.
+
 - The Apple TV profile in use and the time sit at the top of the menu, as
   they do in the Apple TV app.
 

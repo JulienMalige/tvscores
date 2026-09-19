@@ -24,12 +24,16 @@ struct PersonMark: View {
             .frame(width: size, height: size)
             .clipShape(Circle())
             if let flag, !flag.isEmpty {
-                Text(flag)
-                    .font(.system(size: size * 0.34))
-                    .frame(width: size * 0.42, height: size * 0.42)
-                    .background(Circle().fill(Color.black.opacity(0.85)))
-                    .clipShape(Circle())
-                    .offset(x: size * 0.06, y: size * 0.06)
+                // The flat flag fills its little circle, ringed in dark so it
+                // reads against the portrait; the emoji until it has come.
+                CachedImage(url: Flags.icon(for: flag), contentMode: .fill) {
+                    Text(flag).font(.system(size: size * 0.3))
+                }
+                .frame(width: size * 0.4, height: size * 0.4)
+                .background(Circle().fill(Color.black.opacity(0.85)))
+                .clipShape(Circle())
+                .overlay(Circle().stroke(Color.black.opacity(0.85), lineWidth: size * 0.03))
+                .offset(x: size * 0.06, y: size * 0.06)
             }
         }
         .frame(width: size, height: size)

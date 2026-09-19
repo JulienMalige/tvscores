@@ -330,3 +330,11 @@ profile's picture, name and the clock at the top of the sidebar, as it does
 for its own apps. Each Apple TV profile gets its own copy of the app's data;
 we keep nothing per user, so nothing changes — until favourites, where it is
 the right foundation.
+
+## Flags (2026-09-19)
+
+Flat, square flags come from the flag-icons set (MIT, lipis/flag-icons),
+rasterised once by `proxy/scripts/build-flags.mjs` into
+`proxy/assets/flags/<iso2>.png` and served from there. The app names a flag
+by the emoji the proxy already sends — two regional-indicator letters — and
+clips the picture to a circle; the emoji stands in until it has loaded.

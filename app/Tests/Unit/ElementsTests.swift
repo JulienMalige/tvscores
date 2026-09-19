@@ -99,4 +99,16 @@ struct ElementsTests {
         #expect(Color(hex: "#gggggg") == nil)
         #expect(Color(hex: nil) == nil)
     }
+
+    // MARK: Flags
+
+    @Test("a flag emoji names the flat flag the proxy serves")
+    func flagEmojiNamesItsPicture() {
+        #expect(Flags.code("🇦🇿") == "az")
+        #expect(Flags.code("🇬🇧") == "gb")
+        #expect(Flags.code("🏁") == nil, "a chequered flag is not a country")
+        #expect(Flags.code("AZ") == nil)
+        #expect(Flags.icon(for: "🇪🇸")?.path.hasSuffix("/v1/assets/flags/es.png") == true)
+        #expect(Flags.icon(for: nil) == nil)
+    }
 }
