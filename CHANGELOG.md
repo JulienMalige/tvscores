@@ -8,6 +8,9 @@ notes when a version ships.
 
 ## Unreleased
 
+- The Apple TV profile in use and the time sit at the top of the menu, as
+  they do in the Apple TV app.
+
 - The menu is grouped — Football, Motorsport, US sports, Tennis — with a
   heading over each group, the way the Apple TV app lists its channels, and
   its icons are smaller, about half the row, so the names have room.

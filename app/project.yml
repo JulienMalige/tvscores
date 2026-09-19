@@ -40,6 +40,10 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.julienmalige.tvscores
+        # Runs as the Apple TV profile in use: that is what puts the
+        # profile and the clock at the top of the sidebar. The App ID has
+        # the User Management capability and the profile carries it.
+        CODE_SIGN_ENTITLEMENTS: TVScores.entitlements
         TARGETED_DEVICE_FAMILY: "3"
         ENABLE_PREVIEWS: "YES"
         ASSETCATALOG_COMPILER_APPICON_NAME: App Icon & Top Shelf Image

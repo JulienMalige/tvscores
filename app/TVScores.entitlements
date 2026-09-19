@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- The app runs as the Apple TV profile in use, which is what makes
+	     tvOS put that profile's picture, name and the clock at the top of
+	     the sidebar, as it does for its own apps. We keep nothing per user. -->
+	<key>com.apple.developer.user-management</key>
+	<array>
+		<string>runs-as-current-user</string>
+	</array>
+</dict>
+</plist>

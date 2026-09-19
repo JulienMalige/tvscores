@@ -21,7 +21,7 @@ as repository secrets.
 | Issuer ID | `69a6de7c-7178-47e3-e053-5b8c7c11a4d1` |
 | Internal TestFlight group | `Internal`, account holder added as tester |
 | Distribution certificate | `TLAS59R725`, expires 2027-09-14 |
-| Provisioning profile | `TV Scores tvOS App Store`, expires 2027-09-14 |
+| Provisioning profile | `TV Scores tvOS App Store 2` (`3YA4WZL5X6`), expires 2027-09-14 — minted 2026-09-19 with the User Management capability; the first one (`WK22RPQ32X`) is deleted once a build has shipped on this one |
 
 The `.p8` private key lives only in `~/.config/tvscores/` on the VPS (mode 600)
 and in GitHub Actions secrets. It is never committed; `.gitignore` blocks

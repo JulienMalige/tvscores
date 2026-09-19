@@ -319,3 +319,14 @@ the cups' eight and twenty-four — are ours, in `proxy/src/config.js`
 its format this season. A coefficient place or a cup winner can shift a line
 by one; the table is a guide, not the regulations. The feed carries none of
 this. Brasileirão marks the Libertadores and Sudamericana places.
+
+## Runs as current user (2026-09-19)
+
+The app carries `com.apple.developer.user-management` = `runs-as-current-user`
+(`app/TVScores.entitlements`), the App ID has the User Management capability
+(added through the App Store Connect API, bundle id `SDRLJ2W5LF`), and the
+App Store profile was minted anew to carry it. tvOS then draws the current
+profile's picture, name and the clock at the top of the sidebar, as it does
+for its own apps. Each Apple TV profile gets its own copy of the app's data;
+we keep nothing per user, so nothing changes — until favourites, where it is
+the right foundation.
