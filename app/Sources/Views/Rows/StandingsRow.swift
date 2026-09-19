@@ -41,6 +41,8 @@ private struct StandingsRowContent: View {
                     Text(cell)
                         .font(.system(size: i == cells.count - 1 ? 34 : 28, weight: i == cells.count - 1 ? .bold : .regular, design: .rounded))
                         .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7) // "1.000" fits the column rather than wrapping
                         .foregroundStyle(i == cells.count - 1 ? .primary : .secondary)
                         .frame(width: Metrics.tableCell, alignment: .trailing)
                 }
