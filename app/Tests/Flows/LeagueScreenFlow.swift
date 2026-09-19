@@ -48,7 +48,7 @@ final class LeagueScreenFlow: FlowCase {
         let app = Flow.launch(league: "football")
         app.staticTexts["Standings"].appears(within: 10)
         XCTAssertTrue(Flow.walk(.down, until: app.buttons["standing.1"], limit: 40), "focus walks down to the top of the table")
-        XCTAssertTrue(app.staticTexts["PTS"].firstMatch.exists, "the column names head the table")
+        XCTAssertTrue(app.staticTexts["col.pts"].firstMatch.exists, "the column names head the table")
         XCTAssertTrue(app.descendants(matching: .any)["table.cut.solid"].exists, "a line under the Libertadores places")
         XCTAssertTrue(Flow.walk(.down, until: app.buttons["standing.20"], limit: 30), "and down to the bottom")
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Relegation'")).firstMatch.exists, "the legend says what the places mean")
@@ -58,8 +58,8 @@ final class LeagueScreenFlow: FlowCase {
         let app = Flow.launch(league: "nfl")
         app.staticTexts["Standings"].appears(within: 10)
         XCTAssertTrue(app.buttons["AFC"].firstMatch.exists && app.buttons["NFC"].firstMatch.exists, "two conferences to switch between")
-        XCTAssertTrue(app.staticTexts["East"].firstMatch.waitForExistence(timeout: 8), "the first division heads its four teams")
-        XCTAssertTrue(app.staticTexts["PCT"].firstMatch.exists)
+        XCTAssertTrue(app.staticTexts["division.East"].firstMatch.waitForExistence(timeout: 8), "the first division heads its four teams")
+        XCTAssertTrue(app.staticTexts["col.pct"].firstMatch.exists, "with the record's columns over them")
     }
 
     func testACompetitionBetweenSeasonsSaysWhenItIsBack() {

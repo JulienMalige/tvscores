@@ -125,11 +125,13 @@ struct ModelTests {
     @Test("a table read as numbers has a cell per column, and its cuts fall inside it")
     func tablesLineUp() throws {
         let bundle = try ScoreboardDecoder.make().decode(StandingsBundle.self, from: Self.sample("sample-standings"))
-        var seenColumns = 0
         for (key, standings) in bundle.standings {
+            // A team sport's table is read as columns; a table of people —
+            // drivers, riders, players — is a list with a number beside each.
+            let people = key.hasPrefix("f1:") || key.hasPrefix("motogp:") || key.hasPrefix("tennis:")
             for table in standings.tables {
+                #expect((table.columns == nil) == people, "\(key) \(table.id)")
                 guard let columns = table.columns else { continue }
-                seenColumns += 1
                 for row in table.rows {
                     #expect(row.cells?.count == columns.count, "\(key) \(row.name)")
                 }
@@ -141,7 +143,6 @@ struct ModelTests {
                 }
             }
         }
-        #expect(seenColumns >= 8, "every football table and both conferences read as columns")
         let nfl = try #require(bundle.standings["nfl:4391"])
         #expect(nfl.tables.map(\.id) == ["AFC", "NFC"])
         #expect(nfl.tables[0].rows.allSatisfy { $0.section != nil }, "a conference is read division by division")

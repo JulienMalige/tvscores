@@ -58,6 +58,7 @@ struct StandingsSection: View {
                             .font(.title3.weight(.semibold))
                             .foregroundStyle(.secondary)
                             .padding(.leading, Metrics.rowInsetH)
+                            .accessibilityIdentifier("division.\(section)")
                         Spacer()
                         if let columns = table.columns { columnLabels(columns) }
                     }
@@ -102,6 +103,7 @@ struct StandingsSection: View {
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .frame(width: Metrics.tableCell, alignment: .trailing)
+                    .accessibilityIdentifier("col." + column)
             }
         }
     }
