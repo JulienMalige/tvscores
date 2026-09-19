@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Formula 1 (and later MotoGP): event name, status, podium once the race is classified.
+/// A race weekend: the country's flag, the event, its status, and the podium
+/// once the race is classified.
 struct RaceRow: View {
     let event: Event
 

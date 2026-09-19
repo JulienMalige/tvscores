@@ -304,7 +304,7 @@ TheSportsDB's `lookuptable.php` answers with nothing for the NFL, the NBA,
 the Champions League, the Europa League and the Libertadores — this season and
 last. Its `eventsseason.php` has every game with its score, so the proxy
 builds those tables itself (`proxy/src/tables.js`): a record by conference for
-the American leagues, with the division beside it from our own list
+the American leagues, ranked division by division from our own list
 (`proxy/src/divisions.js`, the feed has no division field), and a points
 table for the cups' league phase (rounds 1–8; qualifying is round 0). One
 season call per league per refresh. Libertadores stays without a table: its

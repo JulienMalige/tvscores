@@ -5,9 +5,12 @@ struct OffseasonSection: View {
     let ref: LeagueRef
     let next: NextGame
 
-    /// A fortnight between rounds is not an off-season: the title says
-    /// which it is.
-    private var soon: Bool { next.start.timeIntervalSinceNow < 45 * 86400 }
+    /// A break shorter than this is "coming up", with the day; longer is an
+    /// off-season, with the month. Six weeks: longer than any gap in a
+    /// season's calendar, shorter than the shortest off-season we follow.
+    private static let offseasonFrom: TimeInterval = 45 * 86400
+
+    private var soon: Bool { next.start.timeIntervalSinceNow < Self.offseasonFrom }
 
     var body: some View {
         VStack(spacing: 10) {

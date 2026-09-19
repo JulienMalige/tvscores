@@ -67,7 +67,7 @@ avatar the app draws. Anything unasked-for for 60 days is pruned.
 
 | Sport | Provider & plan | Cap | Schedule batch | Live poll | Source's own freshness | Worst-case day | Licensed for release? |
 |---|---|---|---|---|---|---|---|
-| football (8 competitions) | TheSportsDB, Single Developer ($9/mo) | 100/min | 9 calls, once per UTC day after 04:00 (or 3 h stale) | 30 s inside a window, 1 call | 60 s (measured) | ~1,500 incl. tables | yes, confirm wording |
+| football (8 competitions) | TheSportsDB, Single Developer ($9/mo) | 100/min | 9 calls, once per UTC day after 04:00 (or 3 h stale), +1 per idle competition | 30 s inside a window, 1 call | 60 s (measured) | ~1,500 incl. tables | yes, confirm wording |
 | nfl | TheSportsDB, same key | shared | 9 calls, same | 30 s, 1 call | 60 s (assumed, as football) | ~800 | yes |
 | nba | TheSportsDB, same key | shared | 9 calls, same | 30 s, 1 call | 60 s (assumed, as football) | ~800 | yes |
 | tennis (ATP/WTA, majors and 1000s) | livetennisapi, free | **100/day** | 1 call daily + catalogue once a month | 30 min, 1 call | seconds | ~55 | free tier only |
