@@ -9,8 +9,9 @@ notes when a version ships.
 ## Unreleased
 
 - The day switch and the table switches change only when you click, not as
-  the remote passes over them, and sit without a track: the day or table
-  being shown is filled, the one the remote is on is white.
+  the remote passes over them, and look like the Apple TV app's season
+  switch: bare words, a light pill on the one being shown, white on the one
+  the remote is on.
 
 ## 1.0 build 18 — 19 September 2026
 - League tables read as columns — played, won, drawn, lost, goal difference,

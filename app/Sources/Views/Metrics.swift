@@ -45,7 +45,7 @@ enum Metrics {
     /// A pill of a switch: its inset, and the gap to the next.
     static let pillInsetV: CGFloat = 14
     static let pillInsetH: CGFloat = 32
-    static let pillGap: CGFloat = 16
+    static let pillGap: CGFloat = 28
 }
 
 extension View {

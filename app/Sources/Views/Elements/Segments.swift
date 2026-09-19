@@ -1,9 +1,10 @@
 import SwiftUI
 
 /// A choice between a few things — the day switch, the table switch under a
-/// competition — as a row of pills: the one the remote is on white, the one
-/// chosen filled, the rest faint. A pill is chosen on click, not as focus
-/// passes over it, and there is no track behind the row.
+/// competition — the way the Apple TV app switches seasons: bare words, a
+/// light pill on the one chosen, a white lifted pill on the one the remote
+/// is on. A pill is chosen on click, not as focus passes over it, and there
+/// is no track behind the row.
 ///
 /// Not the system's segmented control, which draws a track it will not give
 /// up and chooses a segment the moment focus reaches it — on a page where
@@ -35,12 +36,12 @@ struct Segments<Value: Hashable>: View {
 
         var body: some View {
             Text(title)
-                .font(.title3.weight(selected || isFocused ? .semibold : .regular))
+                .font(.title3.weight(.semibold))
                 .foregroundStyle(isFocused ? Color.black : Color.white)
                 .padding(.vertical, Metrics.pillInsetV)
                 .padding(.horizontal, Metrics.pillInsetH)
-                .background(Capsule().fill(isFocused ? Color.white : Color.white.opacity(selected ? 0.28 : 0.10)))
-                .scaleEffect(isFocused ? 1.06 : 1)
+                .background(Capsule().fill(isFocused ? Color.white : Color.white.opacity(selected ? 0.32 : 0)))
+                .scaleEffect(isFocused ? 1.08 : 1)
                 .animation(.easeOut(duration: 0.15), value: isFocused)
         }
     }
