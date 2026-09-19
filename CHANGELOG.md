@@ -10,7 +10,9 @@ notes when a version ships.
 
 - Competition icons that had not arrived when the menu was first drawn — a
   ball where Brasileirão or La Liga should be — now fill in as soon as they
-  do, instead of staying that way until the next launch.
+  do, instead of staying that way until the next launch. The same for club
+  crests in the tables and rows: a picture the television's wifi dropped on
+  waking is asked for again while the row is on screen.
 
 - League tables for the NFL (by conference, with each team's division), the
   Champions League and the Europa League (the league phase, all 36 teams).

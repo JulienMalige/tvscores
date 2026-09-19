@@ -22,8 +22,10 @@ import { stateOf } from "./providers/sportsdb.js";
 export function tableFromResults(rows, { rounds: [first, last], scoring, groups, after }, now = Date.now()) {
   const teams = new Map();
   const team = (name, badge) => {
-    if (!teams.has(name)) teams.set(name, { name, logo: badge || undefined, p: 0, w: 0, d: 0, l: 0, f: 0, a: 0 });
-    return teams.get(name);
+    if (!teams.has(name)) teams.set(name, { name, logo: undefined, p: 0, w: 0, d: 0, l: 0, f: 0, a: 0 });
+    const t = teams.get(name);
+    if (!t.logo && badge) t.logo = badge; // whichever of its games carries the crest
+    return t;
   };
   for (const r of rows) {
     const round = Number(r.intRound);

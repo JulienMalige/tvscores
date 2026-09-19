@@ -19,7 +19,17 @@ final class ImageCache {
     private var attemptCount = 0
     var attempts: Int { lock.withLock { attemptCount } }
 
-    init(fetch: @escaping Fetch = { try await URLSession.shared.data(for: $0) }, forget: TimeInterval = 60) {
+    /// A television's wifi sleeps between uses, and the first requests after
+    /// it wakes fail outright; a session that waits for connectivity hands
+    /// them to the network once it is there instead of reporting a loss.
+    private static let session: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.waitsForConnectivity = true
+        config.timeoutIntervalForResource = 30
+        return URLSession(configuration: config)
+    }()
+
+    init(fetch: @escaping Fetch = { try await ImageCache.session.data(for: $0) }, forget: TimeInterval = 60) {
         self.fetch = fetch
         self.forget = forget
     }
@@ -70,7 +80,9 @@ final class ImageCache {
     func load(_ url: URL) async -> UIImage? {
         if let hit = image(for: url) { return hit }
         for attempt in 0..<3 {
-            if attempt > 0 { try? await Task.sleep(for: .milliseconds(400 << attempt)) }
+            // A second, then four: long enough for a sleeping wifi to wake,
+            // short enough that a row is not blank for the page's life.
+            if attempt > 0 { try? await Task.sleep(for: .seconds(attempt == 1 ? 1 : 4)) }
             var request = URLRequest(url: url)
             request.timeoutInterval = 15
             lock.withLock { attemptCount += 1 }
@@ -126,10 +138,17 @@ struct CachedImage<Placeholder: View>: View {
         }
         .task(id: url) {
             // A picture already in memory was drawn on the first frame; only
-            // one that is not there yet has anything to record.
+            // one that is not there yet has anything to record. One that
+            // fails is asked for again while the row is still on screen —
+            // twice, a minute apart — rather than left blank for good.
             guard let url, ImageCache.shared.image(for: url) == nil else { return }
-            loaded = await ImageCache.shared.load(url)
-            settled = true
+            for _ in 0..<3 {
+                loaded = await ImageCache.shared.load(url)
+                settled = true
+                if loaded != nil { return }
+                try? await Task.sleep(for: .seconds(65))
+                settled = false
+            }
         }
     }
 }

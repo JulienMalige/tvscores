@@ -105,9 +105,12 @@ export function withTablePhotos(standings, photoFor, mirror, badgeFor) {
     const k = photoKey(r);
     return img(k ? photoFor(k) : undefined);
   };
+  // A club's crest in a table is mirrored like the ones in match rows: a
+  // television fetching forty of them from the provider's CDN at once lost
+  // the first few; from this proxy they are one cached file each.
   const decorate = (r) => (r.kind === "team"
     ? { ...r, logo: badgeFor ? badgeFor(r.name) : undefined }
-    : { ...r, photo: rowPhoto(r) });
+    : { ...r, photo: rowPhoto(r), logo: r.logo ? img(r.logo) : r.logo });
   return { ...standings, tables: standings.tables.map((t) => ({ ...t, rows: t.rows.map(decorate) })) };
 }
 
