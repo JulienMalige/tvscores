@@ -8,6 +8,10 @@ notes when a version ships.
 
 ## Unreleased
 
+- Crests and portraits no longer go missing for a minute after the menu
+  redraws: a picture whose loading was interrupted is asked for again, not
+  written off.
+
 - Flags are flat and fill their circle — on a race, and on a driver's or
   player's portrait — the way Apple Sports draws them, instead of the emoji.
 

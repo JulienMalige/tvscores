@@ -61,6 +61,20 @@ struct ElementsTests {
         #expect(!cache.hasFailed(url), "but not for long: a television's wifi blips")
     }
 
+    @Test("a load cancelled under a row is not remembered as a failure")
+    func cancellationIsNotFailure() async {
+        var calls = 0
+        let cache = ImageCache(fetch: { _ in
+            calls += 1
+            throw CancellationError()
+        })
+        let url = URL(string: "https://example.test/torn-down.png")!
+        let image = await cache.load(url)
+        #expect(image == nil)
+        #expect(calls == 1, "one attempt, then out: a cancelled task does not retry")
+        #expect(!cache.hasFailed(url), "and the next row to ask is not told it failed")
+    }
+
     @Test("a non-2xx answer is a failure, not an image")
     func rejectsErrorBodies() async {
         let cache = ImageCache(fetch: { req in

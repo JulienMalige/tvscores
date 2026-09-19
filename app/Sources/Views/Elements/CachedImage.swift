@@ -87,7 +87,10 @@ final class ImageCache {
         for attempt in 0..<3 {
             // A second, then four: long enough for a sleeping wifi to wake,
             // short enough that a row is not blank for the page's life.
-            if attempt > 0 { try? await Task.sleep(for: .seconds(attempt == 1 ? 1 : 4)) }
+            if attempt > 0 {
+                try? await Task.sleep(for: .seconds(attempt == 1 ? 1 : 4))
+                if Task.isCancelled { return nil }
+            }
             var request = URLRequest(url: url)
             request.timeoutInterval = 15
             lock.withLock { attemptCount += 1 }
@@ -95,6 +98,12 @@ final class ImageCache {
             do {
                 (data, response) = try await fetch(request)
             } catch {
+                // A cancelled load is not a failed one: the row that asked
+                // was torn down (the menu redrawing under it, a list
+                // rebuilt) and its replacement will ask again. Counting it
+                // marked every picture on the page as failed for a minute —
+                // 2,432 times in one CI run — and drew blanks in their place.
+                if Task.isCancelled || error is CancellationError { return nil }
                 Self.log.error("attempt \(attempt + 1) \(url.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
                 continue
             }
@@ -159,6 +168,7 @@ struct CachedImage<Placeholder: View>: View {
             guard let url, ImageCache.shared.image(for: url) == nil else { return }
             for _ in 0..<3 {
                 loaded = await ImageCache.shared.load(url)
+                if Task.isCancelled { return } // torn down; nothing to record
                 settled = true
                 if loaded != nil { return }
                 try? await Task.sleep(for: .seconds(65))
