@@ -5,9 +5,13 @@ struct OffseasonSection: View {
     let ref: LeagueRef
     let next: NextGame
 
+    /// A fortnight between rounds is not an off-season: the title says
+    /// which it is.
+    private var soon: Bool { next.start.timeIntervalSinceNow < 45 * 86400 }
+
     var body: some View {
         VStack(spacing: 10) {
-            Text("offseason.title")
+            Text(soon ? "offseason.soonTitle" : "offseason.title")
                 .font(.title2.weight(.bold))
             Text(sentence)
                 .font(.title3)
@@ -23,7 +27,6 @@ struct OffseasonSection: View {
     /// "NBA returns in October for the 2026–2027 season." — or, within a
     /// few weeks, the day itself.
     private var sentence: String {
-        let soon = next.start.timeIntervalSinceNow < 45 * 86400
         if soon {
             let day = next.start.formatted(.dateTime.weekday(.wide).day().month(.wide))
             return String(format: String(localized: "offseason.date"), ref.name, day)
