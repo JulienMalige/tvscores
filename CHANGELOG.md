@@ -8,11 +8,12 @@ notes when a version ships.
 
 ## Unreleased
 
-- The top of the menu is laid out as in the Apple TV app: a round picture,
-  the name, the time in the lighter style. The name is the television's own
-  ("Julien's Apple TV" gives "Julien") and the picture a placeholder: the
-  Apple TV profile that build 19 promised is Apple's own, and no app can
-  read it. The page keeps the date. Section headings sit on the icon column.
+- The top row of the menu is laid out as in the Apple TV app — a round
+  picture, the name, the time in the lighter style — and it is Home. The
+  name is the television's own ("Julien's Apple TV" gives "Julien") and the
+  picture a placeholder: the Apple TV profile that build 19 promised is
+  Apple's own, and no app can read it. The page keeps the date. Section
+  headings sit on the icon column.
 
 - The day switch and the table switches are the system control of build
   18 again — small and steady — with its dark track gone: bare words, the
