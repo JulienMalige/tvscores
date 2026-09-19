@@ -1,3 +1,4 @@
+import OSLog
 import SwiftUI
 import UIKit
 
@@ -76,6 +77,10 @@ final class ImageCache {
     /// the life of the screen: the row had already fallen back to its monogram
     /// and nothing asked again. A television shares its wifi with the rest of
     /// the house and the app opens a few dozen of these at once.
+    /// Every failure, with its reason, for the CI log and a television's
+    /// console: "the first five crests are missing" has no other witness.
+    private static let log = Logger(subsystem: "com.julienmalige.tvscores", category: "images")
+
     @discardableResult
     func load(_ url: URL) async -> UIImage? {
         if let hit = image(for: url) { return hit }
@@ -86,14 +91,24 @@ final class ImageCache {
             var request = URLRequest(url: url)
             request.timeoutInterval = 15
             lock.withLock { attemptCount += 1 }
-            guard let (data, response) = try? await fetch(request) else { continue }
-            guard (response as? HTTPURLResponse).map({ (200..<300).contains($0.statusCode) }) ?? true,
-                  let image = UIImage(data: data) else { continue }
+            let data: Data, response: URLResponse
+            do {
+                (data, response) = try await fetch(request)
+            } catch {
+                Self.log.error("attempt \(attempt + 1) \(url.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                continue
+            }
+            let status = (response as? HTTPURLResponse)?.statusCode ?? 200
+            guard (200..<300).contains(status), let image = UIImage(data: data) else {
+                Self.log.error("attempt \(attempt + 1) \(url.lastPathComponent, privacy: .public): HTTP \(status) \(data.count) bytes\(status == 200 ? ", not an image" : "")")
+                continue
+            }
             memory.setObject(image, forKey: url as NSURL, cost: data.count)
             lock.withLock { failedAt[url] = nil }
             return image
         }
         lock.withLock { failedAt[url] = Date() }
+        Self.log.error("gave up on \(url.lastPathComponent, privacy: .public)")
         return nil
     }
 }

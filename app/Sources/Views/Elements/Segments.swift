@@ -24,6 +24,9 @@ struct Segments<Value: Hashable>: View {
                     Pill(title: option.title, selected: selection == option.value)
                 }
                 .buttonStyle(.plain)
+                // The plain style still draws tvOS's own focus card behind
+                // the label; the pill is the focus effect here.
+                .focusEffectDisabled()
             }
             Spacer()
         }

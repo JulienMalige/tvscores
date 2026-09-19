@@ -175,6 +175,12 @@ jobs:
           mkdir -p crash
           cp ~/Library/Logs/DiagnosticReports/TVScores*.ips crash/ 2>/dev/null || echo "no crash report"
           ls -la crash || true
+          # Every picture the app failed to load during these launches, with
+          # the reason — the only witness to a crest missing from a screenshot.
+          xcrun simctl spawn "$UDID" log show --last 15m --style compact \
+            --predicate 'subsystem == "com.julienmalige.tvscores"' > shots/images.log 2>/dev/null || true
+          echo "image failures: $(grep -c 'attempt\|gave up' shots/images.log || true)"
+          grep -E 'attempt|gave up' shots/images.log | sed 's/^/IMG| /' | head -40 || true
 
       - name: Upload crash reports
         if: always()
