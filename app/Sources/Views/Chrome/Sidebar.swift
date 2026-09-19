@@ -54,9 +54,10 @@ struct Sidebar: View {
             ForEach(Self.sections, id: \.id) { section in
                 let mine = leagues.filter { section.sports.contains($0.sport) }
                 if !mine.isEmpty {
-                    // The section's heading drawn by us, so it can sit on the
-                    // icon column as the Apple TV app's do; the system's own
-                    // heading is set in from it.
+                    // The section's heading. tvOS sets it in from the icon
+                    // column, unlike the Apple TV app's own; a negative
+                    // leading padding and zero row insets (2026-09-19) both
+                    // changed nothing, so the inset is the system's.
                     TabSection {
                         // `day` is deliberately not passed from the binding: a
                         // league page takes it once, at creation, and reading
@@ -79,12 +80,6 @@ struct Sidebar: View {
                         Text(section.title)
                             .font(.callout.weight(.semibold))
                             .foregroundStyle(.secondary)
-                            // The sidebar is a list underneath; its heading
-                            // takes the row's insets, which is the indent
-                            // seen on the television. Padding on the text
-                            // did nothing; the row's insets are the lever.
-                            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
             }
