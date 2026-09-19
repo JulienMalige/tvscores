@@ -8,16 +8,16 @@ notes when a version ships.
 
 ## Unreleased
 
-- The top row of the menu is laid out as in the Apple TV app — a round
-  picture, the name, the time in the lighter style — and it is Home. The
-  name is the television's own ("Julien's Apple TV" gives "Julien") and the
-  picture a placeholder: the Apple TV profile that build 19 promised is
-  Apple's own, and no app can read it. The page keeps the date. Section
-  headings sit on the icon column.
+- The top row of the menu is laid out after the Apple TV app's — a round
+  picture and the name — and it is Home. The name is the television's own
+  ("Julien's Apple TV" gives "Julien") and the picture a placeholder: the
+  Apple TV profile that build 19 promised is Apple's own, and no app can
+  read it. The clock stays beside the date on the page: a menu row cannot
+  carry it.
 
-- The day switch and the table switches are the system control of build
-  18 again — small and steady — with its dark track gone: bare words, the
-  chosen one light, the one the remote is on white, as in the Apple TV app.
+- The day switch and the table switches are the size of the system control
+  of build 18, without its dark track: bare words, the chosen one light, the
+  one the remote is on white, as in the Apple TV app; chosen on click.
 
 - A race weekend is on every day it has a session: Saturday shows the
   qualifying and the sprint with their times, Sunday the race — instead of
