@@ -74,6 +74,11 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
       const hit = memo.get(tz);
       if (hit && Date.now() - hit.at < MEMO_MS) return send(res, 200, hit.body, {}, req);
       const body = buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, mirror, activeSports, upcomingDays: config.schedule.upcomingDays });
+      // The tables' crests and portraits are registered with the mirror here
+      // too, so the warmer has them before any television opens a table:
+      // a crest first mirrored while a page waits for it is the one that
+      // arrives late and is remembered as missing.
+      if (mirror) for (const table of Object.entries(store.standings)) withTablePhotos(table[1], photoFor, mirror, badgeFor(table[0].split(":")[0]));
       memo.set(tz, { at: Date.now(), body });
       return send(res, 200, body, {}, req);
     }
