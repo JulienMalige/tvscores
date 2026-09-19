@@ -1,6 +1,29 @@
+import Observation
 import OSLog
 import SwiftUI
 import UIKit
+
+/// A count that moves when a picture lands in the cache — coalesced, a few
+/// times a second at most — so every slot on screen looks at the cache again.
+/// A slot whose own request was cut short (a row rebuilt under it, a task
+/// cancelled) still shows the picture once anyone's request brought it.
+@MainActor
+@Observable
+final class ImageArrivals {
+    static let shared = ImageArrivals()
+    private(set) var count = 0
+    private var pending = false
+
+    func note() {
+        guard !pending else { return }
+        pending = true
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(250))
+            pending = false
+            count += 1
+        }
+    }
+}
 
 /// Decoded images kept in memory for as long as the app runs.
 ///
@@ -114,6 +137,7 @@ final class ImageCache {
             }
             memory.setObject(image, forKey: url as NSURL, cost: data.count)
             lock.withLock { failedAt[url] = nil }
+            Task { @MainActor in ImageArrivals.shared.note() }
             return image
         }
         lock.withLock { failedAt[url] = Date() }
@@ -149,7 +173,9 @@ struct CachedImage<Placeholder: View>: View {
     }
 
     var body: some View {
-        Group {
+        // Read for its change alone: when any picture lands, look again.
+        let _ = ImageArrivals.shared.count
+        return Group {
             if let image {
                 Image(uiImage: image)
                     .resizable()

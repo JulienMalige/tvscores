@@ -12,6 +12,7 @@ import SwiftUI
 /// championship table — were unreachable for eleven days at a time.
 struct Sidebar: View {
     @State private var store = ScoreboardStore()
+    @State private var profile = Profile.shared
     @State private var selection = Selection.home
     @State private var day: Day = Self.initialDay()
     /// The day a competition's page was opened on from the front page, so
@@ -21,6 +22,7 @@ struct Sidebar: View {
     enum Selection: Hashable {
         case home
         case league(String)
+        case settings
     }
 
     var body: some View {
@@ -41,7 +43,7 @@ struct Sidebar: View {
             Tab(value: Selection.home) {
                 HomeScreen(store: store, day: $day, openLeague: open)
             } label: {
-                SidebarHeader()
+                SidebarHeader(profile: profile)
             }
 
             // One section per family of sport, the way the Apple TV app groups
@@ -77,6 +79,12 @@ struct Sidebar: View {
                             .padding(.leading, -Metrics.sidebarHeadingInset)
                     }
                 }
+            }
+            // Who is watching: the name that heads the menu.
+            Tab(value: Selection.settings) {
+                SettingsScreen(profile: profile)
+            } label: {
+                Label("tab.settings", systemImage: "gearshape")
             }
         }
         .tabViewStyle(.sidebarAdaptable)

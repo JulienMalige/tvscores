@@ -40,6 +40,10 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.julienmalige.tvscores
+        # Runs as the Apple TV user in use: the name in Settings is per user.
+        # The App ID has the User Management capability and the profile
+        # carries it (docs/release.md).
+        CODE_SIGN_ENTITLEMENTS: TVScores.entitlements
         TARGETED_DEVICE_FAMILY: "3"
         ENABLE_PREVIEWS: "YES"
         ASSETCATALOG_COMPILER_APPICON_NAME: App Icon & Top Shelf Image

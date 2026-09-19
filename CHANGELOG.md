@@ -8,6 +8,15 @@ notes when a version ships.
 
 ## Unreleased
 
+- A Settings page, last in the menu, with one thing on it: your name. It
+  heads the menu with your initials for a picture, the way Apple TV shows a
+  user without a photo, and each Apple TV user keeps their own. The Apple TV
+  profile itself — its name and photo — is Apple's own; no app can read it,
+  and since tvOS 16 not even the television's name.
+
+- Crests and marks that had loaded but stayed blank until you scrolled now
+  appear the moment they land, whatever became of the row that asked.
+
 ## 1.0 build 20 — 19 September 2026
 - The top row of the menu is laid out after the Apple TV app's — a round
   picture and the name — and it is Home. The name is the television's own
