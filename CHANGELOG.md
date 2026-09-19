@@ -8,6 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
+## 1.0 build 20 — 19 September 2026
 - The top row of the menu is laid out after the Apple TV app's — a round
   picture and the name — and it is Home. The name is the television's own
   ("Julien's Apple TV" gives "Julien") and the picture a placeholder: the
