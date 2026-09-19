@@ -8,13 +8,16 @@ import SwiftUI
 /// placeholder until the app has profiles of its own.
 struct SidebarHeader: View {
     var body: some View {
+        // Name, then the time under it: a tvOS sidebar row holds one label
+        // and drops anything trailing, so the time cannot sit on the right
+        // as in the Apple TV app's header.
         Label {
-            HStack(spacing: 24) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(Self.viewerName)
                     .font(.title3.weight(.semibold))
                     .lineLimit(1)
-                Spacer(minLength: 24)
                 ClockLabel(showsDate: false)
+                    .font(.caption)
             }
         } icon: {
             Image(systemName: "person.crop.circle.fill")

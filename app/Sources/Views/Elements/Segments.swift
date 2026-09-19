@@ -29,6 +29,26 @@ struct Segments<Value: Hashable>: UIViewRepresentable {
         context.coordinator.parent = self
         let index = options.firstIndex { $0.value == selection } ?? 0
         if control.selectedSegmentIndex != index { control.selectedSegmentIndex = index }
+        clearTrack(control)
+    }
+
+    /// tvOS draws the track as a subview of its own that spans the control,
+    /// and ignores the background image that clears it elsewhere. That view
+    /// is found by its shape — the one as wide as the control, with a
+    /// background — and made clear; the segments and their highlights are
+    /// narrower and untouched.
+    private func clearTrack(_ control: UISegmentedControl) {
+        control.backgroundColor = .clear
+        DispatchQueue.main.async {
+            for view in control.subviews where view.bounds.width >= control.bounds.width - 1 && !(view is UILabel) {
+                view.backgroundColor = .clear
+                view.layer.backgroundColor = UIColor.clear.cgColor
+                for inner in view.subviews where inner.bounds.width >= control.bounds.width - 1 && !(inner is UILabel) {
+                    inner.backgroundColor = .clear
+                    inner.layer.backgroundColor = UIColor.clear.cgColor
+                }
+            }
+        }
     }
 
     func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
