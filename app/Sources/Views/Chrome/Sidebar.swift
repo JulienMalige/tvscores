@@ -45,7 +45,10 @@ struct Sidebar: View {
             ForEach(Self.sections, id: \.id) { section in
                 let mine = leagues.filter { section.sports.contains($0.sport) }
                 if !mine.isEmpty {
-                    TabSection(section.title) {
+                    // The section's heading drawn by us, so it can sit on the
+                    // icon column as the Apple TV app's do; the system's own
+                    // heading is set in from it.
+                    TabSection {
                         // `day` is deliberately not passed from the binding: a
                         // league page takes it once, at creation, and reading
                         // the live value here would rebuild every tab in the
@@ -63,6 +66,11 @@ struct Sidebar: View {
                                 SidebarRow(league: league, iconsVersion: store.iconsVersion)
                             }
                         }
+                    } header: {
+                        Text(section.title)
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .padding(.leading, -Metrics.sidebarHeadingInset)
                     }
                 }
             }
@@ -72,16 +80,7 @@ struct Sidebar: View {
         // its profile and the time. Every app draws its own header here —
         // Disney+ and the like put their own account's profile in it — and
         // we have no profiles, so ours carries the name and the time.
-        .tabViewSidebarHeader {
-            HStack {
-                Text("app.title")
-                    .font(.title3.weight(.semibold))
-                Spacer()
-                ClockLabel(showsDate: false)
-            }
-            .padding(.horizontal, 12)
-            .padding(.bottom, 24)
-        }
+        .tabViewSidebarHeader { SidebarHeader() }
     }
 
     /// The menu's sections, in order. A sport not named here is not shown.
