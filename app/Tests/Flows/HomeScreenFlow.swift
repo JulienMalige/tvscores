@@ -19,10 +19,14 @@ final class HomeScreenFlow: FlowCase {
         yesterday.appears()
         let seenYesterday = yesterday.identifier
 
-        // Move focus along the switch to Upcoming: a segment is chosen as
-        // focus reaches it, no click. The list below is lazy, so a header
-        // far down does not exist yet; the first match does.
-        XCTAssertTrue(Flow.walk(.right, until: Flow.day(app, "upcoming")), "the remote reaches the Upcoming segment")
+        // Move focus along the switch to Upcoming and click it: passing over
+        // a pill changes nothing. The list below is lazy, so a header far
+        // down does not exist yet; the first match does.
+        XCTAssertTrue(Flow.walk(.right, until: Flow.day(app, "upcoming")), "the remote reaches the Upcoming pill")
+        XCTAssertTrue(app.buttons[seenYesterday].exists, "nothing changed on the way there")
+        Flow.remote.press(.select)
+        sleep(1)
+        XCTAssertTrue(Flow.day(app, "upcoming").hasFocus, "the pill just picked keeps focus while its list is swapped in")
         let changed = NSPredicate(format: "identifier BEGINSWITH 'match.' AND identifier != %@", seenYesterday)
         XCTAssertTrue(app.buttons.matching(changed).firstMatch.waitForExistence(timeout: 8), "Upcoming shows different matches")
         XCTAssertFalse(app.buttons[seenYesterday].exists, "yesterday's match is gone from Upcoming")

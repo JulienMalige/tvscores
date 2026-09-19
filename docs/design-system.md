@@ -24,9 +24,11 @@ itself for a measurement, and a screen never draws a row's insides. Chrome is
 the exception to "everything lives on a screen": the sidebar wraps every
 screen, and tvOS draws it — which is why nothing in `Chrome/` is worth a
 snapshot test, and why its rows are given square icons rather than sizes.
-`Segments` is the system's segmented control, not buttons of ours — the day
-switch (`DayTabs`) and the table switch under a competition are both it: tvOS
-chooses a segment as focus reaches it and keeps focus where it belongs.
+`Segments` — the day switch (`DayTabs`) and the table switch under a
+competition — is a row of pills on the plain button style, chosen on click.
+It was the system's segmented control for a day (2026-09-18): that control
+chooses a segment as focus passes over it and draws a track it will not give
+up, and Julien wanted neither.
 
 A **mark** is the identity image of something: a crest (`TeamMark`), a portrait
 (`PersonMark`), a competition (`LeagueMark`). All three are the same size in a

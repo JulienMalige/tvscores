@@ -30,8 +30,7 @@ enum Flow {
 
     static var remote: XCUIRemote { .shared }
 
-    /// A segment of the day switch, by the day it shows. The system control
-    /// carries no identifiers of ours, so it is found by its English label.
+    /// A pill of the day switch, by the day it shows, found by its English label.
     static func day(_ app: XCUIApplication, _ day: String) -> XCUIElement {
         app.buttons[day.prefix(1).uppercased() + day.dropFirst()].firstMatch
     }
@@ -63,7 +62,7 @@ enum Flow {
     /// so whatever a flow does in the menu it does straight after this.
     static func openMenu(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
         // Never called with focus on the day switch: left along it moves
-        // between its segments and picks them, which is not the menu.
+        // between its pills, which is not the menu.
         for _ in 0..<3 {
             remote.press(.left)
             sleep(2)

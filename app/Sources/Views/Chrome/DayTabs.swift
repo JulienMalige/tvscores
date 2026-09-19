@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// The day switch: Yesterday, Today, Upcoming, under the title on the left.
+/// The day switch: Yesterday, Today, Upcoming, under the title on the left;
+/// a day is chosen on click.
 struct DayTabs: View {
     @Binding var selected: Day
 
