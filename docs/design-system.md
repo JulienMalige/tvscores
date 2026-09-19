@@ -25,11 +25,11 @@ the exception to "everything lives on a screen": the sidebar wraps every
 screen, and tvOS draws it — which is why nothing in `Chrome/` is worth a
 snapshot test, and why its rows are given square icons rather than sizes.
 `Segments` — the day switch (`DayTabs`) and the table switch under a
-competition — is UIKit's `UISegmentedControl`, wrapped, with its value held
-back until the remote is pressed: the highlight follows focus, the page
-follows the click, and the highlight returns to the page's choice if focus
-leaves without one. Its track stays (nothing public clears it, all tried
-2026-09-19); Julien is fine with it.
+competition — is a row of pills of ours on a drawn track, the look of the
+system control, chosen on click. The system control itself (tried both as
+SwiftUI's picker and UIKit's control, 2026-09-19) chooses on focus, keeps
+a track nothing clears, and — the deciding flaw — keeps focus at its first
+segment on a press left, so the menu could not be opened from it.
 
 A **mark** is the identity image of something: a crest (`TeamMark`), a portrait
 (`PersonMark`), a competition (`LeagueMark`). All three are the same size in a

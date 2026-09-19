@@ -13,7 +13,7 @@ struct SidebarHeader: View {
     var body: some View {
         Label {
             if profile.name.isEmpty {
-                Text("app.title")
+                Text("tab.home")
                     .font(.title3.weight(.semibold))
             } else {
                 Text(profile.name)

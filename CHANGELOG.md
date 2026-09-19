@@ -8,6 +8,10 @@ notes when a version ships.
 
 ## Unreleased
 
+- Pressing left from the day switch opens the menu again. The switch keeps
+  its look and changes only on click; until a name is set, the menu's first
+  row reads "Home".
+
 ## 1.0 build 21 — 19 September 2026
 - A Settings page, last in the menu, with one thing on it: your name. It
   heads the menu with your initials for a picture, the way Apple TV shows a
