@@ -12,9 +12,6 @@ struct SidebarRow: View {
     /// Changes when icons arrive; unused inside, its change is the point.
     let iconsVersion: Int
 
-    /// The icon's square, matching the system's own sidebar icons.
-    private static let icon: CGFloat = 56
-
     var body: some View {
         Label {
             VStack(alignment: .leading, spacing: 2) {
@@ -26,7 +23,7 @@ struct SidebarRow: View {
                 }
             }
         } icon: {
-            SidebarIcon(league: league, size: Self.icon)
+            SidebarIcon(league: league, size: Metrics.sidebarIcon)
         }
         .accessibilityIdentifier("tab.\(league.sport).\(league.id.raw)")
     }
