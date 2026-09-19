@@ -80,11 +80,17 @@ struct Sidebar: View {
                     }
                 }
             }
-            // Who is watching: the name that heads the menu.
-            Tab(value: Selection.settings) {
-                SettingsScreen(profile: profile)
-            } label: {
-                Label("tab.settings", systemImage: "gearshape")
+            // Who is watching: the name that heads the menu. In a section of
+            // its own so it comes last — tvOS lists single tabs before any
+            // section, whatever the order here.
+            TabSection {
+                Tab(value: Selection.settings) {
+                    SettingsScreen(profile: profile)
+                } label: {
+                    Label("tab.settings", systemImage: "gearshape")
+                }
+            } header: {
+                EmptyView()
             }
         }
         .tabViewStyle(.sidebarAdaptable)

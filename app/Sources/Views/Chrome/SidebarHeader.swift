@@ -21,7 +21,12 @@ struct SidebarHeader: View {
                     .lineLimit(1)
             }
         } icon: {
-            InitialsMark(initials: profile.initials, size: Metrics.sidebarAvatar)
+            // Drawn as a bitmap: the row's icon slot renders an Image and
+            // nothing else, as the competition icons found out first.
+            Image(uiImage: InitialsMark.image(initials: profile.initials, size: Metrics.sidebarAvatar))
+                .resizable()
+                .scaledToFit()
+                .frame(width: Metrics.sidebarAvatar, height: Metrics.sidebarAvatar)
         }
         .accessibilityIdentifier("tab.home")
         .accessibilityLabel("Home")
