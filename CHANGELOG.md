@@ -8,6 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
+## 1.0 build 21 — 19 September 2026
 - A Settings page, last in the menu, with one thing on it: your name. It
   heads the menu with your initials for a picture, the way Apple TV shows a
   user without a photo, and each Apple TV user keeps their own. The Apple TV
