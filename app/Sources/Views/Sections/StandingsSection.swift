@@ -85,6 +85,7 @@ struct StandingsSection: View {
                 }
                 .font(.callout)
                 .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading) // under the names, not centred
                 .padding(.leading, Metrics.rowInsetH)
                 .padding(.top, Metrics.headingGap)
             }
