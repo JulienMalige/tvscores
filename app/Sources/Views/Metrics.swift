@@ -42,7 +42,7 @@ enum Metrics {
     static let leagueMark: CGFloat = 52
     /// A competition's icon in the menu: about half the row, as the Apple TV
     /// app sizes its channels — bigger crowds the words beside it.
-    static let sidebarIcon: CGFloat = 40
+    static let sidebarIcon: CGFloat = 34
     /// One column of a table read as numbers — played, won, points.
     static let tableCell: CGFloat = 96
 }
