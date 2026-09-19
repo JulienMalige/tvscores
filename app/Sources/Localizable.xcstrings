@@ -56,7 +56,8 @@
             "value": "E"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "col.gd": {
       "localizations": {
@@ -84,7 +85,8 @@
             "value": "DG"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "col.l": {
       "localizations": {
@@ -112,7 +114,8 @@
             "value": "P"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "col.p": {
       "localizations": {
@@ -140,7 +143,8 @@
             "value": "PJ"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "col.pct": {
       "localizations": {
@@ -168,7 +172,8 @@
             "value": "%"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "col.pts": {
       "localizations": {
@@ -196,7 +201,8 @@
             "value": "Pts"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "col.t": {
       "localizations": {
@@ -224,7 +230,8 @@
             "value": "E"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "col.w": {
       "localizations": {
@@ -252,7 +259,8 @@
             "value": "G"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "home.empty": {
       "localizations": {
@@ -1858,7 +1866,8 @@
             "value": "Eliminado"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "zone.libertadores": {
       "localizations": {
@@ -1886,7 +1895,8 @@
             "value": "Libertadores"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "zone.libertadores-qualifying": {
       "localizations": {
@@ -1914,7 +1924,8 @@
             "value": "Fase previa Libertadores"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "zone.playoff-seeded": {
       "localizations": {
@@ -1942,7 +1953,8 @@
             "value": "Play-off, cabeza de serie"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "zone.playoff-unseeded": {
       "localizations": {
@@ -1970,7 +1982,8 @@
             "value": "Play-off, sin cabeza de serie"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "zone.r16": {
       "localizations": {
@@ -1998,7 +2011,8 @@
             "value": "Clasifica a octavos"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "zone.relegation": {
       "localizations": {
@@ -2026,7 +2040,8 @@
             "value": "Descenso"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "zone.relegation-playoff": {
       "localizations": {
@@ -2054,7 +2069,8 @@
             "value": "Promoción de descenso"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "zone.sudamericana": {
       "localizations": {
@@ -2082,7 +2098,8 @@
             "value": "Sudamericana"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "zone.ucl": {
       "localizations": {
@@ -2110,7 +2127,8 @@
             "value": "Champions League"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "zone.uecl": {
       "localizations": {
@@ -2138,7 +2156,8 @@
             "value": "Conference League"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     },
     "zone.uel": {
       "localizations": {
@@ -2166,7 +2185,8 @@
             "value": "Europa League"
           }
         }
-      }
+      },
+      "extractionState": "manual"
     }
   }
 }

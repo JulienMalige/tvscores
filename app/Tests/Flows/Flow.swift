@@ -21,7 +21,9 @@ enum Flow {
         // has the day switch, so the segment for the tab asked for is the
         // sign the page is up — waited for here, once, rather than hoped for
         // in each test's first assertion.
-        let sign = ready.map { app.staticTexts[$0] } ?? day(app, tab)
+        // A competition's page may have no day switch — between seasons it
+        // shows when it is back instead — so its sign is the Standings heading.
+        let sign = ready.map { app.staticTexts[$0] } ?? (league == nil ? day(app, tab) : app.staticTexts["Standings"])
         XCTAssertTrue(sign.waitForExistence(timeout: 25), "the app finished loading and shows \(ready ?? "the \(tab) pill")")
         return app
     }
