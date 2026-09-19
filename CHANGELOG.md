@@ -8,6 +8,9 @@ notes when a version ships.
 
 ## Unreleased
 
+- The day switch no longer sits on a dark track; just the three words, with
+  the chosen day in grey and the one the remote is on in white.
+
 - Competition icons that had not arrived when the menu was first drawn — a
   ball where Brasileirão or La Liga should be — now fill in as soon as they
   do, instead of staying that way until the next launch. The same for club
