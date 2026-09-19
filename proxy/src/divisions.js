@@ -32,18 +32,19 @@ const nba = {
   },
 };
 
-/** { "Buffalo Bills": { table: "AFC", division: "AFC East" }, ... } */
-function flatten(conferences, label) {
+/**
+ * { "Buffalo Bills": { table: "AFC", division: "East", order: 0 }, ... } —
+ * `order` keeps the divisions in the order written above, which is how the
+ * league lists them, rather than alphabetical.
+ */
+function flatten(conferences) {
   const out = {};
   for (const [conf, divisions] of Object.entries(conferences)) {
-    for (const [div, teams] of Object.entries(divisions)) {
-      for (const team of teams) out[team] = { table: conf, division: label(conf, div) };
-    }
+    Object.entries(divisions).forEach(([div, teams], order) => {
+      for (const team of teams) out[team] = { table: conf, division: div, order };
+    });
   }
   return out;
 }
 
-export const DIVISIONS = {
-  nfl: flatten(nfl, (conf, div) => `${conf} ${div}`),
-  nba: flatten(nba, (conf, div) => div),
-};
+export const DIVISIONS = { nfl: flatten(nfl), nba: flatten(nba) };

@@ -19,7 +19,8 @@ private struct RaceRowContent: View {
 
     var body: some View {
         VStack(spacing: Metrics.headingGap) {
-            HStack {
+            HStack(spacing: 20) {
+                FlagMark(flag: event.flag)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(event.name ?? "")
                         .font(.title3.weight(.semibold))

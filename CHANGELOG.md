@@ -8,6 +8,22 @@ notes when a version ships.
 
 ## Unreleased
 
+- League tables read as columns — played, won, drawn, lost, goal difference,
+  points — with a line under the Champions League places and a dashed one
+  above relegation, and what the places mean written under the table. The
+  cups' league phase the same, cut at eight and twenty-four.
+
+- NFL and NBA conferences are read division by division — East, North,
+  South, West — each ranked on its own, with wins, losses, ties and the
+  percentage.
+
+- A race carries its country's flag as a round mark, in the row and on its
+  page, and an upcoming race's page lists the weekend: qualifying, the
+  sprint, the race, each with its day and time.
+
+- A competition between seasons says so, and when it is back: "NBA returns
+  in October for the 2026–2027 season."
+
 - Opening a competition from the front page now takes you to its place in
   the menu — the same page the menu opens, on the day you were reading —
   instead of a copy on top of Home with the menu still saying Home.

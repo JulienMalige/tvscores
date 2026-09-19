@@ -35,10 +35,20 @@ function groupByLeague(events, sportOrder, leagues = {}, publicBase = "", standi
  * page became unreachable for eleven days at a time. This list is what a menu
  * is built from, and `playing` says which of them have anything this week.
  */
-function everyLeague(sportOrder, leagues = {}, publicBase = "", standings = {}, days = {}) {
+function everyLeague(sportOrder, leagues = {}, publicBase = "", standings = {}, days = {}, meta = {}, events = [], now = Date.now()) {
   const playing = new Set(
     Object.values(days).flatMap((groups) => groups.map((g) => `${g.sport}:${g.league.id}`)),
   );
+  // When a competition with nothing this week is next on: what the daily
+  // pass learned for a team sport, or the calendar's next round for a
+  // series whose whole season is already in the store.
+  const nextOf = (sport, id) => {
+    const learned = meta[sport]?.next?.[String(id)];
+    if (learned) return learned;
+    const soon = events.filter((e) => e.sport === sport && String(e.league?.id) === String(id) && Date.parse(e.start) > now)
+      .sort((a, b) => Date.parse(a.start) - Date.parse(b.start))[0];
+    return soon ? { start: soon.start } : undefined;
+  };
   const order = (s) => (sportOrder.indexOf(s) + 1 || 99);
   return Object.entries(leagues)
     .flatMap(([sport, list]) => list.map((l) => ({ sport, cfg: l })))
@@ -58,6 +68,7 @@ function everyLeague(sportOrder, leagues = {}, publicBase = "", standings = {}, 
         icon: cfg.badge ? `${publicBase}/v1/assets/leagues/icon/${cfg.badge}.png` : undefined,
         hasStandings: Boolean(standings[key]),
         playing: playing.has(key),
+        next: playing.has(key) ? undefined : nextOf(sport, cfg.id),
       };
     });
 }
@@ -150,7 +161,7 @@ export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrd
     tz,
     stale,
     live: events.filter((e) => e.status.state === STATE.live).length,
-    leagues: everyLeague(sportOrder, leagues, publicBase, standings, grouped),
+    leagues: everyLeague(sportOrder, leagues, publicBase, standings, grouped, meta, events, now),
     days: grouped,
   };
 }

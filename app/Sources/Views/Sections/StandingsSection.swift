@@ -48,10 +48,77 @@ struct StandingsSection: View {
 
     private func rows(_ table: StandingsTable) -> some View {
         VStack(spacing: Metrics.rowGap) {
-            ForEach(table.rows) { entry in
+            if let columns = table.columns, table.rows.first?.section == nil { columnHeader(columns) }
+            ForEach(Array(table.rows.enumerated()), id: \.element.id) { i, entry in
+                // A division's name above its first row, with the columns
+                // again: a conference is read division by division.
+                if let section = entry.section, i == 0 || table.rows[i - 1].section != section {
+                    HStack {
+                        Text(section)
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .padding(.leading, Metrics.rowInsetH)
+                        Spacer()
+                        if let columns = table.columns { columnLabels(columns) }
+                    }
+                    .padding(.top, i == 0 ? 0 : Metrics.headingGap)
+                    .padding(.trailing, Metrics.rowInsetH)
+                }
                 StandingsRow(entry: entry)
+                if let line = table.lines?.first(where: { $0.after == entry.pos && entry.section == nil }) {
+                    cut(line.line)
+                }
+            }
+            if let legend = table.legend, !legend.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(legend, id: \.key) { zone in
+                        Text("\(zone.from == zone.to ? "\(zone.from)" : "\(zone.from)–\(zone.to)"): ") + Text(LocalizedStringKey("zone.\(zone.key)"))
+                    }
+                }
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .padding(.leading, Metrics.rowInsetH)
+                .padding(.top, Metrics.headingGap)
             }
         }
+    }
+
+    /// The column names over a table read as numbers.
+    private func columnHeader(_ columns: [String]) -> some View {
+        HStack {
+            Spacer()
+            columnLabels(columns)
+        }
+        .padding(.trailing, Metrics.rowInsetH)
+    }
+
+    private func columnLabels(_ columns: [String]) -> some View {
+        HStack(spacing: 20) {
+            ForEach(columns, id: \.self) { column in
+                Text(LocalizedStringKey("col.\(column)"))
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: Metrics.tableCell, alignment: .trailing)
+            }
+        }
+    }
+
+    /// Where the table is cut: a line, solid or dashed, across the rows.
+    private func cut(_ style: String) -> some View {
+        Rectangle()
+            .fill(.clear)
+            .frame(height: 2)
+            .overlay(
+                Path { p in
+                    p.move(to: .zero)
+                    p.addLine(to: CGPoint(x: 4000, y: 0))
+                }
+                .stroke(Color.white.opacity(0.45), style: StrokeStyle(lineWidth: 2, dash: style == "dashed" ? [14, 12] : []))
+            )
+            .clipped()
+            .padding(.horizontal, Metrics.rowInsetH)
+            .padding(.vertical, 6)
+            .accessibilityIdentifier("table.cut.\(style)")
     }
 
     private func title(_ id: String) -> LocalizedStringKey {

@@ -1,6 +1,6 @@
 import { getJson } from "../http.js";
 import { STATE, team } from "../model.js";
-import { tableFromResults } from "../tables.js";
+import { tableFromResults, feedTableRow, zonesFor, POINTS_COLUMNS } from "../tables.js";
 import { DIVISIONS } from "../divisions.js";
 
 const V1 = "https://www.thesportsdb.com/api/v1/json";
@@ -127,30 +127,12 @@ export function datesAround({ back, ahead }, now = new Date()) {
 }
 
 /**
- * A league table row. `intRank` is the provider's own ordering, so a league
- * that separates on goal difference or head-to-head is already sorted.
- */
-function standingsRow(r) {
-  const played = Number(r.intPlayed || 0);
-  const record = [r.intWin, r.intDraw, r.intLoss].every((v) => v != null)
-    ? `${played} · ${r.intWin}-${r.intDraw}-${r.intLoss}`
-    : `${played} played`;
-  return {
-    pos: Number(r.intRank),
-    name: r.strTeam,
-    sub: record,
-    value: r.intPoints == null ? null : Number(r.intPoints),
-    logo: r.strBadge || undefined,
-  };
-}
-
-/**
  * A team sport from TheSportsDB: one call per day of the window, filtered to
  * the competitions we show. The paid key returns up to 1,500 events for a
  * date, which is why a seven-day Upcoming costs one call per day rather than
  * a season fixture list per league — and why a competition costs nothing.
  */
-export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons = {}, log = () => {} }) {
+export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons = {}, next = {}, log = () => {} }) {
   const { feed, live: livePath } = SPORTS[sport];
   const byId = new Map(leagues.map((l) => [String(l.id), l]));
   const mine = (rows) => {
@@ -178,7 +160,28 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
     const out = [];
     for (const date of datesAround(win)) out.push(...(await byDate(date)));
     log(`GET sportsdb ${sport} ${win.back + win.ahead + 1} days -> ${out.length} matches`);
+    await nextFixtures(out);
     return out;
+  }
+
+  /**
+   * For a competition with nothing in the window — between seasons, or in
+   * a break — when it is next on, so the app can say "back in October"
+   * rather than "no games". One call per such competition per daily pass;
+   * `next` is the sport's meta and persists, and is cleared for a
+   * competition the moment it has fixtures again.
+   */
+  async function nextFixtures(events) {
+    const busy = new Set(events.map((e) => String(e.league.id)));
+    for (const league of leagues) {
+      const id = String(league.id);
+      if (busy.has(id)) { delete next[id]; continue; }
+      const { body } = await getJson(`${V1}/${key}/eventsnextleague.php?id=${id}`);
+      quota.record(undefined);
+      const soonest = (body?.events || []).map((r) => ({ start: startOf(r), season: r.strSeason })).filter((r) => r.start).sort((a, b) => a.start.localeCompare(b.start))[0];
+      if (soonest) next[id] = soonest;
+      else delete next[id];
+    }
   }
 
   /** V2 carries the minute and the running score; V1 only catches up at the whistle. */
@@ -223,14 +226,17 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
       if (league.table) {
         const { body } = await getJson(`${V1}/${key}/eventsseason.php?id=${league.id}&s=${encodeURIComponent(season)}`);
         quota.record(undefined);
-        const built = tableFromResults(body?.events || [], { ...league.table, groups: DIVISIONS[league.table.groups] });
+        const built = tableFromResults(body?.events || [], { ...league.table, groups: DIVISIONS[league.table.groups], zones: league.zones });
         if (built) out[league.id] = { updatedAt: new Date().toISOString(), ...built };
         continue;
       }
       const { body } = await getJson(`${V1}/${key}/lookuptable.php?l=${league.id}&s=${encodeURIComponent(season)}`);
       quota.record(undefined);
-      const rows = (body?.table || []).map(standingsRow);
-      if (rows.length) out[league.id] = { updatedAt: new Date().toISOString(), tables: [{ id: "table", rows }] };
+      const rows = (body?.table || []).map(feedTableRow);
+      if (rows.length) {
+        const table = { id: "table", columns: POINTS_COLUMNS, rows, ...(league.zones ? zonesFor(league.zones, rows.length) : {}) };
+        out[league.id] = { updatedAt: new Date().toISOString(), tables: [table] };
+      }
     }
     log(`GET sportsdb ${sport} tables -> ${Object.keys(out).length} of ${leagues.length}`);
     return out;

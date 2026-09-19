@@ -10,8 +10,13 @@ struct LeagueScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Metrics.sectionGap / 2) {
                 header
-                DayTabs(selected: $day)
-                games
+                if !ref.playing, let next = ref.next {
+                    // Between seasons there is no day to switch to.
+                    OffseasonSection(ref: ref, next: next)
+                } else {
+                    DayTabs(selected: $day)
+                    games
+                }
                 StandingsSection(ref: ref, store: store)
             }
             .pageMargins()

@@ -128,6 +128,9 @@ jobs:
           shot en yesterday
           shot en upcoming
           shot en today f1
+          shot en today nfl
+          shot en today nba
+          shot en today 4480
           shot en upcoming tennis
           shot en yesterday football
           xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true

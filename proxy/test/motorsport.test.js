@@ -7,6 +7,15 @@ const fx = JSON.parse(readFileSync(new URL("./fixtures/ocb-f1.json", import.meta
 const F1 = { id: "f1", name: "Formula 1", short: "F1" };
 const [spain, future, testing] = fx.events;
 
+test("a grand prix carries its country's flag and the weekend's sessions, practice left out", () => {
+  const e = normaliseEvent(fx.events[1], { sport: "formula-1", league: F1 });
+  assert.equal(e.flag, "🇦🇿");
+  assert.deepEqual(e.sessions.map((s) => [s.kind, s.name, s.start]), [
+    ["qualifying", "Qualifying", "2026-09-25T12:00:00.000Z"],
+    ["race", "Race", "2026-09-26T11:00:00.000Z"],
+  ]);
+});
+
 test("completed grand prix with podium, gaps and flags", () => {
   const e = normaliseEvent(spain, { sport: "formula1", league: F1, results: fx.results, nationalities: { Antonelli: "Italian", Verstappen: "Dutch" } });
   assert.equal(e.kind, "race");

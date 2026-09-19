@@ -55,14 +55,29 @@ test("a day's fixtures are filtered to our competitions, and every call is charg
   assert.equal(seasons["4332"], named, "and the provider keeps it, so the table lookup will not have to ask");
 });
 
-test("the daily pass is one call per day of the window, which is what it says it costs", async (t) => {
-  const calls = network(t, { "eventsday.php": { events: [] } });
-  const { p } = provider();
+test("the daily pass is one call per day of the window, plus one per competition with nothing in it", async (t) => {
+  const calls = network(t, {
+    "eventsday.php": { events: [] },
+    "eventsnextleague.php?id=4332": { events: [{ strTimestamp: "2026-10-03T14:00:00", strSeason: "2026-2027" }] },
+    "eventsnextleague.php?id=4335": null,
+  });
+  const next = {};
+  const { p } = provider({ next });
   await p.daily();
-  assert.equal(calls.length, 9, "yesterday, today and seven days ahead");
+  const days = calls.filter((c) => c.url.includes("eventsday.php"));
+  assert.equal(days.length, 9, "yesterday, today and seven days ahead");
   assert.equal(p.dailyCost, 9, "and the scheduler is told the same number");
-  const dates = calls.map((c) => c.url.match(/d=(\d{4}-\d{2}-\d{2})/)[1]);
-  assert.deepEqual([...new Set(dates)].length, 9, "nine different dates");
+  assert.deepEqual([...new Set(days.map((c) => c.url.match(/d=(\d{4}-\d{2}-\d{2})/)[1]))].length, 9, "nine different dates");
+  assert.deepEqual(next, { 4332: { start: "2026-10-03T14:00:00.000Z", season: "2026-2027" } }, "when an idle competition is next on; nothing for one the feed knows nothing about");
+});
+
+test("a competition with fixtures this week is not asked when it is next on, and forgets an old answer", async (t) => {
+  const calls = network(t, { "eventsday.php": { events: football }, "eventsnextleague.php": null });
+  const next = { 4332: { start: "2026-06-01T00:00:00.000Z" } };
+  const { p } = provider({ next });
+  await p.daily();
+  assert.ok(!calls.some((c) => c.url.includes("eventsnextleague.php?id=4332")), "Serie A has games in the window");
+  assert.equal(next[4332], undefined, "and the stale next-fixture is dropped");
 });
 
 test("the live feed is the V2 endpoint with the key in a header, never in the URL", async (t) => {
@@ -95,9 +110,10 @@ test("a league table becomes rows with a record under each team", async (t) => {
   const tables = await p.standings();
   assert.deepEqual(Object.keys(tables), ["4332"], "the league whose table came back empty is left out, not shown blank");
   const [inter, roma] = tables[4332].tables[0].rows;
-  assert.deepEqual(inter, { pos: 1, name: "Inter", sub: "3 · 3-0-0", value: 9, logo: "https://x/inter.png" });
+  assert.deepEqual(inter, { pos: 1, name: "Inter", cells: ["3", "3", "0", "0", "0", "9"], value: 9, logo: "https://x/inter.png" });
   assert.equal(roma.logo, undefined);
-  assert.equal(roma.sub, "3 · 2-1-0");
+  assert.deepEqual(roma.cells, ["3", "2", "1", "0", "0", "7"]);
+  assert.deepEqual(tables[4332].tables[0].columns, ["p", "w", "d", "l", "gd", "pts"]);
 });
 
 test("a competition with no table is skipped, not fatal", async (t) => {

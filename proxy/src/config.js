@@ -14,6 +14,29 @@ function readKey(envName, fileName) {
   }
 }
 
+/** Four to the Champions League, one each to the Europa and Conference Leagues, three down. */
+const EUROPE_20 = [
+  { from: 1, to: 4, key: "ucl", line: "solid" },
+  { from: 5, to: 5, key: "uel" },
+  { from: 6, to: 6, key: "uecl" },
+  { from: 18, key: "relegation", line: "dashed" },
+];
+/** Eighteen teams: the same places, a relegation play-off at 16, two down. */
+const EUROPE_18 = [
+  { from: 1, to: 4, key: "ucl", line: "solid" },
+  { from: 5, to: 5, key: "uel" },
+  { from: 6, to: 6, key: "uecl" },
+  { from: 16, to: 16, key: "relegation-playoff" },
+  { from: 17, key: "relegation", line: "dashed" },
+];
+/** The league phase of the European cups: eight straight through, sixteen to the play-offs, the rest out. */
+const LEAGUE_PHASE = [
+  { from: 1, to: 8, key: "r16", line: "solid" },
+  { from: 9, to: 16, key: "playoff-seeded" },
+  { from: 17, to: 24, key: "playoff-unseeded", line: "dashed" },
+  { from: 25, key: "eliminated" },
+];
+
 export const config = {
   host: env.TVSCORES_HOST || "127.0.0.1",
   port: Number(env.TVSCORES_PORT || 8787),
@@ -37,22 +60,31 @@ export const config = {
      * a subscription. Ids verified against the live catalogue, and the
      * ordering is the order they appear on the scoreboard.
      */
+    // `zones`: where a table is cut and what the places mean, the way the
+    // competition itself publishes it this season (checked 2026-09-19; a
+    // coefficient place or a cup winner can shift these by one, and the
+    // table is a guide, not the regulations).
     football: [
-      { id: 4328, name: "Premier League", short: "PL", badge: "epl" },
-      { id: 4335, name: "La Liga", short: "LIGA", badge: "laliga" },
-      { id: 4332, name: "Serie A", short: "SA", badge: "seriea" },
-      { id: 4331, name: "Bundesliga", short: "BUN", badge: "bundesliga" },
-      { id: 4334, name: "Ligue 1", short: "L1", badge: "ligue1" },
+      { id: 4328, name: "Premier League", short: "PL", badge: "epl", zones: EUROPE_20 },
+      { id: 4335, name: "La Liga", short: "LIGA", badge: "laliga", zones: EUROPE_20 },
+      { id: 4332, name: "Serie A", short: "SA", badge: "seriea", zones: EUROPE_20 },
+      { id: 4331, name: "Bundesliga", short: "BUN", badge: "bundesliga", zones: EUROPE_18 },
+      { id: 4334, name: "Ligue 1", short: "L1", badge: "ligue1", zones: EUROPE_18 },
       // `menu` is the name where a sidebar row is too narrow for the full one.
       // tvOS lays those rows out itself and wraps rather than truncating, so a
       // long name costs a second line; this is cheaper than fighting it.
       // The feed has results for the cups but no table, so theirs is built
       // from the league phase: the games from September, since the feed
       // numbers the qualifiers 1 to 3 and the play-off 0 (knockouts are 100+).
-      { id: 4480, name: "UEFA Champions League", menu: "Champions League", short: "UCL", badge: "ucl", table: { rounds: [1, 99], after: "09-01", scoring: "points" } },
-      { id: 4481, name: "UEFA Europa League", menu: "Europa League", short: "UEL", badge: "uel", table: { rounds: [1, 99], after: "09-01", scoring: "points" } },
+      { id: 4480, name: "UEFA Champions League", menu: "Champions League", short: "UCL", badge: "ucl", table: { rounds: [1, 99], after: "09-01", scoring: "points" }, zones: LEAGUE_PHASE },
+      { id: 4481, name: "UEFA Europa League", menu: "Europa League", short: "UEL", badge: "uel", table: { rounds: [1, 99], after: "09-01", scoring: "points" }, zones: LEAGUE_PHASE },
       { id: 4501, name: "Copa Libertadores", short: "LIB", badge: "libertadores" },
-      { id: 4351, name: "Brasileirão", short: "BRA", badge: "brasileirao" },
+      { id: 4351, name: "Brasileirão", short: "BRA", badge: "brasileirao", zones: [
+        { from: 1, to: 4, key: "libertadores", line: "solid" },
+        { from: 5, to: 6, key: "libertadores-qualifying" },
+        { from: 7, to: 12, key: "sudamericana", line: "solid" },
+        { from: 17, key: "relegation", line: "dashed" },
+      ] },
     ],
     // Records built from results, split by conference (src/divisions.js):
     // the NFL's regular season is rounds 1 to 18, preseason and playoffs

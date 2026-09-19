@@ -74,3 +74,15 @@ test("stale only covers sports with a scheduler this run", () => {
   const meta = { f1: { lastOk: new Date(now).toISOString() }, motogp: { lastOk: new Date(now - 10 * 3600e3).toISOString() } };
   assert.deepEqual(buildScoreboard([], { now, meta, activeSports: ["f1"] }).stale, { f1: false });
 });
+
+test("a competition with nothing this week says when it is next on", () => {
+  const now = Date.UTC(2026, 8, 19, 12);
+  const leagues = { nba: [{ id: 4387, name: "NBA", short: "NBA" }], f1: [{ id: "f1", name: "Formula 1", short: "F1" }], nfl: [{ id: 4391, name: "NFL", short: "NFL" }] };
+  const race = { id: "f1:r", sport: "f1", kind: "race", league: { id: "f1", name: "Formula 1", short: "F1" }, start: "2026-09-26T11:00:00.000Z", status: { state: "scheduled" }, name: "Azerbaijan Grand Prix" };
+  const game = { id: "nfl:g", sport: "nfl", kind: "match", league: { id: 4391, name: "NFL", short: "NFL" }, start: "2026-09-19T20:00:00.000Z", status: { state: "scheduled" }, home: { name: "A", short: "A" }, away: { name: "B", short: "B" }, score: {} };
+  const sb = buildScoreboard([race, game], { now, leagues, upcomingDays: 3, meta: { nba: { next: { 4387: { start: "2026-10-21T23:30:00.000Z", season: "2026-2027" } } } } });
+  const by = Object.fromEntries(sb.leagues.map((l) => [l.sport, l]));
+  assert.deepEqual(by.nba.next, { start: "2026-10-21T23:30:00.000Z", season: "2026-2027" }, "what the daily pass learned");
+  assert.deepEqual(by.f1.next, { start: "2026-09-26T11:00:00.000Z" }, "the calendar's next round, beyond the window");
+  assert.equal(by.nfl.next, undefined, "a competition playing this week has no next to speak of");
+});

@@ -64,6 +64,13 @@ export function flagIso3(code) {
   return iso ? [...iso].map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65)).join("") : undefined;
 }
 
+/** "ES" -> "🇪🇸" from an ISO-3166 alpha-2 code; undefined when unknown. */
+export function flagIso2(code) {
+  const iso = String(code || "").toUpperCase();
+  if (!/^[A-Z]{2}$/.test(iso)) return undefined;
+  return [...iso].map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65)).join("");
+}
+
 /** "Italian" -> "🇮🇹" (regional indicator pair); undefined when unknown. */
 export function flag(nationality) {
   const iso = NATIONALITY_ISO[nationality];

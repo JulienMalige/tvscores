@@ -310,3 +310,12 @@ table for the cups' league phase (rounds 1–8; qualifying is round 0). One
 season call per league per refresh. Libertadores stays without a table: its
 group phase is over and the feed carries no group labels; a bracket is a later
 question.
+
+## Table zones (2026-09-19)
+
+The lines and legend under a table — Champions League places, relegation,
+the cups' eight and twenty-four — are ours, in `proxy/src/config.js`
+(`zones` on each competition), written from how each competition publishes
+its format this season. A coefficient place or a cup winner can shift a line
+by one; the table is a guide, not the regulations. The feed carries none of
+this. Brasileirão marks the Libertadores and Sudamericana places.

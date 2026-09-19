@@ -34,7 +34,17 @@ private struct StandingsRowContent: View {
                 }
             }
             Spacer()
-            if let v = entry.value {
+            if let cells = entry.cells {
+                // A table read as numbers: one column each, the last — the
+                // points, or the percentage — carrying the weight.
+                ForEach(Array(cells.enumerated()), id: \.offset) { i, cell in
+                    Text(cell)
+                        .font(.system(size: i == cells.count - 1 ? 34 : 28, weight: i == cells.count - 1 ? .bold : .regular, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(i == cells.count - 1 ? .primary : .secondary)
+                        .frame(width: Metrics.tableCell, alignment: .trailing)
+                }
+            } else if let v = entry.value {
                 Text(v, format: .number.grouping(.automatic))
                     .font(.system(size: 34, weight: .bold, design: .rounded))
                     .monospacedDigit()

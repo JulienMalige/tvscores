@@ -108,4 +108,56 @@ struct ModelTests {
         #expect(!dnf.finished)
         #expect(dnf.id == "--Lando Norris", "a retirement has no position and must not collide with one that does")
     }
+
+    @Test("a race carries its country's flag and the weekend's timetable")
+    func racesCarryFlagAndSessions() throws {
+        let board = try ScoreboardDecoder.make().decode(Scoreboard.self, from: Self.sample("sample-race"))
+        let races = Day.allCases.flatMap { board.groups(for: $0) }.flatMap(\.events).filter { $0.kind == .race }
+        #expect(!races.isEmpty)
+        for race in races {
+            #expect(race.flag?.isEmpty == false, "\(race.name ?? race.id) has a flag")
+            let sessions = try #require(race.sessions)
+            #expect(sessions.contains { $0.kind == "race" }, "\(race.name ?? race.id) lists the race itself")
+            #expect(sessions == sessions.sorted { $0.start < $1.start }, "in the order of the weekend")
+        }
+    }
+
+    @Test("a table read as numbers has a cell per column, and its cuts fall inside it")
+    func tablesLineUp() throws {
+        let bundle = try ScoreboardDecoder.make().decode(StandingsBundle.self, from: Self.sample("sample-standings"))
+        var seenColumns = 0
+        for (key, standings) in bundle.standings {
+            for table in standings.tables {
+                guard let columns = table.columns else { continue }
+                seenColumns += 1
+                for row in table.rows {
+                    #expect(row.cells?.count == columns.count, "\(key) \(row.name)")
+                }
+                for line in table.lines ?? [] {
+                    #expect(line.after >= 1 && line.after < table.rows.count, "\(key): a cut after row \(line.after) is inside the table")
+                }
+                for zone in table.legend ?? [] {
+                    #expect(zone.from <= zone.to && zone.to <= table.rows.count, "\(key): \(zone.key)")
+                }
+            }
+        }
+        #expect(seenColumns >= 8, "every football table and both conferences read as columns")
+        let nfl = try #require(bundle.standings["nfl:4391"])
+        #expect(nfl.tables.map(\.id) == ["AFC", "NFC"])
+        #expect(nfl.tables[0].rows.allSatisfy { $0.section != nil }, "a conference is read division by division")
+        #expect(nfl.tables[0].lines == nil, "and has no cut lines through its divisions")
+    }
+
+    @Test("a competition with nothing this week says when it is next on")
+    func idleLeaguesSayWhenTheyAreBack() throws {
+        let board = try ScoreboardDecoder.make().decode(Scoreboard.self, from: Self.sample("sample-scoreboard"))
+        let nba = try #require(board.leagues.first { $0.sport == "nba" })
+        #expect(!nba.playing)
+        let next = try #require(nba.next)
+        #expect(next.start > board.generatedAt)
+        #expect(next.season?.isEmpty == false)
+        for league in board.leagues where league.playing {
+            #expect(league.next == nil, "\(league.name) is on this week and has no next to speak of")
+        }
+    }
 }

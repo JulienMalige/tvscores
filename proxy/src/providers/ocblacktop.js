@@ -1,5 +1,5 @@
 import { getJson } from "../http.js";
-import { STATE, flag, shortName } from "../model.js";
+import { STATE, flag, flagIso2, shortName } from "../model.js";
 
 const BASE = "https://api.ocblacktop.com/v1";
 const RACE_HOURS = 3;
@@ -54,6 +54,13 @@ export function normaliseEvent(e, { sport, league, results, nationalities = {}, 
     name: titleCase(e.name),
     circuit: e.location?.name,
     country: e.location?.country?.name,
+    flag: flagIso2(e.location?.country?.twoCode),
+    // The weekend's timetable, practice left out: what a person wants to
+    // know is when qualifying, the sprint and the race are.
+    sessions: (e.schedule || [])
+      .filter((s) => s.type !== "practice" && s.startTime)
+      .map((s) => ({ kind: s.type, name: s.name, start: new Date(s.startTime).toISOString() }))
+      .sort((a, b) => Date.parse(a.start) - Date.parse(b.start)),
     status: { state, detail: state === STATE.final ? "Race" : state === STATE.other ? "Cancelled" : undefined },
     results: classification,
     _sessionId: race.id,

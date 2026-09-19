@@ -63,6 +63,14 @@ struct LeagueSummary: Decodable, Equatable, Identifiable, Hashable {
     let hasStandings: Bool
     /// False when nothing of this competition falls inside the week we show.
     let playing: Bool
+    /// When it is next on, for a competition with nothing this week.
+    let next: NextGame?
+}
+
+/// The next fixture of a competition between seasons or in a break.
+struct NextGame: Decodable, Equatable, Hashable {
+    let start: Date
+    let season: String?
 }
 
 struct LeagueRef: Hashable {
@@ -72,6 +80,10 @@ struct LeagueRef: Hashable {
     let short: String
     let logo: URL?
     let hasStandings: Bool
+    /// Whether anything of it falls inside the week; a page reached from a
+    /// group of games is playing by definition.
+    let playing: Bool
+    let next: NextGame?
 
     init(_ summary: LeagueSummary) {
         sport = summary.sport
@@ -80,6 +92,8 @@ struct LeagueRef: Hashable {
         short = summary.short
         logo = summary.logo
         hasStandings = summary.hasStandings
+        playing = summary.playing
+        next = summary.next
     }
 
     init(group: LeagueGroup) {
@@ -89,6 +103,8 @@ struct LeagueRef: Hashable {
         short = group.league.short
         logo = group.league.logo
         hasStandings = group.league.hasStandings ?? false
+        playing = true
+        next = nil
     }
 
     func matches(_ group: LeagueGroup) -> Bool {
@@ -102,8 +118,26 @@ struct Standings: Decodable {
 }
 
 struct StandingsTable: Decodable, Identifiable {
-    let id: String   // drivers | constructors | teams | rankings
+    let id: String   // drivers | constructors | teams | rankings | table | AFC | NFC | east | west
     let rows: [StandingsEntry]
+    /// Column ids the rows' `cells` line up with ("p", "w", "pts"...), for the
+    /// tables that are read as columns; a table of people has none.
+    let columns: [String]?
+    /// Where the table is cut: a line after the given row, solid or dashed.
+    let lines: [TableLine]?
+    /// What the places mean, listed under the table.
+    let legend: [TableZone]?
+}
+
+struct TableLine: Decodable, Equatable {
+    let after: Int
+    let line: String
+}
+
+struct TableZone: Decodable, Equatable {
+    let from: Int
+    let to: Int
+    let key: String
 }
 
 struct StandingsEntry: Decodable, Identifiable {
@@ -118,7 +152,11 @@ struct StandingsEntry: Decodable, Identifiable {
     let photo: URL?
     /// Constructor or team badge; a table of marques, not of people.
     let logo: URL?
-    var id: String { "\(pos)-\(name)" }
+    /// The row's numbers, one per column of the table.
+    let cells: [String]?
+    /// The division this row sits in, for a table read division by division.
+    let section: String?
+    var id: String { "\(section ?? "")-\(pos)-\(name)" }
 }
 
 /// Bundled demo file: { "standings": { "sport:league": Standings } }
@@ -155,9 +193,20 @@ struct Event: Decodable, Identifiable, Equatable {
     let name: String?
     let circuit: String?
     let country: String?
+    /// The country's flag, for a race.
+    let flag: String?
+    /// The weekend's timetable — qualifying, sprint, race — for a race.
+    let sessions: [Session]?
     let results: [RaceResult]?
 
     enum Kind: String, Decodable, Equatable { case match, race }
+}
+
+struct Session: Decodable, Equatable, Identifiable {
+    let kind: String   // qualifying | sprint | race, or whatever the feed calls it
+    let name: String
+    let start: Date
+    var id: String { "\(kind)-\(start.timeIntervalSince1970)" }
 }
 
 struct Status: Decodable, Equatable {

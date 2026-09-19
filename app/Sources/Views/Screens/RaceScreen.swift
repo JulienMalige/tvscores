@@ -26,11 +26,17 @@ struct RaceScreen: View {
             VStack(alignment: .leading, spacing: Metrics.sectionGap * 0.75) {
                 header
                 if results.filter(\.finished).isEmpty {
-                    Text("home.empty")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, 80)
+                    // Nothing classified yet: the weekend ahead, when the
+                    // feed has it.
+                    if let sessions = event.sessions, !sessions.isEmpty {
+                        SessionSection(sessions: sessions)
+                    } else {
+                        Text("home.empty")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.top, 80)
+                    }
                 } else {
                     PodiumSection(results: results)
                     ResultSection(results: results)
@@ -41,16 +47,17 @@ struct RaceScreen: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(event.name ?? "")
-                .font(.system(size: 48, weight: .bold))
-            HStack(spacing: 16) {
+        HStack(spacing: 24) {
+            FlagMark(flag: event.flag, size: Metrics.markHero)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(event.name ?? "")
+                    .font(.system(size: 48, weight: .bold))
                 Text([event.circuit, event.country].compactMap { $0 }.joined(separator: " · "))
                     .font(.title3)
                     .foregroundStyle(.secondary)
-                Spacer()
-                StatusLabel(status: event.status, start: event.start)
             }
+            Spacer()
+            StatusLabel(status: event.status, start: event.start)
         }
     }
 }

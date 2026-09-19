@@ -36,6 +36,8 @@ for (const sport of ["football", "nfl", "nba"]) {
     // sport's meta, which the store persists: a restart can read a table
     // before it has seen a fixture.
     seasons: (store.sportMeta(sport).seasons ??= {}),
+    // The next fixture of a competition with nothing this week, same home.
+    next: (store.sportMeta(sport).next ??= {}),
     log,
   });
   schedulers.push(new TeamSportScheduler({ provider, store, cfg, log }));
