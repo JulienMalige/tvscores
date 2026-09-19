@@ -49,14 +49,19 @@ final class ClickToChooseSegmentedControl: UISegmentedControl {
 
     override init(items: [Any]?) {
         super.init(items: items)
-        addTarget(self, action: #selector(pressed), for: .primaryActionTriggered)
     }
 
     required init?(coder: NSCoder) { fatalError("not from a storyboard") }
 
-    @objc private func pressed() {
-        committed = selectedSegmentIndex
-        onCommit(selectedSegmentIndex)
+    /// The remote's select press, taken at the press level: on tvOS the
+    /// control's own actions fire on the focus-driven change too, so they
+    /// cannot tell a click from a move.
+    override func pressesEnded(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        if presses.contains(where: { $0.type == .select }) {
+            committed = selectedSegmentIndex
+            onCommit(selectedSegmentIndex)
+        }
+        super.pressesEnded(presses, with: event)
     }
 
     override func didUpdateFocus(in context: UIFocusUpdateContext, with coordinator: UIFocusAnimationCoordinator) {
