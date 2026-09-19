@@ -23,9 +23,11 @@ struct Segments<Value: Hashable>: View {
                 } label: {
                     Pill(title: option.title, selected: selection == option.value)
                 }
-                .buttonStyle(.plain)
-                // The plain style still draws tvOS's own focus card behind
-                // the label; the pill is the focus effect here.
+                // Borderless, not plain: the plain style lifts a platter of
+                // its own behind the label on focus, larger than the pill,
+                // and ignores `focusEffectDisabled`. The pill is the focus
+                // effect here.
+                .buttonStyle(.borderless)
                 .focusEffectDisabled()
             }
             Spacer()
