@@ -14,6 +14,9 @@ struct Sidebar: View {
     @State private var store = ScoreboardStore()
     @State private var selection = Selection.home
     @State private var day: Day = Self.initialDay()
+    /// The day a competition's page was opened on from the front page, so
+    /// Yesterday's La Liga header opens Yesterday's La Liga.
+    @State private var leagueDays: [String: Day] = [:]
 
     enum Selection: Hashable {
         case home
@@ -32,17 +35,20 @@ struct Sidebar: View {
     private var tabs: some View {
         TabView(selection: $selection) {
             Tab(value: Selection.home) {
-                HomeScreen(store: store, day: $day)
+                HomeScreen(store: store, day: $day, openLeague: open)
             } label: {
                 Label("tab.home", systemImage: "house")
             }
 
             // `day` is deliberately not passed from the binding: a league page
             // takes it once, at creation, and reading the live value here would
-            // rebuild every tab in the menu each time the day pills are used.
+            // rebuild every tab in the menu each time the day switch is used.
+            // A page opened from the front page takes that day instead, and is
+            // made afresh for it.
             ForEach(leagues) { league in
                 Tab(value: Selection.league(key(league))) {
-                    LeaguePage(league: league, store: store, day: Self.initialDay())
+                    LeaguePage(league: league, store: store, day: leagueDays[key(league)] ?? Self.initialDay())
+                        .id(leagueDays[key(league)])
                 } label: {
                     // The version is what makes a row look at the cache again
                     // once its icon has arrived; the rows hold no state.
@@ -56,6 +62,15 @@ struct Sidebar: View {
     private var leagues: [LeagueSummary] { store.leagues }
 
     private func key(_ league: LeagueSummary) -> String { "\(league.sport):\(league.id.raw)" }
+
+    /// A competition opened from the front page: its own tab, on the day the
+    /// front page was showing.
+    private func open(_ ref: LeagueRef) {
+        let key = "\(ref.sport):\(ref.leagueId)"
+        guard leagues.contains(where: { self.key($0) == key }) else { return }
+        leagueDays[key] = day
+        selection = .league(key)
+    }
 
     /// `-TVScoresLeague f1` opens that competition (CI screenshots).
     private func openRequestedLeague() {

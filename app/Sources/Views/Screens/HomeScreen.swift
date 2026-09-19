@@ -4,6 +4,8 @@ import SwiftUI
 struct HomeScreen: View {
     let store: ScoreboardStore
     @Binding var day: Day
+    /// Takes the viewer to a competition's own place in the menu.
+    let openLeague: (LeagueRef) -> Void
     @State private var path = NavigationPath()
     @State private var openedInitialRace = false
 
@@ -20,9 +22,6 @@ struct HomeScreen: View {
                     content
                 }
                 .pageMargins()
-            }
-            .navigationDestination(for: LeagueRef.self) { ref in
-                LeagueScreen(ref: ref, store: store, day: day)
             }
             .navigationDestination(for: Event.self) { RaceScreen(eventId: $0.id, fallback: $0, store: store) }
         }
@@ -77,7 +76,7 @@ struct HomeScreen: View {
             } else {
                 LazyVStack(alignment: .leading, spacing: Metrics.sectionGap) {
                     ForEach(groups) { group in
-                        LeagueSection(group: group, linkToLeague: true)
+                        LeagueSection(group: group, openLeague: openLeague)
                     }
                 }
                 .padding(.top, 4)

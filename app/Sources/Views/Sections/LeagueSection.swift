@@ -2,17 +2,22 @@ import SwiftUI
 
 struct LeagueSection: View {
     let group: LeagueGroup
-    var linkToLeague = false
+    /// On the front page, the heading opens the competition — in its own
+    /// place in the menu, not as a page pushed over Home, so the menu says
+    /// where you are whichever way you came.
+    var openLeague: ((LeagueRef) -> Void)? = nil
     var showHeader = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: Metrics.headingGap) {
-            if linkToLeague {
+            if let openLeague {
                 // The focusable area spans the row width, not the words:
                 // tvOS moves focus in straight lines, and a heading that only
                 // covers the left edge is stepped over from the full-width
                 // row beneath. The highlight itself stays on the words.
-                NavigationLink(value: LeagueRef(group: group)) {
+                Button {
+                    openLeague(LeagueRef(group: group))
+                } label: {
                     LeagueHeader(group: group, chevron: true)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }

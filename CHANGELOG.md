@@ -8,6 +8,10 @@ notes when a version ships.
 
 ## Unreleased
 
+- Opening a competition from the front page now takes you to its place in
+  the menu — the same page the menu opens, on the day you were reading —
+  instead of a copy on top of Home with the menu still saying Home.
+
 - The day switch no longer sits on a dark track; just the three words, with
   the chosen day in grey and the one the remote is on in white. The switch
   between a competition's tables — Drivers and Constructors, Riders and
