@@ -48,7 +48,18 @@ struct InitialsMark: View {
             let rect = CGRect(x: 0, y: 0, width: size, height: size)
             colour(for: initials).setFill()
             context.cgContext.fillEllipse(in: rect)
-            let text = initials ?? "•"
+            guard let text = initials else {
+                // No name yet: a person's silhouette, as an unnamed profile
+                // in the Apple TV app's sidebar, not a glyph that reads as
+                // a dot from the sofa.
+                let config = UIImage.SymbolConfiguration(pointSize: size * 0.42, weight: .medium)
+                if let person = UIImage(systemName: "person.fill", withConfiguration: config)?
+                    .withTintColor(.white, renderingMode: .alwaysOriginal) {
+                    let w = person.size.width, h = person.size.height
+                    person.draw(in: CGRect(x: (size - w) / 2, y: (size - h) / 2 + size * 0.02, width: w, height: h))
+                }
+                return
+            }
             let font = UIFont.systemFont(ofSize: size * 0.4, weight: .semibold)
             let style = NSMutableParagraphStyle()
             style.alignment = .center

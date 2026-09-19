@@ -10,7 +10,7 @@ notes when a version ships.
 
 - Pressing left from the day switch opens the menu again. The switch keeps
   its look and changes only on click; until a name is set, the menu's first
-  row reads "Home".
+  row reads "Home", with a silhouette in place of the dot.
 
 ## 1.0 build 21 — 19 September 2026
 - A Settings page, last in the menu, with one thing on it: your name. It
