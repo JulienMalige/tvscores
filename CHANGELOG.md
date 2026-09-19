@@ -9,8 +9,11 @@ notes when a version ships.
 ## Unreleased
 
 - Pressing left from the day switch opens the menu again. The switch keeps
-  its look and changes only on click; until a name is set, the menu's first
-  row reads "Home", with a silhouette in place of the dot.
+  its look and changes only on click.
+- The menu's first row is Home again, with a house for its mark. The name
+  and Settings page of build 21 are gone: the Apple TV profile's name and
+  picture are Apple's own, and typing a name into a scores app was not
+  worth a page.
 - The app keeps a trace of the remote's moves and the menu's state, and
   sends it to the proxy: it is how the menu's occasional open-and-shut can
   be seen from here. Anonymous, no name or address in it.

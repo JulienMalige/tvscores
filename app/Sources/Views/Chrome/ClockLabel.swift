@@ -1,9 +1,7 @@
 import SwiftUI
 
-/// The date at the top of a page, and the time at the top of the menu —
-/// where the Apple TV app keeps its clock. The profile picture and name
-/// beside it there are Apple's own, drawn only in Apple's apps; an app gets
-/// the header slot and fills it with what it has.
+/// The date and time at the top of a page — where the Apple TV app keeps
+/// its clock, beside a profile that is Apple's own to draw.
 struct ClockLabel: View {
     var showsDate = true
     var showsTime = true

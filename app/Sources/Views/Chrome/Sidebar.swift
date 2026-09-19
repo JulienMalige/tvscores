@@ -12,7 +12,6 @@ import SwiftUI
 /// championship table — were unreachable for eleven days at a time.
 struct Sidebar: View {
     @State private var store = ScoreboardStore()
-    @State private var profile = Profile.shared
     @State private var selection = Selection.home
     @State private var day: Day = Self.initialDay()
     /// The day a competition's page was opened on from the front page, so
@@ -22,7 +21,6 @@ struct Sidebar: View {
     enum Selection: Hashable {
         case home
         case league(String)
-        case settings
     }
 
     var body: some View {
@@ -39,14 +37,12 @@ struct Sidebar: View {
 
     private var tabs: some View {
         TabView(selection: $selection) {
-            // The first row is the header, as at the top of the Apple TV
-            // app's sidebar — picture, name, time — and it is Home. tvOS's
-            // sidebar has no header slot of its own (`tabViewSidebarHeader`
-            // is not on tvOS), so the row is the header.
+            // The first row is Home. tvOS's sidebar has no header slot of
+            // its own (`tabViewSidebarHeader` is not on tvOS).
             Tab(value: Selection.home) {
                 HomeScreen(store: store, day: $day, openLeague: open)
             } label: {
-                SidebarHeader(profile: profile)
+                SidebarHeader()
             }
 
             // One section per family of sport, the way the Apple TV app groups
@@ -82,18 +78,6 @@ struct Sidebar: View {
                             .foregroundStyle(.secondary)
                     }
                 }
-            }
-            // Who is watching: the name that heads the menu. In a section of
-            // its own so it comes last — tvOS lists single tabs before any
-            // section, whatever the order here.
-            TabSection {
-                Tab(value: Selection.settings) {
-                    SettingsScreen(profile: profile)
-                } label: {
-                    Label("tab.settings", systemImage: "gearshape")
-                }
-            } header: {
-                EmptyView()
             }
         }
         .tabViewStyle(.sidebarAdaptable)

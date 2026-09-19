@@ -829,90 +829,6 @@
         }
       }
     },
-    "settings.name": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your name"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Votre nom"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Seu nome"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tu nombre"
-          }
-        }
-      }
-    },
-    "settings.nameHint": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Heads the menu, with your initials for a picture. Each Apple TV user has their own."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En tête du menu, avec vos initiales en guise de photo. Chaque utilisateur de l'Apple TV a le sien."
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No topo do menu, com suas iniciais no lugar da foto. Cada usuário da Apple TV tem o seu."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Encabeza el menú, con tus iniciales como foto. Cada usuario del Apple TV tiene el suyo."
-          }
-        }
-      }
-    },
-    "settings.namePrompt": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Name"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nom"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nome"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nombre"
-          }
-        }
-      }
-    },
     "sidebar.football": {
       "localizations": {
         "en": {
@@ -1948,34 +1864,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Inicio"
-          }
-        }
-      }
-    },
-    "tab.settings": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Settings"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Réglages"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajustes"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajustes"
           }
         }
       }

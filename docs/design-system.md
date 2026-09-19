@@ -13,10 +13,10 @@ so a file says what it is before you open it.
 
 | Level | Folder | What it owns | Members |
 |---|---|---|---|
-| **Screen** | `app/Sources/Views/Screens` | the scroll view, the page margins, the navigation | `HomeScreen`, `LeagueScreen`, `RaceScreen`, `SettingsScreen` |
+| **Screen** | `app/Sources/Views/Screens` | the scroll view, the page margins, the navigation | `HomeScreen`, `LeagueScreen`, `RaceScreen` |
 | **Section** | `app/Sources/Views/Sections` | a heading and the list under it | `LeagueSection`, `StandingsSection`, `PodiumSection`, `ResultSection`, `SessionSection`, `OffseasonSection` |
 | **Row** | `app/Sources/Views/Rows` | one focusable line, on the shared row surface | `MatchRow`, `RaceRow`, `StandingsRow`, `ResultRow`, `SessionRow` |
-| **Element** | `app/Sources/Views/Elements` | the atoms a row is made of | `TeamMark`, `PersonMark`, `LeagueMark`, `FlagMark`, `InitialsMark`, `StatusLabel`, `EmptyDay`, `CachedImage`, `Segments` |
+| **Element** | `app/Sources/Views/Elements` | the atoms a row is made of | `TeamMark`, `PersonMark`, `LeagueMark`, `FlagMark`, `StatusLabel`, `EmptyDay`, `CachedImage`, `Segments` |
 | **Chrome** | `app/Sources/Views/Chrome` | navigation that outlives any one screen | `Sidebar`, `SidebarRow`, `SidebarHeader`, `DayTabs`, `ClockLabel`, `LaunchLoader` |
 
 Sections stack inside a screen; they never nest. A row never reaches outside

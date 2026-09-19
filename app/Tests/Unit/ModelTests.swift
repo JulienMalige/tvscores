@@ -182,18 +182,4 @@ struct ModelTests {
         #expect(race.sessions(on: .today, now: sunday, calendar: utc).map(\.kind) == ["race"])
         #expect(race.sessions(on: .yesterday, now: sunday, calendar: utc).map(\.kind) == ["qualifying", "sprint"])
     }
-
-    @Test("a name becomes initials for a picture, and is kept")
-    @MainActor
-    func profileInitialsAndPersistence() throws {
-        #expect(Profile.initials(of: "Julien Malige") == "JM")
-        #expect(Profile.initials(of: "julien") == "J")
-        #expect(Profile.initials(of: "Jean-Pierre") == "JP")
-        #expect(Profile.initials(of: "  ") == nil)
-        let suite = "tvscores.tests.\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: suite))
-        defer { defaults.removePersistentDomain(forName: suite) }
-        Profile(defaults: defaults).name = "Julien"
-        #expect(Profile(defaults: defaults).name == "Julien", "the name survives the next launch")
-    }
 }

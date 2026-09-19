@@ -325,15 +325,19 @@ this. Brasileirão marks the Libertadores and Sudamericana places.
 Build 19 tried `com.apple.developer.user-management` = `runs-as-current-user`
 in the belief that tvOS draws the current profile's picture, name and the
 clock at the top of a sidebar for apps that run as the current user. It does
-not: that header is Apple's own, in Apple's apps. Build 21 keeps the
-entitlement for what it is for: the name typed in Settings is stored per
-Apple TV user. The App ID has the User Management capability and the
-profile carries it (`3YA4WZL5X6`). Since tvOS 16 `UIDevice.name` reads
-"Apple TV" for apps without a special entitlement, so the television's name
-is no source for a viewer's name either. What an app has is `tabViewSidebarHeader`, a slot at the top of the
-sidebar, and that is what every app with such a header uses — Disney+ and the
-rest draw their own account's profile there, from their own profile systems.
-Ours carries the app's name and the time; a profile would need profiles.
+not: that header is Apple's own, in Apple's apps. Checked against the
+frameworks on 2026-09-19: `TVUserManager` exposes an opaque
+`currentUserIdentifier` and nothing else (no name, no picture; most of it
+deprecated since tvOS 16); Sign in with Apple hands over a name once, on the
+first sign-in, and never a picture; CloudKit user discoverability was
+deprecated in iOS 17; the Contacts "me" card is macOS-only. Since tvOS 16
+`UIDevice.name` reads "Apple TV" too. `tabViewSidebarHeader` is not on
+tvOS, so a sidebar row is the header. Build 21 put a typed name there with
+initials for a picture; Julien dropped it on 2026-09-19 ("back to Home
+with a house icon") — a scores app asking for a name is a worse first
+minute than a Home row. The entitlement stays (the App ID has the User
+Management capability and profile `3YA4WZL5X6` carries it); it costs
+nothing and per-user defaults are ready if profiles ever come.
 
 ## Flags (2026-09-19)
 
