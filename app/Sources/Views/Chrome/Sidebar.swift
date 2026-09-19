@@ -68,6 +68,19 @@ struct Sidebar: View {
             }
         }
         .tabViewStyle(.sidebarAdaptable)
+        // The slot at the top of the sidebar, where the Apple TV app shows
+        // the profile and the time. The profile is Apple's to show, not ours;
+        // the time is.
+        .tabViewSidebarHeader {
+            HStack {
+                Text("app.title")
+                    .font(.title3.weight(.semibold))
+                Spacer()
+                ClockLabel(showsDate: false)
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 24)
+        }
     }
 
     /// The menu's sections, in order. A sport not named here is not shown.

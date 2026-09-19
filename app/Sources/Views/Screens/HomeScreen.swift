@@ -63,7 +63,7 @@ struct HomeScreen: View {
                     .font(.callout)
                     .foregroundStyle(.orange)
             }
-            ClockLabel()
+            ClockLabel(showsTime: false)
         }
     }
 

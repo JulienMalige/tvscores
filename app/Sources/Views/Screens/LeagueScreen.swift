@@ -30,7 +30,7 @@ struct LeagueScreen: View {
             Text(ref.name)
                 .font(.system(size: 48, weight: .bold))
             Spacer()
-            ClockLabel()
+            ClockLabel(showsTime: false)
         }
     }
 

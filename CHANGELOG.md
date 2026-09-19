@@ -8,6 +8,11 @@ notes when a version ships.
 
 ## Unreleased
 
+- The time sits at the top of the menu, beside the app's name, where the
+  Apple TV app keeps its clock; the page keeps the date. Build 19 promised
+  the Apple TV profile there too — that picture and name are Apple's own,
+  drawn only in Apple's apps, and no app can show them.
+
 - The day switch and the table switches are the system control of build
   18 again — small and steady — with its dark track gone: bare words, the
   chosen one light, the one the remote is on white, as in the Apple TV app.
