@@ -1,25 +1,30 @@
 import SwiftUI
 
-/// The top of the menu, as the Apple TV app has it: a round picture, the
-/// name, the time in the lighter style. The Apple TV profile itself is not
-/// something an app can read — no API hands over the viewer's picture or
-/// name — so the name is the television's own ("Julien's Apple TV" gives
-/// "Julien") and the picture a placeholder until the app has profiles.
+/// The top row of the menu, as the Apple TV app has it: a round picture,
+/// the name, the time in the lighter style. It is the Home row. The Apple TV
+/// profile itself is not something an app can read — `TVUserManager` hands
+/// over an opaque identifier and nothing else — so the name is the
+/// television's own ("Julien's Apple TV" gives "Julien") and the picture a
+/// placeholder until the app has profiles of its own.
 struct SidebarHeader: View {
     var body: some View {
-        HStack(spacing: 18) {
+        Label {
+            HStack(spacing: 24) {
+                Text(Self.viewerName)
+                    .font(.title3.weight(.semibold))
+                    .lineLimit(1)
+                Spacer(minLength: 24)
+                ClockLabel(showsDate: false)
+            }
+        } icon: {
             Image(systemName: "person.crop.circle.fill")
                 .resizable()
                 .scaledToFit()
                 .foregroundStyle(.white.opacity(0.85), Color.white.opacity(0.18))
                 .frame(width: Metrics.sidebarAvatar, height: Metrics.sidebarAvatar)
-            Text(Self.viewerName)
-                .font(.title3.weight(.semibold))
-                .lineLimit(1)
-            Spacer()
-            ClockLabel(showsDate: false)
         }
-        .padding(.bottom, 24)
+        .accessibilityIdentifier("tab.home")
+        .accessibilityLabel("Home")
     }
 
     /// "Julien's Apple TV" → "Julien"; "Apple TV" alone → the app's name.

@@ -43,8 +43,8 @@ enum Metrics {
     /// A competition's icon in the menu: about half the row, as the Apple TV
     /// app sizes its channels — bigger crowds the words beside it.
     static let sidebarIcon: CGFloat = 34
-    /// The round picture at the top of the menu.
-    static let sidebarAvatar: CGFloat = 56
+    /// The round picture at the top of the menu, the Home row's.
+    static let sidebarAvatar: CGFloat = 48
     /// How far the system sets a section heading in from the icon column;
     /// undone so the heading sits on the column, as in the Apple TV app.
     static let sidebarHeadingInset: CGFloat = 24

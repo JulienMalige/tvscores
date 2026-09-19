@@ -34,10 +34,14 @@ struct Sidebar: View {
 
     private var tabs: some View {
         TabView(selection: $selection) {
+            // The first row is the header, as at the top of the Apple TV
+            // app's sidebar — picture, name, time — and it is Home. tvOS's
+            // sidebar has no header slot of its own (`tabViewSidebarHeader`
+            // is not on tvOS), so the row is the header.
             Tab(value: Selection.home) {
                 HomeScreen(store: store, day: $day, openLeague: open)
             } label: {
-                Label("tab.home", systemImage: "house")
+                SidebarHeader()
             }
 
             // One section per family of sport, the way the Apple TV app groups
@@ -76,11 +80,6 @@ struct Sidebar: View {
             }
         }
         .tabViewStyle(.sidebarAdaptable)
-        // The slot at the top of the sidebar, where the Apple TV app shows
-        // its profile and the time. Every app draws its own header here —
-        // Disney+ and the like put their own account's profile in it — and
-        // we have no profiles, so ours carries the name and the time.
-        .tabViewSidebarHeader { SidebarHeader() }
     }
 
     /// The menu's sections, in order. A sport not named here is not shown.
