@@ -8,6 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
+## 1.0 build 19 — 19 September 2026
 - Crests and portraits no longer go missing for a minute after the menu
   redraws: a picture whose loading was interrupted is asked for again, not
   written off.
