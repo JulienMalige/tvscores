@@ -42,7 +42,7 @@ struct Sidebar: View {
 
             // One section per family of sport, the way the Apple TV app groups
             // its channels: a heading over each, and the competitions under it.
-            ForEach(Self.sections, id: \.title) { section in
+            ForEach(Self.sections, id: \.id) { section in
                 let mine = leagues.filter { section.sports.contains($0.sport) }
                 if !mine.isEmpty {
                     TabSection(section.title) {
@@ -71,11 +71,11 @@ struct Sidebar: View {
     }
 
     /// The menu's sections, in order. A sport not named here is not shown.
-    private static let sections: [(title: LocalizedStringKey, sports: [String])] = [
-        ("sidebar.football", ["football"]),
-        ("sidebar.motorsport", ["f1", "motogp"]),
-        ("sidebar.us", ["nfl", "nba"]),
-        ("sidebar.tennis", ["tennis"]),
+    private static let sections: [(id: String, title: LocalizedStringKey, sports: [String])] = [
+        ("football", "sidebar.football", ["football"]),
+        ("motorsport", "sidebar.motorsport", ["f1", "motogp"]),
+        ("us", "sidebar.us", ["nfl", "nba"]),
+        ("tennis", "sidebar.tennis", ["tennis"]),
     ]
 
     private var leagues: [LeagueSummary] { store.leagues }
