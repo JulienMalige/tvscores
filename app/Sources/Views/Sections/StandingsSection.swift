@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// The league table under a competition's games: a heading, one pill per table
-/// the provider publishes (drivers and constructors, riders and teams), and the
-/// rows of whichever is selected. It loads its own data so the screen above it
+/// The league table under a competition's games: a heading, a switch between
+/// the tables the provider publishes (drivers and constructors, riders and
+/// teams, the two conferences), and the rows of whichever is chosen. It loads its own data so the screen above it
 /// only has to say which competition it is.
 struct StandingsSection: View {
     let ref: LeagueRef
@@ -42,15 +42,8 @@ struct StandingsSection: View {
     }
 
     private func tabs(_ standings: Standings) -> some View {
-        HStack(spacing: 20) {
-            ForEach(Array(standings.tables.enumerated()), id: \.offset) { i, t in
-                Button(title(t.id)) { table = i }
-                    .buttonStyle(.bordered)
-                    .fontWeight(table == i ? .bold : .regular)
-                    .accessibilityIdentifier("table.\(t.id)")
-            }
-            Spacer()
-        }
+        Segments(selection: $table, options: standings.tables.enumerated().map { ($0.offset, title($0.element.id)) })
+            .accessibilityIdentifier("table.switch")
     }
 
     private func rows(_ table: StandingsTable) -> some View {

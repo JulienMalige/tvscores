@@ -16,7 +16,7 @@ so a file says what it is before you open it.
 | **Screen** | `app/Sources/Views/Screens` | the scroll view, the page margins, the navigation | `HomeScreen`, `LeagueScreen`, `RaceScreen` |
 | **Section** | `app/Sources/Views/Sections` | a heading and the list under it | `LeagueSection`, `StandingsSection`, `PodiumSection`, `ResultSection` |
 | **Row** | `app/Sources/Views/Rows` | one focusable line, on the shared row surface | `MatchRow`, `RaceRow`, `StandingsRow`, `ResultRow` |
-| **Element** | `app/Sources/Views/Elements` | the atoms a row is made of | `TeamMark`, `PersonMark`, `LeagueMark`, `StatusLabel`, `EmptyDay`, `CachedImage` |
+| **Element** | `app/Sources/Views/Elements` | the atoms a row is made of | `TeamMark`, `PersonMark`, `LeagueMark`, `StatusLabel`, `EmptyDay`, `CachedImage`, `Segments` |
 | **Chrome** | `app/Sources/Views/Chrome` | navigation that outlives any one screen | `Sidebar`, `SidebarRow`, `DayTabs`, `ClockLabel`, `LaunchLoader` |
 
 Sections stack inside a screen; they never nest. A row never reaches outside
@@ -24,8 +24,9 @@ itself for a measurement, and a screen never draws a row's insides. Chrome is
 the exception to "everything lives on a screen": the sidebar wraps every
 screen, and tvOS draws it — which is why nothing in `Chrome/` is worth a
 snapshot test, and why its rows are given square icons rather than sizes.
-`DayTabs` is the system's segmented control, not buttons of ours: tvOS chooses
-a segment as focus reaches it and keeps focus where it belongs.
+`Segments` is the system's segmented control, not buttons of ours — the day
+switch (`DayTabs`) and the table switch under a competition are both it: tvOS
+chooses a segment as focus reaches it and keeps focus where it belongs.
 
 A **mark** is the identity image of something: a crest (`TeamMark`), a portrait
 (`PersonMark`), a competition (`LeagueMark`). All three are the same size in a

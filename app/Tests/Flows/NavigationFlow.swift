@@ -119,7 +119,7 @@ final class NavigationFlow: FlowCase {
     func testHomeFromTheMenuReturnsToTheFrontPage() throws {
         try probeOnly()
         let app = Flow.launch(league: "f1")
-        app.buttons["table.drivers"].appears(within: 10)
+        app.buttons["Drivers"].firstMatch.appears(within: 10)
         // The rows between Formula 1 and Home, counted from the collapsed tree
         // as the selection flow does — a system row reports no focus.
         let order = app.buttons.allElementsBoundByIndex.map(\.label)
@@ -134,21 +134,21 @@ final class NavigationFlow: FlowCase {
         }
         Flow.remote.press(.select)
         app.buttons["league.football.4501"].appears(within: 10)
-        XCTAssertFalse(app.buttons["table.drivers"].exists, "and the Formula 1 page is gone")
+        XCTAssertFalse(app.buttons["Drivers"].firstMatch.exists, "and the Formula 1 page is gone")
     }
 
     func testARaceOpensFromItsRowAndBackReturnsToItsCompetition() {
         // A race opened from the Formula 1 page comes back to Formula 1, not
         // to Home: each competition's page has its own navigation.
         let app = Flow.launch(tab: "yesterday", league: "f1", extra: ["-TVScoresSample", "race"])
-        app.buttons["table.drivers"].appears(within: 10)
+        app.buttons["Drivers"].firstMatch.appears(within: 10)
         Flow.focusThePage()
         let race = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'race.'")).firstMatch
         XCTAssertTrue(Flow.walk(.down, until: race, limit: 10), "focus reaches the race row")
         Flow.remote.press(.select)
         app.staticTexts["Race Result"].appears(within: 10)
         Flow.remote.press(.menu)
-        app.buttons["table.drivers"].appears(within: 8)
+        app.buttons["Drivers"].firstMatch.appears(within: 8)
         XCTAssertFalse(app.staticTexts["Race Result"].exists, "back leaves the race, on the competition it was opened from")
     }
 }

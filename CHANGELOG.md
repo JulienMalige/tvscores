@@ -9,7 +9,9 @@ notes when a version ships.
 ## Unreleased
 
 - The day switch no longer sits on a dark track; just the three words, with
-  the chosen day in grey and the one the remote is on in white.
+  the chosen day in grey and the one the remote is on in white. The switch
+  between a competition's tables — Drivers and Constructors, Riders and
+  Teams, AFC and NFC — is now the same control.
 
 - Competition icons that had not arrived when the menu was first drawn — a
   ball where Brasileirão or La Liga should be — now fill in as soon as they

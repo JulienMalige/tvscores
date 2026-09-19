@@ -24,6 +24,6 @@ final class SidebarFlow: FlowCase {
         }
         Flow.remote.press(.select)
         // The page opening is the proof; a selection that landed elsewhere fails here.
-        app.buttons["table.drivers"].appears(within: 10)
+        app.buttons["Drivers"].firstMatch.appears(within: 10)
     }
 }

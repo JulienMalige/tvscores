@@ -7,8 +7,8 @@ final class LeagueScreenFlow: FlowCase {
         // The whole reason the sidebar exists: F1 races every other weekend,
         // and its page — and championship — used to vanish in between.
         let app = Flow.launch(league: "f1")
-        app.buttons["table.drivers"].appears(within: 10)
-        app.buttons["table.constructors"].appears()
+        app.buttons["Drivers"].firstMatch.appears(within: 10)
+        app.buttons["Constructors"].firstMatch.appears()
         app.buttons["standing.1"].appears()
     }
 
