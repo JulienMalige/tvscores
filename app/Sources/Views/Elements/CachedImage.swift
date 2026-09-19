@@ -128,6 +128,11 @@ final class ImageCache {
                 // 2,432 times in one CI run — and drew blanks in their place.
                 if Task.isCancelled || error is CancellationError { return nil }
                 Self.log.error("attempt \(attempt + 1) \(url.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
+                // Into the television's trace too: a crest missing on the
+                // first screen and a request that timed out are the same
+                // fault seen from two sides, and only the trace leaves the TV.
+                let what = "image attempt \(attempt + 1) \(url.lastPathComponent): \(error.localizedDescription)"
+                Task { @MainActor in Diagnostics.shared.note(what) }
                 continue
             }
             let status = (response as? HTTPURLResponse)?.statusCode ?? 200
@@ -142,6 +147,8 @@ final class ImageCache {
         }
         lock.withLock { failedAt[url] = Date() }
         Self.log.error("gave up on \(url.lastPathComponent, privacy: .public)")
+        let name = url.lastPathComponent
+        Task { @MainActor in Diagnostics.shared.note("image gave up on \(name)") }
         return nil
     }
 }
