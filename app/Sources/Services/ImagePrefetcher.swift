@@ -13,21 +13,30 @@ actor ImagePrefetcher {
     private var done: Set<URL> = []
     private let parallel = 4
 
-    func prefetch(_ urls: [URL?]) async {
-        let wanted = urls.compactMap { $0 }.filter { !done.contains($0) }
-        guard !wanted.isEmpty else { return }
-        done.formUnion(wanted)
+    /// Returns how many of the pictures asked for are now in memory. Only a
+    /// picture that arrived is remembered as done: one that failed on a cold
+    /// line is asked for again next time, which is how the menu's icons fill
+    /// in after a slow start.
+    @discardableResult
+    func prefetch(_ urls: [URL?]) async -> Int {
+        let wanted = Array(Set(urls.compactMap { $0 })).filter { !done.contains($0) }
+        guard !wanted.isEmpty else { return urls.compactMap { $0 }.count }
         // A few at a time: an Apple TV on a slow line should not open sixty
         // connections at once, and the visible rows matter more than the tail.
         for chunk in stride(from: 0, to: wanted.count, by: parallel).map({
             Array(wanted[$0..<min($0 + parallel, wanted.count)])
         }) {
-            await withTaskGroup(of: Void.self) { group in
+            let arrived = await withTaskGroup(of: URL?.self, returning: [URL].self) { group in
                 for url in chunk {
-                    group.addTask { _ = await ImageCache.shared.load(url) }
+                    group.addTask { await ImageCache.shared.load(url) == nil ? nil : url }
                 }
+                var out: [URL] = []
+                for await hit in group { if let hit { out.append(hit) } }
+                return out
             }
+            done.formUnion(arrived)
         }
+        return urls.compactMap { $0 }.filter { done.contains($0) }.count
     }
 }
 

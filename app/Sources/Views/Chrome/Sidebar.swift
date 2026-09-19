@@ -44,7 +44,9 @@ struct Sidebar: View {
                 Tab(value: Selection.league(key(league))) {
                     LeaguePage(league: league, store: store, day: Self.initialDay())
                 } label: {
-                    SidebarRow(league: league)
+                    // The version is what makes a row look at the cache again
+                    // once its icon has arrived; the rows hold no state.
+                    SidebarRow(league: league, iconsVersion: store.iconsVersion)
                 }
             }
         }

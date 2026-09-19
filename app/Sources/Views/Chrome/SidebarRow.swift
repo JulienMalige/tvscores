@@ -9,6 +9,8 @@ import SwiftUI
 /// round them, so a wide wordmark sent as-is towered over the crest beside it.
 struct SidebarRow: View {
     let league: LeagueSummary
+    /// Changes when icons arrive; unused inside, its change is the point.
+    let iconsVersion: Int
 
     /// The icon's square, matching the system's own sidebar icons.
     private static let icon: CGFloat = 56
@@ -30,16 +32,13 @@ struct SidebarRow: View {
     }
 }
 
-/// A competition's icon in the menu, drawn once and never touched again.
+/// A competition's icon in the menu, read from the cache as the row is drawn.
 ///
-/// A row of the sidebar is drawn by tvOS, and any state that changes inside
-/// it after it appears makes tvOS rebuild the menu — which the reader sees as
-/// the menu shutting a second or three after it opened. `CachedImage` records
-/// its loading, so it cannot live here. This reads the cache at the moment
-/// the row is drawn and holds no state at all: the icon is there if it was
-/// warmed — the loader waits for exactly that — and the sport's symbol stands
-/// in if it was not, until the menu is next opened. A missing icon for one
-/// opening beats a menu that will not stay open.
+/// A row of the sidebar is drawn by tvOS, so nothing in it loads or records
+/// anything of its own: the icon is there if it was warmed — the loader
+/// waits for exactly that — and the sport's symbol stands in if it was not.
+/// A row is redrawn when `ScoreboardStore.iconsVersion` moves, which is how
+/// an icon that missed the loader's ceiling on a slow line fills in later.
 private struct SidebarIcon: View {
     let league: LeagueSummary
     let size: CGFloat

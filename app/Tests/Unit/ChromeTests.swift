@@ -69,6 +69,7 @@ struct ChromePictureTests {
         // warm-up here never finishes, so it is the ceiling that lets us in.
         let store = ScoreboardStore(source: .bundled(), warmImages: true) { _ in
             try? await Task.sleep(for: .seconds(60))
+            return 0
         }
         let began = Date()
         await store.refresh()
@@ -85,5 +86,26 @@ struct ChromePictureTests {
         #expect(store.error != nil)
         #expect(store.board == nil)
         #expect(!store.ready, "the loader gives way to the error, not to an empty page")
+    }
+
+    @Test("the menu is told to look again once its icons are in, and not before")
+    @MainActor
+    func iconsVersionMovesWhenIconsArrive() async throws {
+        // Fifteen icons asked for; the first pass brings none (a cold line),
+        // the next brings all of them. The version moves when they land, and
+        // once — a pass that finds nothing new is not a redraw.
+        var passes = 0
+        let store = ScoreboardStore(source: .bundled(), warmImages: true) { urls in
+            passes += 1
+            return passes >= 2 ? urls.compactMap { $0 }.count : 0
+        }
+        #expect(store.iconsVersion == 0)
+        await store.refresh()
+        #expect(store.ready)
+        try await Task.sleep(for: .milliseconds(300))
+        #expect(store.iconsVersion == 1, "the menu is redrawn once the icons are in")
+        await store.refresh()
+        try await Task.sleep(for: .milliseconds(300))
+        #expect(store.iconsVersion == 1, "and not again for a refresh that brings nothing new")
     }
 }

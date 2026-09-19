@@ -41,16 +41,22 @@ final class ScoreboardStore {
     /// before its pictures shows fallbacks and then swaps them — which reads
     /// as a glitch rather than as loading.
     private(set) var ready = false
+    /// Moves when the menu's icons have arrived — once after launch, and
+    /// again if a retry brings in one that a slow line lost. The sidebar
+    /// rows are drawn from the image cache without state of their own, so
+    /// this is what tells them to look again; it changes a handful of times
+    /// in a session, never while a picture is in flight.
+    private(set) var iconsVersion = 0
     let source: ScoreboardSource
     /// Whether a board's pictures are decoded ahead of the screen. A test of
     /// the model has no screen and no wish to fetch three hundred crests.
     private let warmsImages: Bool
-    /// What decodes them; a test hands in one that never finishes.
-    private let prefetch: ([URL?]) async -> Void
+    /// What decodes them, answering how many are in; a test hands in its own.
+    private let prefetch: ([URL?]) async -> Int
     private var task: Task<Void, Never>?
 
     init(source: ScoreboardSource = .resolve(), warmImages: Bool = true,
-         prefetch: @escaping ([URL?]) async -> Void = { await ImagePrefetcher.shared.prefetch($0) }) {
+         prefetch: @escaping ([URL?]) async -> Int = { await ImagePrefetcher.shared.prefetch($0) }) {
         self.source = source
         self.warmsImages = warmImages
         self.prefetch = prefetch
@@ -72,21 +78,17 @@ final class ScoreboardStore {
 
     /// Decode the pictures before the screen wants them.
     ///
-    /// The marks go first and are waited for: there are a dozen or so, they
-    /// head every section and fill the sidebar, and a second of loader beats a
-    /// sidebar full of soccerballs that turn into badges. Everything else — a
-    /// few hundred crests and portraits — carries on behind the screen.
+    /// The menu's icons go first and are waited for: there are fifteen, they
+    /// are the smallest files, and a second of loader beats a menu full of
+    /// soccerballs. A slow line must not hold the app shut, so the wait has a
+    /// ceiling; whatever is still missing after it keeps loading behind the
+    /// screen, and `iconsVersion` moves when it lands so the menu redraws.
+    /// Everything else — heading marks, crests, portraits — carries on behind.
     private func warm(_ board: Scoreboard) async {
-        // Both shapes of every competition's mark: the heading's, and the
-        // square icon the sidebar is drawn from. Icons first: they are the
-        // smaller files, so if the ceiling below cuts the warm-up short it is
-        // a heading mark that arrives late, not a menu row.
-        let marks = board.leagues.flatMap { [$0.icon, $0.logo] }
+        let icons = board.leagues.map(\.icon)
         if !ready {
-            // A slow line must not hold the app shut: show what we have after
-            // this long whether the marks arrived or not.
             await withTaskGroup(of: Void.self) { group in
-                group.addTask { [prefetch] in await prefetch(marks) }
+                group.addTask { [prefetch] in _ = await prefetch(icons) }
                 group.addTask { try? await Task.sleep(for: .seconds(4)) }
                 await group.next()
                 group.cancelAll()
@@ -94,7 +96,35 @@ final class ScoreboardStore {
             ready = true
         }
         let rest = board.imageURLs
-        Task.detached(priority: .utility) { [prefetch] in await prefetch(rest) }
+        Task.detached(priority: .utility) { [prefetch] in _ = await prefetch(rest) }
+        // Behind the screen, so a refresh is never held up by a slow icon;
+        // one filler at a time, so refreshes do not stack them.
+        guard !fillingIcons else { return }
+        fillingIcons = true
+        Task { [weak self] in
+            await self?.fillIcons(icons)
+            self?.fillingIcons = false
+        }
+    }
+
+    private var iconsHave = 0
+    private var fillingIcons = false
+
+    /// The icons that missed the ceiling, or failed on a cold line: asked for
+    /// again, a little later each time, until they are all in or we give up.
+    /// The version moves only when more of them are in than before, so a
+    /// refresh that finds nothing new redraws nothing.
+    private func fillIcons(_ icons: [URL?]) async {
+        let wanted = icons.compactMap { $0 }.count
+        for attempt in 0..<5 {
+            let have = await prefetch(icons)
+            if have > iconsHave {
+                iconsHave = have
+                iconsVersion += 1
+            }
+            if have >= wanted { return }
+            try? await Task.sleep(for: .seconds(15 << attempt))
+        }
     }
 
     /// Every 30 s while a game is on, every 3 min otherwise. Idempotent.

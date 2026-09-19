@@ -8,6 +8,10 @@ notes when a version ships.
 
 ## Unreleased
 
+- Competition icons that had not arrived when the menu was first drawn — a
+  ball where Brasileirão or La Liga should be — now fill in as soon as they
+  do, instead of staying that way until the next launch.
+
 - League tables for the NFL (by conference, with each team's division), the
   Champions League and the Europa League (the league phase, all 36 teams).
   The NBA's East and West follow once its season starts. The feed publishes
