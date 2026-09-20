@@ -13,7 +13,9 @@ import UIKit
 /// proxy every few seconds, where they land in one file per television.
 ///
 /// Nothing personal goes: no name, no address, an anonymous id made once
-/// per install. Off in the simulator's test runs and the bundled demo.
+/// per install. Without a proxy address — the simulator's test runs, the
+/// bundled demo — the lines are still kept and written to the system log,
+/// and never posted.
 @MainActor
 final class Diagnostics {
     static let shared = Diagnostics()

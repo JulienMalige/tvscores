@@ -35,12 +35,12 @@ TV Scores. The screenshots stay on his device; this note records what to copy.
 
 ## tvOS adaptation
 
-- Tabs become a top segmented control driven by the focus engine; the
-  league headers and game rows are focusable so the user can drill into a
-  game with the remote.
-- Rows are wider: keep the same five-column shape, scale type up
-  (score ≈ 64 pt, names ≈ 29 pt), keep at least six rows visible on a 1080p
-  frame.
+- The day tabs are a row of pills of ours, chosen on click, drawn as the
+  Apple TV app draws its season switch; the league headers and game rows
+  are focusable so the user can drill into a game with the remote.
+- Rows are wider and stacked: the crest with the name captioned under it,
+  the score beside it (score ≈ 54 pt, names ≈ 27 pt). About five rows fit
+  a 1080p frame.
 - Dark green tinted background is Apple's; we use our own dark neutral and
   the league's accent colour on the header only.
 - Logos: Apple licenses crests. Julien decided on 2026-09-14 to show the

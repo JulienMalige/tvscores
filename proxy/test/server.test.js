@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Store } from "../src/cache.js";
@@ -158,6 +158,22 @@ test("a television's trace is filed under its device, and junk is refused", asyn
     assert.match(trace, /focus left A -> B/);
     assert.equal((await post("not json")).status, 400);
     assert.equal((await post(JSON.stringify({ device: "../etc", lines: [] }))).status, 400, "a device is a token, not a path");
+  } finally {
+    await s.close();
+  }
+});
+
+test("a trace past the cap is halved rather than left to grow", async () => {
+  const s = await serve();
+  try {
+    const post = (body) => fetch(`http://127.0.0.1:${s.port}${config.pathPrefix}/v1/diag`, { method: "POST", body, headers: { "content-type": "application/json" } });
+    const line = "x".repeat(250);
+    // 200 lines of ~280 bytes per post, under the body limit; twelve posts
+    // pass the 512 KB cap.
+    for (let i = 0; i < 12; i++) assert.equal((await post(JSON.stringify({ device: "cap0", lines: Array(200).fill(line) }))).status, 200);
+    const size = statSync(join(s.store.dir, "traces", "cap0.log")).size;
+    assert.ok(size < 512 * 1024, `the file was halved: ${size} bytes`);
+    assert.ok(size > 100 * 1024, "and not emptied");
   } finally {
     await s.close();
   }
