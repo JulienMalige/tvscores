@@ -8,6 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
+## 1.0 build 23 — 20 September 2026
 - The day switch and the table switches look like the Apple TV app's
   season switch: no bar behind them, grey words, a light pill on the one
   chosen, a white one where the remote is.
