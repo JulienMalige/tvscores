@@ -168,13 +168,17 @@ writes its own number is a bug, and rows all use `rowSurface(focused:)`.
   an audience.
 - Leagues in the MVP: Premier League, Champions League, NFL, NBA, F1, MotoGP,
   ATP/WTA. Rugby is available on the same plan if Julien wants it.
-- **The menu opening and shutting in one movement on the TV**, some of the
-  time, since the first builds (Julien, 2026-09-19: "not the sections, not
-  the switch; maybe since the logos"). The simulator never does it. Since
-  build 22 the app posts a trace (`Diagnostics.swift` → `POST /v1/diag`)
-  to `~/.local/state/tvscores/traces/<device>.log` on the VPS: read it
-  after Julien sees the fault, look for the focus moves around a `menu`
-  line. Take the trace out once the fault is found.
+- **The menu opening and shutting in one movement on the TV.** Diagnosed
+  from the television's trace on 2026-09-20 (build 24): a press left from
+  a page whose tab sits low in the sidebar (NFL, three of three) puts
+  focus on nothing for 30 ms and the menu shuts; from Home, Brasileirão,
+  Bundesliga or Libertadores it opens every time. This is Apple's tvOS 18
+  `sidebarAdaptable` fault with eight or more tabs (forum thread 769884,
+  feedback FB16027712, "known issue"); we have sixteen. No workaround
+  short of fewer tabs is known. Decision pending with Julien: a tab per
+  sport with the competitions inside it, or a sidebar of our own. The
+  trace stays (`Diagnostics.swift` → `POST /v1/diag`, files under
+  `~/.local/state/tvscores/traces/` on the VPS) until the menu is settled.
 - **Table zones are ours and drift by season.** `proxy/src/config.js` encodes
   this season's formats (Champions League places, relegation, the cups' 8 and
   24). Check them against each competition's regulations every August.

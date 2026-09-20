@@ -8,6 +8,10 @@ notes when a version ships.
 
 ## Unreleased
 
+- A competition between rounds — Copa Libertadores this week — no longer
+  leaves the remote dead: its "coming up" card takes focus, so left opens
+  the menu as anywhere else.
+
 ## 1.0 build 24 — 20 September 2026
 - When the first request to the server fails, the app tries again within
   seconds and says so under the spinner, instead of waiting three minutes
