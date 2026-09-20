@@ -84,7 +84,7 @@ final class ScoreboardStore {
     /// it fails, and three minutes of loader for that read as an app that
     /// hangs. Once a board is up, the poll: 30 s while a game is on, 3 min
     /// otherwise.
-    static func retryDelay(ready: Bool, live: Bool, failures: Int) -> Duration {
+    nonisolated static func retryDelay(ready: Bool, live: Bool, failures: Int) -> Duration {
         guard ready else { return .seconds(min(3 << min(failures, 4), 30)) }
         return .seconds(live ? 30 : 180)
     }
