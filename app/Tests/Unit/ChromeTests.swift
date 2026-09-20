@@ -19,6 +19,14 @@ struct ChromeTests {
         #expect(store.leagues == first)
     }
 
+    @Test("until the first board, retries come in seconds; after it, the poll")
+    func retriesFastUntilReady() {
+        #expect(ScoreboardStore.retryDelay(ready: false, live: false, failures: 1) == .seconds(6))
+        #expect(ScoreboardStore.retryDelay(ready: false, live: false, failures: 9) == .seconds(30), "and never longer than half a minute")
+        #expect(ScoreboardStore.retryDelay(ready: true, live: true, failures: 0) == .seconds(30))
+        #expect(ScoreboardStore.retryDelay(ready: true, live: false, failures: 3) == .seconds(180), "a failure after the first board does not hurry the poll")
+    }
+
     @Test("the first board makes the app ready, and only the first")
     @MainActor
     func readyFlipsOnce() async {

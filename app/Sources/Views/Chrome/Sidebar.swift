@@ -25,14 +25,16 @@ struct Sidebar: View {
 
     var body: some View {
         Group {
-            if store.ready { tabs } else { LaunchLoader() }
+            if store.ready { tabs } else { LaunchLoader(error: store.error) }
         }
         .task { Diagnostics.shared.start(); store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
         .onChange(of: selection) { old, new in Diagnostics.shared.note("menu \(old) -> \(new)") }
         .onChange(of: store.iconsVersion) { _, v in Diagnostics.shared.note("icons version \(v)") }
-        .onChange(of: store.leagues.count) { _, n in Diagnostics.shared.note("menu rebuilt: \(n) competitions") }
-        .onChange(of: store.leagues.count) { _, _ in openRequestedLeague() }
+        .onChange(of: store.leagues.count) { _, n in
+            Diagnostics.shared.note("menu rebuilt: \(n) competitions")
+            openRequestedLeague()
+        }
     }
 
     private var tabs: some View {

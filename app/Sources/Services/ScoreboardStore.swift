@@ -75,7 +75,18 @@ final class ScoreboardStore {
             if warmsImages { await warm(fresh) } else { ready = true }
         } catch {
             self.error = error.localizedDescription
+            Diagnostics.shared.note("refresh failed: \(error.localizedDescription)")
         }
+    }
+
+    /// How long to wait before asking again. Until the first board is in,
+    /// seconds — a television's wifi wakes late and the first request after
+    /// it fails, and three minutes of loader for that read as an app that
+    /// hangs. Once a board is up, the poll: 30 s while a game is on, 3 min
+    /// otherwise.
+    static func retryDelay(ready: Bool, live: Bool, failures: Int) -> Duration {
+        guard ready else { return .seconds(min(3 << min(failures, 4), 30)) }
+        return .seconds(live ? 30 : 180)
     }
 
     /// Decode the pictures before the screen wants them.
@@ -138,10 +149,12 @@ final class ScoreboardStore {
     func startAutoRefresh() {
         guard task == nil else { return }
         task = Task { [weak self] in
+            var failures = 0
             while !Task.isCancelled {
                 await self?.refresh()
+                failures = self?.error == nil ? 0 : failures + 1
                 let live = (self?.board?.live ?? 0) > 0
-                try? await Task.sleep(for: .seconds(live ? 30 : 180))
+                try? await Task.sleep(for: Self.retryDelay(ready: self?.ready ?? false, live: live, failures: failures))
             }
         }
     }

@@ -8,6 +8,10 @@ notes when a version ships.
 
 ## Unreleased
 
+- When the first request to the server fails, the app tries again within
+  seconds and says so under the spinner, instead of waiting three minutes
+  in silence and looking stuck on loading.
+
 ## 1.0 build 23 — 20 September 2026
 - The day switch and the table switches look like the Apple TV app's
   season switch: no bar behind them, grey words, a light pill on the one

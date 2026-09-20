@@ -374,6 +374,34 @@
         }
       }
     },
+    "launch.retrying": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Can't reach the server yet. Trying again…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serveur injoignable pour l'instant. Nouvel essai…"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Servidor inacessível por enquanto. Tentando de novo…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede conectar con el servidor todavía. Reintentando…"
+          }
+        }
+      }
+    },
     "offseason.date": {
       "localizations": {
         "en": {
