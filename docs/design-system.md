@@ -25,8 +25,9 @@ the exception to "everything lives on a screen": the sidebar wraps every
 screen, and tvOS draws it — which is why nothing in `Chrome/` is worth a
 snapshot test, and why its rows are given square icons rather than sizes.
 `Segments` — the day switch (`DayTabs`) and the table switch under a
-competition — is a row of pills of ours on a drawn track, the look of the
-system control, chosen on click. The system control itself (tried both as
+competition — is a row of pills of ours, the look of the Apple TV app's
+season switch (no bar, grey words, a light pill on the chosen one, white
+where the remote is), chosen on click. The system control itself (tried both as
 SwiftUI's picker and UIKit's control, 2026-09-19) chooses on focus, keeps
 a track nothing clears, and — the deciding flaw — keeps focus at its first
 segment on a press left, so the menu could not be opened from it.

@@ -8,6 +8,9 @@ notes when a version ships.
 
 ## Unreleased
 
+- The day switch and the table switches look like the Apple TV app's
+  season switch: no bar behind them, grey words, a light pill on the one
+  chosen, a white one where the remote is.
 - Match rows read like the Apple Sports app's: the crest with the team's
   name captioned under it, the score beside it. Rows are a little taller.
 

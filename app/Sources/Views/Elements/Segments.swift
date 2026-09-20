@@ -1,9 +1,11 @@
 import SwiftUI
 
 /// A choice between a few things — the day switch, the table switch under a
-/// competition — as a row of pills on a track, the look of tvOS's segmented
-/// control, chosen on click: the pill the remote is on white, the one chosen
-/// light, the rest bare words.
+/// competition — as a row of pills the way the Apple TV app switches
+/// seasons: bare words in grey, the one chosen on a light pill, the one the
+/// remote is on white with dark words, no bar behind them, chosen on click.
+/// Apple's own switch is buttons too, not the segmented control (whose
+/// track cannot be removed); Julien asked for its look on 2026-09-20.
 ///
 /// Pills of ours rather than the system control, for one reason found on
 /// the television: the system control keeps focus at its first segment on a
@@ -27,8 +29,6 @@ struct Segments<Value: Hashable>: View {
                     .focusEffectDisabled()
                 }
             }
-            .padding(Metrics.pillTrackInset)
-            .background(Capsule().fill(Color.black.opacity(0.28)))
             Spacer()
         }
     }
@@ -40,11 +40,11 @@ struct Segments<Value: Hashable>: View {
 
         var body: some View {
             Text(title)
-                .font(.callout.weight(.semibold))
-                .foregroundStyle(isFocused ? Color.black : Color.white)
+                .font(.body.weight(.medium))
+                .foregroundStyle(isFocused ? Color.black : selected ? Color.white : Color.secondary)
                 .padding(.vertical, Metrics.pillInsetV)
                 .padding(.horizontal, Metrics.pillInsetH)
-                .background(Capsule().fill(isFocused ? Color.white : Color.white.opacity(selected ? 0.3 : 0)))
+                .background(Capsule().fill(isFocused ? Color.white : Color.white.opacity(selected ? 0.22 : 0)))
                 .scaleEffect(isFocused ? 1.06 : 1)
                 .animation(.easeOut(duration: 0.15), value: isFocused)
         }
