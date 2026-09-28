@@ -26,6 +26,24 @@ private struct MatchRowContent: View {
     @Environment(\.isFocused) private var isFocused
 
     var body: some View {
+        VStack(spacing: 6) {
+            // Where a tennis match is, in grey over it: "Beijing · Round of 32".
+            if let caption {
+                Text(verbatim: caption)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
+            }
+            line
+        }
+        .rowSurface(focused: isFocused, resting: 0)
+    }
+
+    private var caption: String? {
+        guard let name = event.competition?.name else { return nil }
+        return [name, event.round].compactMap { $0 }.joined(separator: " · ")
+    }
+
+    private var line: some View {
         HStack(spacing: 0) {
             side(event.home)
             scoreText(event.score?.home, winner: winner == .home)
@@ -36,7 +54,6 @@ private struct MatchRowContent: View {
                 .frame(width: Metrics.matchScore, alignment: .center)
             side(event.away)
         }
-        .rowSurface(focused: isFocused)
     }
 
     private enum Winner { case home, away, nobody }

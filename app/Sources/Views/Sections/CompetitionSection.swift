@@ -15,10 +15,9 @@ struct CompetitionSection: View {
             if !ref.playing, let next = ref.next {
                 OffseasonSection(ref: ref, next: next)
             } else {
-                DayTabs(selected: $day)
-                games
+                BoardCard(day: $day) { games }
             }
-            StandingsSection(ref: ref, store: store)
+            StandingsSection(ref: ref, store: store, carded: true)
         }
     }
 
@@ -29,7 +28,7 @@ struct CompetitionSection: View {
             EmptyDay(compact: true)
         } else {
             ForEach(groups) { group in
-                LeagueSection(group: group, day: day, now: store.board?.generatedAt ?? .now, showHeader: false)
+                LeagueSection(group: group, day: day, now: store.board?.generatedAt ?? .now, showHeader: false, onPage: true)
             }
         }
     }

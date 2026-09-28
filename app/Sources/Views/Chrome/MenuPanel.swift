@@ -25,6 +25,15 @@ struct MenuPanel: View {
     private var panel: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Metrics.menuRowGap) {
+                // Where Apple Sports puts the viewer's picture: the day and
+                // the time. tvOS gives an app neither the profile's name nor
+                // its picture (researched 2026-09-21).
+                VStack(alignment: .leading, spacing: 2) {
+                    ClockLabel(showsDate: false, font: .system(size: Metrics.menuFont * 1.6, weight: .bold))
+                    ClockLabel(showsTime: false, font: .system(size: Metrics.menuFont))
+                }
+                .padding(.horizontal, Metrics.menuRowInsetH)
+                .padding(.vertical, Metrics.menuRowInsetV)
                 row(.home, title: Text("tab.home"), icon: .symbol("house.fill"), id: "menu.home")
                 ForEach(sections, id: \.section.id) { entry in
                     Text(entry.section.title)

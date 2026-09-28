@@ -23,12 +23,15 @@ struct Segments<Value: Hashable>: View {
     /// Sends focus arriving for the first time to the chosen pill — for the
     /// day switch at the top of a page, which is where a page should start.
     var claimsFocus = false
+    /// In the middle of its row, as the switch on top of a board card.
+    var centred = false
     /// The pill the remote is on, by position.
     @FocusState private var focused: Int?
     @State private var claimed = false
 
     var body: some View {
         HStack {
+            if centred { Spacer() }
             HStack(spacing: Metrics.pillGap) {
                 ForEach(Array(options.enumerated()), id: \.offset) { index, option in
                     Button {

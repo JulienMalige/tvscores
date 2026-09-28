@@ -5,6 +5,7 @@ import SwiftUI
 struct ClockLabel: View {
     var showsDate = true
     var showsTime = true
+    var font: Font = .title3
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 60)) { tick in
@@ -18,7 +19,7 @@ struct ClockLabel: View {
                         .foregroundStyle(.primary)
                 }
             }
-            .font(.title3)
+            .font(font)
             .foregroundStyle(.secondary)
         }
     }

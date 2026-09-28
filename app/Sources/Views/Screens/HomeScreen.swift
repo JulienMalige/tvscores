@@ -20,8 +20,7 @@ struct HomeScreen: View {
                 // brings them back on screen when it does.
                 VStack(alignment: .leading, spacing: Metrics.sectionGap / 2) {
                     header
-                    DayTabs(selected: $day)
-                    content
+                    BoardCard(day: $day) { content }
                 }
                 .pageMargins()
             }

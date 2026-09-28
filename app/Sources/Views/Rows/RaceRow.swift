@@ -1,7 +1,10 @@
 import SwiftUI
 
-/// A race weekend: the country's flag, the event, its status, and the podium
-/// once the race is classified.
+/// A race weekend, as Apple Sports lists one. On the front page it is
+/// compact — "Bahrain · Qualifying" in grey over the time, then the podium
+/// once the race is classified. On the series' page it is the weekend's
+/// schedule: the flag, the name and the circuit centred, then each session
+/// with its day and time.
 struct RaceRow: View {
     let event: Event
     /// The day this row is listed under: on a day with sessions but no
@@ -9,10 +12,12 @@ struct RaceRow: View {
     let day: Day
     /// What "today" is — the board's clock, so a bundled board reads right.
     var now: Date = .now
+    /// On the series' own page: the weekend's whole schedule under its flag.
+    var onPage = false
 
     var body: some View {
         NavigationLink(value: event) {
-            RaceRowContent(event: event, sessions: event.status.state == .scheduled ? event.sessions(on: day, now: now) : [])
+            RaceRowContent(event: event, sessions: event.status.state == .scheduled ? event.sessions(on: day, now: now) : [], onPage: onPage)
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("race.\(event.id)")
@@ -23,56 +28,100 @@ private struct RaceRowContent: View {
     let event: Event
     /// This day's sessions when the race itself is another day's.
     let sessions: [Session]
+    let onPage: Bool
     @Environment(\.isFocused) private var isFocused
 
     var body: some View {
         VStack(spacing: Metrics.headingGap) {
-            HStack(spacing: 20) {
-                FlagMark(flag: event.flag)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(event.name ?? "")
-                        .font(.title3.weight(.semibold))
-                    Text([event.circuit, event.country].compactMap { $0 }.joined(separator: " · "))
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
+            if onPage { schedule } else { compact }
+            podium
+        }
+        .rowSurface(focused: isFocused, resting: 0)
+    }
+
+    /// What is on this day: the sessions of it, or the race.
+    private var shown: [Session] {
+        sessions.isEmpty || sessions.contains(where: { $0.kind == "race" }) ? [] : sessions
+    }
+
+    @ViewBuilder
+    private var compact: some View {
+        if shown.isEmpty {
+            VStack(spacing: 6) {
+                caption(String(localized: "session.race"))
+                StatusLabel(status: event.status, start: event.start)
+            }
+            .frame(maxWidth: .infinity)
+        } else {
+            ForEach(shown) { session in
+                VStack(spacing: 6) {
+                    caption(session.name)
+                    Text(session.start, format: .dateTime.weekday(.wide).hour().minute())
+                        .font(.title2.weight(.semibold))
                 }
-                Spacer()
-                if sessions.isEmpty || sessions.contains(where: { $0.kind == "race" }) {
-                    StatusLabel(status: event.status, start: event.start)
-                } else {
-                    // Qualifying and the sprint, with their times: what is
-                    // on this day of the weekend.
-                    VStack(alignment: .trailing, spacing: 4) {
-                        ForEach(sessions) { session in
-                            HStack(spacing: 12) {
-                                Text(session.title).font(.callout).foregroundStyle(.secondary)
-                                Text(session.start, format: .dateTime.hour().minute())
-                                    .font(.title3.weight(.semibold))
-                                    .monospacedDigit()
-                            }
-                        }
-                    }
+                .frame(maxWidth: .infinity)
+            }
+        }
+    }
+
+    private func caption(_ what: String) -> some View {
+        Text(verbatim: [event.name, what].compactMap { $0 }.joined(separator: " · "))
+            .font(.caption.weight(.medium))
+            .foregroundStyle(.secondary)
+    }
+
+    private var schedule: some View {
+        VStack(spacing: 0) {
+            VStack(spacing: 8) {
+                FlagMark(flag: event.flag, size: Metrics.markHero * 0.6)
+                Text(event.name ?? "").font(.headline)
+                if let circuit = event.circuit {
+                    Text(circuit).font(.callout).foregroundStyle(.secondary)
                 }
             }
-            let podium = (event.results ?? []).filter(\.finished).prefix(3)
-            if !podium.isEmpty {
-                HStack(spacing: 24) {
-                    ForEach(podium) { r in
-                        HStack(spacing: 14) {
-                            Text("\(r.pos ?? 0)")
-                                .font(.system(size: 34, weight: .bold, design: .rounded))
-                            PersonMark(photo: r.photo, flag: r.flag, color: Color(hex: r.teamColor),
-                                       monogram: r.code ?? PersonMark.monogram(for: r.driver), size: Metrics.mark)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(r.driver).font(.callout.weight(.semibold))
-                                Text(r.gap ?? r.team ?? "").font(.footnote).foregroundStyle(.secondary)
-                            }
+            .frame(maxWidth: .infinity)
+            .padding(.bottom, Metrics.headingGap)
+            if event.status.state != .final {
+                ForEach(event.sessions ?? []) { session in
+                    RowRule()
+                    HStack {
+                        Text(session.name).font(.callout)
+                        Spacer()
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text(session.start, format: .dateTime.weekday(.abbreviated).day().month(.abbreviated))
+                                .font(.callout)
+                            Text(session.start, format: .dateTime.hour().minute())
+                                .font(.callout)
+                                .foregroundStyle(.secondary)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    .padding(.vertical, 12)
+                }
+            } else {
+                StatusLabel(status: event.status, start: event.start)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var podium: some View {
+        let podium = (event.results ?? []).filter(\.finished).prefix(3)
+        if !podium.isEmpty {
+            HStack(spacing: 24) {
+                ForEach(podium) { r in
+                    HStack(spacing: 14) {
+                        Text("\(r.pos ?? 0)")
+                            .font(.system(size: 34, weight: .bold, design: .rounded))
+                        PersonMark(photo: r.photo, flag: r.flag, color: Color(hex: r.teamColor),
+                                   monogram: r.code ?? PersonMark.monogram(for: r.driver), size: Metrics.mark)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(r.driver).font(.callout.weight(.semibold))
+                            Text(r.gap ?? r.team ?? "").font(.footnote).foregroundStyle(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
         }
-        .rowSurface(focused: isFocused)
     }
 }

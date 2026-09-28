@@ -8,6 +8,15 @@ notes when a version ships.
 
 ## Unreleased
 
+- Home and each competition look like Apple Sports: the day switch sits
+  on top of one panel holding the games, with thin lines between them. On
+  Home, a race weekend is one line, "Bahrain · Qualifying" over the time,
+  and a tennis match says where it is played over the players. On a tour's
+  page each tournament is headed by its flag, name, tier, surface and
+  town; on the F1 and MotoGP pages each weekend shows its schedule, every
+  session with its day and time. The table sits on a panel of its own.
+- The menu shows the day and the time at its top.
+
 - Tennis under way reaches Today again: the server had stopped asking for
   matches in progress once its list ran empty, so the Beijing matches of
   the day never came.
