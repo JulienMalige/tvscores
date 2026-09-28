@@ -5,7 +5,7 @@ struct DayTabs: View {
     @Binding var selected: Day
 
     var body: some View {
-        Segments(selection: $selected, options: Day.allCases.map { .init(value: $0, title: Text(title($0))) })
+        Segments(selection: $selected, options: Day.allCases.map { .init(value: $0, title: Text(title($0))) }, claimsFocus: true)
             .accessibilityIdentifier("day.switch")
     }
 

@@ -20,8 +20,13 @@ struct Segments<Value: Hashable>: View {
 
     @Binding var selection: Value
     let options: [Option]
+    /// Takes focus onto the chosen pill when the switch first appears — for
+    /// the day switch at the top of a page, which is where a page should
+    /// start. Never for a switch further down: it would pull focus away.
+    var claimsFocus = false
     /// The pill the remote is on, by position.
     @FocusState private var focused: Int?
+    @State private var claimed = false
 
     var body: some View {
         HStack {
@@ -41,6 +46,16 @@ struct Segments<Value: Hashable>: View {
             // first: a page opened on Today starts on Today (Julien,
             // 2026-09-28: "yesterday is focused when in fact today is active").
             .defaultFocus($focused, options.firstIndex { $0.value == selection })
+            // The hint above is not enough for a page made as the menu shuts:
+            // the engine has already chosen the first pill by then (CI,
+            // 2026-09-28). So the day switch says where to start, once —
+            // coming back from a race keeps focus on the race's row.
+            .task {
+                guard claimsFocus, !claimed else { return }
+                claimed = true
+                try? await Task.sleep(for: .milliseconds(450))
+                focused = options.firstIndex { $0.value == selection }
+            }
             Spacer()
         }
     }

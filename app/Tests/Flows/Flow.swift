@@ -84,7 +84,7 @@ enum Flow {
     /// query there is; ask only once something has already gone wrong.
     static func reportFocus(_ app: XCUIApplication, _ when: String) {
         let focused = app.descendants(matching: .any).matching(NSPredicate(format: "hasFocus == 1")).allElementsBoundByIndex
-        let names = focused.prefix(3).map { "\($0.elementType.rawValue):\($0.identifier.isEmpty ? $0.label : $0.identifier)" }
+        let names = focused.prefix(3).map { "\($0.elementType.rawValue):\($0.identifier.isEmpty ? $0.label : $0.identifier) \"\($0.label)\"" }
         print("TREE| focus \(when): \(names.isEmpty ? "nowhere" : names.joined(separator: ", "))")
     }
 }
