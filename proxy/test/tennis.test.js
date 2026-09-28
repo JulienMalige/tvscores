@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { normaliseMatch, liveClock, setsLine, bigEventFilter, tierLabel } from "../src/providers/livetennis.js";
+import { normaliseMatch, liveClock, setsLine, bigEventFilter, tierLabel, TIER_CATEGORY } from "../src/providers/livetennis.js";
 
 const raw = JSON.parse(readFileSync(new URL("./fixtures/tennis.json", import.meta.url))).data[0];
 
@@ -100,4 +100,11 @@ test("a match carries its tournament: name, flag, tier and surface from the cata
   assert.equal(tierLabel("atp_1000"), "ATP 1000");
   assert.equal(tierLabel(null), undefined);
   assert.equal(tierLabel("wta__500_"), "WTA 500", "an odd label is tidied, not a crash that loses every match");
+});
+
+test("a tournament with a tier and no category still counts by its tier", () => {
+  // Beijing, 2026-09-28: category null, tier wta_1000.
+  assert.equal(TIER_CATEGORY.wta_1000, "wta_1000");
+  assert.equal(TIER_CATEGORY.atp_1000, "masters_1000", "the ATP's 1000s are the Masters");
+  assert.equal(TIER_CATEGORY.atp_500, undefined, "a 500 stays out");
 });

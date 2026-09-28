@@ -86,6 +86,24 @@ export function normaliseMatch(m, info) {
   };
 }
 
+/**
+ * The category a tournament's tier stands for, when the feed gives a tier
+ * and no category. It does that for some of the very events we want — the
+ * WTA 1000 in Beijing came with `category: null, tier: "wta_1000"` on
+ * 2026-09-28 — and a missing category drops a tournament from the list.
+ */
+export const TIER_CATEGORY = {
+  grand_slam: "grand_slam",
+  atp_1000: "masters_1000",
+  wta_1000: "wta_1000",
+  atp_finals: "tour_finals",
+  wta_finals: "tour_finals",
+  tour_finals: "tour_finals",
+};
+
+/** Bumped when what the catalogue holds changes, so an older one is fetched again. */
+const CATALOGUE_VERSION = 2;
+
 /** A month: tournament identity is stable across seasons, so the catalogue is nearly static. */
 const CATALOGUE_TTL = 30 * 86400e3;
 
@@ -120,8 +138,8 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
    */
   async function catalogue() {
     const held = meta.tournaments;
-    // A catalogue from before tournaments carried their details is fetched again.
-    if (held?.info && Date.now() - new Date(held.at).getTime() < CATALOGUE_TTL) return held;
+    // A catalogue from an earlier version of this code is fetched again.
+    if (held?.version === CATALOGUE_VERSION && Date.now() - new Date(held.at).getTime() < CATALOGUE_TTL) return held;
     const byId = {};
     const info = {};
     for (const tour of ["atp", "wta"]) {
@@ -129,14 +147,14 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
         const { body } = await getJson(`${BASE}/tournaments?tour=${tour}&limit=200&offset=${offset}`, { headers });
         quota.record(undefined);
         for (const t of body?.data || []) {
-          byId[String(t.id)] = t.category;
+          byId[String(t.id)] = t.category || TIER_CATEGORY[t.tier] || null;
           info[String(t.id)] = { name: t.name, city: t.city, country: t.country, tier: t.tier, surface: t.surface };
         }
         if (!body?.meta?.has_more) break;
         offset += body.data?.length || 200;
       }
     }
-    meta.tournaments = { at: new Date().toISOString(), byId, info };
+    meta.tournaments = { version: CATALOGUE_VERSION, at: new Date().toISOString(), byId, info };
     log(`GET tennis tournaments -> ${Object.keys(byId).length} catalogued`);
     return meta.tournaments;
   }
