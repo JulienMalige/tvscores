@@ -71,6 +71,15 @@ final class LeagueScreenFlow: FlowCase {
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'NBA'")).firstMatch.exists, "and says when it is back")
         XCTAssertFalse(Flow.day(app, "today").exists, "no day switch: there is no day to switch to")
     }
+
+    func testTennisNamesItsTournamentWithItsFlag() {
+        // The sample's WTA has two Beijing matches on Upcoming, copied from
+        // the live board with their tournament.
+        let app = Flow.launch(tab: "upcoming", league: "wta")
+        let heading = app.descendants(matching: .any)["tournament.Beijing"]
+        XCTAssertTrue(heading.waitForExistence(timeout: 10), "the matches sit under their tournament's heading")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'WTA 1000'")).firstMatch.exists, "with its tier")
+    }
 }
 
 /// Every competition's page must give the remote something to stand on.
