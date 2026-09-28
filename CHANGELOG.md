@@ -11,7 +11,7 @@ notes when a version ships.
 - The menu is now the app's own, drawn after Apple's: every competition is
   still in it, and it opens every time, from any row. Apple's sidebar lost
   its place with more than seven entries, and ours had sixteen. Press left
-  or Back to open it; right or Back to close it. Section titles now line
+  or Back to open it, right to close it; Back in the menu leaves the app. Section titles now line
   up with the icons.
 - Tennis names its tournaments: each has a heading with its country's flag,
   its name and its tier and surface — Beijing, WTA 1000 · Hard. The feed

@@ -43,16 +43,16 @@ final class NavigationFlow: FlowCase {
         XCTAssertTrue(Flow.focusOnPage(app).exists, "and focus is on the page")
     }
 
-    func testBackOpensTheMenuAndBackShutsIt() {
+    func testBackOpensTheMenuAndBackAgainLeavesTheApp() {
+        // The way out of an app, which App Review checks: Back from the top
+        // opens the menu, and Back in the menu leaves, as tvOS's own does.
         let app = Flow.launch()
         Flow.focusThePage()
         Flow.remote.press(.menu)
         sleep(1)
         XCTAssertTrue(Flow.menuIsOpen(app), "Back on a page opens the menu")
         Flow.remote.press(.menu)
-        sleep(1)
-        XCTAssertFalse(Flow.menuIsOpen(app), "Back in the menu shuts it")
-        XCTAssertTrue(Flow.focusOnPage(app).exists, "and focus is on the page")
+        XCTAssertTrue(app.wait(for: .runningBackground, timeout: 8), "Back in the menu leaves the app")
     }
 
     func testPickingACompetitionLowInTheMenuOpensIt() {

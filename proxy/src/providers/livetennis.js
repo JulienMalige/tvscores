@@ -43,7 +43,7 @@ export function setsLine(score) {
 /** "wta_1000" -> "WTA 1000", "grand_slam" -> "Grand Slam"; undefined when unknown. */
 export function tierLabel(tier) {
   if (!tier) return undefined;
-  return String(tier).split("_").map((w) => (/^(atp|wta|itf)$/.test(w) ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1))).join(" ");
+  return String(tier).split("_").filter(Boolean).map((w) => (/^(atp|wta|itf)$/.test(w) ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1))).join(" ");
 }
 
 /**

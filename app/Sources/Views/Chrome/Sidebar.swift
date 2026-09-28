@@ -10,7 +10,8 @@ import UIKit
 /// still Apple's known issue on tvOS 26.6 (forum thread 769884). This one is
 /// drawn after it: a chip at the top left saying where you are; a press
 /// left that finds nothing further left on the page, or Back, opens a panel over the dimmed page with the
-/// focus on the current row; right or Back closes it, a click opens the row.
+/// focus on the current row; right closes it, a click opens the row, and Back
+/// in it leaves the app, as from tvOS's own.
 ///
 /// It exists at all because the day buckets only carry competitions that
 /// have fixtures: Formula 1 races every other weekend, so its page — and
@@ -39,6 +40,11 @@ struct Sidebar: View {
         .onChange(of: store.leagues.count) { _, n in
             Diagnostics.shared.note("menu rebuilt: \(n) competitions")
             openRequestedLeague()
+            // A competition gone from the list leaves nothing to show and
+            // nothing for the remote to stand on: back to Home.
+            if case .league(let key) = selection, !store.leagues.contains(where: { Self.key($0) == key }) {
+                selection = .home
+            }
         }
     }
 
@@ -53,7 +59,7 @@ struct Sidebar: View {
                     .transition(.opacity)
             }
             MenuPanel(sections: sections, selection: selection, expanded: expanded,
-                      focus: $menuFocus, pick: pick, close: closeMenu)
+                      focus: $menuFocus, pick: pick)
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.86), value: expanded)
         .onChange(of: menuFocus) { _, focused in
@@ -82,11 +88,24 @@ struct Sidebar: View {
         }
     }
 
-    @ViewBuilder
+    /// Home stays mounted underneath, hidden, so a race opened on it and its
+    /// place in the list are still there when you come back; a competition's
+    /// page is made when it is picked.
     private var page: some View {
+        ZStack {
+            HomeScreen(store: store, day: $day, openLeague: open)
+                .opacity(selection == .home ? 1 : 0)
+                .disabled(selection != .home)
+                .accessibilityHidden(selection != .home)
+            competitionPage
+        }
+    }
+
+    @ViewBuilder
+    private var competitionPage: some View {
         switch selection {
         case .home:
-            HomeScreen(store: store, day: $day, openLeague: open)
+            EmptyView()
         case .league(let key):
             if let league = store.leagues.first(where: { Self.key($0) == key }) {
                 NavigationStack {
@@ -132,8 +151,6 @@ struct Sidebar: View {
             moving = false
         }
     }
-
-    private func closeMenu() { shut() }
 
     private func pick(_ item: MenuItem) {
         selection = item

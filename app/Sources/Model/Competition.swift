@@ -14,7 +14,7 @@ struct Competition: Decodable, Equatable {
 
 extension Array where Element == Event {
     /// The events in runs of one tournament, in the order the first of each
-    /// appears; events with no tournament are one run of their own.
+    /// appears; events with no tournament are one run of their own, last.
     func byCompetition() -> [(competition: Competition?, events: [Event])] {
         var runs: [(competition: Competition?, events: [Event])] = []
         for event in self {
@@ -24,6 +24,6 @@ extension Array where Element == Event {
                 runs.append((event.competition, [event]))
             }
         }
-        return runs
+        return runs.filter { $0.competition != nil } + runs.filter { $0.competition == nil }
     }
 }

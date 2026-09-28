@@ -2039,6 +2039,34 @@
         }
       }
     },
+    "tournament.other": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Other tournaments"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autres tournois"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outros torneios"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otros torneos"
+          }
+        }
+      }
+    },
     "zone.eliminated": {
       "localizations": {
         "en": {

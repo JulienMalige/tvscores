@@ -32,8 +32,18 @@ struct LeagueSection: View {
             // Tennis names its tournaments, each under a heading with its
             // country's flag, as a race weekend is shown; other sports have
             // one run and no heading.
-            ForEach(Array(group.events.byCompetition().enumerated()), id: \.offset) { _, run in
-                if let competition = run.competition { TournamentHeader(competition: competition) }
+            let runs = group.events.byCompetition()
+            ForEach(Array(runs.enumerated()), id: \.offset) { _, run in
+                if let competition = run.competition {
+                    TournamentHeader(competition: competition)
+                } else if runs.count > 1 {
+                    // Matches whose tournament the feed did not name, kept
+                    // apart so they do not read as the heading's above.
+                    Text("tournament.other")
+                        .font(.callout.weight(.semibold))
+                        .padding(.top, 6)
+                        .padding(.horizontal, 16)
+                }
                 VStack(spacing: Metrics.rowGap) {
                     ForEach(run.events) { event in
                         switch event.kind {
@@ -95,7 +105,10 @@ struct TournamentHeader: View {
     }
 
     private var subtitle: Text? {
-        let surface = competition.surface.map { Text(LocalizedStringKey("surface." + $0)) }
+        let surface = competition.surface.map { raw -> Text in
+            let known = ["hard", "clay", "grass"]
+            return known.contains(raw.lowercased()) ? Text(LocalizedStringKey("surface." + raw.lowercased())) : Text(verbatim: raw.capitalized)
+        }
         switch (competition.tier, surface) {
         case let (tier?, surface?): return Text(verbatim: tier + " · ") + surface
         case let (tier?, nil): return Text(verbatim: tier)

@@ -11,7 +11,6 @@ struct MenuPanel: View {
     let expanded: Bool
     var focus: FocusState<MenuItem?>.Binding
     let pick: (MenuItem) -> Void
-    let close: () -> Void
 
     var body: some View {
         if expanded {
@@ -50,7 +49,9 @@ struct MenuPanel: View {
         .padding(Metrics.menuMargin)
         .ignoresSafeArea()
         .focusSection()
-        .onExitCommand(perform: close)
+        // No Back handler here on purpose: Back in the open menu leaves the
+        // app, as it does from tvOS's own sidebar — the way out of an app
+        // that App Review checks for.
     }
 
     private func row(_ item: MenuItem, title: Text, icon: MenuIcon, id: String) -> some View {

@@ -99,4 +99,5 @@ test("a match carries its tournament: name, flag, tier and surface from the cata
   assert.equal(tierLabel("grand_slam"), "Grand Slam");
   assert.equal(tierLabel("atp_1000"), "ATP 1000");
   assert.equal(tierLabel(null), undefined);
+  assert.equal(tierLabel("wta__500_"), "WTA 500", "an odd label is tidied, not a crash that loses every match");
 });
