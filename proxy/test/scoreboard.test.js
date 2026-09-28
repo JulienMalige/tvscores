@@ -124,3 +124,25 @@ test("national teams come after their sport's clubs, with their section and symb
   assert.equal(sb.days.today[1].league.symbol, "globe");
   assert.equal(sb.leagues.find((l) => l.id === 4562).section, "international");
 });
+
+test("a competition's brand colour reaches both the day's groups and the menu list", () => {
+  const now = Date.UTC(2026, 8, 28, 12);
+  const leagues = { nba: [{ id: 4387, name: "NBA", short: "NBA", color: "#1d428a" }], f1: [{ id: "f1", name: "Formula 1", short: "F1" }] };
+  const game = { id: "1", sport: "nba", kind: "match", league: { id: 4387, name: "NBA", short: "NBA" }, start: "2026-09-28T15:00:00.000Z", status: { state: "scheduled" }, home: { name: "A", short: "A" }, away: { name: "B", short: "B" }, score: {} };
+  const sb = buildScoreboard([game], { now, leagues, sportOrder: ["f1", "nba"] });
+  assert.equal(sb.days.today[0].league.color, "#1d428a");
+  assert.equal(sb.leagues.find((l) => l.id === 4387).color, "#1d428a");
+  assert.equal(sb.leagues.find((l) => l.id === "f1").color, undefined, "no colour configured, none invented");
+});
+
+test("every configured competition has a dark #RRGGBB colour", async () => {
+  const { config } = await import("../src/config.js");
+  for (const l of Object.values(config.leagues).flat()) {
+    assert.match(l.color ?? "", /^#[0-9a-f]{6}$/i, l.name);
+    // Relative luminance well under white text's limit, so captions stay readable over it.
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(l.color.slice(i, i + 2), 16) / 255)
+      .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+    const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    assert.ok((1.05) / (lum + 0.05) >= 7, `${l.name} too light for white text`);
+  }
+});

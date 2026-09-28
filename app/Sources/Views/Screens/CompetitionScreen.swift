@@ -6,6 +6,15 @@ struct CompetitionScreen: View {
     let store: ScoreboardStore
     @State var day: Day
     @Environment(\.openMenu) private var openMenu
+    /// The logo's own colour, read only when the proxy names none.
+    @State private var logoTint: Color?
+
+    /// The competition's brand colour from the proxy, chosen by hand as
+    /// Apple Sports chooses its own; failing that, its logo's commonest
+    /// colour, darkened so white text still reads on it; failing that, none.
+    private var tint: Color? {
+        Color(hex: ref.color) ?? logoTint?.mix(with: .black, by: 0.45)
+    }
 
     var body: some View {
         ScrollView {
@@ -22,6 +31,11 @@ struct CompetitionScreen: View {
             .pageMargins()
         }
         .scrollClipDisabled()
+        .pageTint(tint)
+        .task(id: ref.logo) {
+            guard Color(hex: ref.color) == nil else { return }
+            logoTint = await TeamTint.of(logo: ref.logo)
+        }
         // Back on a page opens the menu, as it does on tvOS's own sidebar.
         .onExitCommand(perform: openMenu)
     }

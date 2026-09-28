@@ -47,6 +47,7 @@ struct League: Decodable, Equatable {
     let logo: URL?
     /// A system symbol in place of a mark not worth showing (friendlies).
     let symbol: String?
+    let color: String?
     let hasStandings: Bool?
 }
 
@@ -66,6 +67,8 @@ struct LeagueSummary: Decodable, Equatable, Identifiable, Hashable {
     let symbol: String?
     /// The menu section it goes in when not its sport's own: "international".
     let section: String?
+    /// The competition's brand colour ("#37003c"), which tints its page.
+    let color: String?
     let hasStandings: Bool
     /// False when nothing of this competition falls inside the week we show.
     let playing: Bool
@@ -88,6 +91,7 @@ struct LeagueRef: Hashable {
     let short: String
     let logo: URL?
     let symbol: String?
+    let color: String?
     let hasStandings: Bool
     /// Whether anything of it falls inside the week; a page reached from a
     /// group of games is playing by definition.
@@ -101,6 +105,7 @@ struct LeagueRef: Hashable {
         short = summary.short
         logo = summary.logo
         symbol = summary.symbol
+        color = summary.color
         hasStandings = summary.hasStandings
         playing = summary.playing
         next = summary.next
@@ -113,6 +118,7 @@ struct LeagueRef: Hashable {
         short = group.league.short
         logo = group.league.logo
         symbol = group.league.symbol
+        color = group.league.color
         hasStandings = group.league.hasStandings ?? false
         playing = true
         next = nil

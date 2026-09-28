@@ -42,3 +42,12 @@ enum TeamTint {
         return Color(red: Double(top.r) / n, green: Double(top.g) / n, blue: Double(top.b) / n)
     }
 }
+
+extension TeamTint {
+    /// The same reading of any mark by its address: a competition's logo,
+    /// for a page the proxy names no colour for.
+    static func of(logo url: URL?) async -> Color? {
+        guard let url, let image = await ImageCache.shared.load(url) else { return nil }
+        return dominant(image)
+    }
+}
