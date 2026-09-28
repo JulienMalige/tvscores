@@ -52,14 +52,15 @@ enum Metrics {
     static let pillGap: CGFloat = 12
     /// The menu, measured off tvOS's own sidebar in the build 19 screenshots:
     /// its width and distance from the screen's edge, a row's inset and the
-    /// space between rows, and the icon.
-    static let menuWidth: CGFloat = 340
+    /// space between rows, the icon, and the type, a little under body.
+    static let menuWidth: CGFloat = 370
     static let menuMargin: CGFloat = 36
     static let menuInset: CGFloat = 16
     static let menuRowInsetV: CGFloat = 12
     static let menuRowInsetH: CGFloat = 18
     static let menuRowGap: CGFloat = 8
-    static let menuIcon: CGFloat = 34
+    static let menuIcon: CGFloat = 40
+    static let menuFont: CGFloat = 26
     static let menuRadius: CGFloat = 40
     /// One column of a table read as numbers — played, won, points.
     static let tableCell: CGFloat = 96

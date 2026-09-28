@@ -57,7 +57,9 @@ struct MenuPanel: View {
         Button { pick(item) } label: {
             MenuRow(title: title, icon: icon, current: item == selection)
         }
-        .buttonStyle(.borderless)
+        // A style of ours: tvOS's borderless style blows a symbol inside a
+        // button up to its own size, which made Home's house twice a crest.
+        .buttonStyle(MenuRowStyle())
         .focusEffectDisabled()
         .focused(focus, equals: item)
         .accessibilityIdentifier(id)
@@ -128,10 +130,15 @@ private struct MenuRow: View {
     var body: some View {
         HStack(spacing: 16) {
             icon.view(size: Metrics.menuIcon)
+            // Long names fade out at the panel's edge, as tvOS's own
+            // sidebar does, rather than end in an ellipsis.
             title
-                .font(.body.weight(.medium))
+                .font(.system(size: Metrics.menuFont, weight: .medium))
                 .lineLimit(1)
-            Spacer(minLength: 0)
+                .fixedSize()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .mask(LinearGradient(stops: [.init(color: .black, location: 0.85), .init(color: .clear, location: 1)],
+                                     startPoint: .leading, endPoint: .trailing))
         }
         .foregroundStyle(isFocused ? Color.black : Color.primary)
         .padding(.vertical, Metrics.menuRowInsetV)
@@ -139,5 +146,12 @@ private struct MenuRow: View {
         .background(Capsule().fill(isFocused ? Color.white : Color.white.opacity(current ? 0.16 : 0)))
         .scaleEffect(isFocused ? 1.04 : 1)
         .animation(.easeOut(duration: 0.15), value: isFocused)
+    }
+}
+
+/// A button that draws nothing of its own: the row says focus itself.
+private struct MenuRowStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
     }
 }
