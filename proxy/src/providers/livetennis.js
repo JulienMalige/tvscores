@@ -61,7 +61,14 @@ function competitionOf(info) {
 export function roundOf(round) {
   if (!round) return undefined;
   const cut = round.lastIndexOf(" - ");
-  return cut >= 0 ? round.slice(cut + 3) : round;
+  const bare = cut >= 0 ? round.slice(cut + 3) : round;
+  // "1/64-finals" is the feed's; a draw of 128 is how people say it.
+  const part = bare.match(/^1\/(\d+)-finals?$/i);
+  if (part) {
+    const n = Number(part[1]) * 2;
+    return n === 8 ? "Quarter-final" : n === 4 ? "Semi-final" : `Round of ${n}`;
+  }
+  return bare;
 }
 
 /** The feed's tiers for the categories we show, for its `tier=` filter. */
@@ -82,7 +89,9 @@ export function normaliseMatch(m, info) {
   else if (m.status === "completed") state = STATE.final;
   const interrupted = m.event_status === "Interrupted";
   const sets = setsLine(m.score);
-  const detail = state === STATE.final ? sets : m.round || undefined;
+  // The round is the caption over the row now ("Beijing · Round of 64"):
+  // under the time as well, it said the same thing twice (Julien, build 28).
+  const detail = state === STATE.final ? sets : undefined;
   // A match we never saw in play carries a 0-0 score block from the upcoming
   // feed. Showing "Final 0-0" would be a lie, so report no score instead.
   const known = state === STATE.live || (state === STATE.final && sets !== undefined);

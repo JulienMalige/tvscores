@@ -5,7 +5,7 @@ import { roundOf, tiersFor, normaliseMatch, liveClock, setsLine, bigEventFilter,
 
 const raw = JSON.parse(readFileSync(new URL("./fixtures/tennis.json", import.meta.url))).data[0];
 
-test("live ATP singles match: sets as score, current set as clock, round as detail", () => {
+test("live ATP singles match: sets as score, current set as clock, round as caption, not detail", () => {
   const e = normaliseMatch(raw);
   assert.equal(e.sport, "tennis");
   assert.equal(e.league.short, "ATP");
@@ -14,7 +14,8 @@ test("live ATP singles match: sets as score, current set as clock, round as deta
   // games [[7, 5, 0], [6, 7, 0]] is 7-6, 5-7, then a third set just started,
   // which matches the fixture's own sets total of one apiece.
   assert.equal(e.status.clock, "Set 3 · 0-0");
-  assert.equal(e.status.detail, raw.round);
+  assert.equal(e.status.detail, undefined, "the round is the caption over the row");
+  assert.equal(e.round, roundOf(raw.round));
   assert.equal(e.home.nick, "Fenty");
   assert.equal(e.home.short, "FEN");
   assert.ok(e.start.endsWith("Z"));
@@ -41,7 +42,7 @@ test("upcoming and interrupted states", () => {
   assert.equal(up.score.home, null);
   const paused = normaliseMatch({ ...raw, event_status: "Interrupted" });
   assert.equal(paused.status.clock, undefined);
-  assert.equal(paused.status.detail, raw.round);
+  assert.equal(paused.status.detail, undefined);
   assert.equal(paused.status.note, "Interrupted");
 });
 
@@ -113,6 +114,10 @@ test("upcoming asks for our tiers only, and rounds lose the tournament's name", 
   assert.deepEqual(tiersFor(["grand_slam", "masters_1000", "tour_finals", "wta_1000"]).sort(),
     ["atp_1000", "atp_finals", "grand_slam", "wta_1000", "wta_finals"]);
   assert.equal(roundOf("WTA Beijing - Round of 64"), "Round of 64");
+  assert.equal(roundOf("WTA Beijing - 1/64-finals"), "Round of 128");
+  assert.equal(roundOf("1/8-finals"), "Round of 16");
+  assert.equal(roundOf("1/4-finals"), "Quarter-final");
+  assert.equal(roundOf("1/2-final"), "Semi-final");
   assert.equal(roundOf("Final"), "Final");
   assert.equal(roundOf(undefined), undefined);
 });
