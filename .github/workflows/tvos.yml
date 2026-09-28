@@ -174,11 +174,11 @@ jobs:
           sleep 20
           xcrun simctl io "$UDID" screenshot shots/live-league-nfl-en.png
           # A game's page on live data: one finished, one to come.
-          for state in final scheduled; do
+          for state in final:football final:nfl scheduled:football; do
             xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
             SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresTab today -TVScoresGame "$state" -AppleLanguages "(en)"
             sleep 14
-            xcrun simctl io "$UDID" screenshot "shots/live-game-$state-en.png"
+            xcrun simctl io "$UDID" screenshot "shots/live-game-${state/:/-}-en.png"
           done
           # Tennis on live data, for its tournament headings.
           xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true

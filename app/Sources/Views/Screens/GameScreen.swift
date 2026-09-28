@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// One game, opened from its row: rises over the page as a sheet, and Back
+/// One game, opened from its row: fills the screen over the page, and Back
 /// puts it away. After Apple Sports' game card (Julien, 2026-09-28), without
 /// what we do not have — no following, no play-by-play.
 ///
