@@ -80,10 +80,12 @@ export const config = {
       { id: 4481, name: "UEFA Europa League", menu: "Europa League", short: "UEL", badge: "uel", table: { rounds: [1, 99], after: "09-01", scoring: "points" }, zones: LEAGUE_PHASE },
       { id: 4501, name: "Copa Libertadores", short: "LIB", badge: "libertadores" },
       // National teams (Julien, 2026-09-28: "nations leagues or brazilian
-      // national games"). The friendlies feed also carries youth sides —
+      // national games"), in the menu's International section after
+      // Football's clubs. The friendlies feed also carries youth sides —
       // "England U19 vs Norway U19" — which `seniorOnly` leaves out.
-      { id: 4490, name: "UEFA Nations League", menu: "Nations League", short: "UNL", logo: "https://r2.thesportsdb.com/images/media/league/badge/cwsp321698386224.png" },
-      { id: 4562, name: "International Friendlies", menu: "Friendlies", short: "INT", logo: "https://r2.thesportsdb.com/images/media/league/badge/pdnktx1648659448.png", seniorOnly: true, seasonless: true,
+      { id: 4490, name: "UEFA Nations League", menu: "Nations League", short: "UNL", section: "international", logo: "https://r2.thesportsdb.com/images/media/league/badge/cwsp321698386224.png" },
+      // A globe, not the feed's badge: a wordmark too thin to read as an icon.
+      { id: 4562, name: "International Friendlies", menu: "Friendlies", short: "INT", section: "international", symbol: "globe", seniorOnly: true, seasonless: true,
         // Every national side plays friendlies, Cook Islands v Tahiti too:
         // a game is kept when one side is a team people tune in for.
         teams: ["Brazil", "Argentina", "Uruguay", "Colombia", "Chile", "Ecuador", "Paraguay", "Peru",

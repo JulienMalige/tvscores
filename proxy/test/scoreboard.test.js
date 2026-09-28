@@ -111,3 +111,16 @@ test("a race weekend is on every day it has a session, the race on the last of t
   const friday = on(18);
   assert.deepEqual([friday.yesterday.length, friday.today.length, friday.upcoming.length], [0, 0, 1], "Friday: the whole weekend is ahead, once");
 });
+
+test("national teams come after their sport's clubs, with their section and symbol", () => {
+  const now = Date.UTC(2026, 8, 28, 12);
+  const leagues = { football: [
+    { id: 4562, name: "International Friendlies", short: "INT", section: "international", symbol: "globe" },
+    { id: 4335, name: "La Liga", short: "LIGA" },
+  ] };
+  const ev = (id, league) => ({ id, sport: "football", kind: "match", league, start: "2026-09-28T15:00:00.000Z", status: { state: "scheduled" }, home: { name: "A", short: "A" }, away: { name: "B", short: "B" }, score: {} });
+  const sb = buildScoreboard([ev("1", { id: 4562, name: "International Friendlies", short: "INT" }), ev("2", { id: 4335, name: "La Liga", short: "LIGA" })], { now, leagues, sportOrder: ["football"] });
+  assert.deepEqual(sb.days.today.map((g) => g.league.name), ["La Liga", "International Friendlies"], "clubs first, though I sorts before L");
+  assert.equal(sb.days.today[1].league.symbol, "globe");
+  assert.equal(sb.leagues.find((l) => l.id === 4562).section, "international");
+});

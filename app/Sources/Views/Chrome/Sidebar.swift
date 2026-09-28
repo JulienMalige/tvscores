@@ -122,7 +122,8 @@ struct Sidebar: View {
 
     private var sections: [(section: SportSection, leagues: [LeagueSummary])] {
         SportSection.all.compactMap { section in
-            let mine = store.leagues.filter { section.sports.contains($0.sport) }
+            // A league naming its own section goes there, not in its sport's.
+            let mine = store.leagues.filter { $0.section.map { $0 == section.id } ?? section.sports.contains($0.sport) }
             return mine.isEmpty ? nil : (section, mine)
         }
     }

@@ -121,7 +121,7 @@ enum MenuIcon {
                 .frame(width: size, height: size)
         case .league(let league):
             CachedImage(url: league.icon ?? league.logo) {
-                Image(systemName: Sport.icon(for: league.sport))
+                Image(systemName: league.symbol ?? Sport.icon(for: league.sport))
                     .font(.system(size: size * 0.6))
                     .foregroundStyle(Sport.tint(for: league.sport))
             }

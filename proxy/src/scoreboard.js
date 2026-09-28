@@ -17,13 +17,14 @@ function groupByLeague(events, sportOrder, leagues = {}, publicBase = "", standi
       // League logo comes from config at serve time so cached events need no refresh.
       const cfg = (leagues[e.sport] || []).find((l) => String(l.id) === String(e.league.id));
       const logo = cfg?.badge ? `${publicBase}/v1/assets/leagues/${cfg.badge}.png` : cfg?.logo;
-      groups.set(key, { sport: e.sport, league: { ...e.league, logo, hasStandings: Boolean(standings[key]) }, events: [] });
+      groups.set(key, { sport: e.sport, league: { ...e.league, logo, symbol: cfg?.symbol, section: cfg?.section, hasStandings: Boolean(standings[key]) }, events: [] });
     }
     groups.get(key).events.push(e);
   }
   const order = (s) => (sportOrder.indexOf(s) + 1 || 99);
   return [...groups.values()]
-    .sort((a, b) => order(a.sport) - order(b.sport) || a.league.name.localeCompare(b.league.name))
+    // National teams after the clubs of their sport, as in the menu.
+    .sort((a, b) => order(a.sport) - order(b.sport) || Boolean(a.league.section) - Boolean(b.league.section) || a.league.name.localeCompare(b.league.name))
     .map((g) => ({ ...g, events: g.events.sort((a, b) => Date.parse(a.start) - Date.parse(b.start)) }));
 }
 
@@ -66,6 +67,10 @@ function everyLeague(sportOrder, leagues = {}, publicBase = "", standings = {}, 
         // competition, because tvOS lays its icons out itself and a wordmark
         // given its own proportions dwarfs the crest under it.
         icon: cfg.badge ? `${publicBase}/v1/assets/leagues/icon/${cfg.badge}.png` : undefined,
+        // A system symbol for a competition with no mark worth showing, and
+        // the menu section it goes in when not its sport's own.
+        symbol: cfg.symbol,
+        section: cfg.section,
         hasStandings: Boolean(standings[key]),
         playing: playing.has(key),
         // While playing, only what the daily pass learned before the games

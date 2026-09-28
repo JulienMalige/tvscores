@@ -8,6 +8,10 @@ notes when a version ships.
 
 ## Unreleased
 
+- National teams have a menu section of their own, International, after
+  Football's clubs; on Home they follow the clubs too. Friendlies carry a
+  globe for a mark.
+
 ## 1.0 build 27 — 28 September 2026
 - National teams: the UEFA Nations League, and friendlies with a side
   people tune in for — Brazil, Argentina, France, England, the USA and

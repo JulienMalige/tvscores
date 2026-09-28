@@ -69,7 +69,7 @@ struct LeagueHeader: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            LeagueMark(sport: group.sport, logo: group.league.logo)
+            LeagueMark(sport: group.sport, logo: group.league.logo, symbol: group.league.symbol)
             Text(group.league.name)
                 .font(.title3.weight(.semibold))
             if chevron {

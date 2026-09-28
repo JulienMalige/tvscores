@@ -9,6 +9,9 @@ struct SportSection: Identifiable {
     /// The menu's sections, in order. A sport not named here is not shown.
     static let all: [SportSection] = [
         SportSection(id: "football", title: "sidebar.football", sports: ["football"]),
+        // National teams, after the clubs: leagues say so themselves, by
+        // their `section` (Julien, 2026-09-28).
+        SportSection(id: "international", title: "sidebar.international", sports: []),
         SportSection(id: "motorsport", title: "sidebar.motorsport", sports: ["f1", "motogp"]),
         SportSection(id: "us", title: "sidebar.us", sports: ["nfl", "nba"]),
         SportSection(id: "tennis", title: "sidebar.tennis", sports: ["tennis"]),
