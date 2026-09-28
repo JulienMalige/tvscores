@@ -11,7 +11,7 @@ struct CompetitionScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Metrics.sectionGap / 2) {
                 HStack(spacing: Metrics.headingGap) {
-                    LeagueMark(sport: ref.sport, logo: ref.logo, symbol: ref.symbol)
+                    LeagueMark(sport: ref.sport, logo: ref.logo, symbolName: ref.symbol)
                     Text(ref.name)
                         .font(.system(size: 48, weight: .bold))
                     Spacer()

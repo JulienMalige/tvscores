@@ -5,7 +5,7 @@ struct LeagueMark: View {
     let sport: String
     let logo: URL?
     /// The proxy's symbol for a competition without a mark worth showing.
-    var symbol: String? = nil
+    var symbolName: String? = nil
     /// A square to fit inside. Left out, the mark takes the width a wordmark
     /// needs, which is right in a heading and wrong in a list of icons.
     var square: CGFloat? = nil
@@ -37,7 +37,7 @@ struct LeagueMark: View {
     }
 
     private var symbol: some View {
-        Image(systemName: symbol ?? Sport.icon(for: sport))
+        Image(systemName: symbolName ?? Sport.icon(for: sport))
             .font(.title3)
             .foregroundStyle(Sport.tint(for: sport))
     }
