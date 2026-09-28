@@ -8,6 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
+## 1.0 build 28 — 28 September 2026
 - National teams have a menu section of their own, International, after
   Football's clubs; on Home they follow the clubs too. Friendlies carry a
   globe for a mark.
