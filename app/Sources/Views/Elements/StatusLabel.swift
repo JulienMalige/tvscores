@@ -11,13 +11,16 @@ struct StatusLabel: View {
 
     /// Under a date heading the day is said already: the time alone.
     @Environment(\.underDayHeading) private var underDayHeading
+    /// The board's own clock: a bundled board from September is not a day
+    /// of games all overdue (CI, build 29).
+    @Environment(\.boardNow) private var boardNow
 
     private var mainFont: Font { compact ? .title3.weight(.semibold) : .title2.weight(.semibold) }
 
     var body: some View {
         VStack(spacing: 4) {
             switch status.state {
-            case .scheduled where start.timeIntervalSinceNow < -Self.overdue:
+            case .scheduled where start.timeIntervalSince(boardNow ?? .now) < -Self.overdue:
                 // Long past its start with no word from the feed: a time
                 // here read as a game still to come, at six in the evening
                 // for a match of three in the morning (Julien, build 28).
@@ -106,4 +109,6 @@ struct StatusLabel: View {
 extension EnvironmentValues {
     /// Rows listed under a heading naming their day ("Sat, 3 Oct").
     @Entry var underDayHeading = false
+    /// When the board on screen was made.
+    @Entry var boardNow: Date? = nil
 }
