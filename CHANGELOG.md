@@ -15,7 +15,7 @@ notes when a version ships.
   page each tournament is headed by its flag, name, tier, surface and
   town; on the F1 and MotoGP pages each weekend shows its schedule, every
   session with its day and time. The table sits on a panel of its own.
-- The menu shows the day and the time at its top.
+- The menu has the app's name at its top.
 - An empty day reads as Apple Sports words it, under a day switch that
   now stays on every competition: "No Events Today", "No Events for 7
   Days". A competition whose new season is near says so instead —
