@@ -8,6 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
+## 1.0 build 25 — 28 September 2026
 - The menu is now the app's own, drawn after Apple's: every competition is
   still in it, and it opens every time, from any row. Apple's sidebar lost
   its place with more than seven entries, and ours had sixteen. Press left
