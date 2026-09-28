@@ -8,6 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
+## 1.0 build 27 — 28 September 2026
 - National teams: the UEFA Nations League, and friendlies with a side
   people tune in for — Brazil, Argentina, France, England, the USA and
   others. Each has its place in the menu under Football.
