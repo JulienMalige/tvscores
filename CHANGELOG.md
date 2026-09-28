@@ -8,6 +8,10 @@ notes when a version ships.
 
 ## Unreleased
 
+- Tennis under way reaches Today again: the server had stopped asking for
+  matches in progress once its list ran empty, so the Beijing matches of
+  the day never came.
+
 - A match opens its own page, a card over the list as the TV app shows a
   series, tinted in the two sides' colours: both sides large with their
   records, the score or the kickoff. A game to come shows the table with both teams
