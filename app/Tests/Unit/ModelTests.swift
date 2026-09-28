@@ -26,8 +26,11 @@ struct ModelTests {
         let board = try ScoreboardDecoder.make().decode(Scoreboard.self, from: Self.sample("sample-scoreboard"))
         for league in board.leagues {
             #expect(!league.menu.isEmpty, "\(league.name) has a menu name")
-            #expect(league.icon != nil, "\(league.name) has a square icon for the sidebar")
-            #expect(league.logo != nil, "\(league.name) has a mark for its heading")
+            // A badge we ship gives both; a feed's badge a logo alone, which
+            // the menu shows in its square; a system symbol stands in for a
+            // mark not worth showing (the friendlies' globe).
+            #expect(league.icon != nil || league.logo != nil || league.symbol != nil, "\(league.name) has a mark for the sidebar")
+            #expect(league.logo != nil || league.symbol != nil, "\(league.name) has a mark for its heading")
         }
         let ids = board.leagues.map(\.id.raw)
         #expect(Set(ids).count == ids.count, "no competition is listed twice")
