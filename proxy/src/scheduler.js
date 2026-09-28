@@ -67,6 +67,19 @@ export class TeamSportScheduler {
     });
   }
 
+  /**
+   * Whether to ask the live feed this round. A tour's day is matches back to
+   * back from morning to night, and the free tier's daily listing only has
+   * those not yet begun: a match under way is only in the live feed. So a
+   * provider can ask for it to be polled whatever we track. Otherwise a day
+   * that starts with nothing tracked (the Beijing WTA 1000 on 28 September,
+   * after a feed change had dropped its matches) never asks, and so never
+   * finds anything to track.
+   */
+  pollsLive(now = Date.now()) {
+    return Boolean(this.p.alwaysLive) || this.hasLiveWindow(now);
+  }
+
   needsDaily(now = Date.now()) {
     const last = this.meta.lastDaily ? Date.parse(this.meta.lastDaily) : 0;
     const dayChanged = Quota.utcDay(last) !== Quota.utcDay(now) && new Date(now).getUTCHours() >= this.cfg.dailyRefreshHourUtc;
@@ -140,7 +153,7 @@ export class TeamSportScheduler {
    * and today's exhausted quotas are the reason that matters here.
    */
   nextDelay(now = Date.now()) {
-    const base = this.hasLiveWindow(now) ? this.quota.liveInterval(this.cfg.liveIntervalSeconds, now) * 1000 : 5 * MIN;
+    const base = this.pollsLive(now) ? this.quota.liveInterval(this.cfg.liveIntervalSeconds, now) * 1000 : 5 * MIN;
     return backoff(base, this.meta.failures);
   }
 
@@ -148,7 +161,7 @@ export class TeamSportScheduler {
     const now = Date.now();
     try {
       if (this.needsDaily(now)) await this.daily(now);
-      if (this.hasLiveWindow(now)) await this.live(now);
+      if (this.pollsLive(now)) await this.live(now);
       await refreshStandings(this, now);
       this.meta.lastError = undefined;
       this.meta.failures = 0;

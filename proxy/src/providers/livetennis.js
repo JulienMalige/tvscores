@@ -192,6 +192,8 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
     standings,
     /** Orphans of the live feed are over (no `completed` listing on the free tier). */
     finalizeOrphans: true,
+    /** Matches under way are only in the live feed: poll it all day (every 30 min). */
+    alwaysLive: true,
     daily: () => list("upcoming"),
     live: () => list("live"),
   };

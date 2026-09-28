@@ -174,3 +174,18 @@ test("a provider with no byDate is not asked for one", async () => {
   s.store.upsert([match({ id: "tennis:1", sport: "tennis" })]);
   await s.live(KICKOFF + 3 * 3600e3); // would throw if it tried
 });
+
+test("a provider that plays all day is polled live with nothing tracked", async () => {
+  // Reproduction, 28 September: no tennis tracked, so no live window, so the
+  // live feed was never asked, and the Beijing matches under way never came.
+  const row = match({ id: "tennis:lt:1", sport: "tennis", status: { state: "live" } });
+  const provider = { ...fake({ live: [row] }), sport: "tennis" };
+  const s = scheduler(provider);
+  assert.equal(s.hasLiveWindow(KICKOFF), false, "nothing tracked");
+  assert.equal(s.pollsLive(KICKOFF), false, "a team sport waits for a kickoff");
+  provider.alwaysLive = true;
+  assert.equal(s.pollsLive(KICKOFF), true, "a tour does not");
+  await s.tick();
+  assert.equal(provider.calls.live, 1);
+  assert.equal(s.events().length, 1, "the match under way is tracked");
+});
