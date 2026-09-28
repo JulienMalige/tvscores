@@ -220,6 +220,24 @@ from the scoreboard for weeks at a time. That is the filter working.
 The free tier's 100 calls a day is now the binding constraint on tennis, not
 the data. Their BASIC tier is $9.99/mo for 1,000/day.
 
+## Tennis 500s, and our own calendar (2026-09-28)
+
+Julien: tennis must show the ATP 500 and WTA 500 tournaments too, each under
+its proper name and dates from a calendar we maintain by hand. The feed's
+`tier=` filter takes `atp_500` and `wta_500` alongside the others, so both are
+in `config.tennis.categories` and asked for on the upcoming call; a
+catalogue tournament with a 500 tier and no category counts by its tier.
+
+The feed has no dates and names a tournament by its town ("Beijing" for the
+China Open), so `proxy/tennis-calendar.json` is a fact file typed from the
+official ATP and WTA calendars: tour, name as broadcasters say it, city,
+ISO country, first and last day, tier. It is not fetched by any code; an
+event whose dates could not be confirmed is left out rather than guessed.
+Each match's tournament is joined to it by tour, town (or the country, when
+only one entry of that tour is on there) and week, and a match's
+`competition` then carries the calendar's name and dates. Update the file
+when the tours publish the next season.
+
 ## Football moved to TheSportsDB (2026-09-15)
 
 Julien subscribed to the $9 Single Developer tier, and football moved onto it

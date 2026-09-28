@@ -10,6 +10,29 @@ struct Competition: Decodable, Equatable {
     let tier: String?
     /// hard | clay | grass.
     let surface: String?
+    /// ISO 3166 code, "CN", for the country's name in the viewer's language.
+    let country: String?
+    /// "2026-09-30", from the proxy's hand-kept calendar when it knows the
+    /// tournament. Kept as text and read below, so a date in another shape
+    /// costs the heading its dates rather than the whole board failing to
+    /// decode.
+    let start: String?
+    let end: String?
+
+    /// Midnight of the first day to midnight of the last, when both dates
+    /// read and are in order: the span a heading's date interval shows.
+    var dates: Range<Date>? {
+        guard let first = Self.day(start), let last = Self.day(end), first <= last else { return nil }
+        return first..<last
+    }
+
+    /// "2026-09-30" as midnight of that day in the viewer's calendar: a
+    /// tournament's days are the same numbers wherever you watch it from.
+    private static func day(_ text: String?) -> Date? {
+        let parts = text?.split(separator: "-").compactMap { Int($0) } ?? []
+        guard parts.count == 3 else { return nil }
+        return Calendar.current.date(from: DateComponents(year: parts[0], month: parts[1], day: parts[2]))
+    }
 }
 
 extension Array where Element == Event {
