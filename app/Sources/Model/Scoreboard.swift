@@ -137,6 +137,8 @@ struct Event: Decodable, Identifiable, Equatable {
     let home: TeamRef?
     let away: TeamRef?
     let score: Score?
+    /// The tournament a tennis match belongs to.
+    let competition: Competition?
     // race
     let name: String?
     let circuit: String?

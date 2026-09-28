@@ -182,4 +182,19 @@ struct ModelTests {
         #expect(race.sessions(on: .today, now: sunday, calendar: utc).map(\.kind) == ["race"])
         #expect(race.sessions(on: .yesterday, now: sunday, calendar: utc).map(\.kind) == ["qualifying", "sprint"])
     }
+
+    @Test("tennis matches fall into runs by tournament, each once, in order of appearance")
+    func tennisRunsByTournament() throws {
+        let json = """
+        [{"id":"1","sport":"tennis","kind":"match","start":"2026-09-28T03:00:00Z","status":{"state":"scheduled"},"competition":{"name":"Beijing","flag":"🇨🇳","tier":"WTA 1000","surface":"hard"}},
+         {"id":"2","sport":"tennis","kind":"match","start":"2026-09-28T04:00:00Z","status":{"state":"scheduled"},"competition":{"name":"Tokyo","flag":"🇯🇵"}},
+         {"id":"3","sport":"tennis","kind":"match","start":"2026-09-28T05:00:00Z","status":{"state":"scheduled"},"competition":{"name":"Beijing","flag":"🇨🇳"}},
+         {"id":"4","sport":"tennis","kind":"match","start":"2026-09-28T06:00:00Z","status":{"state":"scheduled"}}]
+        """
+        let events = try ScoreboardDecoder.make().decode([Event].self, from: Data(json.utf8))
+        let runs = events.byCompetition()
+        #expect(runs.map { $0.competition?.name } == ["Beijing", "Tokyo", nil])
+        #expect(runs[0].events.map(\.id) == ["1", "3"], "Beijing's matches together")
+        #expect(runs[0].competition?.tier == "WTA 1000")
+    }
 }

@@ -13,6 +13,10 @@ notes when a version ships.
   its place with more than seven entries, and ours had sixteen. Press left
   or Back to open it; right or Back to close it. Section titles now line
   up with the icons.
+- Tennis names its tournaments: each has a heading with its country's flag,
+  its name and its tier and surface — Beijing, WTA 1000 · Hard. The feed
+  has no tournament logos, and names some by their city rather than their
+  sponsor's title.
 - A competition between rounds — Copa Libertadores this week — no longer
   leaves the remote dead: its "coming up" card takes focus, so left opens
   the menu as anywhere else.

@@ -173,9 +173,9 @@ writes its own number is a bug, and rows all use `rowSurface(focused:)`.
   seven tabs — the menu opened and shut in one movement from its lower
   rows, seen in the television's trace (build 24) and still Apple's known
   issue on tvOS 26.6 (forum thread 769884). `Sidebar.swift` and
-  `MenuPanel.swift` draw it after the system's: a chip when shut, a strip
-  down the left edge that a press left lands on, a glass panel over the
-  dimmed page. What it cannot copy: the swipe on the remote's pad that
+  `MenuPanel.swift` draw it after the system's: a chip when shut; a press
+  left that goes nowhere on the page (the focus engine's failed-move
+  notice) or Back opens a glass panel over the dimmed page. What it cannot copy: the swipe on the remote's pad that
   drags the system's open. Its flows are real tests, not probes. The
   trace (`Diagnostics.swift` → `POST /v1/diag`, files under
   `~/.local/state/tvscores/traces/` on the VPS) stays until the menu has

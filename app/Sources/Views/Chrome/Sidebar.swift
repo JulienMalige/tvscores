@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// The app's navigation: a menu of ours on the left, and the page it picks.
 ///
@@ -8,7 +9,7 @@ import SwiftUI
 /// movement from its lower rows — in the television's trace (build 24), and
 /// still Apple's known issue on tvOS 26.6 (forum thread 769884). This one is
 /// drawn after it: a chip at the top left saying where you are; a press
-/// left from the page, or Back, opens a panel over the dimmed page with the
+/// left that finds nothing further left on the page, or Back, opens a panel over the dimmed page with the
 /// focus on the current row; right or Back closes it, a click opens the row.
 ///
 /// It exists at all because the day buckets only carry competitions that
@@ -22,12 +23,9 @@ struct Sidebar: View {
     /// Yesterday's La Liga header opens Yesterday's La Liga.
     @State private var leagueDays: [String: Day] = [:]
     @State private var expanded = false
-    /// Off while the menu opens or shuts, and for a moment after launch:
-    /// the strip is the leftmost thing on screen, and the focus engine,
-    /// choosing where to start, would otherwise start there.
-    @State private var openerArmed = false
+    /// Set while the menu opens or shuts, when focus moves under our feet.
+    @State private var moving = false
     @FocusState private var menuFocus: MenuItem?
-    @FocusState private var openerFocused: Bool
 
     var body: some View {
         Group {
@@ -54,29 +52,28 @@ struct Sidebar: View {
                     .allowsHitTesting(false)
                     .transition(.opacity)
             }
-            if !expanded {
-                // What a press left lands on: a strip down the whole left
-                // edge, so it is in the way of a press from any row.
-                Color.white.opacity(0.02)
-                    .frame(width: Metrics.menuOpener)
-                    .frame(maxHeight: .infinity)
-                    .ignoresSafeArea()
-                    .focusable(openerArmed)
-                    .focused($openerFocused)
-                    .accessibilityIdentifier("menu.opener")
-            }
             MenuPanel(sections: sections, selection: selection, expanded: expanded,
                       focus: $menuFocus, pick: pick, close: closeMenu)
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.86), value: expanded)
-        .onChange(of: openerFocused) { _, focused in if focused { openMenu() } }
         .onChange(of: menuFocus) { _, focused in
             // Focus gone from every row — a press right onto the page.
-            if focused == nil, expanded, openerArmed { shut() }
+            if focused == nil, expanded, !moving { shut() }
+        }
+        .task {
+            // A press left with nothing further left on the page is what
+            // opens the menu: the focus engine reports a move that went
+            // nowhere, and which way it was headed. An invisible strip along
+            // the edge for focus to land on was tried first; the focus
+            // engine would not take it (CI, 2026-09-28).
+            for await note in NotificationCenter.default.notifications(named: UIFocusSystem.movementDidFailNotification) {
+                guard let context = note.userInfo?[UIFocusSystem.focusUpdateContextUserInfoKey] as? UIFocusUpdateContext,
+                      context.focusHeading.contains(.left), !expanded, !moving else { continue }
+                openMenu()
+            }
         }
         .task {
             try? await Task.sleep(for: .seconds(1.5))
-            openerArmed = true
             if Self.argument("-TVScoresMenuOpen") != nil { openMenu() }
         }
     }
@@ -111,24 +108,24 @@ struct Sidebar: View {
 
     private func openMenu() {
         guard !expanded else { return }
-        openerArmed = false
+        moving = true
         expanded = true
         Task { @MainActor in
             // The rows exist from the next frame; focus can be put there then.
             try? await Task.sleep(for: .milliseconds(60))
             menuFocus = selection
             try? await Task.sleep(for: .milliseconds(300))
-            openerArmed = true
+            moving = false
         }
     }
 
     private func shut() {
-        openerArmed = false
+        moving = true
         expanded = false
         menuFocus = nil
         Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(800))
-            openerArmed = true
+            try? await Task.sleep(for: .milliseconds(400))
+            moving = false
         }
     }
 
