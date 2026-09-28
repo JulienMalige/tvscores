@@ -10,6 +10,7 @@ import { TeamSportScheduler, CalendarScheduler } from "./scheduler.js";
 import { createApp } from "./server.js";
 import { PhotoResolver } from "./photos.js";
 import { ImageMirror } from "./images.js";
+import { EventDetails } from "./details.js";
 
 const log = (msg) => console.log(`${new Date().toISOString()} ${msg}`);
 const store = new Store(config.cacheDir);
@@ -64,7 +65,8 @@ const photos = new PhotoResolver({ store, key: config.theSportsDbKey, log });
 const images = new ImageMirror({ dir: join(config.cacheDir, "images"), publicBase: config.publicBase, log });
 const limits = Object.fromEntries(schedulers.filter((s) => s.quota).map((s) => [s.p.sport, s.quota.dailyQuota]));
 limits.photos = 1000; // TheSportsDB test key: ~30/min; a soft daily line for the health page
-const app = createApp({ store, config, photos, images, activeSports: schedulers.map((s) => s.p.sport), limits });
+const details = new EventDetails({ key: config.theSportsDbKey, store, log });
+const app = createApp({ store, config, photos, images, details, activeSports: schedulers.map((s) => s.p.sport), limits });
 app.listen(config.port, config.host, () => {
   log(`tvscores proxy listening on http://${config.host}:${config.port} (prefix ${config.pathPrefix || "none"})`);
   for (const s of schedulers) s.start();

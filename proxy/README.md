@@ -18,6 +18,7 @@ Node 22, no dependencies. `npm test` runs the unit tests (`node --test`).
 | `GET /v1/assets/leagues/{id}.png` | competition badge we ship |
 | `GET /v1/assets/teams/{sport}/{slug}.png` | constructor or team badge we ship |
 | `GET /v1/health` | uptime, cached event count, image-mirror totals, and per-sport quota: `used / limit / remaining`, last success, last error |
+| `GET /v1/event?id=<event id>` | one game's page for football, NFL and NBA: score by period, a trimmed set of statistics, goals and cards, venue, both records from the tables. Fetched when asked, held 12 h once final and 1 min otherwise |
 | `POST /v1/diag` | a television's trace — focus moves, menu selection, refreshes — appended to `traces/<device>.log` under the cache directory, capped at 512 KB per device. Anonymous device id, no personal data; the only way to watch a real Apple TV without a Mac |
 
 Responses carry `Cache-Control: public, max-age=30`. The server also accepts the

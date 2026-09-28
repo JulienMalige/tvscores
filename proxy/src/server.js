@@ -60,7 +60,7 @@ function appendTrace(cacheDir, device, lines) {
   } catch { /* the file is a convenience; losing a line of it is fine */ }
 }
 
-export function createApp({ store, config, startedAt = Date.now(), photos, images, activeSports = [], limits = {} }) {
+export function createApp({ store, config, startedAt = Date.now(), photos, images, details, activeSports = [], limits = {} }) {
   const photoFor = photos ? (name) => photos.photoFor(name) : undefined;
   const mirror = images ? (url) => images.url(url) : undefined;
   // Constructor badges are files we shipped; list them once so a missing one
@@ -108,6 +108,14 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
     }
     if (path === "/v1/standings") {
       return send(res, 200, { standings: Object.fromEntries(Object.entries(store.standings).map(([k, v]) => [k, withTablePhotos(v, photoFor, mirror, badgeFor(k.split(":")[0]))])) });
+    }
+    // One game's page: its periods, statistics, goals and cards, records.
+    if (path === "/v1/event") {
+      const id = url.searchParams.get("id") || "";
+      if (!details || !/^(football|nfl|nba):tsdb:\d+$/.test(id)) return send(res, 404, { error: "no detail for this game" });
+      details.get(id).then((body) => (body ? send(res, 200, body, {}, req) : send(res, 404, { error: "unknown game" })))
+        .catch(() => send(res, 502, { error: "detail fetch failed" }));
+      return;
     }
     const one = path.match(/^\/v1\/standings\/([a-z0-9-]+)\/([a-z0-9-]+)$/);
     if (one) {
