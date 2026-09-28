@@ -20,7 +20,7 @@ struct StatusLabel: View {
     var body: some View {
         VStack(spacing: 4) {
             switch status.state {
-            case .scheduled where start.timeIntervalSince(boardNow ?? .now) < -Self.overdue:
+            case .scheduled where start.timeIntervalSince(boardNow ?? .now) < -overdue:
                 // Long past its start with no word from the feed: a time
                 // here read as a game still to come, at six in the evening
                 // for a match of three in the morning (Julien, build 28).
@@ -54,8 +54,13 @@ struct StatusLabel: View {
         }
     }
 
+    /// The sport, for how long a game may run late: a tennis match's time is
+    /// often when play on its court begins, and the third on a court starts
+    /// hours after it (review, build 29).
+    var sport: String? = nil
+
     /// How long after its start a game with no news stops showing its time.
-    static let overdue: TimeInterval = 3 * 3600
+    private var overdue: TimeInterval { (sport == "tennis" ? 10 : 3) * 3600 }
 
     /// Endings worth folding into the "Final" line rather than printing below it.
     static let finalCombined: [String: String] = [

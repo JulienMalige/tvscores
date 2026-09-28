@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { config } from "../src/config.js";
-import { roundOf, tiersFor, normaliseMatch, liveClock, setsLine, bigEventFilter, tierLabel, TIER_CATEGORY } from "../src/providers/livetennis.js";
+import { roundOf, tiersFor, untieredOn, normaliseMatch, liveClock, setsLine, bigEventFilter, tierLabel, TIER_CATEGORY } from "../src/providers/livetennis.js";
 import { calendarEntry } from "../src/providers/tennis-calendar.js";
 
 const raw = JSON.parse(readFileSync(new URL("./fixtures/tennis.json", import.meta.url))).data[0];
@@ -204,4 +204,11 @@ test("the calendar file is well formed: every entry joinable, dated, and in orde
   for (const a of file) for (const b of file) {
     if (a !== b && a.tour === b.tour && a.city === b.city) assert.ok(a.end < b.start || b.end < a.start, `${a.tour} ${a.city} ${a.start} and ${b.start}`);
   }
+});
+
+test("a pinned tournament with no tier is asked for by id only in its week", () => {
+  const info = { 1667: { name: "Shanghai", city: "Shanghai", country: "CN", tier: null }, 1269: { name: "Madrid", city: "Madrid", country: "ES", tier: "atp_1000" } };
+  const calendar = [{ tour: "atp", name: "Shanghai Masters", city: "Shanghai", country: "CN", start: "2026-10-07", end: "2026-10-18", tier: "atp_1000" }];
+  assert.deepEqual(untieredOn([1667, 1269], info, calendar, "2026-10-10"), ["1667"], "Shanghai in its week; Madrid has a tier");
+  assert.deepEqual(untieredOn([1667], info, calendar, "2026-11-20"), [], "not outside it");
 });

@@ -93,6 +93,12 @@ export function tiersFor(categories) {
 /** The tier names the feed's filter accepts; "tour_finals" is only ours (HTTP 400). */
 const FEED_TIERS = ["grand_slam", "atp_1000", "wta_1000", "atp_500", "wta_500", "atp_finals", "wta_finals"];
 
+/** Pinned tournaments with no tier the feed can filter on, on our calendar today. */
+export function untieredOn(pinned = [], info = {}, calendar = [], day) {
+  return pinned.map(String).filter((id) => info[id] && !FEED_TIERS.includes(info[id].tier)
+    && ["atp", "wta"].some((tour) => calendarEntry(calendar, { tour, info: info[id], day })));
+}
+
 export function normaliseMatch(m, info, calendar = []) {
   const league = TOURS[m.tour];
   if (!league || m.is_doubles) return null;
@@ -213,9 +219,22 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
     const tiers = status === "upcoming" ? `&tier=${tiersFor(tennis.categories).join(",")}` : "";
     const { body } = await getJson(`${BASE}/matches?status=${status}${tiers}&limit=200`, { headers });
     quota.record(undefined);
+    const data = [...(body.data || [])];
+    // A pinned tournament the feed gives no tier (Shanghai, WTA Montreal)
+    // falls outside that filter, so it is asked for by id — only in its week
+    // on our calendar, a call per refresh while it is on (review, build 29).
+    if (status === "upcoming") {
+      const today = new Date().toISOString().slice(0, 10);
+      const seen = new Set(data.map((m) => m.id));
+      for (const id of untieredOn(tennis.alsoBig, info, tennis.calendar, today)) {
+        const extra = await getJson(`${BASE}/matches?status=upcoming&tournament_id=${id}&limit=200`, { headers });
+        quota.record(undefined);
+        for (const m of extra.body?.data || []) if (!seen.has(m.id)) { seen.add(m.id); data.push(m); }
+      }
+    }
     const big = bigEventFilter({ byId, ...tennis });
-    const rows = (body.data || []).filter(big).map((m) => normaliseMatch(m, info[String(m.tournament_id)], tennis.calendar)).filter(Boolean);
-    log(`GET tennis ${status} -> ${body?.data?.length ?? 0} matches, ${rows.length} in ${tennis.categories.join("/")}`);
+    const rows = data.filter(big).map((m) => normaliseMatch(m, info[String(m.tournament_id)], tennis.calendar)).filter(Boolean);
+    log(`GET tennis ${status} -> ${data.length} matches, ${rows.length} in ${tennis.categories.join("/")}`);
     return rows;
   }
   /** Top 25 per tour built from the ranked player list (1 call; /rankings is a paid tier). */

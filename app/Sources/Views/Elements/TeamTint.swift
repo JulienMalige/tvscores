@@ -27,6 +27,9 @@ enum TeamTint {
         async let a = palette(of: away)
         let (homes, aways) = await (h, a)
         guard let first = homes.first else { return (nil, aways.first?.color) }
+        // A crest that gave nothing — not loaded, or all black and white —
+        // keeps the page's grey; white is for colours that are all too near.
+        guard !aways.isEmpty else { return (first.color, nil) }
         let apart = aways.first { $0.distance(to: first) >= Self.apart }
         return (first.color, apart?.color ?? Color.white.opacity(0.85))
     }
