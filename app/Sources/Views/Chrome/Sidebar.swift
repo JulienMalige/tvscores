@@ -31,6 +31,9 @@ struct Sidebar: View {
     /// Set while the menu opens or shuts, when focus moves under our feet.
     @State private var moving = false
     @FocusState private var menuFocus: MenuItem?
+    /// The page's focus scope: its day switch prefers to be first in it.
+    @Namespace private var pageScope
+    @Environment(\.resetFocus) private var resetFocus
 
     var body: some View {
         Group {
@@ -58,6 +61,8 @@ struct Sidebar: View {
             page
                 .environment(\.openMenu, openMenu)
                 .environment(\.openGame) { game = $0 }
+                .focusScope(pageScope)
+                .environment(\.pageScope, pageScope)
             if expanded {
                 Color.black.opacity(0.45)
                     .ignoresSafeArea()
@@ -68,6 +73,7 @@ struct Sidebar: View {
                       focus: $menuFocus, pick: pick)
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.86), value: expanded)
+        .onAppear { focusThePage() }
         .fullScreenCover(item: $game) { event in
             GameScreen(eventId: event.id, fallback: event, store: store)
         }
@@ -154,6 +160,19 @@ struct Sidebar: View {
     private func pick(_ item: MenuItem) {
         selection = item
         shut()
+        focusThePage()
+    }
+
+    /// Focus onto a page just shown, at its preferred place — the day it
+    /// shows. Left alone, the focus engine moves sideways from where the
+    /// menu row was and lands on whatever heading or game is level with it
+    /// (CI, 2026-09-28). Not on a plain shut: that keeps the place the
+    /// viewer had on the page.
+    private func focusThePage() {
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(150))
+            resetFocus(in: pageScope)
+        }
     }
 
     /// A competition opened from the front page: its own row, on the day the
@@ -163,6 +182,7 @@ struct Sidebar: View {
         guard store.leagues.contains(where: { Self.key($0) == key }) else { return }
         leagueDays[key] = day
         selection = .league(key)
+        focusThePage()
     }
 
     /// `-TVScoresLeague f1` opens that competition (CI screenshots).

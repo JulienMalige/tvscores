@@ -6,7 +6,6 @@ struct CompetitionScreen: View {
     let store: ScoreboardStore
     @State var day: Day
     @Environment(\.openMenu) private var openMenu
-    @Namespace private var page
 
     var body: some View {
         ScrollView {
@@ -22,8 +21,6 @@ struct CompetitionScreen: View {
             }
             .pageMargins()
         }
-        .focusScope(page)
-        .environment(\.pageScope, page)
         .scrollClipDisabled()
         // Back on a page opens the menu, as it does on tvOS's own sidebar.
         .onExitCommand(perform: openMenu)
