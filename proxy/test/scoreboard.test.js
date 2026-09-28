@@ -146,3 +146,12 @@ test("every configured competition has a dark #RRGGBB colour", async () => {
     assert.ok((1.05) / (lum + 0.05) >= 7, `${l.name} too light for white text`);
   }
 });
+
+test("a game to come carries both sides' records from the table", () => {
+  const now = Date.UTC(2026, 8, 28, 12);
+  const leagues = { nfl: [{ id: 4391, name: "NFL", short: "NFL" }] };
+  const game = { id: "nfl:1", sport: "nfl", kind: "match", league: { id: 4391, name: "NFL", short: "NFL" }, start: "2026-09-28T18:00:00.000Z", status: { state: "scheduled" }, home: { name: "Colts", short: "IND" }, away: { name: "Commanders", short: "WAS" }, score: {} };
+  const standings = { "nfl:4391": { tables: [{ id: "afc", columns: ["w", "l", "t", "pct"], rows: [{ name: "Colts", cells: ["1", "2", "0", ".333"] }] }] } };
+  const sb = buildScoreboard([game], { now, leagues, standings });
+  assert.deepEqual(sb.days.today[0].events[0].records, { home: "1-2", away: undefined });
+});

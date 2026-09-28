@@ -84,8 +84,16 @@ struct HomeScreen: View {
                 EmptyDay(day: day)
             } else {
                 LazyVStack(alignment: .leading, spacing: Metrics.sectionGap) {
-                    ForEach(groups) { group in
-                        LeagueSection(group: group, day: day, now: board.generatedAt, openLeague: openLeague)
+                    if day == .upcoming {
+                        ForEach(LeagueGroup.byDay(groups), id: \.day) { entry in
+                            DaySection(day: entry.day, groups: entry.groups) { group in
+                                LeagueSection(group: group, day: day, now: board.generatedAt, openLeague: openLeague)
+                            }
+                        }
+                    } else {
+                        ForEach(groups) { group in
+                            LeagueSection(group: group, day: day, now: board.generatedAt, openLeague: openLeague)
+                        }
                     }
                 }
                 .padding(.top, 4)

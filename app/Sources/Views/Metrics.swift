@@ -68,6 +68,8 @@ enum Metrics {
     static let cardGap: CGFloat = 26
     /// Competition marks are wordmarks as often as badges, so they get width.
     static let leagueMark: CGFloat = 52
+    /// The same over a list of games, about half a team's crest.
+    static let leagueMarkSmall: CGFloat = 34
     /// A pill of a switch, the size of the Apple TV app's season pills.
     static let pillInsetV: CGFloat = 10
     static let pillInsetH: CGFloat = 26

@@ -1,5 +1,6 @@
 import { STATE } from "./model.js";
 import { photoKey } from "./photos.js";
+import { recordsFor } from "./details.js";
 
 /** Local calendar date (YYYY-MM-DD) of an instant in a time zone. */
 export function localDate(iso, tz) {
@@ -8,6 +9,7 @@ export function localDate(iso, tz) {
   const get = (t) => parts.find((p) => p.type === t).value;
   return `${get("year")}-${get("month")}-${get("day")}`;
 }
+
 
 function groupByLeague(events, sportOrder, leagues = {}, publicBase = "", standings = {}) {
   const groups = new Map();
@@ -19,7 +21,10 @@ function groupByLeague(events, sportOrder, leagues = {}, publicBase = "", standi
       const logo = cfg?.badge ? `${publicBase}/v1/assets/leagues/${cfg.badge}.png` : cfg?.logo;
       groups.set(key, { sport: e.sport, league: { ...e.league, logo, symbol: cfg?.symbol, section: cfg?.section, color: cfg?.color, hasStandings: Boolean(standings[key]) }, events: [] });
     }
-    groups.get(key).events.push(e);
+    // A game to come shows each side's record where its score will go, as
+    // Apple Sports does: "11-7-9", "1-2" (Julien, build 28).
+    const records = e.kind === "match" && e.status?.state === "scheduled" ? recordsFor(standings, e) : undefined;
+    groups.get(key).events.push(records && (records.home || records.away) ? { ...e, records } : e);
   }
   const order = (s) => (sportOrder.indexOf(s) + 1 || 99);
   return [...groups.values()]

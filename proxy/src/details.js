@@ -87,7 +87,8 @@ export function recordOf(table, row) {
   return t !== undefined && Number(t) > 0 ? `${w}-${l}-${t}` : `${w}-${l}`;
 }
 
-function recordsFor(standings, event) {
+/** Both sides' records from their competition's table, when it has them. */
+export function recordsFor(standings, event) {
   const tables = standings?.[`${event.sport}:${event.league?.id}`]?.tables || [];
   const find = (name) => {
     for (const table of tables) {

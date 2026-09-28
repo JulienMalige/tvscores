@@ -156,6 +156,8 @@ struct Event: Decodable, Identifiable, Equatable {
     let score: Score?
     /// The tournament a tennis match belongs to.
     let competition: Competition?
+    /// Each side's record from its table, for a game to come: "1-2".
+    let records: GameDetail.Records?
     // race
     let name: String?
     let circuit: String?

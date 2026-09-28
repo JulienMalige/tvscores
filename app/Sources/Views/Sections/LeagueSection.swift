@@ -82,9 +82,11 @@ struct LeagueHeader: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            LeagueMark(sport: group.sport, logo: group.league.logo, symbolName: group.league.symbol)
+            // Small, as Apple Sports sets a list's league: the games under
+            // it are what the eye is for (Julien, build 28).
+            LeagueMark(sport: group.sport, logo: group.league.logo, symbolName: group.league.symbol, height: Metrics.leagueMarkSmall)
             Text(group.league.name)
-                .font(.title3.weight(.semibold))
+                .font(.callout.weight(.semibold))
             if chevron {
                 Image(systemName: "chevron.right")
                     .font(.callout.weight(.semibold))

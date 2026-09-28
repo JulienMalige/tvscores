@@ -9,6 +9,9 @@ struct StatusLabel: View {
     /// a game's page keeps the larger size.
     var compact = false
 
+    /// Under a date heading the day is said already: the time alone.
+    @Environment(\.underDayHeading) private var underDayHeading
+
     private var mainFont: Font { compact ? .title3.weight(.semibold) : .title2.weight(.semibold) }
 
     var body: some View {
@@ -22,7 +25,7 @@ struct StatusLabel: View {
                     .font(mainFont)
                     .foregroundStyle(.secondary)
             case .scheduled:
-                if !Calendar.current.isDateInToday(start) {
+                if !underDayHeading, !Calendar.current.isDateInToday(start) {
                     Text(start, format: .dateTime.weekday(.abbreviated).day().month(.abbreviated))
                         .font(.callout)
                         .foregroundStyle(.secondary)
@@ -98,4 +101,9 @@ struct StatusLabel: View {
         guard let key = Self.detailKeys[d] else { return d }
         return String(localized: String.LocalizationValue(key))
     }
+}
+
+extension EnvironmentValues {
+    /// Rows listed under a heading naming their day ("Sat, 3 Oct").
+    @Entry var underDayHeading = false
 }

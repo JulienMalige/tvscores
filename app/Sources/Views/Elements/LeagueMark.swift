@@ -9,6 +9,9 @@ struct LeagueMark: View {
     /// A square to fit inside. Left out, the mark takes the width a wordmark
     /// needs, which is right in a heading and wrong in a list of icons.
     var square: CGFloat? = nil
+    /// The height a wordmark gets when it is not squared: the page's title
+    /// takes the full size, a list's heading less.
+    var height: CGFloat = Metrics.leagueMark
 
     var body: some View {
         Group {
@@ -18,20 +21,21 @@ struct LeagueMark: View {
                 symbol
             }
         }
-        .modifier(Box(square: square))
+        .modifier(Box(square: square, height: height))
     }
 
     /// Two shapes, one mark: a heading gives a wordmark its width; a sidebar
     /// gives every competition the same square, whatever shape its mark is.
     private struct Box: ViewModifier {
         let square: CGFloat?
+        let height: CGFloat
 
         func body(content: Content) -> some View {
             if let square {
                 content.frame(width: square, height: square)
             } else {
                 // Wide marks (F1, MotoGP, ATP) get room; square badges stay compact.
-                content.frame(maxWidth: Metrics.leagueMark * 2.5, minHeight: Metrics.leagueMark, maxHeight: Metrics.leagueMark)
+                content.frame(maxWidth: height * 2.5, minHeight: height, maxHeight: height)
             }
         }
     }

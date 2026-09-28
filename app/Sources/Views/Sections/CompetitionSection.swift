@@ -25,6 +25,12 @@ struct CompetitionSection: View {
             } else {
                 EmptyDay(day: day)
             }
+        } else if day == .upcoming {
+            ForEach(LeagueGroup.byDay(groups), id: \.day) { entry in
+                DaySection(day: entry.day, groups: entry.groups) { group in
+                    LeagueSection(group: group, day: day, now: store.board?.generatedAt ?? .now, showHeader: false, onPage: true)
+                }
+            }
         } else {
             ForEach(groups) { group in
                 LeagueSection(group: group, day: day, now: store.board?.generatedAt ?? .now, showHeader: false, onPage: true)

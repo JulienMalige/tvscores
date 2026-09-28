@@ -47,11 +47,11 @@ private struct MatchRowContent: View {
     private var line: some View {
         HStack(spacing: 0) {
             side(event.home)
-            scoreText(event.score?.home, winner: winner == .home)
+            middle(event.score?.home, record: event.records?.home, winner: winner == .home)
                 .frame(width: Metrics.matchScore, alignment: .center)
             StatusLabel(status: event.status, start: event.start, compact: true)
                 .frame(maxWidth: .infinity)
-            scoreText(event.score?.away, winner: winner == .away)
+            middle(event.score?.away, record: event.records?.away, winner: winner == .away)
                 .frame(width: Metrics.matchScore, alignment: .center)
             side(event.away)
         }
@@ -83,6 +83,20 @@ private struct MatchRowContent: View {
             }
         }
         .frame(width: Metrics.matchSide)
+    }
+
+    /// Beside the crest: the score once there is one; before, the side's
+    /// record in small grey where the score will go, as Apple Sports.
+    @ViewBuilder
+    private func middle(_ value: Int?, record: String?, winner: Bool) -> some View {
+        if event.status.state == .scheduled, let record {
+            Text(verbatim: record)
+                .font(.callout.weight(.medium))
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+        } else {
+            scoreText(value, winner: winner)
+        }
     }
 
     private func scoreText(_ value: Int?, winner: Bool) -> some View {

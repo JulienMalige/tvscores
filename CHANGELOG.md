@@ -27,6 +27,10 @@ notes when a version ships.
 - The menu chip keeps its icon only once a page is scrolled down.
 - Left on a game's page no longer opens the menu behind it.
 - Friendlies have their own mark again.
+- Upcoming is listed day by day, under "Sat, 3 Oct", each game with its
+  time alone; a game to come shows each side's record where the score will
+  go ("1-2", "11-7-9"); a list's league heading is smaller, as in Apple
+  Sports.
 
 - The WTA 1000 in Beijing is on Home and the WTA page again, each match
   with its tournament over it. The server asked the feed for every
