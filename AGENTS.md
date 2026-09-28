@@ -183,6 +183,14 @@ writes its own number is a bug, and rows all use `rowSurface(focused:)`.
   trace (`Diagnostics.swift` → `POST /v1/diag`, files under
   `~/.local/state/tvscores/traces/` on the VPS) stays until the menu has
   been used on the television.
+- **National teams, later a menu section of their own** (Julien,
+  2026-09-28: "all international principal things, like world cup, euro,
+  can etc, in a soccer nation category"). Today the Nations League and
+  the friendlies (major sides only, `teams` in `proxy/src/config.js`) sit
+  under Football. The plan: a "National teams" section with the World Cup
+  (4429), the Euro (4502), Copa América (4499), the Africa Cup of Nations
+  (4496), their qualifiers and the Nations League, each added while it is
+  on — TheSportsDB has all of them on our plan. Not scheduled yet.
 - **Table zones are ours and drift by season.** `proxy/src/config.js` encodes
   this season's formats (Champions League places, relegation, the cups' 8 and
   24). Check them against each competition's regulations every August.
