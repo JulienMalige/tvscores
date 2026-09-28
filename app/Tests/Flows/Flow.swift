@@ -53,7 +53,7 @@ enum Flow {
     static func menuIsOpen(_ app: XCUIApplication) -> Bool { menuRow(app).exists }
 
     /// Presses left until the menu opens: along the day switch to its first
-    /// pill, then onto the strip at the screen's edge.
+    /// pill, then once more, a press that finds nothing further left.
     static func openMenu(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
         for _ in 0..<6 {
             remote.press(.left)
@@ -70,9 +70,8 @@ enum Flow {
             .firstMatch
     }
 
-    /// Settles focus on the page after launch, as a person's would be: the
-    /// menu's strip only takes focus a moment after launch, and a press right
-    /// makes sure focus is on the page and not still being placed.
+    /// Settles focus on the page after launch, as a person's would be: a
+    /// press right makes sure focus is on the page and not still being placed.
     static func focusThePage() {
         // One press, not two: the second would move along the day switch
         // and pick another day, and the page under test would change.

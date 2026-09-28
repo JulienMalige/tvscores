@@ -90,6 +90,9 @@ Julien watches from Brazil (America/Sao_Paulo): capture `Resources/sample-scoreb
 - Every decision that is not derivable from the code goes into `docs/` as a dated note.
 - **Review the diff before pushing**, and fix what the review finds. Run
   `node scripts/audit.mjs`, which has to be clean.
+- **Run `/code-review` before every TestFlight build**, over everything
+  since the last build shipped (Julien, 2026-09-28: "on each release,
+  version"), and fix what it finds.
 - **Look at the CI screenshots before building for TestFlight.** The workflow
   renders the app against live data; judge the build on those images, not on
   the diff. Releases then go out through the `TestFlight` workflow.

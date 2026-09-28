@@ -76,13 +76,11 @@ with `XCUIRemote`, the only cursor a television has. Rows and sections are
 covered through the screen that shows them; they do not exist on their own.
 Both run in CI before the screenshots, on the same simulator.
 
-One thing the simulator cannot judge: whether the system sidebar stays open.
-Driven by `XCUIRemote` it shuts within a second of opening — for a bare
-three-tab `TabView` as much as for ours (settled 2026-09-17, eight CI runs
-bisecting every piece of the app). Every flow that opens the menu is a probe
-behind `TVSCORES_MENU_PROBE=1`, and the television is the judge: with the
-day switch on the page, a menu that shuts drops focus onto a segment, which
-selects it, so not even "open and pick" can be asserted there.
+The menu is ours since 2026-09-28 (`Sidebar`, `MenuPanel`), plain views, so
+its flows are real tests: opening from the day switch and from a row,
+staying open across a refresh, shutting on right and on Back, picking a
+competition low in the list. tvOS's own sidebar never stayed open under
+`XCUIRemote`, which is why those flows were probes before.
 
 ## Working on a screen
 
