@@ -262,6 +262,93 @@
       },
       "extractionState": "manual"
     },
+    "empty.today": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Events Today"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun match aujourd'hui"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum evento hoje"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin eventos hoy"
+          }
+        }
+      }
+    },
+    "empty.upcoming": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Events for 7 Days"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun match dans les 7 jours"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum evento em 7 dias"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin eventos en 7 días"
+          }
+        }
+      }
+    },
+    "empty.yesterday": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Events Yesterday"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun match hier"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum evento ontem"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin eventos ayer"
+          }
+        }
+      }
+    },
     "game.information": {
       "localizations": {
         "en": {
@@ -488,34 +575,6 @@
         }
       }
     },
-    "home.empty": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No games on this day."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucun match ce jour-là."
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nenhum jogo neste dia."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay partidos ese día."
-          }
-        }
-      }
-    },
     "home.error": {
       "localizations": {
         "en": {
@@ -628,142 +687,118 @@
         }
       }
     },
-    "offseason.date": {
+    "offseason.checkUpcoming": {
+      "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ is back on %2$@."
+            "value": "Check the schedule in Upcoming."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ reprend le %2$@."
+            "value": "Le programme est dans À venir."
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ volta em %2$@."
+            "value": "Veja a programação em Próximos."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ vuelve el %2$@."
+            "value": "Consulta el calendario en Próximos."
           }
         }
       }
     },
-    "offseason.month": {
+    "offseason.startsDate": {
+      "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ returns in %2$@."
+            "value": "%1$@ Season Starts %2$@"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ reprend en %2$@."
+            "value": "La saison %1$@ commence le %2$@"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ volta em %2$@."
+            "value": "A temporada %1$@ começa em %2$@"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ vuelve en %2$@."
+            "value": "La temporada %1$@ empieza el %2$@"
           }
         }
       }
     },
-    "offseason.monthSeason": {
+    "offseason.startsDay": {
+      "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ returns in %2$@ for the %3$@ season."
+            "value": "%1$@ Season Starts %2$@"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ reprend en %2$@ pour la saison %3$@."
+            "value": "La saison %1$@ commence %2$@"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ volta em %2$@ para a temporada %3$@."
+            "value": "A temporada %1$@ começa %2$@"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ vuelve en %2$@ para la temporada %3$@."
+            "value": "La temporada %1$@ empieza el %2$@"
           }
         }
       }
     },
-    "offseason.soonTitle": {
+    "offseason.startsMonth": {
+      "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Coming up"
+            "value": "%1$@ Season Starts in %2$@"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Prochainement"
+            "value": "La saison %1$@ commence en %2$@"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Em breve"
+            "value": "A temporada %1$@ começa em %2$@"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Próximamente"
-          }
-        }
-      }
-    },
-    "offseason.title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Offseason"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Intersaison"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fora de temporada"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fuera de temporada"
+            "value": "La temporada %1$@ empieza en %2$@"
           }
         }
       }
@@ -851,6 +886,35 @@
           "stringUnit": {
             "state": "translated",
             "value": "Diferencia"
+          }
+        }
+      }
+    },
+    "race.noSchedule": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Schedule Yet"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas encore de programme"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programação ainda não disponível"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aún sin calendario"
           }
         }
       }

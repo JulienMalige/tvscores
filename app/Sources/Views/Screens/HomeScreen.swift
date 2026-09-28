@@ -76,7 +76,7 @@ struct HomeScreen: View {
         if let board = store.board {
             let groups = board.groups(for: day)
             if groups.isEmpty {
-                EmptyDay()
+                EmptyDay(day: day)
             } else {
                 LazyVStack(alignment: .leading, spacing: Metrics.sectionGap) {
                     ForEach(groups) { group in

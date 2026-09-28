@@ -23,11 +23,8 @@ struct RaceScreen: View {
                     if let sessions = event.sessions, !sessions.isEmpty {
                         SessionSection(sessions: sessions)
                     } else {
-                        Text("home.empty")
-                            .font(.title3)
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.top, 80)
+                        EmptyDay(title: Text("race.noSchedule"), line: nil)
+                            .padding(.top, 40)
                     }
                 } else {
                     PodiumSection(results: results)

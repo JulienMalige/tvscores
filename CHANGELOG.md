@@ -16,6 +16,11 @@ notes when a version ships.
   town; on the F1 and MotoGP pages each weekend shows its schedule, every
   session with its day and time. The table sits on a panel of its own.
 - The menu shows the day and the time at its top.
+- An empty day reads as Apple Sports words it, under a day switch that
+  now stays on every competition: "No Events Today", "No Events for 7
+  Days". A competition whose new season is near says so instead —
+  "2026–2027 Season Starts Saturday", then "Check the schedule in
+  Upcoming." A break inside a season says nothing more than the empty day.
 
 - Tennis under way reaches Today again: the server had stopped asking for
   matches in progress once its list ran empty, so the Beijing matches of

@@ -71,6 +71,8 @@ struct LeagueSummary: Decodable, Equatable, Identifiable, Hashable {
 struct NextGame: Decodable, Equatable, Hashable {
     let start: Date
     let season: String?
+    /// The first game of a new season, not the next round of this one.
+    let newSeason: Bool?
 }
 
 struct LeagueRef: Hashable {

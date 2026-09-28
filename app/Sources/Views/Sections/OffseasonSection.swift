@@ -1,53 +1,51 @@
 import SwiftUI
 
-/// A competition with nothing this week, and when it is back.
-///
-/// Focusable, though there is nothing to do with it: a page that is only
-/// this card has nothing else the remote can land on, and a page with
-/// nothing to land on is a dead remote — the television's trace showed
-/// Julien quitting the app twice to get out of Copa Libertadores.
+/// A competition whose new season has not begun, in the board card's place
+/// for an empty day, as Apple Sports words it: "2026–2027 Season Starts
+/// Saturday", and "Check the schedule in Upcoming." once the first games
+/// are there. A break inside a season — the Champions League between
+/// rounds — gets the plain empty day instead; Apple says nothing there of
+/// when it is back (Julien, 2026-09-28).
 struct OffseasonSection: View {
-    let ref: LeagueRef
     let next: NextGame
-    @FocusState private var isFocused: Bool
+    let season: String
 
-    /// A break shorter than this is "coming up", with the day; longer is an
-    /// off-season, with the month. Six weeks: longer than any gap in a
-    /// season's calendar, shorter than the shortest off-season we follow.
-    private static let offseasonFrom: TimeInterval = 45 * 86400
+    /// Within the Upcoming list's reach: its games are there to look at.
+    private static let upcomingReach: TimeInterval = 7 * 86400
 
-    private var soon: Bool { next.start.timeIntervalSinceNow < Self.offseasonFrom }
-
-    var body: some View {
-        VStack(spacing: 10) {
-            Text(soon ? "offseason.soonTitle" : "offseason.title")
-                .font(.title2.weight(.bold))
-            Text(sentence)
-                .font(.title3)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+    /// The words for the season to come, for any sport, or nil for a break
+    /// inside a season. The proxy says which, from the season its games
+    /// last carried: then the feed's label, "2026–2027", or the league's
+    /// name. A feed with no seasons at all (the race calendars) counts a
+    /// gap of more than six weeks, longer than any break in a calendar we
+    /// follow, as between seasons.
+    static func season(of next: NextGame, league: String, now: Date = .now) -> String? {
+        let label = next.season?.replacingOccurrences(of: "-", with: "–")
+        switch next.newSeason {
+        case true?: return label ?? league
+        case false?: return nil
+        case nil: return next.start.timeIntervalSince(now) > 45 * 86400 ? league : nil
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 48)
-        .background(RoundedRectangle(cornerRadius: Metrics.rowRadius, style: .continuous).fill(Color.white.opacity(isFocused ? 0.1 : 0.04)))
-        .scaleEffect(isFocused ? 1.01 : 1)
-        .animation(.easeOut(duration: 0.15), value: isFocused)
-        .focusable()
-        .focused($isFocused)
-        .accessibilityIdentifier("offseason")
     }
 
-    /// "NBA returns in October for the 2026–2027 season." — or, within a
-    /// few weeks, the day itself.
-    private var sentence: String {
-        if soon {
-            let day = next.start.formatted(.dateTime.weekday(.wide).day().month(.wide))
-            return String(format: String(localized: "offseason.date"), ref.name, day)
+    private var inReach: Bool { next.start.timeIntervalSinceNow < Self.upcomingReach }
+
+    var body: some View {
+        EmptyDay(title: Text(verbatim: title), line: inReach ? Text("offseason.checkUpcoming") : nil)
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("offseason")
+    }
+
+    /// "Season Starts Saturday" within the week, "Season Starts October 21"
+    /// within six, "Season Starts in October" beyond.
+    private var title: String {
+        let gap = next.start.timeIntervalSinceNow
+        if gap < Self.upcomingReach {
+            return String(format: String(localized: "offseason.startsDay"), season, next.start.formatted(.dateTime.weekday(.wide)))
         }
-        let month = next.start.formatted(.dateTime.month(.wide))
-        if let season = next.season?.replacingOccurrences(of: "-", with: "–") {
-            return String(format: String(localized: "offseason.monthSeason"), ref.name, month, season)
+        if gap < 45 * 86400 {
+            return String(format: String(localized: "offseason.startsDate"), season, next.start.formatted(.dateTime.day().month(.wide)))
         }
-        return String(format: String(localized: "offseason.month"), ref.name, month)
+        return String(format: String(localized: "offseason.startsMonth"), season, next.start.formatted(.dateTime.month(.wide)))
     }
 }

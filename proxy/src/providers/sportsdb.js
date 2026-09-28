@@ -179,7 +179,11 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
       const { body } = await getJson(`${V1}/${key}/eventsnextleague.php?id=${id}`);
       quota.record(undefined);
       const soonest = (body?.events || []).map((r) => ({ start: startOf(r), season: r.strSeason })).filter((r) => r.start).sort((a, b) => a.start.localeCompare(b.start))[0];
-      if (soonest) next[id] = soonest;
+      // A new season when its label is not the one the league's own games
+      // last carried: the NBA's first game of 2026-2027 after 2025-2026,
+      // but not the Champions League's next round within 2026-2027 — the
+      // app says "Season Starts" only for the first (Julien, 2026-09-28).
+      if (soonest) next[id] = { ...soonest, newSeason: Boolean(soonest.season) && soonest.season !== seasons[id] };
       else delete next[id];
     }
   }

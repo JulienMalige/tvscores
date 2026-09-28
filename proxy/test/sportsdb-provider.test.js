@@ -68,7 +68,22 @@ test("the daily pass is one call per day of the window, plus one per competition
   assert.equal(days.length, 9, "yesterday, today and seven days ahead");
   assert.equal(p.dailyCost, 9, "and the scheduler is told the same number");
   assert.deepEqual([...new Set(days.map((c) => c.url.match(/d=(\d{4}-\d{2}-\d{2})/)[1]))].length, 9, "nine different dates");
-  assert.deepEqual(next, { 4332: { start: "2026-10-03T14:00:00.000Z", season: "2026-2027" } }, "when an idle competition is next on; nothing for one the feed knows nothing about");
+  assert.deepEqual(next, { 4332: { start: "2026-10-03T14:00:00.000Z", season: "2026-2027", newSeason: true } }, "when an idle competition is next on; nothing for one the feed knows nothing about");
+});
+
+test("a break inside a season is not a new season", async (t) => {
+  // The Champions League between rounds: its next game is in the season its
+  // last games carried, and the app must not say "Season Starts" for it.
+  network(t, {
+    "eventsday.php": { events: [] },
+    "eventsnextleague.php?id=4332": { events: [{ strTimestamp: "2026-10-03T14:00:00", strSeason: "2026-2027" }] },
+    "eventsnextleague.php?id=4335": { events: [{ strTimestamp: "2026-10-04T14:00:00", strSeason: "2026-2027" }] },
+  });
+  const next = {};
+  const { p } = provider({ next, seasons: { 4332: "2025-2026", 4335: "2026-2027" } });
+  await p.daily();
+  assert.equal(next[4332].newSeason, true, "2026-2027 after 2025-2026 starts a season");
+  assert.equal(next[4335].newSeason, false, "2026-2027 after 2026-2027 does not");
 });
 
 test("a competition with fixtures this week is not asked when it is next on, and forgets an old answer", async (t) => {

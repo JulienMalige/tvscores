@@ -63,13 +63,13 @@ final class LeagueScreenFlow: FlowCase {
     }
 
     func testACompetitionBetweenSeasonsSaysWhenItIsBack() {
-        // The sample's NBA is back in a fortnight, so the card says "Coming
-        // up"; further out it says "Offseason". Either way it carries the
-        // sentence with the date or the month.
+        // The sample's NBA starts its new season within the fortnight: an
+        // empty day says so, under a day switch that stays, as Apple Sports.
         let app = Flow.launch(league: "nba")
-        app.staticTexts["offseason"].firstMatch.appears(within: 10)
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'NBA'")).firstMatch.exists, "and says when it is back")
-        XCTAssertFalse(Flow.day(app, "today").exists, "no day switch: there is no day to switch to")
+        let line = app.descendants(matching: .any)["offseason"].firstMatch
+        XCTAssertTrue(line.waitForExistence(timeout: 10), "an empty day says when the season starts")
+        XCTAssertTrue(line.label.contains("Season Starts"), "in Apple's words: \(line.label)")
+        XCTAssertTrue(Flow.day(app, "today").exists, "the day switch stays")
     }
 
     func testTennisNamesItsTournamentWithItsFlag() {
