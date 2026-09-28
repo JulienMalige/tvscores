@@ -33,6 +33,7 @@ struct StandingsSection: View {
                 ProgressView()
             }
         }
+        .frame(maxWidth: .infinity, alignment: carded ? .center : .leading)
         .padding(.vertical, carded ? Metrics.cardInsetV : 0)
         .padding(.horizontal, carded ? Metrics.cardInsetH / 2 : 0)
         .background { if carded { Color.clear.gameCardSurface() } }
@@ -50,7 +51,7 @@ struct StandingsSection: View {
     }
 
     private func tabs(_ standings: Standings) -> some View {
-        Segments(selection: $table, options: standings.tables.enumerated().map { .init(value: $0.offset, title: Text(title($0.element.id))) })
+        Segments(selection: $table, options: standings.tables.enumerated().map { .init(value: $0.offset, title: Text(title($0.element.id))) }, centred: carded)
             .accessibilityIdentifier("table.switch")
     }
 
