@@ -1,5 +1,5 @@
 import { getJson } from "../http.js";
-import { STATE, flagIso3 } from "../model.js";
+import { STATE, flagIso2, flagIso3 } from "../model.js";
 
 const BASE = "https://api.livetennisapi.com/api/public/v1";
 const TOURS = {
@@ -40,7 +40,24 @@ export function setsLine(score) {
   return sets.map(([a, b]) => `${a}-${b}`).join(" ");
 }
 
-export function normaliseMatch(m) {
+/** "wta_1000" -> "WTA 1000", "grand_slam" -> "Grand Slam"; undefined when unknown. */
+export function tierLabel(tier) {
+  if (!tier) return undefined;
+  return String(tier).split("_").map((w) => (/^(atp|wta|itf)$/.test(w) ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1))).join(" ");
+}
+
+/**
+ * The tournament a match belongs to, as a heading can show it: its name,
+ * its country's flag (the proxy's flat flags, as a race weekend's), its tier
+ * and surface. The feed has no logo and no sponsor's name — the China Open
+ * is "Beijing" — so the name is the feed's own.
+ */
+function competitionOf(info) {
+  if (!info?.name) return undefined;
+  return { name: info.name, city: info.city || undefined, flag: flagIso2(info.country), tier: tierLabel(info.tier), surface: info.surface || undefined };
+}
+
+export function normaliseMatch(m, info) {
   const league = TOURS[m.tour];
   if (!league || m.is_doubles) return null;
   let state = STATE.other;
@@ -61,6 +78,7 @@ export function normaliseMatch(m) {
     start: new Date(m.scheduled_time || m.live_at || Date.now()).toISOString(),
     round: m.round,
     tournament: m.tournament,
+    competition: competitionOf(info),
     status: { state, clock: state === STATE.live && !interrupted ? liveClock(m.score) : undefined, detail, note: interrupted ? "Interrupted" : undefined },
     home: player(m.players?.p1),
     away: player(m.players?.p2),
@@ -102,29 +120,34 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
    */
   async function catalogue() {
     const held = meta.tournaments;
-    if (held && Date.now() - new Date(held.at).getTime() < CATALOGUE_TTL) return held.byId;
+    // A catalogue from before tournaments carried their details is fetched again.
+    if (held?.info && Date.now() - new Date(held.at).getTime() < CATALOGUE_TTL) return held;
     const byId = {};
+    const info = {};
     for (const tour of ["atp", "wta"]) {
       for (let offset = 0; ; ) {
         const { body } = await getJson(`${BASE}/tournaments?tour=${tour}&limit=200&offset=${offset}`, { headers });
         quota.record(undefined);
-        for (const t of body?.data || []) byId[String(t.id)] = t.category;
+        for (const t of body?.data || []) {
+          byId[String(t.id)] = t.category;
+          info[String(t.id)] = { name: t.name, city: t.city, country: t.country, tier: t.tier, surface: t.surface };
+        }
         if (!body?.meta?.has_more) break;
         offset += body.data?.length || 200;
       }
     }
-    meta.tournaments = { at: new Date().toISOString(), byId };
+    meta.tournaments = { at: new Date().toISOString(), byId, info };
     log(`GET tennis tournaments -> ${Object.keys(byId).length} catalogued`);
-    return byId;
+    return meta.tournaments;
   }
 
   async function list(status) {
     if (!key) throw new Error("Live Tennis API key missing");
-    const byId = await catalogue();
+    const { byId, info } = await catalogue();
     const { body } = await getJson(`${BASE}/matches?status=${status}&limit=200`, { headers });
     quota.record(undefined);
     const big = bigEventFilter({ byId, ...tennis });
-    const rows = (body.data || []).filter(big).map(normaliseMatch).filter(Boolean);
+    const rows = (body.data || []).filter(big).map((m) => normaliseMatch(m, info[String(m.tournament_id)])).filter(Boolean);
     log(`GET tennis ${status} -> ${body?.data?.length ?? 0} matches, ${rows.length} in ${tennis.categories.join("/")}`);
     return rows;
   }

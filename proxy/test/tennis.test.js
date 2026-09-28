@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { normaliseMatch, liveClock, setsLine, bigEventFilter } from "../src/providers/livetennis.js";
+import { normaliseMatch, liveClock, setsLine, bigEventFilter, tierLabel } from "../src/providers/livetennis.js";
 
 const raw = JSON.parse(readFileSync(new URL("./fixtures/tennis.json", import.meta.url))).data[0];
 
@@ -90,4 +90,13 @@ test("a 1000 their catalogue mislabels is pinned by id", () => {
   assert.equal(keep({ tournament_id: 1270 }), true, "and we show it anyway");
   assert.equal(keep({ tournament_id: 9004 }), false, "without letting every itf through");
   assert.equal(keep({ tournament_id: 1270, is_qualifying: true }), false, "qualifying stays out even when pinned");
+});
+
+test("a match carries its tournament: name, flag, tier and surface from the catalogue", () => {
+  const e = normaliseMatch(raw, { name: "Beijing", city: "Beijing", country: "CN", tier: "wta_1000", surface: "hard" });
+  assert.deepEqual(e.competition, { name: "Beijing", city: "Beijing", flag: "🇨🇳", tier: "WTA 1000", surface: "hard" });
+  assert.equal(normaliseMatch(raw).competition, undefined, "no catalogue entry, no heading");
+  assert.equal(tierLabel("grand_slam"), "Grand Slam");
+  assert.equal(tierLabel("atp_1000"), "ATP 1000");
+  assert.equal(tierLabel(null), undefined);
 });
