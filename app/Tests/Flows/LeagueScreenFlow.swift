@@ -72,3 +72,43 @@ final class LeagueScreenFlow: FlowCase {
         XCTAssertFalse(Flow.day(app, "today").exists, "no day switch: there is no day to switch to")
     }
 }
+
+/// Every competition's page must give the remote something to stand on.
+///
+/// A page with nothing focusable leaves focus nowhere, and from nowhere a
+/// press left goes nowhere: the menu cannot be opened and the only way out
+/// is to quit the app. The television's trace showed exactly that on Copa
+/// Libertadores between rounds (build 24): a page of a "coming up" card and
+/// no table. This walks every competition in the sample, whatever it has
+/// on — games, a table, only a card — and asks the one question.
+final class EveryPageTakesFocusFlow: FlowCase {
+
+    /// The sample's fifteen, by the id the launch argument matches on.
+    private static let competitions = [
+        ("4351", "Brasileirão"), ("4331", "Bundesliga"), ("4501", "Copa Libertadores"),
+        ("4335", "La Liga"), ("4334", "Ligue 1"), ("4328", "Premier League"),
+        ("4332", "Serie A"), ("4480", "UEFA Champions League"), ("4481", "UEFA Europa League"),
+        ("f1", "Formula 1"), ("motogp", "MotoGP"), ("atp", "ATP Tour"), ("wta", "WTA Tour"),
+        ("4387", "NBA"), ("4391", "NFL"),
+    ]
+
+    func testEveryCompetitionPageHoldsFocus() {
+        var dead: [String] = []
+        for (id, name) in Self.competitions {
+            let app = Flow.launch(league: id, ready: name)
+            Flow.focusThePage()
+            sleep(1)
+            let onPage = app.descendants(matching: .any)
+                .matching(NSPredicate(format: "hasFocus == 1 AND NOT (identifier BEGINSWITH 'tab.')"))
+                .firstMatch
+            if !onPage.exists {
+                Flow.reportFocus(app, "on \(name)'s page")
+                dead.append(name)
+            } else {
+                print("TREE| \(name): focus on \(onPage.identifier.isEmpty ? onPage.label : onPage.identifier)")
+            }
+            app.terminate()
+        }
+        XCTAssertEqual(dead, [], "pages where nothing can take focus, so left cannot open the menu")
+    }
+}
