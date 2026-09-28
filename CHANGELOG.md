@@ -8,6 +8,26 @@ notes when a version ships.
 
 ## Unreleased
 
+- Each competition's page takes its colour, as in Apple Sports — purple
+  for the Premier League and the WTA, blue for the NBA, black for F1 — and
+  Home is green. The panels take a darker shade of it.
+- Tennis adds the ATP 500s and WTA 500s, and each tournament has its own
+  name and dates: "China Open, 30 Sep – 11 Oct · Beijing, China".
+- A tennis match's page shows the tour's ranking with both players
+  picked out.
+- A game's page keeps room for its statistics while they come, and the
+  two sides' colours no longer look alike (no more red against red).
+- Scores are set in the same tall figures on the lists as on a game's
+  page; "Final" and the kickoff are smaller beside them.
+- A game long past its start with no news says "Awaiting result" instead
+  of a time that looked still to come.
+- The highlighted row stands clear of the lines between rows, and white
+  logos get a thin outline on it.
+- Opening a page puts the remote on its day at once, without a jump.
+- The menu chip keeps its icon only once a page is scrolled down.
+- Left on a game's page no longer opens the menu behind it.
+- Friendlies have their own mark again.
+
 - The WTA 1000 in Beijing is on Home and the WTA page again, each match
   with its tournament over it. The server asked the feed for every
   upcoming match and got the first 200 — small tournaments filled them.

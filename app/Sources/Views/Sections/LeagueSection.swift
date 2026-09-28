@@ -14,6 +14,8 @@ struct LeagueSection: View {
     /// a centred heading, as Apple Sports' league page. The front page keeps
     /// it compact, a grey line over each row naming where it is.
     var onPage = false
+    /// The row the remote is on, for the lines either side of it.
+    @FocusState private var focusedRow: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: Metrics.headingGap) {
@@ -50,11 +52,22 @@ struct LeagueSection: View {
                 }
                 VStack(spacing: 0) {
                     ForEach(Array(run.events.enumerated()), id: \.element.id) { i, event in
-                        if i > 0 { RowRule() }
-                        switch event.kind {
-                        case .match: MatchRow(event: event)
-                        case .race: RaceRow(event: event, day: day, now: now, onPage: onPage)
+                        // The line between two rows goes while either is lit,
+                        // and the lit row sits over its neighbours: it grows
+                        // under focus, and a line drawn over it crossed its
+                        // white (Julien, build 28).
+                        if i > 0 {
+                            RowRule()
+                                .opacity(focusedRow == event.id || focusedRow == run.events[i - 1].id ? 0 : 1)
                         }
+                        Group {
+                            switch event.kind {
+                            case .match: MatchRow(event: event)
+                            case .race: RaceRow(event: event, day: day, now: now, onPage: onPage)
+                            }
+                        }
+                        .focused($focusedRow, equals: event.id)
+                        .zIndex(focusedRow == event.id ? 1 : 0)
                     }
                 }
             }
