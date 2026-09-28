@@ -47,13 +47,16 @@ struct Segments<Value: Hashable>: View {
             // 2026-09-28: "yesterday is focused when in fact today is active").
             .defaultFocus($focused, options.firstIndex { $0.value == selection })
             // The hint above is not enough for a page made as the menu shuts:
-            // the engine has already chosen the first pill by then (CI,
-            // 2026-09-28). So the day switch says where to start, once —
-            // coming back from a race keeps focus on the race's row.
+            // the engine has already put focus on the first pill by then
+            // (CI, 2026-09-28). So the day switch moves it to the chosen
+            // pill — but only if focus is still on one of its own pills. Any
+            // move the viewer made in the meantime (down to a row, left into
+            // the menu, back to a race's row) is left alone.
             .task {
                 guard claimsFocus, !claimed else { return }
                 claimed = true
                 try? await Task.sleep(for: .milliseconds(450))
+                guard !Task.isCancelled, focused != nil else { return }
                 focused = options.firstIndex { $0.value == selection }
             }
             Spacer()
