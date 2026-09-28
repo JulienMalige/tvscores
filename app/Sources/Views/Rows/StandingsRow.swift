@@ -5,12 +5,14 @@ struct StandingsRow: View {
     let entry: StandingsEntry
     /// One of the two teams of the game whose page this table is on.
     var highlighted = false
+    /// On a game card's panel: lines without a card each, as Apple Sports.
+    var plain = false
 
     var body: some View {
         Button {
             // A driver or team page comes later.
         } label: {
-            StandingsRowContent(entry: entry, highlighted: highlighted)
+            StandingsRowContent(entry: entry, highlighted: highlighted, plain: plain)
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("standing.\(entry.pos)")
@@ -20,6 +22,7 @@ struct StandingsRow: View {
 private struct StandingsRowContent: View {
     let entry: StandingsEntry
     let highlighted: Bool
+    let plain: Bool
     @Environment(\.isFocused) private var isFocused
 
     var body: some View {
@@ -55,7 +58,7 @@ private struct StandingsRowContent: View {
                     .monospacedDigit()
             }
         }
-        .rowSurface(focused: isFocused)
+        .rowSurface(focused: isFocused, resting: plain ? 0 : 0.04)
         // A game's two sides, a shade lighter, as Apple Sports picks them out.
         .background(
             RoundedRectangle(cornerRadius: Metrics.rowRadius, style: .continuous)

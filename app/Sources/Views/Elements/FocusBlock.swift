@@ -7,7 +7,8 @@ import SwiftUI
 struct FocusBlock<Content: View>: View {
     var identifier: String = ""
     /// False for a block that sits on the page's tint, as a game's header:
-    /// no panel, and only a faint one under focus.
+    /// no panel, focused or not. It is there to hold the remote, not to be
+    /// chosen, and Apple Sports draws nothing round it.
     var surface = true
     @ViewBuilder var content: () -> Content
     @FocusState private var isFocused: Bool
@@ -32,11 +33,6 @@ private struct Surface: ViewModifier {
         } else {
             content
                 .padding(.vertical, Metrics.rowInsetV)
-                .background(
-                    RoundedRectangle(cornerRadius: Metrics.cardRadius, style: .continuous)
-                        .fill(Color.white.opacity(focused ? 0.08 : 0))
-                )
-                .animation(.easeOut(duration: 0.15), value: focused)
         }
     }
 }

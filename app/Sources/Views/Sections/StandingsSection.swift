@@ -73,7 +73,7 @@ struct StandingsSection: View {
                     .padding(.top, i == 0 ? 0 : Metrics.headingGap)
                     .padding(.trailing, Metrics.rowInsetH)
                 }
-                StandingsRow(entry: entry, highlighted: highlight.contains(entry.name))
+                StandingsRow(entry: entry, highlighted: highlight.contains(entry.name), plain: carded)
                 if let line = table.lines?.first(where: { $0.after == entry.pos && entry.section == nil }) {
                     cut(line.line)
                 }

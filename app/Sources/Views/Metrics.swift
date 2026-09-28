@@ -91,13 +91,13 @@ enum Metrics {
 extension View {
     /// The card a row sits on. tvOS says "this one" by lightening and lifting
     /// it, and every row in the app says it the same way and at the same size.
-    func rowSurface(focused: Bool) -> some View {
+    func rowSurface(focused: Bool, resting: Double = 0.04) -> some View {
         self
             .padding(.vertical, Metrics.rowInsetV)
             .padding(.horizontal, Metrics.rowInsetH)
             .background(
                 RoundedRectangle(cornerRadius: Metrics.rowRadius, style: .continuous)
-                    .fill(Color.white.opacity(focused ? 0.14 : 0.04))
+                    .fill(Color.white.opacity(focused ? 0.14 : resting))
             )
             .scaleEffect(focused ? 1.02 : 1)
             .animation(.easeOut(duration: 0.15), value: focused)
