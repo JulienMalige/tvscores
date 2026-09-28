@@ -20,11 +20,13 @@ struct Segments<Value: Hashable>: View {
 
     @Binding var selection: Value
     let options: [Option]
+    /// The pill the remote is on, by position.
+    @FocusState private var focused: Int?
 
     var body: some View {
         HStack {
             HStack(spacing: Metrics.pillGap) {
-                ForEach(Array(options.enumerated()), id: \.offset) { _, option in
+                ForEach(Array(options.enumerated()), id: \.offset) { index, option in
                     Button {
                         selection = option.value
                     } label: {
@@ -32,8 +34,13 @@ struct Segments<Value: Hashable>: View {
                     }
                     .buttonStyle(.borderless)
                     .focusEffectDisabled()
+                    .focused($focused, equals: index)
                 }
             }
+            // Focus arriving on the switch lands on the pill chosen, not the
+            // first: a page opened on Today starts on Today (Julien,
+            // 2026-09-28: "yesterday is focused when in fact today is active").
+            .defaultFocus($focused, options.firstIndex { $0.value == selection })
             Spacer()
         }
     }

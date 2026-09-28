@@ -66,7 +66,7 @@ final class NavigationFlow: FlowCase {
         app.buttons["AFC"].firstMatch.appears(within: 10)
         XCTAssertFalse(Flow.menuIsOpen(app), "the menu shut")
         sleep(1)
-        XCTAssertTrue(Flow.focusOnPage(app).exists, "focus is on NFL's page")
+        XCTAssertTrue(Flow.day(app, "today").hasFocus, "focus is on NFL's page, on the day it shows, not the first pill")
         Flow.openMenu(app)
         XCTAssertTrue(nfl.hasFocus, "and left opens the menu again, on NFL")
     }
