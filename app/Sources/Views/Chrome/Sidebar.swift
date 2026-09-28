@@ -66,10 +66,14 @@ struct Sidebar: View {
             // nowhere, and which way it was headed. An invisible strip along
             // the edge for focus to land on was tried first; the focus
             // engine would not take it (CI, 2026-09-28).
+            // The same notice shuts it: a press right from a row with
+            // nothing beside it on the page (Home, at the top) goes nowhere,
+            // and tvOS's own sidebar shuts on any press right.
             for await note in NotificationCenter.default.notifications(named: UIFocusSystem.movementDidFailNotification) {
                 guard let context = note.userInfo?[UIFocusSystem.focusUpdateContextUserInfoKey] as? UIFocusUpdateContext,
-                      context.focusHeading.contains(.left), !expanded, !moving else { continue }
-                openMenu()
+                      !moving else { continue }
+                if context.focusHeading.contains(.left), !expanded { openMenu() }
+                if context.focusHeading.contains(.right), expanded { shut() }
             }
         }
         .task {
