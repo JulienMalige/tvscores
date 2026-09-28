@@ -20,9 +20,8 @@ struct Segments<Value: Hashable>: View {
 
     @Binding var selection: Value
     let options: [Option]
-    /// Takes focus onto the chosen pill when the switch first appears — for
-    /// the day switch at the top of a page, which is where a page should
-    /// start. Never for a switch further down: it would pull focus away.
+    /// Sends focus arriving for the first time to the chosen pill — for the
+    /// day switch at the top of a page, which is where a page should start.
     var claimsFocus = false
     /// The pill the remote is on, by position.
     @FocusState private var focused: Int?
@@ -47,17 +46,17 @@ struct Segments<Value: Hashable>: View {
             // 2026-09-28: "yesterday is focused when in fact today is active").
             .defaultFocus($focused, options.firstIndex { $0.value == selection })
             // The hint above is not enough for a page made as the menu shuts:
-            // the engine has already put focus on the first pill by then
-            // (CI, 2026-09-28). So the day switch moves it to the chosen
-            // pill — but only if focus is still on one of its own pills. Any
-            // move the viewer made in the meantime (down to a row, left into
-            // the menu, back to a race's row) is left alone.
-            .task {
-                guard claimsFocus, !claimed else { return }
+            // the engine puts focus on the first pill on its own, and later
+            // than any fixed wait (CI, 2026-09-28). So the day switch watches
+            // for focus arriving: the first time it does, on a pill other
+            // than the chosen one, it moves to the chosen one. Only that
+            // first arrival — a move along the pills after it is the viewer's.
+            .onChange(of: focused) { old, new in
+                guard claimsFocus, !claimed, old == nil, let new else { return }
                 claimed = true
-                try? await Task.sleep(for: .milliseconds(450))
-                guard !Task.isCancelled, focused != nil else { return }
-                focused = options.firstIndex { $0.value == selection }
+                if let chosen = options.firstIndex(where: { $0.value == selection }), chosen != new {
+                    focused = chosen
+                }
             }
             Spacer()
         }
