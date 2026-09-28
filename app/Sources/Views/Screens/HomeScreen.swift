@@ -24,6 +24,8 @@ struct HomeScreen: View {
                 }
                 .pageMargins()
             }
+            // Set inside the stack, so a race pushed over Home keeps its own page.
+            .pageTint(.homeTint)
             // Back on the page opens the menu, as on tvOS's own sidebar; a
             // race pushed over it takes Back for itself first.
             .onExitCommand(perform: openMenu)

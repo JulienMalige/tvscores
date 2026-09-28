@@ -52,6 +52,9 @@ export const config = {
   /**
    * Which competitions to keep, per provider. `badge` names a trimmed PNG in
    * proxy/assets/leagues (built by scripts/build-badges.py) served by this proxy.
+   * `color` tints the competition's page, chosen by hand from its own brand
+   * the way Apple Sports does (WTA purple, NBA blue, F1 black) rather than
+   * read off the logo, and dark enough to sit behind white text on a TV.
    */
   leagues: {
     /**
@@ -65,34 +68,34 @@ export const config = {
     // coefficient place or a cup winner can shift these by one, and the
     // table is a guide, not the regulations).
     football: [
-      { id: 4328, name: "Premier League", short: "PL", badge: "epl", zones: EUROPE_20 },
-      { id: 4335, name: "La Liga", short: "LIGA", badge: "laliga", zones: EUROPE_20 },
-      { id: 4332, name: "Serie A", short: "SA", badge: "seriea", zones: EUROPE_20 },
-      { id: 4331, name: "Bundesliga", short: "BUN", badge: "bundesliga", zones: EUROPE_18 },
-      { id: 4334, name: "Ligue 1", short: "L1", badge: "ligue1", zones: EUROPE_18 },
+      { id: 4328, name: "Premier League", short: "PL", color: "#37003c", badge: "epl", zones: EUROPE_20 },
+      { id: 4335, name: "La Liga", short: "LIGA", color: "#1a1a1a", badge: "laliga", zones: EUROPE_20 },
+      { id: 4332, name: "Serie A", short: "SA", color: "#0b2a5b", badge: "seriea", zones: EUROPE_20 },
+      { id: 4331, name: "Bundesliga", short: "BUN", color: "#8c0a14", badge: "bundesliga", zones: EUROPE_18 },
+      { id: 4334, name: "Ligue 1", short: "L1", color: "#151515", badge: "ligue1", zones: EUROPE_18 },
       // `menu` is the name where a sidebar row is too narrow for the full one.
       // tvOS lays those rows out itself and wraps rather than truncating, so a
       // long name costs a second line; this is cheaper than fighting it.
       // The feed has results for the cups but no table, so theirs is built
       // from the league phase: the games from September, since the feed
       // numbers the qualifiers 1 to 3 and the play-off 0 (knockouts are 100+).
-      { id: 4480, name: "UEFA Champions League", menu: "Champions League", short: "UCL", badge: "ucl", table: { rounds: [1, 99], after: "09-01", scoring: "points" }, zones: LEAGUE_PHASE },
-      { id: 4481, name: "UEFA Europa League", menu: "Europa League", short: "UEL", badge: "uel", table: { rounds: [1, 99], after: "09-01", scoring: "points" }, zones: LEAGUE_PHASE },
-      { id: 4501, name: "Copa Libertadores", short: "LIB", badge: "libertadores" },
+      { id: 4480, name: "UEFA Champions League", menu: "Champions League", short: "UCL", color: "#0d1b4c", badge: "ucl", table: { rounds: [1, 99], after: "09-01", scoring: "points" }, zones: LEAGUE_PHASE },
+      { id: 4481, name: "UEFA Europa League", menu: "Europa League", short: "UEL", color: "#7a3400", badge: "uel", table: { rounds: [1, 99], after: "09-01", scoring: "points" }, zones: LEAGUE_PHASE },
+      { id: 4501, name: "Copa Libertadores", short: "LIB", color: "#3a2e0c", badge: "libertadores" },
       // National teams (Julien, 2026-09-28: "nations leagues or brazilian
       // national games"), in the menu's International section after
       // Football's clubs. The friendlies feed also carries youth sides —
       // "England U19 vs Norway U19" — which `seniorOnly` leaves out.
-      { id: 4490, name: "UEFA Nations League", menu: "Nations League", short: "UNL", section: "international", logo: "https://r2.thesportsdb.com/images/media/league/badge/cwsp321698386224.png" },
+      { id: 4490, name: "UEFA Nations League", menu: "Nations League", short: "UNL", color: "#0f2a4a", section: "international", logo: "https://r2.thesportsdb.com/images/media/league/badge/cwsp321698386224.png" },
       // A globe, not the feed's badge: a wordmark too thin to read as an icon.
-      { id: 4562, name: "International Friendlies", menu: "Friendlies", short: "INT", section: "international", symbol: "globe", seniorOnly: true, seasonless: true,
+      { id: 4562, name: "International Friendlies", menu: "Friendlies", short: "INT", color: "#1c3552", section: "international", symbol: "globe", seniorOnly: true, seasonless: true,
         // Every national side plays friendlies, Cook Islands v Tahiti too:
         // a game is kept when one side is a team people tune in for.
         teams: ["Brazil", "Argentina", "Uruguay", "Colombia", "Chile", "Ecuador", "Paraguay", "Peru",
           "France", "England", "Spain", "Germany", "Portugal", "Italy", "Netherlands", "Belgium", "Croatia",
           "Switzerland", "Denmark", "Norway", "Austria", "Poland", "Sweden", "Scotland",
           "USA", "Mexico", "Canada", "Japan", "South Korea", "Australia", "Morocco", "Senegal", "Nigeria", "Egypt"] },
-      { id: 4351, name: "Brasileirão", short: "BRA", badge: "brasileirao", zones: [
+      { id: 4351, name: "Brasileirão", short: "BRA", color: "#0a3f7a", badge: "brasileirao", zones: [
         { from: 1, to: 4, key: "libertadores", line: "solid" },
         { from: 5, to: 6, key: "libertadores-qualifying" },
         { from: 7, to: 12, key: "sudamericana", line: "solid" },
@@ -102,13 +105,13 @@ export const config = {
     // Records built from results, split by conference (src/divisions.js):
     // the NFL's regular season is rounds 1 to 18, preseason and playoffs
     // sit at 500 and 150+; the NBA numbers every regular-season game 0.
-    nfl: [{ id: 4391, name: "NFL", short: "NFL", badge: "nfl", table: { rounds: [1, 18], scoring: "record", groups: "nfl" } }],
-    nba: [{ id: 4387, name: "NBA", short: "NBA", badge: "nba", table: { rounds: [0, 0], scoring: "record", groups: "nba" } }],
-    f1: [{ id: "f1", name: "Formula 1", short: "F1", badge: "f1" }],
-    motogp: [{ id: "motogp", name: "MotoGP", short: "MotoGP", badge: "motogp" }],
+    nfl: [{ id: 4391, name: "NFL", short: "NFL", color: "#013369", badge: "nfl", table: { rounds: [1, 18], scoring: "record", groups: "nfl" } }],
+    nba: [{ id: 4387, name: "NBA", short: "NBA", color: "#1d428a", badge: "nba", table: { rounds: [0, 0], scoring: "record", groups: "nba" } }],
+    f1: [{ id: "f1", name: "Formula 1", short: "F1", color: "#151515", badge: "f1" }],
+    motogp: [{ id: "motogp", name: "MotoGP", short: "MotoGP", color: "#1a1a1a", badge: "motogp" }],
     tennis: [
-      { id: "atp", name: "ATP Tour", short: "ATP", badge: "atp" },
-      { id: "wta", name: "WTA Tour", short: "WTA", badge: "wta" },
+      { id: "atp", name: "ATP Tour", short: "ATP", color: "#1f4a5c", badge: "atp" },
+      { id: "wta", name: "WTA Tour", short: "WTA", color: "#3d1a6e", badge: "wta" },
     ],
   },
   /**

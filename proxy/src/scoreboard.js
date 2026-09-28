@@ -17,7 +17,7 @@ function groupByLeague(events, sportOrder, leagues = {}, publicBase = "", standi
       // League logo comes from config at serve time so cached events need no refresh.
       const cfg = (leagues[e.sport] || []).find((l) => String(l.id) === String(e.league.id));
       const logo = cfg?.badge ? `${publicBase}/v1/assets/leagues/${cfg.badge}.png` : cfg?.logo;
-      groups.set(key, { sport: e.sport, league: { ...e.league, logo, symbol: cfg?.symbol, section: cfg?.section, hasStandings: Boolean(standings[key]) }, events: [] });
+      groups.set(key, { sport: e.sport, league: { ...e.league, logo, symbol: cfg?.symbol, section: cfg?.section, color: cfg?.color, hasStandings: Boolean(standings[key]) }, events: [] });
     }
     groups.get(key).events.push(e);
   }
@@ -71,6 +71,8 @@ function everyLeague(sportOrder, leagues = {}, publicBase = "", standings = {}, 
         // the menu section it goes in when not its sport's own.
         symbol: cfg.symbol,
         section: cfg.section,
+        // The page's tint, the competition's own brand colour.
+        color: cfg.color,
         hasStandings: Boolean(standings[key]),
         playing: playing.has(key),
         // While playing, only what the daily pass learned before the games

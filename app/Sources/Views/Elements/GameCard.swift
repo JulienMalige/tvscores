@@ -27,11 +27,30 @@ struct GameCard<Content: View>: View {
 extension View {
     /// The panel under a game card, and under a game page's table.
     func gameCardSurface(lit: Bool = false) -> some View {
-        self
-            .background(
-                RoundedRectangle(cornerRadius: Metrics.cardRadius, style: .continuous)
-                    .fill(Color.white.opacity(lit ? 0.16 : 0.07))
-            )
+        modifier(GameCardSurface(lit: lit))
+    }
+}
+
+/// On a plain page, white at 7%: a shade lighter than the dark. On a tinted
+/// one, a deeper shade of the page's own hue, a little translucent, as Apple
+/// Sports draws its panels — navy on the NBA's page, dark green on Home. The
+/// faint white over it keeps a panel visible on the near-black pages (F1, La
+/// Liga), where a darker shade of the page alone would vanish into it.
+private struct GameCardSurface: ViewModifier {
+    let lit: Bool
+    @Environment(\.pageTint) private var tint
+
+    func body(content: Content) -> some View {
+        content
+            .background {
+                let shape = RoundedRectangle(cornerRadius: Metrics.cardRadius, style: .continuous)
+                if let tint {
+                    shape.fill(tint.mix(with: .black, by: 0.4).opacity(0.8))
+                        .overlay(shape.fill(Color.white.opacity(lit ? 0.12 : 0.04)))
+                } else {
+                    shape.fill(Color.white.opacity(lit ? 0.16 : 0.07))
+                }
+            }
             .overlay(
                 RoundedRectangle(cornerRadius: Metrics.cardRadius, style: .continuous)
                     .stroke(Color.white.opacity(0.1), lineWidth: 1)

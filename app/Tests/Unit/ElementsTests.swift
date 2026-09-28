@@ -125,4 +125,18 @@ struct ElementsTests {
         #expect(Flags.icon(for: "🇪🇸")?.path.hasSuffix("/v1/assets/flags/es.png") == true)
         #expect(Flags.icon(for: nil) == nil)
     }
+
+    // MARK: PageTint
+
+    @Test("every competition in the sample carries a colour its page can be tinted with")
+    func competitionsHaveTints() throws {
+        let url = try #require(Bundle.main.url(forResource: "sample-scoreboard", withExtension: "json"))
+        let board = try ScoreboardDecoder.make().decode(Scoreboard.self, from: Data(contentsOf: url))
+        for league in board.leagues {
+            #expect(Color(hex: LeagueRef(league).color) != nil, "\(league.name)")
+        }
+        for group in Day.allCases.flatMap({ board.groups(for: $0) }) {
+            #expect(Color(hex: LeagueRef(group: group).color) != nil, "\(group.id) from a day's group")
+        }
+    }
 }
