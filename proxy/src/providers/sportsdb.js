@@ -126,6 +126,11 @@ export function datesAround({ back, ahead }, now = new Date()) {
   return out;
 }
 
+/** A youth or women's side, by the name the feed gives it: "Serbia U19", "Brazil Women". */
+export function isYouth(r) {
+  return [r.strHomeTeam, r.strAwayTeam].some((n) => /\bU-?\d{2}\b|\bWomen\b/i.test(n || ""));
+}
+
 /**
  * A team sport from TheSportsDB: one call per day of the window, filtered to
  * the competitions we show. The paid key returns up to 1,500 events for a
@@ -136,7 +141,12 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
   const { feed, live: livePath } = SPORTS[sport];
   const byId = new Map(leagues.map((l) => [String(l.id), l]));
   const mine = (rows) => {
-    const keep = rows.filter((r) => byId.has(String(r.idLeague)));
+    const keep = rows.filter((r) => {
+      const league = byId.get(String(r.idLeague));
+      if (!league) return false;
+      if (league.seniorOnly && isYouth(r)) return false;
+      return !league.teams || league.teams.includes(r.strHomeTeam) || league.teams.includes(r.strAwayTeam);
+    });
     // Every fixture names its own season, so the table lookup never needs a
     // call of its own — nor a hardcoded year that goes stale each August.
     for (const r of keep) if (r.strSeason) seasons[String(r.idLeague)] = r.strSeason;

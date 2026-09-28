@@ -79,6 +79,17 @@ export const config = {
       { id: 4480, name: "UEFA Champions League", menu: "Champions League", short: "UCL", badge: "ucl", table: { rounds: [1, 99], after: "09-01", scoring: "points" }, zones: LEAGUE_PHASE },
       { id: 4481, name: "UEFA Europa League", menu: "Europa League", short: "UEL", badge: "uel", table: { rounds: [1, 99], after: "09-01", scoring: "points" }, zones: LEAGUE_PHASE },
       { id: 4501, name: "Copa Libertadores", short: "LIB", badge: "libertadores" },
+      // National teams (Julien, 2026-09-28: "nations leagues or brazilian
+      // national games"). The friendlies feed also carries youth sides —
+      // "England U19 vs Norway U19" — which `seniorOnly` leaves out.
+      { id: 4490, name: "UEFA Nations League", menu: "Nations League", short: "UNL", logo: "https://r2.thesportsdb.com/images/media/league/badge/cwsp321698386224.png" },
+      { id: 4562, name: "International Friendlies", menu: "Friendlies", short: "INT", logo: "https://r2.thesportsdb.com/images/media/league/badge/pdnktx1648659448.png", seniorOnly: true,
+        // Every national side plays friendlies, Cook Islands v Tahiti too:
+        // a game is kept when one side is a team people tune in for.
+        teams: ["Brazil", "Argentina", "Uruguay", "Colombia", "Chile", "Ecuador", "Paraguay", "Peru",
+          "France", "England", "Spain", "Germany", "Portugal", "Italy", "Netherlands", "Belgium", "Croatia",
+          "Switzerland", "Denmark", "Norway", "Austria", "Poland", "Sweden", "Scotland",
+          "USA", "Mexico", "Canada", "Japan", "South Korea", "Australia", "Morocco", "Senegal", "Nigeria", "Egypt"] },
       { id: 4351, name: "Brasileirão", short: "BRA", badge: "brasileirao", zones: [
         { from: 1, to: 4, key: "libertadores", line: "solid" },
         { from: 5, to: 6, key: "libertadores-qualifying" },

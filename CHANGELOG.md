@@ -8,6 +8,9 @@ notes when a version ships.
 
 ## Unreleased
 
+- National teams: the UEFA Nations League, and friendlies with a side
+  people tune in for — Brazil, Argentina, France, England, the USA and
+  others. Each has its place in the menu under Football.
 - Home and each competition look like Apple Sports: the day switch sits
   on top of one panel holding the games, with thin lines between them. On
   Home, a race weekend is one line, "Bahrain · Qualifying" over the time,

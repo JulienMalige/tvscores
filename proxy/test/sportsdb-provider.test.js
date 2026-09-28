@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { sportsDbSport } from "../src/providers/sportsdb.js";
+import { isYouth, sportsDbSport } from "../src/providers/sportsdb.js";
 
 const football = JSON.parse(readFileSync(new URL("./fixtures/sportsdb-football.json", import.meta.url))).events;
 const SERIE_A = { id: 4332, name: "Serie A", short: "SA" };
@@ -176,4 +176,20 @@ test("a competition the feed has no table for gets one built from its season's r
   assert.equal(tables[4480].tables[0].rows[0].name, "Inter");
   assert.ok(calls.some((c) => c.url.includes("eventsseason.php?id=4480")), "the season, not the table, was asked for");
   assert.ok(!calls.some((c) => c.url.includes("lookuptable.php?l=4480")), "and the table endpoint was not");
+});
+
+test("friendlies keep the senior sides only", () => {
+  assert.equal(isYouth({ strHomeTeam: "England U19", strAwayTeam: "Norway U19" }), true);
+  assert.equal(isYouth({ strHomeTeam: "Netherlands U-17", strAwayTeam: "United States U-17" }), true);
+  assert.equal(isYouth({ strHomeTeam: "Brazil Women", strAwayTeam: "Spain Women" }), true);
+  assert.equal(isYouth({ strHomeTeam: "Australia", strAwayTeam: "Brazil" }), false);
+});
+
+test("a league with a team list keeps a game only when one side is on it", async (t) => {
+  const FRIENDLIES = { id: 4562, name: "International Friendlies", short: "INT", seniorOnly: true, teams: ["Brazil"] };
+  const row = (home, away, id) => ({ idEvent: id, idLeague: "4562", strHomeTeam: home, strAwayTeam: away, strTimestamp: "2026-09-29T10:00:00", strStatus: "NS", strSeason: "2026" });
+  network(t, { "eventsday.php": { events: [row("Australia", "Brazil", "1"), row("Cook Islands", "Tahiti", "2"), row("Brazil U20", "Chile U20", "3")] }, "eventsnextleague.php": null });
+  const p = sportsDbSport({ sport: "football", key: "k", leagues: [FRIENDLIES], window: { back: 0, ahead: 0 }, quota: { record() {} } });
+  const ids = (await p.byDate("2026-09-29")).map((e) => e.id);
+  assert.equal(ids.length, 1, `only Australia v Brazil: ${ids}`);
 });
