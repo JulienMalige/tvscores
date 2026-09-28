@@ -51,7 +51,7 @@ enum Flow {
     /// A row of the menu, as the tree reports it. Collapsed, the sidebar still
     /// lists every row — disabled, at 0×0 — so `exists` says nothing about
     /// whether the menu is open. A row that is open has a frame.
-    static func menuRow(_ app: XCUIApplication, _ name: String = "Formula 1") -> XCUIElement { app.buttons[name].firstMatch }
+    static func menuRow(_ app: XCUIApplication, _ name: String = "Motorsport") -> XCUIElement { app.buttons[name].firstMatch }
     static func menuIsOpen(_ app: XCUIApplication) -> Bool {
         let row = menuRow(app)
         return row.exists && row.frame.width > 0 && row.isEnabled

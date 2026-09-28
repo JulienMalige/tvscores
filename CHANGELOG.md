@@ -8,6 +8,12 @@ notes when a version ships.
 
 ## Unreleased
 
+- The menu now has five entries: Home, Football, Motorsport, US sports and
+  Tennis. Each sport's page opens on All, every competition of that sport
+  for the day; a switch above the days picks one competition, with its
+  table. This is what makes the menu open every time: Apple's sidebar
+  loses its place with more than seven entries, and ours had sixteen.
+
 - A competition between rounds — Copa Libertadores this week — no longer
   leaves the remote dead: its "coming up" card takes focus, so left opens
   the menu as anywhere else.

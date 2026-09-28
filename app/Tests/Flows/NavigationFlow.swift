@@ -121,11 +121,11 @@ final class NavigationFlow: FlowCase {
         try probeOnly()
         let app = Flow.launch(league: "f1")
         app.buttons["Drivers"].firstMatch.appears(within: 10)
-        // The rows between Formula 1 and Home, counted from the collapsed tree
+        // The rows between Motorsport and Home, counted from the collapsed tree
         // as the selection flow does — a system row reports no focus.
         let order = app.buttons.allElementsBoundByIndex.map(\.label)
-        guard let home = order.firstIndex(of: "Home"), let f1 = order.firstIndex(of: "Formula 1"), f1 > home else {
-            return XCTFail("the menu lists Home above Formula 1; it lists \(order)")
+        guard let home = order.firstIndex(of: "Home"), let f1 = order.firstIndex(of: "Motorsport"), f1 > home else {
+            return XCTFail("the menu lists Home above Motorsport; it lists \(order)")
         }
         Flow.focusThePage()
         Flow.openMenu(app)

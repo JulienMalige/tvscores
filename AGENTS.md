@@ -168,17 +168,15 @@ writes its own number is a bug, and rows all use `rowSurface(focused:)`.
   an audience.
 - Leagues in the MVP: Premier League, Champions League, NFL, NBA, F1, MotoGP,
   ATP/WTA. Rugby is available on the same plan if Julien wants it.
-- **The menu opening and shutting in one movement on the TV.** Diagnosed
-  from the television's trace on 2026-09-20 (build 24): a press left from
-  a page whose tab sits low in the sidebar (NFL, three of three) puts
-  focus on nothing for 30 ms and the menu shuts; from Home, Brasileirão,
-  Bundesliga or Libertadores it opens every time. This is Apple's tvOS 18
-  `sidebarAdaptable` fault with eight or more tabs (forum thread 769884,
-  feedback FB16027712, "known issue"); we have sixteen. No workaround
-  short of fewer tabs is known. Decision pending with Julien: a tab per
-  sport with the competitions inside it, or a sidebar of our own. The
-  trace stays (`Diagnostics.swift` → `POST /v1/diag`, files under
-  `~/.local/state/tvscores/traces/` on the VPS) until the menu is settled.
+- **The menu has five entries, one per family of sport** (Julien,
+  2026-09-28). tvOS's sidebar loses focus past seven tabs — the menu opened
+  and shut in one movement from the lower rows, seen in the television's
+  trace (build 24) and still Apple's known issue on tvOS 26.6 (forum thread
+  769884). Competitions are pills on each sport's page. Never add an eighth
+  tab. If Julien still wants every competition in the menu, the way out is
+  a sidebar of our own, not the system's. The trace (`Diagnostics.swift` →
+  `POST /v1/diag`, files under `~/.local/state/tvscores/traces/` on the
+  VPS) stays until the new menu has been used on the television.
 - **Table zones are ours and drift by season.** `proxy/src/config.js` encodes
   this season's formats (Champions League places, relegation, the cups' 8 and
   24). Check them against each competition's regulations every August.

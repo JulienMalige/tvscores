@@ -80,7 +80,8 @@ final class LeagueScreenFlow: FlowCase {
 /// is to quit the app. The television's trace showed exactly that on Copa
 /// Libertadores between rounds (build 24): a page of a "coming up" card and
 /// no table. This walks every competition in the sample, whatever it has
-/// on — games, a table, only a card — and asks the one question.
+/// on — games, a table, only a card — and asks the one question. Failed
+/// on build 24's code for NBA alone (2026-09-28), passes since.
 final class EveryPageTakesFocusFlow: FlowCase {
 
     /// The sample's fifteen, by the id the launch argument matches on.
@@ -95,7 +96,9 @@ final class EveryPageTakesFocusFlow: FlowCase {
     func testEveryCompetitionPageHoldsFocus() {
         var dead: [String] = []
         for (id, name) in Self.competitions {
-            let app = Flow.launch(league: id, ready: name)
+            // Every competition section carries the Standings heading,
+            // tables or not: it is the sign the page is up.
+            let app = Flow.launch(league: id)
             Flow.focusThePage()
             sleep(1)
             let onPage = app.descendants(matching: .any)
@@ -110,5 +113,24 @@ final class EveryPageTakesFocusFlow: FlowCase {
             app.terminate()
         }
         XCTAssertEqual(dead, [], "pages where nothing can take focus, so left cannot open the menu")
+    }
+}
+
+/// A family of sport's page: All first, then one pill per competition.
+final class SportScreenFlow: FlowCase {
+
+    func testAllListsEveryCompetitionOfTheSportAndAHeadingPicksOne() {
+        // Motorsport on Upcoming: both series have a round coming.
+        let app = Flow.launch(tab: "upcoming", league: "f1")
+        app.buttons["competition.all"].firstMatch.appears(within: 10)
+        Flow.focusThePage()
+        XCTAssertTrue(Flow.walk(.left, until: app.buttons["competition.all"], limit: 4), "All leads the competition switch")
+        Flow.remote.press(.select)
+        XCTAssertTrue(app.buttons["league.f1.f1"].waitForExistence(timeout: 8), "All lists Formula 1 under its heading")
+        XCTAssertTrue(app.buttons["league.motogp.motogp"].exists, "and MotoGP under its own")
+        XCTAssertFalse(app.staticTexts["Standings"].exists, "no table: a table belongs to one competition")
+        XCTAssertTrue(Flow.walk(.down, until: app.buttons["league.f1.f1"], limit: 8), "focus reaches the Formula 1 heading")
+        Flow.remote.press(.select)
+        XCTAssertTrue(app.staticTexts["Standings"].waitForExistence(timeout: 8), "the heading picks Formula 1, table and all")
     }
 }

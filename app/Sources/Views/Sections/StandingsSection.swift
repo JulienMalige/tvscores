@@ -42,7 +42,7 @@ struct StandingsSection: View {
     }
 
     private func tabs(_ standings: Standings) -> some View {
-        Segments(selection: $table, options: standings.tables.enumerated().map { ($0.offset, title($0.element.id)) })
+        Segments(selection: $table, options: standings.tables.enumerated().map { .init(value: $0.offset, title: Text(title($0.element.id))) })
             .accessibilityIdentifier("table.switch")
     }
 

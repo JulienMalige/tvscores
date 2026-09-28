@@ -46,13 +46,13 @@ enum Metrics {
     static let markHero: CGFloat = 110
     /// Competition marks are wordmarks as often as badges, so they get width.
     static let leagueMark: CGFloat = 52
-    /// A competition's icon in the menu: about half the row, as the Apple TV
-    /// app sizes its channels — bigger crowds the words beside it.
-    static let sidebarIcon: CGFloat = 34
     /// A pill of a switch, the size of the Apple TV app's season pills.
     static let pillInsetV: CGFloat = 10
     static let pillInsetH: CGFloat = 26
     static let pillGap: CGFloat = 12
+    /// A competition's crest inside its pill, and the space before its name.
+    static let pillIcon: CGFloat = 30
+    static let pillIconGap: CGFloat = 10
     /// One column of a table read as numbers — played, won, points.
     static let tableCell: CGFloat = 96
 }
