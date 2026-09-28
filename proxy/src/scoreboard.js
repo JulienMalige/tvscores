@@ -68,7 +68,10 @@ function everyLeague(sportOrder, leagues = {}, publicBase = "", standings = {}, 
         icon: cfg.badge ? `${publicBase}/v1/assets/leagues/icon/${cfg.badge}.png` : undefined,
         hasStandings: Boolean(standings[key]),
         playing: playing.has(key),
-        next: playing.has(key) ? undefined : nextOf(sport, cfg.id),
+        // While playing, only what the daily pass learned before the games
+        // came into the window: a new season's first week has an empty
+        // Today that says when it starts. Not the calendar's next round.
+        next: playing.has(key) ? meta[sport]?.next?.[String(cfg.id)] : nextOf(sport, cfg.id),
       };
     });
 }

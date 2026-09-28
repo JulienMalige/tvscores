@@ -65,10 +65,12 @@ struct GameScreen: View {
             tints = await (home, away)
         }
         .task(id: eventId) {
-            // Asked when opened; again each minute while the game is on.
+            // Asked when opened; again each minute until the game is over.
             while !Task.isCancelled {
                 if let fresh = await store.detail(for: eventId) { detail = fresh }
-                guard event.status.state == .live else { return }
+                // Until the whistle: a page opened before kickoff has to see
+                // the game start to fetch its periods, stats and goals.
+                guard event.status.state != .final else { return }
                 try? await Task.sleep(for: .seconds(60))
             }
         }

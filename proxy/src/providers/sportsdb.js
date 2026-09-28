@@ -140,13 +140,15 @@ export function isYouth(r) {
 export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons = {}, next = {}, log = () => {} }) {
   const { feed, live: livePath } = SPORTS[sport];
   const byId = new Map(leagues.map((l) => [String(l.id), l]));
+  /** A fixture of ours: a competition we follow, and a game its filters keep. */
+  const wanted = (r) => {
+    const league = byId.get(String(r.idLeague));
+    if (!league) return false;
+    if (league.seniorOnly && isYouth(r)) return false;
+    return !league.teams || league.teams.includes(r.strHomeTeam) || league.teams.includes(r.strAwayTeam);
+  };
   const mine = (rows) => {
-    const keep = rows.filter((r) => {
-      const league = byId.get(String(r.idLeague));
-      if (!league) return false;
-      if (league.seniorOnly && isYouth(r)) return false;
-      return !league.teams || league.teams.includes(r.strHomeTeam) || league.teams.includes(r.strAwayTeam);
-    });
+    const keep = rows.filter(wanted);
     // Every fixture names its own season, so the table lookup never needs a
     // call of its own — nor a hardcoded year that goes stale each August.
     for (const r of keep) if (r.strSeason) seasons[String(r.idLeague)] = r.strSeason;
@@ -178,22 +180,31 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
    * For a competition with nothing in the window — between seasons, or in
    * a break — when it is next on, so the app can say "back in October"
    * rather than "no games". One call per such competition per daily pass;
-   * `next` is the sport's meta and persists, and is cleared for a
-   * competition the moment it has fixtures again.
+   * `next` is the sport's meta and persists. A competition with fixtures
+   * again keeps it until that game has begun: the season's first week is
+   * when "Season Starts Saturday" is worth saying, and its games are in the
+   * window by then.
    */
   async function nextFixtures(events) {
     const busy = new Set(events.map((e) => String(e.league.id)));
     for (const league of leagues) {
       const id = String(league.id);
-      if (busy.has(id)) { delete next[id]; continue; }
+      if (busy.has(id)) {
+        if (!(next[id] && Date.parse(next[id].start) > Date.now())) delete next[id];
+        continue;
+      }
       const { body } = await getJson(`${V1}/${key}/eventsnextleague.php?id=${id}`);
       quota.record(undefined);
-      const soonest = (body?.events || []).map((r) => ({ start: startOf(r), season: r.strSeason })).filter((r) => r.start).sort((a, b) => a.start.localeCompare(b.start))[0];
+      const soonest = (body?.events || []).filter((r) => wanted({ ...r, idLeague: id })).map((r) => ({ start: startOf(r), season: r.strSeason })).filter((r) => r.start).sort((a, b) => a.start.localeCompare(b.start))[0];
       // A new season when its label is not the one the league's own games
       // last carried: the NBA's first game of 2026-2027 after 2025-2026,
       // but not the Champions League's next round within 2026-2027 — the
       // app says "Season Starts" only for the first (Julien, 2026-09-28).
-      if (soonest) next[id] = { ...soonest, newSeason: Boolean(soonest.season) && soonest.season !== seasons[id] };
+      // A season we never saw is not called new: a league just added, or a
+      // wiped store, would otherwise announce one mid-season. Nor is one
+      // with no seasons of its own — friendlies are labelled by the year.
+      const newSeason = !league.seasonless && Boolean(soonest?.season && seasons[id]) && soonest.season !== seasons[id];
+      if (soonest) next[id] = { ...soonest, newSeason };
       else delete next[id];
     }
   }

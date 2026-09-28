@@ -85,6 +85,8 @@ test("a competition with nothing this week says when it is next on", () => {
   assert.deepEqual(by.nba.next, { start: "2026-10-21T23:30:00.000Z", season: "2026-2027" }, "what the daily pass learned");
   assert.deepEqual(by.f1.next, { start: "2026-09-26T11:00:00.000Z" }, "the calendar's next round, beyond the window");
   assert.equal(by.nfl.next, undefined, "a competition playing this week has no next to speak of");
+  const opening = buildScoreboard([game], { now, leagues, upcomingDays: 3, meta: { nfl: { next: { 4391: { start: "2026-09-19T20:00:00.000Z", season: "2026", newSeason: true } } } } });
+  assert.equal(opening.leagues.find((l) => l.sport === "nfl").next?.newSeason, true, "unless the daily pass learned its season's start");
 });
 
 test("a race weekend is on every day it has a session, the race on the last of them", () => {

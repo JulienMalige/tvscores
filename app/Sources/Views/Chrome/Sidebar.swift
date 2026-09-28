@@ -58,6 +58,7 @@ struct Sidebar: View {
             page
                 .environment(\.openMenu, openMenu)
                 .environment(\.openGame) { game = $0 }
+                .environment(\.menuIsOpen) { expanded }
             if expanded {
                 Color.black.opacity(0.45)
                     .ignoresSafeArea()
@@ -209,4 +210,6 @@ extension EnvironmentValues {
     @Entry var openMenu: @MainActor () -> Void = {}
     /// Opens a game's page, from its row.
     @Entry var openGame: @MainActor (Event) -> Void = { _ in }
+    /// Whether the menu is open, read when asked, not when the view was made.
+    @Entry var menuIsOpen: @MainActor () -> Bool = { false }
 }

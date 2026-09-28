@@ -20,7 +20,7 @@ struct CompetitionSection: View {
     private var games: some View {
         let groups = (store.board?.groups(for: day) ?? []).filter { ref.matches($0) }
         if groups.isEmpty {
-            if !ref.playing, let next = ref.next, let season = OffseasonSection.season(of: next, league: ref.name) {
+            if let next = ref.next, next.start > .now, let season = OffseasonSection.season(of: next, league: ref.name) {
                 OffseasonSection(next: next, season: season)
             } else {
                 EmptyDay(day: day)

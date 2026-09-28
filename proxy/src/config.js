@@ -83,7 +83,7 @@ export const config = {
       // national games"). The friendlies feed also carries youth sides —
       // "England U19 vs Norway U19" — which `seniorOnly` leaves out.
       { id: 4490, name: "UEFA Nations League", menu: "Nations League", short: "UNL", logo: "https://r2.thesportsdb.com/images/media/league/badge/cwsp321698386224.png" },
-      { id: 4562, name: "International Friendlies", menu: "Friendlies", short: "INT", logo: "https://r2.thesportsdb.com/images/media/league/badge/pdnktx1648659448.png", seniorOnly: true,
+      { id: 4562, name: "International Friendlies", menu: "Friendlies", short: "INT", logo: "https://r2.thesportsdb.com/images/media/league/badge/pdnktx1648659448.png", seniorOnly: true, seasonless: true,
         // Every national side plays friendlies, Cook Islands v Tahiti too:
         // a game is kept when one side is a team people tune in for.
         teams: ["Brazil", "Argentina", "Uruguay", "Colombia", "Chile", "Ecuador", "Paraguay", "Peru",

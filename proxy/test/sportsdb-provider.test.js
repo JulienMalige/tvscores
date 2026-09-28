@@ -68,7 +68,7 @@ test("the daily pass is one call per day of the window, plus one per competition
   assert.equal(days.length, 9, "yesterday, today and seven days ahead");
   assert.equal(p.dailyCost, 9, "and the scheduler is told the same number");
   assert.deepEqual([...new Set(days.map((c) => c.url.match(/d=(\d{4}-\d{2}-\d{2})/)[1]))].length, 9, "nine different dates");
-  assert.deepEqual(next, { 4332: { start: "2026-10-03T14:00:00.000Z", season: "2026-2027", newSeason: true } }, "when an idle competition is next on; nothing for one the feed knows nothing about");
+  assert.deepEqual(next, { 4332: { start: "2026-10-03T14:00:00.000Z", season: "2026-2027", newSeason: false } }, "when an idle competition is next on; nothing for one the feed knows nothing about; a season never seen is not called new");
 });
 
 test("a break inside a season is not a new season", async (t) => {
@@ -93,6 +93,31 @@ test("a competition with fixtures this week is not asked when it is next on, and
   await p.daily();
   assert.ok(!calls.some((c) => c.url.includes("eventsnextleague.php?id=4332")), "Serie A has games in the window");
   assert.equal(next[4332], undefined, "and the stale next-fixture is dropped");
+});
+
+test("a new season's first game stays known while its week is in the window", async (t) => {
+  // The NBA's opener learned while idle: when its games enter the window the
+  // page still has to say "Season Starts Saturday" until it has begun.
+  network(t, { "eventsday.php": { events: football }, "eventsnextleague.php": null });
+  const soon = new Date(Date.now() + 3 * 86400e3).toISOString();
+  const next = { 4332: { start: soon, season: "2026-2027", newSeason: true } };
+  const { p } = provider({ next });
+  await p.daily();
+  assert.equal(next[4332]?.start, soon, "kept until it starts");
+});
+
+test("the next fixture of a filtered league is one the filters keep", async (t) => {
+  const FRIENDLIES = { id: 4562, name: "International Friendlies", short: "INT", seniorOnly: true, seasonless: true, teams: ["Brazil"] };
+  const row = (home, away, ts) => ({ idLeague: "4562", strHomeTeam: home, strAwayTeam: away, strTimestamp: ts, strSeason: "2027" });
+  network(t, {
+    "eventsday.php": { events: [] },
+    "eventsnextleague.php": { events: [row("Brazil U20", "Chile U20", "2026-10-01T10:00:00"), row("Cook Islands", "Tahiti", "2026-10-02T10:00:00"), row("India", "Brazil", "2026-10-09T10:00:00")] },
+  });
+  const next = {};
+  const p = sportsDbSport({ sport: "football", key: "k", leagues: [FRIENDLIES], window: { back: 0, ahead: 0 }, quota: { record() {} }, next, seasons: { 4562: "2026" } });
+  await p.daily();
+  assert.equal(next[4562].start, "2026-10-09T10:00:00.000Z", "India v Brazil, not the youth game nor Cook Islands");
+  assert.equal(next[4562].newSeason, false, "and friendlies have no seasons to start");
 });
 
 test("the live feed is the V2 endpoint with the key in a header, never in the URL", async (t) => {

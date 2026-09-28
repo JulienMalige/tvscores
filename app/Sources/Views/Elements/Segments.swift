@@ -27,6 +27,7 @@ struct Segments<Value: Hashable>: View {
     var centred = false
     /// The pill the remote is on, by position.
     @FocusState private var focused: Int?
+    @Environment(\.menuIsOpen) private var menuIsOpen
     @State private var claimed = false
 
     var body: some View {
@@ -71,7 +72,9 @@ struct Segments<Value: Hashable>: View {
             .task {
                 guard claimsFocus else { return }
                 try? await Task.sleep(for: .milliseconds(450))
-                guard !claimed, let chosen = options.firstIndex(where: { $0.value == selection }) else { return }
+                // A press left in that time opened the menu: focus is the
+                // viewer's there, and taking it back would shut the menu.
+                guard !claimed, !menuIsOpen(), let chosen = options.firstIndex(where: { $0.value == selection }) else { return }
                 claimed = true
                 focused = chosen
             }
