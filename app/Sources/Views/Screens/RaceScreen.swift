@@ -9,15 +9,7 @@ struct RaceScreen: View {
 
     /// Re-read from the store on every pass: the page outlives a refresh, so a
     /// race in progress keeps moving and portraits resolved later turn up.
-    private var event: Event {
-        guard let board = store.board else { return fallback }
-        for day in Day.allCases {
-            for group in board.groups(for: day) {
-                if let hit = group.events.first(where: { $0.id == eventId }) { return hit }
-            }
-        }
-        return fallback
-    }
+    private var event: Event { store.board?.find(eventId)?.event ?? fallback }
 
     private var results: [RaceResult] { event.results ?? [] }
 
@@ -41,6 +33,9 @@ struct RaceScreen: View {
                     PodiumSection(results: results)
                     ResultSection(results: results)
                 }
+                // When and where, as Apple Sports gives a race: the circuit
+                // and its country.
+                GameInfoSection(start: event.start, venue: event.circuit, place: event.country)
             }
             .pageMargins()
         }

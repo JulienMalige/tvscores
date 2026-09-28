@@ -7,6 +7,8 @@ import SwiftUI
 struct StandingsSection: View {
     let ref: LeagueRef
     let store: ScoreboardStore
+    /// Rows to pick out — a game's two teams on its page.
+    var highlight: Set<String> = []
 
     @State private var standings: Standings?
     @State private var loaded = false
@@ -65,7 +67,7 @@ struct StandingsSection: View {
                     .padding(.top, i == 0 ? 0 : Metrics.headingGap)
                     .padding(.trailing, Metrics.rowInsetH)
                 }
-                StandingsRow(entry: entry)
+                StandingsRow(entry: entry, highlighted: highlight.contains(entry.name))
                 if let line = table.lines?.first(where: { $0.after == entry.pos && entry.section == nil }) {
                     cut(line.line)
                 }

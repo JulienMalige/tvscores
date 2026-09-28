@@ -3,12 +3,14 @@ import SwiftUI
 /// One line of a league table: rank, mark, name, points.
 struct StandingsRow: View {
     let entry: StandingsEntry
+    /// One of the two teams of the game whose page this table is on.
+    var highlighted = false
 
     var body: some View {
         Button {
             // A driver or team page comes later.
         } label: {
-            StandingsRowContent(entry: entry)
+            StandingsRowContent(entry: entry, highlighted: highlighted)
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("standing.\(entry.pos)")
@@ -17,6 +19,7 @@ struct StandingsRow: View {
 
 private struct StandingsRowContent: View {
     let entry: StandingsEntry
+    let highlighted: Bool
     @Environment(\.isFocused) private var isFocused
 
     var body: some View {
@@ -53,6 +56,10 @@ private struct StandingsRowContent: View {
             }
         }
         .rowSurface(focused: isFocused)
+        .overlay(
+            RoundedRectangle(cornerRadius: Metrics.rowRadius, style: .continuous)
+                .stroke(Color.white.opacity(highlighted && !isFocused ? 0.55 : 0), lineWidth: 2)
+        )
     }
 
     /// Constructors and teams arrive as a composed badge; people as a portrait.

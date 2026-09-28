@@ -5,6 +5,7 @@ import SwiftUI
 struct TeamMark: View {
     let code: String
     var logo: URL? = nil
+    var size: CGFloat = Metrics.mark
 
     var body: some View {
         Group {
@@ -15,14 +16,14 @@ struct TeamMark: View {
                 monogram
             }
         }
-        .frame(width: Metrics.mark, height: Metrics.mark)
+        .frame(width: size, height: size)
     }
 
     private var monogram: some View {
         Text(code)
-            .font(.system(size: Metrics.mark * 0.3, weight: .heavy, design: .rounded))
+            .font(.system(size: size * 0.3, weight: .heavy, design: .rounded))
             .foregroundStyle(.white)
-            .frame(width: Metrics.mark, height: Metrics.mark)
+            .frame(width: size, height: size)
             .background(Circle().fill(Color(hue: hue, saturation: 0.55, brightness: 0.55)))
     }
 

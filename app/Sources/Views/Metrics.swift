@@ -44,6 +44,8 @@ enum Metrics {
     static let matchScore: CGFloat = 150
     /// The same thing blown up for a podium, where it is the subject.
     static let markHero: CGFloat = 110
+    /// The middle of a game's header, between the two sides: score or kickoff.
+    static let gameCentre: CGFloat = 520
     /// Competition marks are wordmarks as often as badges, so they get width.
     static let leagueMark: CGFloat = 52
     /// A pill of a switch, the size of the Apple TV app's season pills.

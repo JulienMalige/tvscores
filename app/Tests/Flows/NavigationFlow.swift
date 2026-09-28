@@ -98,4 +98,21 @@ final class NavigationFlow: FlowCase {
         app.buttons["Drivers"].firstMatch.appears(within: 8)
         XCTAssertFalse(app.staticTexts["Race Result"].exists, "back leaves the race, on the competition it was opened from")
     }
+
+    func testAMatchOpensItsPageAndBackPutsItAway() {
+        // The game's page rises over the list as a sheet; Back puts it away
+        // and the remote is on the list again.
+        let app = Flow.launch()
+        let first = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'match.'")).firstMatch
+        XCTAssertTrue(Flow.walk(.down, until: first, limit: 12), "focus reaches the first match row")
+        Flow.remote.press(.select)
+        let page = app.descendants(matching: .any)["game.header"].firstMatch
+        XCTAssertTrue(page.waitForExistence(timeout: 8), "the game's page opens")
+        sleep(1)
+        XCTAssertTrue(Flow.focusOnPage(app).exists, "and the remote has somewhere to be on it")
+        Flow.remote.press(.menu)
+        sleep(1)
+        XCTAssertFalse(page.exists, "Back puts the page away")
+        XCTAssertFalse(Flow.menuIsOpen(app), "without opening the menu")
+    }
 }

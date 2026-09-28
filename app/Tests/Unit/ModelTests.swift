@@ -197,4 +197,22 @@ struct ModelTests {
         #expect(runs[0].events.map(\.id) == ["1", "3"], "Beijing's matches together")
         #expect(runs[0].competition?.tier == "WTA 1000")
     }
+
+    @Test("a game's page decodes what the proxy sends, parts missing or not")
+    func gameDetailDecodes() throws {
+        let json = """
+        {"id":"nfl:tsdb:1","venue":"Highmark Stadium","city":"Orchard Park, NY",
+         "periods":{"labels":["1","2","3","4"],"home":[0,10,0,14],"away":[10,0,3,3]},
+         "stats":[{"id":"possession","home":58,"away":42},{"id":"shots","home":12,"away":9}],
+         "timeline":[{"minute":63,"side":"home","kind":"ownGoal","player":"Martínez"}],
+         "records":{"home":"3-0","away":"0-3"}}
+        """
+        let d = try ScoreboardDecoder.make().decode(GameDetail.self, from: Data(json.utf8))
+        #expect(d.periods?.home.reduce(0, +) == 24)
+        #expect(d.stats.first?.isPercent == true && d.stats.last?.isPercent == false)
+        #expect(d.timeline.first?.isHome == true)
+        #expect(d.records?.away == "0-3")
+        let bare = try ScoreboardDecoder.make().decode(GameDetail.self, from: Data(#"{"stats":[],"timeline":[]}"#.utf8))
+        #expect(bare.periods == nil && bare.venue == nil)
+    }
 }

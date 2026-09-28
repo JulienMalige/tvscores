@@ -164,6 +164,25 @@ final class ScoreboardStore {
         task = nil
     }
 
+    /// One game's page from the proxy, or nil: the bundled demo has none,
+    /// and a race, a tennis match or a failed request has none either.
+    func detail(for eventId: String) async -> GameDetail? {
+        guard case .remote(let base) = source,
+              var comps = URLComponents(url: base.appending(path: "v1/event"), resolvingAgainstBaseURL: false)
+        else { return nil }
+        comps.queryItems = [URLQueryItem(name: "id", value: eventId)]
+        guard let url = comps.url else { return nil }
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 15
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
+            return try ScoreboardDecoder.make().decode(GameDetail.self, from: data)
+        } catch {
+            return nil
+        }
+    }
+
     /// Standings for one league, or nil when the proxy has none (free-plan sports).
     func standings(for ref: LeagueRef) async -> Standings? {
         do {

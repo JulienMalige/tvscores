@@ -24,6 +24,8 @@ struct Sidebar: View {
     /// Yesterday's La Liga header opens Yesterday's La Liga.
     @State private var leagueDays: [String: Day] = [:]
     @State private var homePath = NavigationPath()
+    /// The game whose page is up, over whatever page it was opened from.
+    @State private var game: Event?
     @State private var homeOpenedRace = false
     @State private var expanded = false
     /// Set while the menu opens or shuts, when focus moves under our feet.
@@ -42,6 +44,7 @@ struct Sidebar: View {
         .onChange(of: store.leagues.count) { _, n in
             Diagnostics.shared.note("menu rebuilt: \(n) competitions")
             openRequestedLeague()
+            openRequestedGame()
             // A competition gone from the list leaves nothing to show and
             // nothing for the remote to stand on: back to Home.
             if case .league(let key) = selection, !store.leagues.contains(where: { Self.key($0) == key }) {
@@ -54,6 +57,7 @@ struct Sidebar: View {
         ZStack(alignment: .topLeading) {
             page
                 .environment(\.openMenu, openMenu)
+                .environment(\.openGame) { game = $0 }
             if expanded {
                 Color.black.opacity(0.45)
                     .ignoresSafeArea()
@@ -64,6 +68,9 @@ struct Sidebar: View {
                       focus: $menuFocus, pick: pick)
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.86), value: expanded)
+        .sheet(item: $game) { event in
+            GameScreen(eventId: event.id, fallback: event, store: store)
+        }
         .onChange(of: menuFocus) { _, focused in
             // Focus gone from every row — a press right onto the page.
             if focused == nil, expanded, !moving { shut() }
@@ -166,6 +173,13 @@ struct Sidebar: View {
         selection = .league(Self.key(hit))
     }
 
+    /// `-TVScoresGame final` opens the first game in that state (CI screenshots).
+    private func openRequestedGame() {
+        guard let wanted = Self.argument("-TVScoresGame"), let board = store.board else { return }
+        game = Day.allCases.flatMap { board.groups(for: $0) }.flatMap(\.events)
+            .first { $0.kind == .match && $0.status.state.rawValue == wanted }
+    }
+
     static func key(_ league: LeagueSummary) -> String { "\(league.sport):\(league.id.raw)" }
 
     private static func argument(_ name: String) -> String? {
@@ -190,4 +204,6 @@ enum MenuItem: Hashable {
 extension EnvironmentValues {
     /// Opens the menu; a page calls it on Back, as tvOS's sidebar does.
     @Entry var openMenu: @MainActor () -> Void = {}
+    /// Opens a game's page, from its row.
+    @Entry var openGame: @MainActor (Event) -> Void = { _ in }
 }

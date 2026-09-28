@@ -8,6 +8,13 @@ notes when a version ships.
 
 ## Unreleased
 
+- A match opens its own page: both sides large with their records, the
+  score or the kickoff. A game to come shows the table with both teams
+  picked out, and when and where. A game under way or over shows the score
+  by quarter (NFL, NBA), a short set of statistics (football, NBA), and
+  goals and cards (football). Back puts it away. A race's page gains its
+  circuit, country and start.
+
 ## 1.0 build 26 — 28 September 2026
 - Tennis keeps its big tournaments listed: a change in the feed had
   started to drop some of them, the WTA 1000 in Beijing among them.

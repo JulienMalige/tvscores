@@ -8,10 +8,11 @@ import SwiftUI
 /// type as a caption.
 struct MatchRow: View {
     let event: Event
+    @Environment(\.openGame) private var openGame
 
     var body: some View {
         Button {
-            // Match detail comes later.
+            openGame(event)
         } label: {
             MatchRowContent(event: event)
         }
