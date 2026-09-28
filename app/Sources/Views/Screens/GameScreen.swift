@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// One game, opened from its row: fills the screen over the page, and Back
+/// One game, opened from its row: a card over the page, inset at the top
+/// and sides and running off the bottom, as the Apple TV app's show page, and Back
 /// puts it away. After Apple Sports' game card (Julien, 2026-09-28), without
 /// what we do not have — no following, no play-by-play.
 ///
@@ -14,6 +15,7 @@ struct GameScreen: View {
     let fallback: Event
     let store: ScoreboardStore
     @State private var detail: GameDetail?
+    @State private var tints: (home: Color?, away: Color?) = (nil, nil)
 
     /// Re-read from the store on every pass, so a live score keeps moving.
     private var found: (event: Event, group: LeagueGroup)? { store.board?.find(eventId) }
@@ -28,24 +30,40 @@ struct GameScreen: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Metrics.sectionGap * 0.6) {
+            VStack(spacing: Metrics.gameGap) {
                 GameHeaderSection(event: event, competition: competition, records: detail?.records)
                 if event.status.state != .scheduled {
                     if let periods = detail?.periods { PeriodSection(periods: periods, home: event.home, away: event.away) }
-                    if let stats = detail?.stats, !stats.isEmpty { StatsSection(stats: stats) }
+                    if let stats = detail?.stats, !stats.isEmpty {
+                        StatsSection(stats: stats, homeTint: tints.home, awayTint: tints.away)
+                    }
                     if let moments = detail?.timeline, !moments.isEmpty { MomentsSection(moments: moments) }
                 }
                 if event.sport != "tennis" {
-                    GameInfoSection(start: event.start, venue: detail?.venue, place: detail?.city)
                     if let group = found?.group, group.league.hasStandings == true {
                         StandingsSection(ref: LeagueRef(group: group), store: store,
-                                         highlight: Set([event.home?.name, event.away?.name].compactMap { $0 }))
+                                         highlight: Set([event.home?.name, event.away?.name].compactMap { $0 }),
+                                         carded: true)
                     }
+                    GameInfoSection(start: event.start, venue: detail?.venue, place: detail?.city)
                 }
             }
-            .pageMargins()
+            .padding(.horizontal, Metrics.gameInset)
+            .padding(.top, Metrics.gameInset / 2)
+            .padding(.bottom, Metrics.screenBottom)
         }
+        .background(GameBackdrop(home: tints.home, away: tints.away))
+        .clipShape(UnevenRoundedRectangle(topLeadingRadius: Metrics.gameRadius,
+                                          topTrailingRadius: Metrics.gameRadius, style: .continuous))
+        .padding([.top, .horizontal], Metrics.gameMargin)
+        .ignoresSafeArea()
+        .presentationBackground(Color.black.opacity(0.6))
         .accessibilityIdentifier("page.game")
+        .task(id: eventId) {
+            async let home = TeamTint.of(event.home)
+            async let away = TeamTint.of(event.away)
+            tints = await (home, away)
+        }
         .task(id: eventId) {
             // Asked when opened; again each minute while the game is on.
             while !Task.isCancelled {
@@ -53,6 +71,26 @@ struct GameScreen: View {
                 guard event.status.state == .live else { return }
                 try? await Task.sleep(for: .seconds(60))
             }
+        }
+    }
+}
+
+/// Behind a game's page: the two sides' colours across the top, home on the
+/// left, fading to the page's dark by the middle, as Apple Sports tints its
+/// game cards. Grey where a crest gave no colour.
+private struct GameBackdrop: View {
+    let home: Color?
+    let away: Color?
+
+    var body: some View {
+        ZStack {
+            Color(white: 0.11)
+            LinearGradient(colors: [home ?? Color(white: 0.3), away ?? Color(white: 0.3)],
+                           startPoint: .leading, endPoint: .trailing)
+                .opacity(0.55)
+            LinearGradient(stops: [.init(color: .clear, location: 0),
+                                   .init(color: Color(white: 0.11), location: 0.6)],
+                           startPoint: .top, endPoint: .bottom)
         }
     }
 }

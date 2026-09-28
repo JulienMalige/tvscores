@@ -8,8 +8,9 @@ notes when a version ships.
 
 ## Unreleased
 
-- A match opens its own page: both sides large with their records, the
-  score or the kickoff. A game to come shows the table with both teams
+- A match opens its own page, a card over the list as the TV app shows a
+  series, tinted in the two sides' colours: both sides large with their
+  records, the score or the kickoff. A game to come shows the table with both teams
   picked out, and when and where. A game under way or over shows the score
   by quarter (NFL, NBA), a short set of statistics (football, NBA), and
   goals and cards (football). Back puts it away. A race's page gains its

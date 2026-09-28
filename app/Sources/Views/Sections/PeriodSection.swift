@@ -1,38 +1,47 @@
 import SwiftUI
 
-/// The score by quarter, as a small table: a column per period, then the total.
+/// The score by quarter, laid across the page under the header as Apple
+/// Sports does: no panel, a column per period, then the total, and a hair
+/// line between the two sides.
 struct PeriodSection: View {
     let periods: GameDetail.Periods
     let home: TeamRef?
     let away: TeamRef?
 
     var body: some View {
-        FocusBlock(identifier: "game.periods") {
-            Grid(horizontalSpacing: 12, verticalSpacing: 14) {
+        FocusBlock(identifier: "game.periods", surface: false) {
+            Grid(horizontalSpacing: 0, verticalSpacing: 18) {
                 GridRow {
-                    Text(verbatim: "").gridColumnAlignment(.leading)
+                    Text(verbatim: "").frame(width: Metrics.periodName, alignment: .leading)
                     ForEach(Array(periods.labels.enumerated()), id: \.offset) { _, label in
-                        Text(verbatim: label).foregroundStyle(.secondary)
+                        cell(Text(verbatim: label))
                     }
-                    Text("game.total").foregroundStyle(.secondary)
+                    cell(Text("game.total"))
                 }
                 .font(.callout.weight(.semibold))
+                .foregroundStyle(.secondary)
                 line(home?.short, periods.home)
+                Divider().overlay(Color.white.opacity(0.25))
                 line(away?.short, periods.away)
             }
-            .frame(maxWidth: .infinity)
         }
+    }
+
+    private func cell(_ text: Text) -> some View {
+        text.frame(maxWidth: .infinity)
     }
 
     private func line(_ name: String?, _ values: [Int]) -> some View {
         GridRow {
-            Text(verbatim: name ?? "").font(.title3.weight(.semibold))
+            Text(verbatim: name ?? "")
+                .font(.callout.weight(.bold))
+                .frame(width: Metrics.periodName, alignment: .leading)
             ForEach(Array(values.enumerated()), id: \.offset) { _, v in
-                Text(verbatim: "\(v)").frame(width: Metrics.tableCell)
+                cell(Text(verbatim: "\(v)"))
             }
-            Text(verbatim: "\(values.reduce(0, +))").bold().frame(width: Metrics.tableCell)
+            cell(Text(verbatim: "\(values.reduce(0, +))").bold())
         }
-        .font(.title3)
+        .font(.callout.weight(.medium))
         .monospacedDigit()
     }
 }

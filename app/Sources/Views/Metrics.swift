@@ -44,8 +44,28 @@ enum Metrics {
     static let matchScore: CGFloat = 150
     /// The same thing blown up for a podium, where it is the subject.
     static let markHero: CGFloat = 110
-    /// The middle of a game's header, between the two sides: score or kickoff.
-    static let gameCentre: CGFloat = 520
+    /// A game's page, drawn as the Apple TV app's show page: a card inset
+    /// from the screen's top and sides by the margin, with rounded top
+    /// corners, running off the bottom; inside it, the page's own inset.
+    static let gameMargin: CGFloat = 48
+    static let gameRadius: CGFloat = 56
+    static let gameInset: CGFloat = 100
+    static let gameGap: CGFloat = 40
+    /// Its header: each side's column, the middle between them, and the
+    /// score's tall figures, measured against Apple Sports' 60-point score
+    /// on a 17-point name (build 26 review).
+    static let gameSide: CGFloat = 560
+    static let gameCentre: CGFloat = 460
+    static let gameScore: CGFloat = 150
+    /// The team code's column in the score by quarter.
+    static let periodName: CGFloat = 140
+    /// A statistic's figures, the same tall face as the score.
+    static let statValue: CGFloat = 50
+    /// A game card: its corner, its insets, and the space under its title.
+    static let cardRadius: CGFloat = 36
+    static let cardInsetV: CGFloat = 32
+    static let cardInsetH: CGFloat = 44
+    static let cardGap: CGFloat = 26
     /// Competition marks are wordmarks as often as badges, so they get width.
     static let leagueMark: CGFloat = 52
     /// A pill of a switch, the size of the Apple TV app's season pills.

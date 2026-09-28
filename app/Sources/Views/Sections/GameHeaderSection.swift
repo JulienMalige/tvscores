@@ -1,70 +1,93 @@
 import SwiftUI
 
 /// The top of a game's page, after Apple Sports': the competition over it,
-/// each side's mark large with its name and record under it, and the score
-/// — or the kickoff — between them. The block takes focus, so a page with
+/// each side's mark large with its name and record under it, and between
+/// them the kickoff — or, once it is on, each side's score tall over its
+/// mark with the state of the game in the middle. It sits on the page's
+/// tint rather than a panel, and takes focus plainly, so a page with
 /// nothing else on it still gives the remote a place to be.
 struct GameHeaderSection: View {
     let event: Event
     let competition: String
     let records: GameDetail.Records?
 
+    private var scored: Bool { event.status.state != .scheduled && event.score?.home != nil }
+
     var body: some View {
-        FocusBlock(identifier: "game.header") {
-            VStack(spacing: 20) {
+        FocusBlock(identifier: "game.header", surface: false) {
+            VStack(spacing: 28) {
                 Text(verbatim: competition)
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(.secondary)
-                HStack(alignment: .center, spacing: 0) {
-                    side(event.home, record: records?.home)
-                        .frame(maxWidth: .infinity)
-                    centre
-                        .frame(width: Metrics.gameCentre)
-                    side(event.away, record: records?.away)
-                        .frame(maxWidth: .infinity)
+                Grid(horizontalSpacing: 0, verticalSpacing: 12) {
+                    if scored {
+                        GridRow {
+                            score(event.score?.home, dim: loser == .home)
+                            status
+                            score(event.score?.away, dim: loser == .away)
+                        }
+                    }
+                    GridRow {
+                        mark(event.home)
+                        if scored { empty } else { status }
+                        mark(event.away)
+                    }
+                    GridRow {
+                        name(event.home)
+                        empty
+                        name(event.away)
+                    }
+                    if let records {
+                        GridRow {
+                            record(records.home)
+                            empty
+                            record(records.away)
+                        }
+                    }
                 }
             }
-            .padding(.vertical, 20)
         }
     }
 
+    private var status: some View {
+        StatusLabel(status: event.status, start: event.start)
+            .frame(width: Metrics.gameCentre)
+    }
+
+    private var empty: some View {
+        Color.clear.gridCellUnsizedAxes([.horizontal, .vertical])
+    }
+
     @ViewBuilder
-    private func side(_ team: TeamRef?, record: String?) -> some View {
-        VStack(spacing: 10) {
+    private func mark(_ team: TeamRef?) -> some View {
+        Group {
             if let team {
                 if team.logo == nil, team.flag != nil || team.photo != nil {
-                    PersonMark(photo: team.photo, flag: team.flag, monogram: team.short, size: Metrics.markHero)
+                    PersonMark(photo: team.photo, flag: team.flag, monogram: team.short, size: markSize)
                 } else {
-                    TeamMark(code: team.short, logo: team.logo, size: Metrics.markHero)
-                }
-                Text(team.label)
-                    .font(.title3.weight(.semibold))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                if let record {
-                    Text(verbatim: record)
-                        .font(.callout)
-                        .monospacedDigit()
-                        .foregroundStyle(.secondary)
+                    TeamMark(code: team.short, logo: team.logo, size: markSize)
                 }
             }
         }
+        .frame(width: Metrics.gameSide)
     }
 
-    @ViewBuilder
-    private var centre: some View {
-        VStack(spacing: 8) {
-            if event.status.state == .scheduled {
-                StatusLabel(status: event.status, start: event.start)
-            } else {
-                HStack(spacing: 28) {
-                    score(event.score?.home, dim: loser == .home)
-                    Text(verbatim: "–").font(.system(size: 60, weight: .bold)).foregroundStyle(.secondary)
-                    score(event.score?.away, dim: loser == .away)
-                }
-                StatusLabel(status: event.status, start: event.start)
-            }
-        }
+    /// Smaller under a score, as Apple Sports draws it; larger on its own.
+    private var markSize: CGFloat { scored ? Metrics.markHero : Metrics.markHero * 1.4 }
+
+    private func name(_ team: TeamRef?) -> some View {
+        Text(verbatim: team?.label ?? "")
+            .font(.title3.weight(.semibold))
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .frame(width: Metrics.gameSide)
+    }
+
+    private func record(_ value: String?) -> some View {
+        Text(verbatim: value ?? "")
+            .font(.callout.weight(.medium))
+            .monospacedDigit()
+            .foregroundStyle(.secondary)
     }
 
     private enum Side { case home, away, none }
@@ -74,10 +97,11 @@ struct GameHeaderSection: View {
         return h < a ? .home : .away
     }
 
+    /// Tall and narrow, as a scoreboard's figures: the loser's greyed.
     private func score(_ value: Int?, dim: Bool) -> some View {
-        Text(value.map(String.init) ?? "–")
-            .font(.system(size: 96, weight: .bold, design: .rounded))
+        Text(verbatim: value.map(String.init) ?? "–")
+            .font(.system(size: Metrics.gameScore, weight: .bold).width(.condensed))
             .monospacedDigit()
-            .foregroundStyle(dim ? .secondary : .primary)
+            .foregroundStyle(dim ? Color.white.opacity(0.4) : .white)
     }
 }

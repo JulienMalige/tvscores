@@ -11,7 +11,7 @@ struct MomentRow: View {
             if moment.isHome { minute; mark; player } else { player; mark; minute }
             if moment.isHome { Spacer() }
         }
-        .font(.title3)
+        .font(.callout.weight(.medium))
     }
 
     private var minute: some View {

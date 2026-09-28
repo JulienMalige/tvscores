@@ -9,15 +9,18 @@ struct StandingsSection: View {
     let store: ScoreboardStore
     /// Rows to pick out — a game's two teams on its page.
     var highlight: Set<String> = []
+    /// On a game's page: the table on a panel under a centred title, as
+    /// Apple Sports shows it.
+    var carded = false
 
     @State private var standings: Standings?
     @State private var loaded = false
     @State private var table = 0
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Metrics.headingGap) {
+        VStack(alignment: carded ? .center : .leading, spacing: Metrics.headingGap) {
             Text("standings.title")
-                .font(.title2.weight(.bold))
+                .font(carded ? .headline : .title2.weight(.bold))
                 .padding(.top, 12)
             if let standings, !standings.tables.isEmpty {
                 if standings.tables.count > 1 { tabs(standings) }
@@ -30,6 +33,9 @@ struct StandingsSection: View {
                 ProgressView()
             }
         }
+        .padding(.vertical, carded ? Metrics.cardInsetV : 0)
+        .padding(.horizontal, carded ? Metrics.cardInsetH / 2 : 0)
+        .background { if carded { Color.clear.gameCardSurface() } }
         .task {
             standings = await store.standings(for: ref)
             loaded = true

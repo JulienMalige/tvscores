@@ -1,37 +1,39 @@
 import SwiftUI
 
-/// When and where: the start in the viewer's time, and the venue with its
-/// town — a game's, or a race's circuit and country.
+/// When and where, as Apple Sports closes its game pages: a centred title,
+/// then "Time:" and "Location:" in grey before their values — a game's
+/// venue and town, or a race's circuit and country.
 struct GameInfoSection: View {
     let start: Date
     let venue: String?
     let place: String?
 
+    private var location: String? {
+        let parts = [venue, place].compactMap { $0 }.filter { !$0.isEmpty }
+        return parts.isEmpty ? nil : parts.joined(separator: ", ")
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: Metrics.rowGap) {
-            Text("game.information").font(.title2.weight(.bold))
-            FocusBlock(identifier: "game.information") {
-                VStack(alignment: .leading, spacing: 14) {
-                    Label {
-                        Text(start, format: .dateTime.weekday(.wide).day().month(.wide).hour().minute())
-                    } icon: {
-                        Image(systemName: "clock")
-                    }
-                    if let where_ = [venue, place].compactMap({ $0 }).filter({ !$0.isEmpty }).joined(separator: ", ").nilIfEmpty {
-                        Label {
-                            Text(verbatim: where_)
-                        } icon: {
-                            Image(systemName: "mappin.and.ellipse")
-                        }
-                    }
+        FocusBlock(identifier: "game.information", surface: false) {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("game.information")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding(.bottom, 6)
+                line("clock", "game.time", Text(start, format: .dateTime.weekday(.wide).day().month(.wide).hour().minute()))
+                if let location {
+                    line("mappin.and.ellipse", "game.location", Text(verbatim: location))
                 }
-                .font(.title3)
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .font(.callout)
         }
     }
-}
 
-private extension String {
-    var nilIfEmpty: String? { isEmpty ? nil : self }
+    private func line(_ symbol: String, _ label: LocalizedStringKey, _ value: Text) -> some View {
+        HStack(spacing: 14) {
+            Image(systemName: symbol).foregroundStyle(.secondary)
+            Text(label).foregroundStyle(.secondary) + Text(verbatim: " ") + value
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
 }

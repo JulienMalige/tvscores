@@ -31,7 +31,7 @@ private struct StandingsRowContent: View {
             mark
             VStack(alignment: .leading, spacing: 2) {
                 Text(entry.name)
-                    .font(.title3.weight(.semibold))
+                    .font(.title3.weight(highlighted ? .bold : .semibold))
                 if let sub = entry.sub {
                     Text(sub).font(.callout).foregroundStyle(.secondary)
                 }
@@ -56,9 +56,10 @@ private struct StandingsRowContent: View {
             }
         }
         .rowSurface(focused: isFocused)
-        .overlay(
+        // A game's two sides, a shade lighter, as Apple Sports picks them out.
+        .background(
             RoundedRectangle(cornerRadius: Metrics.rowRadius, style: .continuous)
-                .stroke(Color.white.opacity(highlighted && !isFocused ? 0.55 : 0), lineWidth: 2)
+                .fill(Color.white.opacity(highlighted ? 0.1 : 0))
         )
     }
 
