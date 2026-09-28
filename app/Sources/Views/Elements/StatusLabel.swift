@@ -9,6 +9,13 @@ struct StatusLabel: View {
     var body: some View {
         VStack(spacing: 4) {
             switch status.state {
+            case .scheduled where start.timeIntervalSinceNow < -Self.overdue:
+                // Long past its start with no word from the feed: a time
+                // here read as a game still to come, at six in the evening
+                // for a match of three in the morning (Julien, build 28).
+                Text("status.awaiting")
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(.secondary)
             case .scheduled:
                 if !Calendar.current.isDateInToday(start) {
                     Text(start, format: .dateTime.weekday(.abbreviated).day().month(.abbreviated))
@@ -35,6 +42,9 @@ struct StatusLabel: View {
             }
         }
     }
+
+    /// How long after its start a game with no news stops showing its time.
+    static let overdue: TimeInterval = 3 * 3600
 
     /// Endings worth folding into the "Final" line rather than printing below it.
     static let finalCombined: [String: String] = [

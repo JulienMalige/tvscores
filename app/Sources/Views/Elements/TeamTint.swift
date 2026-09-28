@@ -15,7 +15,42 @@ enum TeamTint {
     private struct Bucket { var count = 0, r = 0, g = 0, b = 0 }
 
     static func dominant(_ image: UIImage) -> Color? {
-        guard let cg = image.cgImage else { return nil }
+        palette(image).first.map(\.color)
+    }
+
+    /// Both sides' colours, told apart. A crest's commonest colour first; an
+    /// away side whose commonest is too near the home side's takes its next
+    /// one, and white when it has none far enough — Turkey's red and Italy's
+    /// made one bar of two on build 28 (Julien: "avoid too similar colors").
+    static func pair(_ home: TeamRef?, _ away: TeamRef?) async -> (home: Color?, away: Color?) {
+        async let h = palette(of: home)
+        async let a = palette(of: away)
+        let (homes, aways) = await (h, a)
+        guard let first = homes.first else { return (nil, aways.first?.color) }
+        let apart = aways.first { $0.distance(to: first) >= Self.apart }
+        return (first.color, apart?.color ?? Color.white.opacity(0.85))
+    }
+
+    /// How far apart two colours must be to read as two bars: red against
+    /// orange-red is 0.15 or so; red against blue or green over 0.6.
+    static let apart = 0.3
+
+    struct Swatch {
+        let r, g, b: Double
+        var color: Color { Color(red: r, green: g, blue: b) }
+        func distance(to other: Swatch) -> Double {
+            ((r - other.r) * (r - other.r) + (g - other.g) * (g - other.g) + (b - other.b) * (b - other.b)).squareRoot()
+        }
+    }
+
+    private static func palette(of team: TeamRef?) async -> [Swatch] {
+        guard let url = team?.logo, let image = await ImageCache.shared.load(url) else { return [] }
+        return palette(image)
+    }
+
+    /// A crest's strong colours, commonest first: up to three.
+    static func palette(_ image: UIImage) -> [Swatch] {
+        guard let cg = image.cgImage else { return [] }
         let side = 24
         var pixels = [UInt8](repeating: 0, count: side * side * 4)
         let drawn = pixels.withUnsafeMutableBytes { buffer -> Bool in
@@ -25,7 +60,7 @@ enum TeamTint {
             ctx.draw(cg, in: CGRect(x: 0, y: 0, width: side, height: side))
             return true
         }
-        guard drawn else { return nil }
+        guard drawn else { return [] }
         var buckets: [Int: Bucket] = [:]
         for i in stride(from: 0, to: pixels.count, by: 4) where pixels[i + 3] > 200 {
             let r = Int(pixels[i]), g = Int(pixels[i + 1]), b = Int(pixels[i + 2])
@@ -37,8 +72,9 @@ enum TeamTint {
             buckets[key] = bucket
         }
         // A few stray pixels are antialiasing, not a colour.
-        guard let top = buckets.values.max(by: { $0.count < $1.count }), top.count >= 8 else { return nil }
-        let n = Double(top.count) * 255
-        return Color(red: Double(top.r) / n, green: Double(top.g) / n, blue: Double(top.b) / n)
+        return buckets.values.filter { $0.count >= 8 }.sorted { $0.count > $1.count }.prefix(3).map { top in
+            let n = Double(top.count) * 255
+            return Swatch(r: Double(top.r) / n, g: Double(top.g) / n, b: Double(top.b) / n)
+        }
     }
 }

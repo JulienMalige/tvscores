@@ -16,6 +16,9 @@ struct GameDetail: Decodable, Equatable {
         let labels: [String]
         let home: [Int]
         let away: [Int]
+
+        /// Four quarters of nothing, drawn blurred while the real ones come.
+        static let placeholder = Periods(labels: ["1", "2", "3", "4"], home: [0, 0, 0, 0], away: [0, 0, 0, 0])
     }
 
     struct Stat: Decodable, Equatable, Identifiable {
@@ -26,6 +29,9 @@ struct GameDetail: Decodable, Equatable {
 
         /// Shown with a percent sign.
         var isPercent: Bool { id == "possession" || id.hasSuffix("Pct") }
+
+        /// Six even lines, drawn blurred while the real ones come.
+        static let placeholders = (0..<6).map { Stat(id: "placeholder\($0)", home: 1, away: 1) }
     }
 
     /// A goal or a card, and on whose side.

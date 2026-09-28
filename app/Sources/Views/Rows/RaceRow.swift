@@ -37,6 +37,7 @@ private struct RaceRowContent: View {
             podium
         }
         .rowSurface(focused: isFocused, resting: 0)
+        .environment(\.onLightSurface, isFocused)
     }
 
     /// What is on this day: the sessions of it, or the race.

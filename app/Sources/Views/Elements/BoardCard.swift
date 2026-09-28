@@ -6,14 +6,25 @@ import SwiftUI
 struct BoardCard<Content: View>: View {
     @Binding var day: Day
     @ViewBuilder var content: () -> Content
+    /// The games can take focus. Not until the day switch has it: with the
+    /// switch centred, tvOS put first focus on the first game, and the page
+    /// then moved it up to the chosen day — a jump Julien saw on build 28.
+    /// With nothing else to take, focus lands on the switch at once. A
+    /// second at most, in case it never does.
+    @State private var open = false
 
     var body: some View {
         VStack(spacing: 0) {
-            DayTabs(selected: $day)
+            DayTabs(selected: $day) { open = true }
                 .padding(.vertical, Metrics.cardInsetV / 2)
             Divider().overlay(Color.white.opacity(0.15))
             content()
+                .disabled(!open)
                 .padding(.vertical, Metrics.cardInsetV)
+        }
+        .task {
+            try? await Task.sleep(for: .seconds(1))
+            open = true
         }
         .padding(.horizontal, Metrics.cardInsetH / 2)
         .gameCardSurface()

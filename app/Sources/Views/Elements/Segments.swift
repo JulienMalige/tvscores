@@ -25,6 +25,8 @@ struct Segments<Value: Hashable>: View {
     var claimsFocus = false
     /// In the middle of its row, as the switch on top of a board card.
     var centred = false
+    /// Told when focus first lands on a pill, so the page can open its rows.
+    var onFocusArrived: () -> Void = {}
     /// The pill the remote is on, by position.
     @FocusState private var focused: Int?
     @Environment(\.menuIsOpen) private var menuIsOpen
@@ -56,6 +58,7 @@ struct Segments<Value: Hashable>: View {
             // than the chosen one, it moves to the chosen one. Only that
             // first arrival — a move along the pills after it is the viewer's.
             .onChange(of: focused) { old, new in
+                if new != nil { onFocusArrived() }
                 guard claimsFocus, !claimed, old == nil, let new else { return }
                 claimed = true
                 if let chosen = options.firstIndex(where: { $0.value == selection }), chosen != new {

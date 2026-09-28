@@ -59,6 +59,7 @@ private struct StandingsRowContent: View {
             }
         }
         .rowSurface(focused: isFocused, resting: plain ? 0 : 0.04)
+        .environment(\.onLightSurface, isFocused)
         // A game's two sides, a shade lighter, as Apple Sports picks them out.
         .background(
             RoundedRectangle(cornerRadius: Metrics.rowRadius, style: .continuous)

@@ -36,6 +36,7 @@ private struct MatchRowContent: View {
             line
         }
         .rowSurface(focused: isFocused, resting: 0)
+        .environment(\.onLightSurface, isFocused)
     }
 
     private var caption: String? {

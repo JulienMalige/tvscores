@@ -9,13 +9,15 @@ import SwiftUI
 /// - to come: the table the two teams sit in, and when and where;
 /// - under way or over: the score by quarter (NFL, NBA), a short set of
 ///   statistics (football, NBA), goals and cards (football), the venue.
-/// Tennis has its tournament over the two players and nothing else to add.
+/// Tennis has its tournament over the two players, and the tour's ranking.
 struct GameScreen: View {
     let eventId: String
     let fallback: Event
     let store: ScoreboardStore
     @State private var detail: GameDetail?
     @State private var tints: (home: Color?, away: Color?) = (nil, nil)
+    /// The first answer about the game has come, empty or not.
+    @State private var asked = false
 
     /// Re-read from the store on every pass, so a live score keeps moving.
     private var found: (event: Event, group: LeagueGroup)? { store.board?.find(eventId) }
@@ -32,6 +34,20 @@ struct GameScreen: View {
         ScrollView {
             VStack(spacing: Metrics.gameGap) {
                 GameHeaderSection(event: event, competition: competition, records: detail?.records)
+                if event.status.state != .scheduled, !asked {
+                    // The room the statistics will take, held while they
+                    // come: they took a few seconds on the television and
+                    // pushed everything under them down when they did
+                    // (Julien, build 28).
+                    if ["nfl", "nba"].contains(event.sport) {
+                        PeriodSection(periods: .placeholder, home: event.home, away: event.away)
+                            .redacted(reason: .placeholder)
+                    }
+                    if ["football", "nba"].contains(event.sport) {
+                        StatsSection(stats: GameDetail.Stat.placeholders)
+                            .redacted(reason: .placeholder)
+                    }
+                }
                 if event.status.state != .scheduled {
                     if let periods = detail?.periods { PeriodSection(periods: periods, home: event.home, away: event.away) }
                     if let stats = detail?.stats, !stats.isEmpty {
@@ -39,12 +55,14 @@ struct GameScreen: View {
                     }
                     if let moments = detail?.timeline, !moments.isEmpty { MomentsSection(moments: moments) }
                 }
+                // The table both sides sit in: a league's, or a tour's
+                // ranking with the two players picked out (Julien, build 28).
+                if let group = found?.group, group.league.hasStandings == true {
+                    StandingsSection(ref: LeagueRef(group: group), store: store,
+                                     highlight: Set([event.home?.name, event.away?.name].compactMap { $0 }),
+                                     carded: true)
+                }
                 if event.sport != "tennis" {
-                    if let group = found?.group, group.league.hasStandings == true {
-                        StandingsSection(ref: LeagueRef(group: group), store: store,
-                                         highlight: Set([event.home?.name, event.away?.name].compactMap { $0 }),
-                                         carded: true)
-                    }
                     GameInfoSection(start: event.start, venue: detail?.venue, place: detail?.city)
                 }
             }
@@ -60,14 +78,13 @@ struct GameScreen: View {
         .presentationBackground(Color.black.opacity(0.6))
         .accessibilityIdentifier("page.game")
         .task(id: eventId) {
-            async let home = TeamTint.of(event.home)
-            async let away = TeamTint.of(event.away)
-            tints = await (home, away)
+            tints = await TeamTint.pair(event.home, event.away)
         }
         .task(id: eventId) {
             // Asked when opened; again each minute until the game is over.
             while !Task.isCancelled {
                 if let fresh = await store.detail(for: eventId) { detail = fresh }
+                asked = true
                 // Until the whistle: a page opened before kickoff has to see
                 // the game start to fetch its periods, stats and goals.
                 guard event.status.state != .final else { return }

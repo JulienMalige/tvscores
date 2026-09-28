@@ -86,8 +86,10 @@ struct Sidebar: View {
             // nothing beside it on the page (Home, at the top) goes nowhere,
             // and tvOS's own sidebar shuts on any press right.
             for await note in NotificationCenter.default.notifications(named: UIFocusSystem.movementDidFailNotification) {
+                // A game's page over everything owns the remote: a press left
+                // on it is not the page underneath asking for the menu (build 28).
                 guard let context = note.userInfo?[UIFocusSystem.focusUpdateContextUserInfoKey] as? UIFocusUpdateContext,
-                      !moving else { continue }
+                      !moving, game == nil else { continue }
                 if context.focusHeading.contains(.left), !expanded { openMenu() }
                 if context.focusHeading.contains(.right), expanded { shut() }
             }

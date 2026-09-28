@@ -139,6 +139,7 @@ private struct MenuRow: View {
     var body: some View {
         HStack(spacing: 16) {
             icon.view(size: Metrics.menuIcon)
+                .environment(\.onLightSurface, isFocused)
             // Long names fade out at the panel's edge, as tvOS's own
             // sidebar does, rather than end in an ellipsis.
             title
