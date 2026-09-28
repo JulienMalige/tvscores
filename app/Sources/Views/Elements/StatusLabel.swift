@@ -5,6 +5,11 @@ import SwiftUI
 struct StatusLabel: View {
     let status: Status
     let start: Date
+    /// A list row's middle, smaller than its scores as Apple Sports sets it;
+    /// a game's page keeps the larger size.
+    var compact = false
+
+    private var mainFont: Font { compact ? .title3.weight(.semibold) : .title2.weight(.semibold) }
 
     var body: some View {
         VStack(spacing: 4) {
@@ -14,7 +19,7 @@ struct StatusLabel: View {
                 // here read as a game still to come, at six in the evening
                 // for a match of three in the morning (Julien, build 28).
                 Text("status.awaiting")
-                    .font(.title2.weight(.semibold))
+                    .font(mainFont)
                     .foregroundStyle(.secondary)
             case .scheduled:
                 if !Calendar.current.isDateInToday(start) {
@@ -23,21 +28,21 @@ struct StatusLabel: View {
                         .foregroundStyle(.secondary)
                 }
                 Text(start, format: .dateTime.hour().minute())
-                    .font(.title2.weight(.semibold))
+                    .font(mainFont)
                 if let d = status.detail { detailText(d) }
             case .live:
                 Text(status.clock ?? localizedDetail(status.note) ?? localizedDetail(status.detail) ?? String(localized: "status.live"))
-                    .font(.title2.weight(.semibold))
+                    .font(mainFont)
                     .foregroundStyle(status.note == nil ? .green : .orange)
                 if status.clock != nil || status.note != nil, let d = status.detail { detailText(d) }
             case .final:
                 Text(finalText)
-                    .font(.title2.weight(.semibold))
+                    .font(mainFont)
                 // "Final/OT" says it on one line; anything else keeps its own.
                 if let d = status.detail, Self.finalCombined[d] == nil { detailText(d) }
             case .other:
                 Text(localizedDetail(status.detail) ?? "–")
-                    .font(.title2.weight(.semibold))
+                    .font(mainFont)
                     .foregroundStyle(.secondary)
             }
         }

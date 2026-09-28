@@ -6,6 +6,7 @@ struct CompetitionScreen: View {
     let store: ScoreboardStore
     @State var day: Day
     @Environment(\.openMenu) private var openMenu
+    @Environment(\.pageScrolled) private var pageScrolled
     /// The logo's own colour, read only when the proxy names none.
     @State private var logoTint: Color?
 
@@ -31,6 +32,8 @@ struct CompetitionScreen: View {
             .pageMargins()
         }
         .scrollClipDisabled()
+        // Scrolled away from the top, the menu chip drops its name.
+        .onScrollGeometryChange(for: Bool.self, of: { $0.contentOffset.y > 60 }) { _, down in pageScrolled(down) }
         .pageTint(tint)
         .task(id: ref.logo) {
             guard Color(hex: ref.color) == nil else { return }

@@ -49,7 +49,7 @@ private struct MatchRowContent: View {
             side(event.home)
             scoreText(event.score?.home, winner: winner == .home)
                 .frame(width: Metrics.matchScore, alignment: .center)
-            StatusLabel(status: event.status, start: event.start)
+            StatusLabel(status: event.status, start: event.start, compact: true)
                 .frame(maxWidth: .infinity)
             scoreText(event.score?.away, winner: winner == .away)
                 .frame(width: Metrics.matchScore, alignment: .center)

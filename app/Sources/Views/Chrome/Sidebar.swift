@@ -30,6 +30,8 @@ struct Sidebar: View {
     @State private var expanded = false
     /// Set while the menu opens or shuts, when focus moves under our feet.
     @State private var moving = false
+    /// The page under the chip is scrolled down: the chip shows its icon only.
+    @State private var chipShrunk = false
     @FocusState private var menuFocus: MenuItem?
 
     var body: some View {
@@ -38,7 +40,10 @@ struct Sidebar: View {
         }
         .task { Diagnostics.shared.start(); store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
-        .onChange(of: selection) { old, new in Diagnostics.shared.note("menu \(old) -> \(new)") }
+        .onChange(of: selection) { old, new in
+            Diagnostics.shared.note("menu \(old) -> \(new)")
+            chipShrunk = false
+        }
         .onChange(of: expanded) { _, open in Diagnostics.shared.note("menu \(open ? "opened" : "shut")") }
         .onChange(of: store.iconsVersion) { _, v in Diagnostics.shared.note("icons version \(v)") }
         .onChange(of: store.leagues.count) { _, n in
@@ -59,6 +64,9 @@ struct Sidebar: View {
                 .environment(\.openMenu, openMenu)
                 .environment(\.openGame) { game = $0 }
                 .environment(\.menuIsOpen) { expanded }
+                .environment(\.pageScrolled) { scrolled in
+                    if scrolled != chipShrunk { chipShrunk = scrolled }
+                }
             if expanded {
                 Color.black.opacity(0.45)
                     .ignoresSafeArea()
@@ -66,7 +74,7 @@ struct Sidebar: View {
                     .transition(.opacity)
             }
             MenuPanel(sections: sections, selection: selection, expanded: expanded,
-                      focus: $menuFocus, pick: pick)
+                      focus: $menuFocus, pick: pick, shrunk: chipShrunk)
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.86), value: expanded)
         .fullScreenCover(item: $game) { event in
@@ -213,6 +221,9 @@ extension EnvironmentValues {
     @Entry var openMenu: @MainActor () -> Void = {}
     /// Opens a game's page, from its row.
     @Entry var openGame: @MainActor (Event) -> Void = { _ in }
+    /// A page reports whether it is scrolled away from its top, for the menu
+    /// chip to shrink to its icon, as tvOS's own does.
+    @Entry var pageScrolled: @MainActor (Bool) -> Void = { _ in }
     /// Whether the menu is open, read when asked, not when the view was made.
     @Entry var menuIsOpen: @MainActor () -> Bool = { false }
 }

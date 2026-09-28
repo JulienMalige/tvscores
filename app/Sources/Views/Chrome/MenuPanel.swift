@@ -11,6 +11,8 @@ struct MenuPanel: View {
     let expanded: Bool
     var focus: FocusState<MenuItem?>.Binding
     let pick: (MenuItem) -> Void
+    /// The page is scrolled down: the chip keeps its icon and drops its name.
+    var shrunk = false
 
     var body: some View {
         if expanded {
@@ -80,10 +82,14 @@ struct MenuPanel: View {
             Image(systemName: "chevron.left")
                 .font(.caption.weight(.semibold))
             currentIcon.view(size: Metrics.menuIcon * 0.8)
-            currentTitle
-                .font(.callout.weight(.semibold))
-                .lineLimit(1)
+            if !shrunk {
+                currentTitle
+                    .font(.callout.weight(.semibold))
+                    .lineLimit(1)
+                    .transition(.opacity.combined(with: .move(edge: .leading)))
+            }
         }
+        .animation(.easeOut(duration: 0.25), value: shrunk)
         .padding(.horizontal, 20)
         .padding(.vertical, 10)
         .background(Capsule().fill(.regularMaterial))

@@ -10,6 +10,7 @@ struct HomeScreen: View {
     @Binding var path: NavigationPath
     @Binding var openedInitialRace: Bool
     @Environment(\.openMenu) private var openMenu
+    @Environment(\.pageScrolled) private var pageScrolled
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -24,6 +25,8 @@ struct HomeScreen: View {
                 }
                 .pageMargins()
             }
+            // Scrolled away from the top, the menu chip drops its name.
+            .onScrollGeometryChange(for: Bool.self, of: { $0.contentOffset.y > 60 }) { _, down in pageScrolled(down) }
             // Set inside the stack, so a race pushed over Home keeps its own page.
             .pageTint(.homeTint)
             // Back on the page opens the menu, as on tvOS's own sidebar; a
