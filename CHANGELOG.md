@@ -8,6 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
+## 1.0 build 26 — 28 September 2026
 - Tennis keeps its big tournaments listed: a change in the feed had
   started to drop some of them, the WTA 1000 in Beijing among them.
 
