@@ -54,6 +54,13 @@ the remote). The workflow does
 this before it takes the screenshots, and keeps `tests.xcresult` as an
 artifact when something fails.
 
+Every green build of `main` is also uploaded to VibeView (vibeview.io), a
+tvOS simulator streamed to a browser, so Julien can try it from his iPad
+before a TestFlight build. The token is `VIBEVIEW_API_TOKEN` in the
+repository's secrets and `~/.config/tvscores/vibeview.key` here; the CLI is
+`npx vibeview` (`whoami`, `list-builds`). Its free tier is 30 streaming
+minutes a month.
+
 The `source-hygiene` skill wraps the audit and adds the judgement a script
 cannot make. Run it when asked about the state of the source.
 

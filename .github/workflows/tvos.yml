@@ -209,3 +209,17 @@ jobs:
         with:
           name: build-log
           path: app/build.log
+
+      # The build, to VibeView (vibeview.io): a real Apple TV simulator in
+      # the cloud, streamed to a browser, so Julien can try a change from
+      # his iPad before it goes to TestFlight (2026-09-28). The live proxy,
+      # not the demo board. A failure there never fails this run.
+      - name: Upload the build to VibeView
+        if: success() && github.ref == 'refs/heads/main'
+        continue-on-error: true
+        env:
+          VIBEVIEW_API_TOKEN: ${{ secrets.VIBEVIEW_API_TOKEN }}
+        run: |
+          APP=$(find build/Build/Products -name 'TVScores.app' -maxdepth 2 | head -1)
+          NOTE="$(git rev-parse --short HEAD) $(git log -1 --format=%s | head -c 80)"
+          npx -y vibeview upload-app "$APP" --name "TV Scores" --note "$NOTE" --output json
