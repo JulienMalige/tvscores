@@ -88,8 +88,9 @@ struct LeagueHeader: View {
 
 /// A tournament's heading on its tour's page, centred over its matches as
 /// Apple Sports heads the China Open: the flag large (the feed has no
-/// tournament logos), the name, then tier, surface and town in grey —
-/// "Beijing", "WTA 1000 · Hard · Beijing, CN".
+/// tournament logos), the name, then in grey its dates and town —
+/// "China Open", "30 Sep – 11 Oct · Beijing, China" — or, for a tournament
+/// our calendar does not know, its tier, surface and town.
 struct TournamentHeader: View {
     let competition: Competition
 
@@ -110,6 +111,14 @@ struct TournamentHeader: View {
     }
 
     private var subtitle: Text? {
+        if let dates = competition.dates {
+            // The interval style says the month once when both days share it
+            // ("30 Sep – 11 Oct", "5 – 11 Oct") in the viewer's own order.
+            let span = dates.formatted(.interval.day().month(.abbreviated))
+            let country = competition.country.flatMap { Locale.current.localizedString(forRegionCode: $0) }
+            let place = [competition.city, country].compactMap { $0 }.joined(separator: ", ")
+            return Text(verbatim: place.isEmpty ? span : "\(span) · \(place)")
+        }
         let surface = competition.surface.map { raw -> Text in
             let known = ["hard", "clay", "grass"]
             return known.contains(raw.lowercased()) ? Text(LocalizedStringKey("surface." + raw.lowercased())) : Text(verbatim: raw.capitalized)

@@ -4,6 +4,22 @@ import { join } from "node:path";
 
 const env = process.env;
 
+/**
+ * Our hand-kept tennis calendar: the names broadcasters use and the dates,
+ * which the feed does not carry. Read once at start; a missing or broken
+ * file leaves tournaments with the feed's own names rather than stopping
+ * the proxy.
+ */
+function readCalendar() {
+  const file = env.TVSCORES_TENNIS_CALENDAR || new URL("../tennis-calendar.json", import.meta.url);
+  try {
+    const entries = JSON.parse(readFileSync(file, "utf8"));
+    return Array.isArray(entries) ? entries : [];
+  } catch {
+    return [];
+  }
+}
+
 function readKey(envName, fileName) {
   if (env[envName]) return env[envName].trim();
   const file = env[`${envName}_FILE`] || join(homedir(), ".config/tvscores", fileName);
@@ -114,13 +130,16 @@ export const config = {
   /**
    * Tennis plays somewhere every week of the year, most of it in front of
    * nobody. These are the events worth a television: the four majors, the
-   * 1000-level fields and the season finals. The feed labels a tournament's
+   * 1000-level and 500-level fields (Julien, 2026-09-28: the 500s too) and
+   * the season finals. The feed labels a tournament's
    * category only where its own catalogues agree on an exact-name join and
    * never guesses from the name, so an unlabelled tournament is left out
    * rather than assumed to be big.
    */
   tennis: {
-    categories: ["grand_slam", "masters_1000", "tour_finals", "wta_1000"],
+    categories: ["grand_slam", "masters_1000", "tour_finals", "wta_1000", "atp_500", "wta_500"],
+    /** Names and dates by tour, town and week; see `calendarEntry`. */
+    calendar: readCalendar(),
     /** Qualifying draws are the same tournament but not the part you watch. */
     includeQualifying: false,
     /**
@@ -128,7 +147,8 @@ export const config = {
      * name match is what mislabelled them: Madrid and Rome come back as `itf`
      * (both cities host an ITF week of the same name) and the rest as `null`.
      * Each tournament has two ids, one per event type, and both are listed.
-     * Checked 2026-09-15; ATP Doha and ATP Beijing are 500s and stay out.
+     * Checked 2026-09-15. ATP Doha and ATP Beijing are 500s, kept by the
+     * category or tier the catalogue gives them now that 500s are shown.
      */
     alsoBig: [
       1262, 1970, // Monte Carlo

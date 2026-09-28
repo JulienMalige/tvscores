@@ -1,5 +1,6 @@
 import { getJson } from "../http.js";
 import { STATE, flagIso2, flagIso3 } from "../model.js";
+import { calendarEntry } from "./tennis-calendar.js";
 
 const BASE = "https://api.livetennisapi.com/api/public/v1";
 const TOURS = {
@@ -48,13 +49,25 @@ export function tierLabel(tier) {
 
 /**
  * The tournament a match belongs to, as a heading can show it: its name,
- * its country's flag (the proxy's flat flags, as a race weekend's), its tier
- * and surface. The feed has no logo and no sponsor's name — the China Open
- * is "Beijing" — so the name is the feed's own.
+ * town, country and flag (the proxy's flat flags, as a race weekend's), its
+ * tier and surface, and its dates. The feed has no logo, no sponsor's name
+ * and no dates — the China Open is "Beijing" — so the name and the dates come
+ * from our calendar when it has the tournament, and the name falls back to
+ * the feed's own when it does not.
  */
-function competitionOf(info) {
+function competitionOf(info, entry) {
   if (!info?.name) return undefined;
-  return { name: info.name, city: info.city || undefined, flag: flagIso2(info.country), tier: tierLabel(info.tier), surface: info.surface || undefined };
+  const country = info.country || entry?.country;
+  return {
+    name: entry?.name || info.name,
+    city: info.city || entry?.city || undefined,
+    country: /^[A-Za-z]{2}$/.test(country || "") ? country.toUpperCase() : undefined,
+    flag: flagIso2(country),
+    tier: tierLabel(info.tier || entry?.tier),
+    surface: info.surface || undefined,
+    start: entry?.start,
+    end: entry?.end,
+  };
 }
 
 /** "WTA Beijing - Round of 64" -> "Round of 64": the tournament is said already. */
@@ -78,11 +91,13 @@ export function tiersFor(categories) {
 }
 
 /** The tier names the feed's filter accepts; "tour_finals" is only ours (HTTP 400). */
-const FEED_TIERS = ["grand_slam", "atp_1000", "wta_1000", "atp_finals", "wta_finals"];
+const FEED_TIERS = ["grand_slam", "atp_1000", "wta_1000", "atp_500", "wta_500", "atp_finals", "wta_finals"];
 
-export function normaliseMatch(m, info) {
+export function normaliseMatch(m, info, calendar = []) {
   const league = TOURS[m.tour];
   if (!league || m.is_doubles) return null;
+  const start = new Date(m.scheduled_time || m.live_at || Date.now()).toISOString();
+  const entry = info ? calendarEntry(calendar, { tour: m.tour, info, day: start.slice(0, 10) }) : undefined;
   let state = STATE.other;
   if (m.status === "upcoming") state = STATE.scheduled;
   else if (m.status === "live") state = STATE.live;
@@ -100,10 +115,10 @@ export function normaliseMatch(m, info) {
     sport: "tennis",
     league,
     kind: "match",
-    start: new Date(m.scheduled_time || m.live_at || Date.now()).toISOString(),
+    start,
     round: roundOf(m.round),
     tournament: m.tournament,
-    competition: competitionOf(info),
+    competition: competitionOf(info, entry),
     status: { state, clock: state === STATE.live && !interrupted ? liveClock(m.score) : undefined, detail, note: interrupted ? "Interrupted" : undefined },
     home: player(m.players?.p1),
     away: player(m.players?.p2),
@@ -121,13 +136,17 @@ export const TIER_CATEGORY = {
   grand_slam: "grand_slam",
   atp_1000: "masters_1000",
   wta_1000: "wta_1000",
+  atp_500: "atp_500",
+  wta_500: "wta_500",
   atp_finals: "tour_finals",
   wta_finals: "tour_finals",
   tour_finals: "tour_finals",
 };
 
 /** Bumped when what the catalogue holds changes, so an older one is fetched again. */
-const CATALOGUE_VERSION = 2;
+// 3: the 500s' tiers stand for a category now, so a catalogue that
+// filed an unlabelled 500 as null is read again.
+const CATALOGUE_VERSION = 3;
 
 /** A month: tournament identity is stable across seasons, so the catalogue is nearly static. */
 const CATALOGUE_TTL = 30 * 86400e3;
@@ -195,7 +214,7 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
     const { body } = await getJson(`${BASE}/matches?status=${status}${tiers}&limit=200`, { headers });
     quota.record(undefined);
     const big = bigEventFilter({ byId, ...tennis });
-    const rows = (body.data || []).filter(big).map((m) => normaliseMatch(m, info[String(m.tournament_id)])).filter(Boolean);
+    const rows = (body.data || []).filter(big).map((m) => normaliseMatch(m, info[String(m.tournament_id)], tennis.calendar)).filter(Boolean);
     log(`GET tennis ${status} -> ${body?.data?.length ?? 0} matches, ${rows.length} in ${tennis.categories.join("/")}`);
     return rows;
   }
