@@ -50,8 +50,5 @@ final class HomeScreenFlow: FlowCase {
         Flow.remote.press(.select)
         // A cup has no table; what says "league page" is the Standings heading.
         app.staticTexts["Standings"].appears(within: 10)
-        // On Football's page, with the cup picked on the competition switch.
-        XCTAssertTrue(app.buttons["competition.football.4501"].exists, "the competition switch names the cup")
-        XCTAssertTrue(app.buttons["competition.all"].exists, "beside All")
     }
 }

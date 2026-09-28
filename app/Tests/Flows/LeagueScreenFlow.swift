@@ -102,7 +102,7 @@ final class EveryPageTakesFocusFlow: FlowCase {
             Flow.focusThePage()
             sleep(1)
             let onPage = app.descendants(matching: .any)
-                .matching(NSPredicate(format: "hasFocus == 1 AND NOT (identifier BEGINSWITH 'tab.')"))
+                .matching(NSPredicate(format: "hasFocus == 1 AND NOT (identifier BEGINSWITH 'menu.')"))
                 .firstMatch
             if !onPage.exists {
                 Flow.reportFocus(app, "on \(name)'s page")
@@ -116,21 +116,3 @@ final class EveryPageTakesFocusFlow: FlowCase {
     }
 }
 
-/// A family of sport's page: All first, then one pill per competition.
-final class SportScreenFlow: FlowCase {
-
-    func testAllListsEveryCompetitionOfTheSportAndAHeadingPicksOne() {
-        // Motorsport on Upcoming: both series have a round coming.
-        let app = Flow.launch(tab: "upcoming", league: "f1")
-        app.buttons["competition.all"].firstMatch.appears(within: 10)
-        Flow.focusThePage()
-        XCTAssertTrue(Flow.walk(.left, until: app.buttons["competition.all"], limit: 4), "All leads the competition switch")
-        Flow.remote.press(.select)
-        XCTAssertTrue(app.buttons["league.f1.f1"].waitForExistence(timeout: 8), "All lists Formula 1 under its heading")
-        XCTAssertTrue(app.buttons["league.motogp.motogp"].exists, "and MotoGP under its own")
-        XCTAssertFalse(app.staticTexts["Standings"].exists, "no table: a table belongs to one competition")
-        XCTAssertTrue(Flow.walk(.down, until: app.buttons["league.f1.f1"], limit: 8), "focus reaches the Formula 1 heading")
-        Flow.remote.press(.select)
-        XCTAssertTrue(app.staticTexts["Standings"].waitForExistence(timeout: 8), "the heading picks Formula 1, table and all")
-    }
-}

@@ -1,142 +1,88 @@
 import XCTest
 
-/// What joins the screens: where focus lands, how the menu opens and closes,
+/// What joins the screens: how the menu opens and shuts, where focus goes,
 /// and that a press takes you where it says and back again.
 ///
-/// The flows before this one each prove a screen; this one proves the moves
-/// between them, which is where "the menu opens and closes" lived.
-///
-/// What the simulator can and cannot say about the menu, settled on
-/// 2026-09-17 over eight CI runs: driven by `XCUIRemote`, the system sidebar
-/// never stays open. It expands on a press left and is shut again within a
-/// second — with every piece of ours switched off, and for a bare three-tab
-/// `TabView` with nothing of ours in it at all. Focus at launch sits on the
-/// sidebar's hidden cell, and one press left moves it to the page's leading
-/// pill. So a flow that needs the menu open for longer than the walk it makes
-/// straight after opening it is a probe, run by hand with
-/// TVSCORES_MENU_PROBE=1, and gates nothing; the television is the judge of
-/// whether the menu stays open. With the day switch on the page even the
-/// moves that act on the menu at once stopped holding: when the simulator's
-/// menu shuts, focus lands on the leftmost element, and where that landed
-/// could not be told apart from the menu working, so nothing about the menu
-/// can be asserted here any more. Every flow that opens the menu is a probe;
-/// the menu is judged on the TV.
+/// The menu is ours since 2026-09-28 — plain views, not tvOS's sidebar —
+/// which is what lets these run: the simulator never held the system's
+/// sidebar open, so every one of these was a probe run by hand until then.
 final class NavigationFlow: FlowCase {
-    private func probeOnly() throws {
-        try XCTSkipUnless(ProcessInfo.processInfo.environment["TVSCORES_MENU_PROBE"] == "1",
-                          "the simulator cannot hold the menu open; set TVSCORES_MENU_PROBE=1 to probe by hand")
-    }
-
-    // MARK: Focus
-
-    func testFocusStartsOnTheDayBeingShown() throws {
-        try probeOnly()
-        // Launched on Upcoming, the highlight starts on Upcoming. The leading
-        // pill instead is the engine re-seeding from nothing — the
-        // fingerprint of a menu that has just been shut from under its reader.
-        let app = Flow.launch(tab: "upcoming")
-        sleep(1)
-        XCTAssertTrue(Flow.day(app, "upcoming").hasFocus, "focus starts on the selected segment, not the leading one")
-    }
 
     // MARK: The menu
 
-    func testTheMenuOpensOnOnePressLeft() throws {
-        try probeOnly()
+    func testTheMenuOpensFromTheDaySwitchOnTheCurrentRow() {
         let app = Flow.launch()
-        Flow.remote.press(.left)
-        sleep(2)
-        XCTAssertTrue(Flow.menuIsOpen(app), "one press left from the day switch opens the menu")
+        Flow.openMenu(app)
+        XCTAssertTrue(Flow.menuRow(app).hasFocus, "focus lands on Home, the page being shown")
     }
 
-    func testTheMenuOpensFromARowToo() throws {
-        try probeOnly()
-        // Not only from the day switch: from a match row, left has nothing to go
-        // to on the page, and that is the menu's cue on tvOS.
+    func testTheMenuOpensFromARowToo() {
         let app = Flow.launch()
         let first = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'match.'")).firstMatch
         XCTAssertTrue(Flow.walk(.down, until: first, limit: 12), "focus reaches the first match row")
-        Flow.remote.press(.left)
-        sleep(2)
-        XCTAssertTrue(Flow.menuIsOpen(app), "left from a match row opens the menu as well")
+        Flow.openMenu(app)
     }
 
-    func testClosingTheMenuPutsFocusBackOnThePage() throws {
-        try probeOnly()
+    func testTheMenuStaysOpenAcrossARefresh() {
+        // The fault on the television: open, then shut on its own. The demo
+        // board reloads every 30 s while a match is live in it.
+        let app = Flow.launch()
+        Flow.openMenu(app)
+        sleep(35)
+        let open = Flow.menuIsOpen(app)
+        if !open { Flow.reportFocus(app, "after the menu shut on its own") }
+        XCTAssertTrue(open, "the menu is still open thirty-five seconds and a refresh later")
+    }
+
+    func testRightShutsTheMenuAndFocusIsBackOnThePage() {
         let app = Flow.launch()
         Flow.openMenu(app)
         Flow.remote.press(.right)
         sleep(1)
         XCTAssertFalse(Flow.menuIsOpen(app), "right shuts the menu")
-        let pills = ["yesterday", "today", "upcoming"].map { Flow.day(app, $0) }
-        XCTAssertTrue(pills.contains { $0.hasFocus }, "and focus is back on the page, on the day switch")
+        XCTAssertTrue(Flow.focusOnPage(app).exists, "and focus is on the page")
     }
 
-    func testTheMenuStaysOpenUntilDismissed() throws {
-        try probeOnly()
-        // The bug as reported: the menu opened and shut on its own. The demo
-        // board reloads every 30 s while a live match is in it, so forty
-        // seconds spans a refresh — and nothing is asked of the app in
-        // between, since asking is what shut it in the earlier probes. One
-        // look at the end, and only if that finds it shut, a look at focus.
+    func testBackOpensTheMenuAndBackShutsIt() {
+        let app = Flow.launch()
+        Flow.focusThePage()
+        Flow.remote.press(.menu)
+        sleep(1)
+        XCTAssertTrue(Flow.menuIsOpen(app), "Back on a page opens the menu")
+        Flow.remote.press(.menu)
+        sleep(1)
+        XCTAssertFalse(Flow.menuIsOpen(app), "Back in the menu shuts it")
+        XCTAssertTrue(Flow.focusOnPage(app).exists, "and focus is on the page")
+    }
+
+    func testPickingACompetitionLowInTheMenuOpensIt() {
+        // NFL, near the bottom: the row tvOS's own sidebar could not be
+        // left from. Picked, it opens its page and shuts the menu.
         let app = Flow.launch()
         Flow.openMenu(app)
-        sleep(40)
-        let open = Flow.menuIsOpen(app)
-        if !open { Flow.reportFocus(app, "after the menu shut on its own") }
-        XCTAssertTrue(open, "the menu is still open forty seconds and one refresh later")
-    }
-
-    func testTheMenuIsStillOpenSixSecondsIn() throws {
-        try probeOnly()
-        // A bracket for the test above: the earlier probes saw the menu shut
-        // between one and five seconds after opening. Green here and red
-        // above says the refresh; red here says something sooner.
-        let app = Flow.launch()
+        let nfl = Flow.menuRow(app, "menu.nfl.4391")
+        XCTAssertTrue(Flow.walk(.down, until: nfl, limit: 20), "focus walks down the menu to NFL")
+        Flow.remote.press(.select)
+        app.buttons["AFC"].firstMatch.appears(within: 10)
+        XCTAssertFalse(Flow.menuIsOpen(app), "the menu shut")
+        sleep(1)
+        XCTAssertTrue(Flow.focusOnPage(app).exists, "focus is on NFL's page")
         Flow.openMenu(app)
-        sleep(6)
-        let open = Flow.menuIsOpen(app)
-        if !open { Flow.reportFocus(app, "after the menu shut within six seconds") }
-        XCTAssertTrue(open, "the menu is still open six seconds after opening")
+        XCTAssertTrue(nfl.hasFocus, "and left opens the menu again, on NFL")
     }
 
-    func testTheMenuStaysOpenOnceThePageHasSettled() throws {
-        try probeOnly()
-        // The crests and portraits behind the page keep arriving for some
-        // seconds after launch, each one redrawing its row. A menu opened
-        // after that has settled tells whether those arrivals are what shuts
-        // it: green here and red above says they are.
-        let app = Flow.launch()
-        sleep(30)
-        Flow.openMenu(app)
-        sleep(40)
-        let open = Flow.menuIsOpen(app)
-        if !open { Flow.reportFocus(app, "after the menu shut on a settled page") }
-        XCTAssertTrue(open, "the menu opened on a settled page is still open forty seconds later")
-    }
-
-    // MARK: Between screens
-
-    func testHomeFromTheMenuReturnsToTheFrontPage() throws {
-        try probeOnly()
+    func testHomeFromTheMenuReturnsToTheFrontPage() {
         let app = Flow.launch(league: "f1")
         app.buttons["Drivers"].firstMatch.appears(within: 10)
-        // The rows between Motorsport and Home, counted from the collapsed tree
-        // as the selection flow does — a system row reports no focus.
-        let order = app.buttons.allElementsBoundByIndex.map(\.label)
-        guard let home = order.firstIndex(of: "Home"), let f1 = order.firstIndex(of: "Motorsport"), f1 > home else {
-            return XCTFail("the menu lists Home above Motorsport; it lists \(order)")
-        }
         Flow.focusThePage()
         Flow.openMenu(app)
-        for _ in 0..<(f1 - home) {
-            Flow.remote.press(.up)
-            usleep(120_000)
-        }
+        XCTAssertTrue(Flow.walk(.up, until: Flow.menuRow(app), limit: 20), "focus walks up to Home")
         Flow.remote.press(.select)
         app.buttons["league.football.4501"].appears(within: 10)
         XCTAssertFalse(app.buttons["Drivers"].firstMatch.exists, "and the Formula 1 page is gone")
     }
+
+    // MARK: Between screens
 
     func testARaceOpensFromItsRowAndBackReturnsToItsCompetition() {
         // A race opened from the Formula 1 page comes back to Formula 1, not

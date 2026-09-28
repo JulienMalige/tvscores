@@ -8,6 +8,7 @@ struct HomeScreen: View {
     let openLeague: (LeagueRef) -> Void
     @State private var path = NavigationPath()
     @State private var openedInitialRace = false
+    @Environment(\.openMenu) private var openMenu
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -23,6 +24,9 @@ struct HomeScreen: View {
                 }
                 .pageMargins()
             }
+            // Back on the page opens the menu, as on tvOS's own sidebar; a
+            // race pushed over it takes Back for itself first.
+            .onExitCommand(perform: openMenu)
             .navigationDestination(for: Event.self) { RaceScreen(eventId: $0.id, fallback: $0, store: store) }
         }
         // `-TVScoresRace f1` opens that series' latest classified race (CI

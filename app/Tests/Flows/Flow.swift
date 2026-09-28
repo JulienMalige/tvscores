@@ -46,34 +46,33 @@ enum Flow {
         return element.exists && element.hasFocus
     }
 
-    // MARK: The system sidebar
+    // MARK: The menu
 
-    /// A row of the menu, as the tree reports it. Collapsed, the sidebar still
-    /// lists every row — disabled, at 0×0 — so `exists` says nothing about
-    /// whether the menu is open. A row that is open has a frame.
-    static func menuRow(_ app: XCUIApplication, _ name: String = "Motorsport") -> XCUIElement { app.buttons[name].firstMatch }
-    static func menuIsOpen(_ app: XCUIApplication) -> Bool {
-        let row = menuRow(app)
-        return row.exists && row.frame.width > 0 && row.isEnabled
-    }
+    /// The menu's rows exist only while it is open.
+    static func menuRow(_ app: XCUIApplication, _ id: String = "menu.home") -> XCUIElement { app.buttons[id].firstMatch }
+    static func menuIsOpen(_ app: XCUIApplication) -> Bool { menuRow(app).exists }
 
-    /// Focus left from the page opens the sidebar — for a moment. The
-    /// simulator shuts it again within a second or two (see NavigationFlow),
-    /// so whatever a flow does in the menu it does straight after this.
+    /// Presses left until the menu opens: along the day switch to its first
+    /// pill, then onto the strip at the screen's edge.
     static func openMenu(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
-        // Never called with focus on the day switch: left along it moves
-        // between its pills, which is not the menu.
-        for _ in 0..<3 {
+        for _ in 0..<6 {
             remote.press(.left)
-            sleep(2)
+            usleep(600_000)
             if menuIsOpen(app) { return }
         }
-        XCTAssertTrue(menuIsOpen(app), "pressing left opens the menu: its rows have frames", file: file, line: line)
+        XCTAssertTrue(menuIsOpen(app), "pressing left opens the menu", file: file, line: line)
     }
 
-    /// A page opened by launch argument arrives with focus still in the
-    /// sidebar — a person opens a page from a focused row and never lands
-    /// this way. A press right puts focus on the page, as theirs would be.
+    /// What has focus, if anything, outside the menu.
+    static func focusOnPage(_ app: XCUIApplication) -> XCUIElement {
+        app.descendants(matching: .any)
+            .matching(NSPredicate(format: "hasFocus == 1 AND NOT (identifier BEGINSWITH 'menu.')"))
+            .firstMatch
+    }
+
+    /// Settles focus on the page after launch, as a person's would be: the
+    /// menu's strip only takes focus a moment after launch, and a press right
+    /// makes sure focus is on the page and not still being placed.
     static func focusThePage() {
         // One press, not two: the second would move along the day switch
         // and pick another day, and the page under test would change.
