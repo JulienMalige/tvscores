@@ -12,7 +12,7 @@ struct PodiumSection: View {
                     PersonMark(photo: r.photo, flag: r.flag, color: Color(hex: r.teamColor),
                                monogram: r.code ?? PersonMark.monogram(for: r.driver), size: Metrics.markHero)
                     Text("\(r.pos ?? 0)")
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                        .font(.system(size: 30, weight: .bold))
                     Text(r.driver).font(.title3.weight(.semibold))
                     Text(r.gap ?? "").font(.callout).foregroundStyle(.secondary)
                 }

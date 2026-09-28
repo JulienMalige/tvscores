@@ -28,7 +28,7 @@ private struct StandingsRowContent: View {
     var body: some View {
         HStack(spacing: 20) {
             Text("\(entry.pos)")
-                .font(.system(size: 30, weight: .bold, design: .rounded))
+                .font(.system(size: 30, weight: .bold))
                 .monospacedDigit()
                 .frame(width: 64, alignment: .trailing)
             mark
@@ -45,7 +45,7 @@ private struct StandingsRowContent: View {
                 // points, or the percentage — carrying the weight.
                 ForEach(Array(cells.enumerated()), id: \.offset) { i, cell in
                     Text(cell)
-                        .font(.system(size: i == cells.count - 1 ? 34 : 28, weight: i == cells.count - 1 ? .bold : .regular, design: .rounded))
+                        .font(.system(size: i == cells.count - 1 ? 34 : 28, weight: i == cells.count - 1 ? .bold : .regular))
                         .monospacedDigit()
                         .lineLimit(1)
                         .minimumScaleFactor(0.7) // "1.000" fits the column rather than wrapping
@@ -54,7 +54,7 @@ private struct StandingsRowContent: View {
                 }
             } else if let v = entry.value {
                 Text(v, format: .number.grouping(.automatic))
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .font(.system(size: 34, weight: .bold))
                     .monospacedDigit()
             }
         }

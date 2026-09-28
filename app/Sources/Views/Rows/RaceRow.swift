@@ -112,7 +112,7 @@ private struct RaceRowContent: View {
                 ForEach(podium) { r in
                     HStack(spacing: 14) {
                         Text("\(r.pos ?? 0)")
-                            .font(.system(size: 34, weight: .bold, design: .rounded))
+                            .font(.system(size: 34, weight: .bold))
                         PersonMark(photo: r.photo, flag: r.flag, color: Color(hex: r.teamColor),
                                    monogram: r.code ?? PersonMark.monogram(for: r.driver), size: Metrics.mark)
                         VStack(alignment: .leading, spacing: 2) {

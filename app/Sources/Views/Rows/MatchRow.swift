@@ -87,7 +87,7 @@ private struct MatchRowContent: View {
 
     private func scoreText(_ value: Int?, winner: Bool) -> some View {
         Text(value.map { String($0) } ?? "–")
-            .font(.system(size: 54, weight: .bold, design: .rounded))
+            .font(.system(size: 64, weight: .bold).width(.condensed))
             .monospacedDigit()
             .foregroundStyle(loser(winner) ? .secondary : .primary)
     }

@@ -21,7 +21,7 @@ struct TeamMark: View {
 
     private var monogram: some View {
         Text(code)
-            .font(.system(size: size * 0.3, weight: .heavy, design: .rounded))
+            .font(.system(size: size * 0.3, weight: .heavy))
             .foregroundStyle(.white)
             .frame(width: size, height: size)
             .background(Circle().fill(Color(hue: hue, saturation: 0.55, brightness: 0.55)))

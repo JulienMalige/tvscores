@@ -18,7 +18,7 @@ struct ResultRow: View {
         HStack(spacing: 0) {
             HStack(spacing: Metrics.headingGap) {
                 Text(result.pos.map { String($0) } ?? "–")
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .font(.system(size: 30, weight: .bold))
                     .frame(width: 60, alignment: .trailing)
                 PersonMark(photo: result.photo, flag: result.flag, color: Color(hex: result.teamColor),
                            monogram: result.code ?? PersonMark.monogram(for: result.driver), size: Metrics.mark)

@@ -47,7 +47,7 @@ struct PersonMark: View {
 
     private var monogramText: some View {
         Text(monogram)
-            .font(.system(size: size * 0.3, weight: .heavy, design: .rounded))
+            .font(.system(size: size * 0.3, weight: .heavy))
             .foregroundStyle(.white)
     }
 }
