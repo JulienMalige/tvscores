@@ -97,7 +97,7 @@ struct Sidebar: View {
             // Its navigation is held here, not in the screen: the screen is
             // made afresh each time Home is picked, and a race opened on it
             // should still be open when you come back.
-            HomeScreen(store: store, day: $day, path: $homePath, openedInitialRace: $homeOpenedRace, openLeague: open)
+            HomeScreen(store: store, day: $day, openLeague: open, path: $homePath, openedInitialRace: $homeOpenedRace)
         case .league(let key):
             if let league = store.leagues.first(where: { Self.key($0) == key }) {
                 NavigationStack {
