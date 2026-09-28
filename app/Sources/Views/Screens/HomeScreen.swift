@@ -6,8 +6,9 @@ struct HomeScreen: View {
     @Binding var day: Day
     /// Takes the viewer to a competition's own place in the menu.
     let openLeague: (LeagueRef) -> Void
-    @State private var path = NavigationPath()
-    @State private var openedInitialRace = false
+    /// Held by the menu's owner, so they outlive this screen.
+    @Binding var path: NavigationPath
+    @Binding var openedInitialRace: Bool
     @Environment(\.openMenu) private var openMenu
 
     var body: some View {
