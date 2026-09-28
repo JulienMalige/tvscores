@@ -209,4 +209,6 @@ extension EnvironmentValues {
     @Entry var openMenu: @MainActor () -> Void = {}
     /// Opens a game's page, from its row.
     @Entry var openGame: @MainActor (Event) -> Void = { _ in }
+    /// A page's focus scope, for the day switch to be its first focus.
+    @Entry var pageScope: Namespace.ID? = nil
 }

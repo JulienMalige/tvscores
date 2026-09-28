@@ -27,6 +27,7 @@ struct Segments<Value: Hashable>: View {
     var centred = false
     /// The pill the remote is on, by position.
     @FocusState private var focused: Int?
+    @Environment(\.pageScope) private var pageScope
     @State private var claimed = false
 
     var body: some View {
@@ -42,6 +43,7 @@ struct Segments<Value: Hashable>: View {
                     .buttonStyle(.borderless)
                     .focusEffectDisabled()
                     .focused($focused, equals: index)
+                    .modifier(PageDefault(scope: claimsFocus ? pageScope : nil, on: selection == option.value))
                 }
             }
             // Focus arriving on the switch lands on the pill chosen, not the
@@ -79,6 +81,23 @@ struct Segments<Value: Hashable>: View {
                 .background(Capsule().fill(isFocused ? Color.white : Color.white.opacity(selected ? 0.22 : 0)))
                 .scaleEffect(isFocused ? 1.06 : 1)
                 .animation(.easeOut(duration: 0.15), value: isFocused)
+        }
+    }
+}
+
+/// The chosen pill as its page's first focus. Placement alone decided it
+/// while the switch sat at the top left, where tvOS starts looking; centred
+/// on its card, a league heading nearer that corner took focus first (CI,
+/// 2026-09-28).
+private struct PageDefault: ViewModifier {
+    let scope: Namespace.ID?
+    let on: Bool
+
+    func body(content: Content) -> some View {
+        if let scope {
+            content.prefersDefaultFocus(on, in: scope)
+        } else {
+            content
         }
     }
 }

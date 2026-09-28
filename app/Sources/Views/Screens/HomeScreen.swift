@@ -10,6 +10,7 @@ struct HomeScreen: View {
     @Binding var path: NavigationPath
     @Binding var openedInitialRace: Bool
     @Environment(\.openMenu) private var openMenu
+    @Namespace private var page
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -24,6 +25,8 @@ struct HomeScreen: View {
                 }
                 .pageMargins()
             }
+            .focusScope(page)
+            .environment(\.pageScope, page)
             // Back on the page opens the menu, as on tvOS's own sidebar; a
             // race pushed over it takes Back for itself first.
             .onExitCommand(perform: openMenu)
