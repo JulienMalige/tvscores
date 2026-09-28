@@ -8,6 +8,11 @@ notes when a version ships.
 
 ## Unreleased
 
+- The WTA 1000 in Beijing is on Home and the WTA page again, each match
+  with its tournament over it. The server asked the feed for every
+  upcoming match and got the first 200 — small tournaments filled them.
+  It now asks for the big tournaments' matches only.
+
 ## 1.0 build 28 — 28 September 2026
 - National teams have a menu section of their own, International, after
   Football's clubs; on Home they follow the clubs too. Friendlies carry a

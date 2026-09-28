@@ -57,6 +57,22 @@ function competitionOf(info) {
   return { name: info.name, city: info.city || undefined, flag: flagIso2(info.country), tier: tierLabel(info.tier), surface: info.surface || undefined };
 }
 
+/** "WTA Beijing - Round of 64" -> "Round of 64": the tournament is said already. */
+export function roundOf(round) {
+  if (!round) return undefined;
+  const cut = round.lastIndexOf(" - ");
+  return cut >= 0 ? round.slice(cut + 3) : round;
+}
+
+/** The feed's tiers for the categories we show, for its `tier=` filter. */
+export function tiersFor(categories) {
+  const wanted = new Set(categories);
+  return FEED_TIERS.filter((t) => wanted.has(TIER_CATEGORY[t]));
+}
+
+/** The tier names the feed's filter accepts; "tour_finals" is only ours (HTTP 400). */
+const FEED_TIERS = ["grand_slam", "atp_1000", "wta_1000", "atp_finals", "wta_finals"];
+
 export function normaliseMatch(m, info) {
   const league = TOURS[m.tour];
   if (!league || m.is_doubles) return null;
@@ -76,7 +92,7 @@ export function normaliseMatch(m, info) {
     league,
     kind: "match",
     start: new Date(m.scheduled_time || m.live_at || Date.now()).toISOString(),
-    round: m.round,
+    round: roundOf(m.round),
     tournament: m.tournament,
     competition: competitionOf(info),
     status: { state, clock: state === STATE.live && !interrupted ? liveClock(m.score) : undefined, detail, note: interrupted ? "Interrupted" : undefined },
@@ -162,7 +178,12 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
   async function list(status) {
     if (!key) throw new Error("Live Tennis API key missing");
     const { byId, info } = await catalogue();
-    const { body } = await getJson(`${BASE}/matches?status=${status}&limit=200`, { headers });
+    // Upcoming is asked for our tiers only: unfiltered, the first 200 are
+    // Challengers and ITF, and the Beijing WTA 1000 fell outside them on
+    // 28 September. The live list is short enough to take whole, which
+    // keeps a tournament pinned in `alsoBig` whatever its tier.
+    const tiers = status === "upcoming" ? `&tier=${tiersFor(tennis.categories).join(",")}` : "";
+    const { body } = await getJson(`${BASE}/matches?status=${status}${tiers}&limit=200`, { headers });
     quota.record(undefined);
     const big = bigEventFilter({ byId, ...tennis });
     const rows = (body.data || []).filter(big).map((m) => normaliseMatch(m, info[String(m.tournament_id)])).filter(Boolean);

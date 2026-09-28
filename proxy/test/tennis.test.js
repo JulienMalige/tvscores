@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { normaliseMatch, liveClock, setsLine, bigEventFilter, tierLabel, TIER_CATEGORY } from "../src/providers/livetennis.js";
+import { roundOf, tiersFor, normaliseMatch, liveClock, setsLine, bigEventFilter, tierLabel, TIER_CATEGORY } from "../src/providers/livetennis.js";
 
 const raw = JSON.parse(readFileSync(new URL("./fixtures/tennis.json", import.meta.url))).data[0];
 
@@ -107,4 +107,12 @@ test("a tournament with a tier and no category still counts by its tier", () => 
   assert.equal(TIER_CATEGORY.wta_1000, "wta_1000");
   assert.equal(TIER_CATEGORY.atp_1000, "masters_1000", "the ATP's 1000s are the Masters");
   assert.equal(TIER_CATEGORY.atp_500, undefined, "a 500 stays out");
+});
+
+test("upcoming asks for our tiers only, and rounds lose the tournament's name", () => {
+  assert.deepEqual(tiersFor(["grand_slam", "masters_1000", "tour_finals", "wta_1000"]).sort(),
+    ["atp_1000", "atp_finals", "grand_slam", "wta_1000", "wta_finals"]);
+  assert.equal(roundOf("WTA Beijing - Round of 64"), "Round of 64");
+  assert.equal(roundOf("Final"), "Final");
+  assert.equal(roundOf(undefined), undefined);
 });
