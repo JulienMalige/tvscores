@@ -8,6 +8,9 @@ notes when a version ships.
 
 ## Unreleased
 
+- Tennis keeps its big tournaments listed: a change in the feed had
+  started to drop some of them, the WTA 1000 in Beijing among them.
+
 - A page opens with focus on the day it shows — Today, usually — instead
   of the first pill; a table switch starts on the table shown.
 
