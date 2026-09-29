@@ -24,7 +24,7 @@ struct EmptyDay: View {
     var body: some View {
         VStack(spacing: 12) {
             title
-                .font(.title3.weight(.semibold))
+                .font(.headline)
             if let line {
                 line
                     .font(.callout)

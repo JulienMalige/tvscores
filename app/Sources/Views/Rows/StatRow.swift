@@ -13,7 +13,7 @@ struct StatRow: View {
                 value(stat.home)
                 Spacer()
                 Text(LocalizedStringKey("stat." + stat.id))
-                    .font(.callout)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                 Spacer()
                 value(stat.away)

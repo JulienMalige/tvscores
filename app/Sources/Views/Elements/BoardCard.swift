@@ -26,7 +26,6 @@ struct BoardCard<Content: View>: View {
             try? await Task.sleep(for: .seconds(1))
             open = true
         }
-        .padding(.horizontal, Metrics.cardInsetH / 2)
         .gameCardSurface()
     }
 }
@@ -36,6 +35,6 @@ struct RowRule: View {
     var body: some View {
         Divider()
             .overlay(Color.white.opacity(0.12))
-            .padding(.horizontal, Metrics.rowInsetH)
+            .padding(.horizontal, 20)
     }
 }

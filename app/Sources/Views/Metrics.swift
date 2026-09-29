@@ -17,7 +17,10 @@ import SwiftUI
 /// standings rows ended up shorter than every other list in the app.
 enum Metrics {
     /// Page margins. The horizontal one is the app's left edge, everywhere.
-    static let screenMargin: CGFloat = 80
+    /// Nothing beyond tvOS's own safe area, where Apple's panels start
+    /// (docs/design-measures.md): the 80 added to it wasted a twelfth of
+    /// the screen's width.
+    static let screenMargin: CGFloat = 0
     static let screenTop: CGFloat = 60
     static let screenBottom: CGFloat = 80
 
@@ -39,44 +42,48 @@ enum Metrics {
     /// A match row's team column — the crest with the name captioned under
     /// it — and the score column beside it. The name gets the column's
     /// width and shrinks a little before it truncates.
-    static let matchSide: CGFloat = 220
+    static let matchSide: CGFloat = 180
     /// A match row, in the proportions measured off Apple Sports' list on
     /// build 29 (a crest 98 px, its score's type 121, the league's mark 63,
     /// a row 272): the crest, the score's type about 1.2 times it, and the
     /// space the row takes above and below its content.
     static let matchMark: CGFloat = 80
-    static let matchScoreType: CGFloat = 98
+    static let matchScoreType: CGFloat = 80
     static let matchRowPad: CGFloat = 18
     static let matchNameGap: CGFloat = 6
     static let matchScore: CGFloat = 150
     /// The same thing blown up for a podium, where it is the subject.
     static let markHero: CGFloat = 110
+    /// A game page's crests under their scores (Apple's 33 pt, doubled).
+    static let gameMark: CGFloat = 67
     /// A game's page, drawn as the Apple TV app's show page: a card inset
     /// from the screen's top and sides by the margin, with rounded top
     /// corners, running off the bottom; inside it, the page's own inset.
     static let gameMargin: CGFloat = 48
     static let gameRadius: CGFloat = 56
-    static let gameInset: CGFloat = 100
+    static let gameInset: CGFloat = 40
     static let gameGap: CGFloat = 40
     /// Its header: each side's column, the middle between them, and the
     /// score's tall figures, measured against Apple Sports' 60-point score
     /// on a 17-point name (build 26 review).
     static let gameSide: CGFloat = 560
     static let gameCentre: CGFloat = 460
-    static let gameScore: CGFloat = 150
+    static let gameScore: CGFloat = 166
     /// The team code's column in the score by quarter.
     static let periodName: CGFloat = 140
     /// A statistic's figures, the same tall face as the score.
-    static let statValue: CGFloat = 50
+    static let statValue: CGFloat = 41
     /// A game card: its corner, its insets, and the space under its title.
-    static let cardRadius: CGFloat = 36
+    static let cardRadius: CGFloat = 48
+    /// A card inside a game's page, rounder than the page's panels are not.
+    static let gameCardRadius: CGFloat = 32
     static let cardInsetV: CGFloat = 32
     static let cardInsetH: CGFloat = 44
     static let cardGap: CGFloat = 26
     /// Competition marks are wordmarks as often as badges, so they get width.
     static let leagueMark: CGFloat = 52
     /// The same over a list of games, two thirds of a team's crest.
-    static let leagueMarkSmall: CGFloat = 50
+    static let leagueMarkSmall: CGFloat = 43
     /// A pill of a switch, the size of the Apple TV app's season pills.
     static let pillInsetV: CGFloat = 10
     static let pillInsetH: CGFloat = 26
@@ -94,15 +101,21 @@ enum Metrics {
     static let menuFont: CGFloat = 26
     static let menuRadius: CGFloat = 40
     /// One column of a table read as numbers — played, won, points.
-    static let tableCell: CGFloat = 96
+    static let tableCell: CGFloat = 70
+    /// The gap between two number columns: a column every 82, as Apple's.
+    static let tableGap: CGFloat = 12
+    /// A table row's crest or portrait (Apple's 19 pt, doubled), and the
+    /// room above and below its line: rows 80 apart, as Apple's 40.
+    static let tableMark: CGFloat = 40
+    static let tableRowPad: CGFloat = 14
 }
 
 extension View {
     /// The card a row sits on. tvOS says "this one" by lightening and lifting
     /// it, and every row in the app says it the same way and at the same size.
-    func rowSurface(focused: Bool, resting: Double = 0.04) -> some View {
+    func rowSurface(focused: Bool, resting: Double = 0.04, insetV: CGFloat = Metrics.rowInsetV) -> some View {
         self
-            .padding(.vertical, Metrics.rowInsetV)
+            .padding(.vertical, insetV)
             .padding(.horizontal, Metrics.rowInsetH)
             .background(
                 RoundedRectangle(cornerRadius: Metrics.rowRadius, style: .continuous)

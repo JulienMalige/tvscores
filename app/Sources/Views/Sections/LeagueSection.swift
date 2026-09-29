@@ -86,7 +86,7 @@ struct LeagueHeader: View {
             // it are what the eye is for (Julien, build 28).
             LeagueMark(sport: group.sport, logo: group.league.logo, symbolName: group.league.symbol, height: Metrics.leagueMarkSmall)
             Text(group.league.name)
-                .font(.callout.weight(.semibold))
+                .font(.caption.weight(.semibold))
             if chevron {
                 Image(systemName: "chevron.right")
                     .font(.callout.weight(.semibold))
@@ -116,7 +116,7 @@ struct TournamentHeader: View {
                 .font(.headline)
             if let line = subtitle {
                 line
-                    .font(.callout)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
         }

@@ -11,7 +11,7 @@ struct DaySection<Row: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Metrics.headingGap) {
             Text(day, format: .dateTime.weekday(.abbreviated).day().month(.abbreviated))
-                .font(.callout.weight(.semibold))
+                .font(.caption.weight(.semibold))
                 .frame(maxWidth: .infinity)
                 .padding(.top, Metrics.headingGap / 2)
             ForEach(groups) { group in row(group) }

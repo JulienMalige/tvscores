@@ -77,7 +77,7 @@ private struct MatchRowContent: View {
                     TeamMark(code: team.short, logo: team.logo, size: Metrics.matchMark)
                 }
                 Text(team.label)
-                    .font(.callout)
+                    .font(.caption.weight(.medium))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -92,7 +92,7 @@ private struct MatchRowContent: View {
     private func middle(_ value: Int?, record: String?, winner: Bool) -> some View {
         if event.status.state == .scheduled, let record {
             Text(verbatim: record)
-                .font(.callout.weight(.medium))
+                .font(.caption.weight(.medium))
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
         } else {

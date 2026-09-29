@@ -20,7 +20,7 @@ struct StandingsSection: View {
     var body: some View {
         VStack(alignment: carded ? .center : .leading, spacing: Metrics.headingGap) {
             Text("standings.title")
-                .font(carded ? .headline : .title2.weight(.bold))
+                .font(carded ? .callout.weight(.semibold) : .title2.weight(.bold))
                 .padding(.top, 12)
             if let standings, !standings.tables.isEmpty {
                 if standings.tables.count > 1 { tabs(standings) }
@@ -35,7 +35,7 @@ struct StandingsSection: View {
         }
         .frame(maxWidth: .infinity, alignment: carded ? .center : .leading)
         .padding(.vertical, carded ? Metrics.cardInsetV : 0)
-        .padding(.horizontal, carded ? Metrics.cardInsetH / 2 : 0)
+        .padding(.horizontal, carded ? 4 : 0)
         .background { if carded { Color.clear.gameCardSurface() } }
         .task {
             standings = await store.standings(for: ref)
@@ -64,7 +64,7 @@ struct StandingsSection: View {
                 if let section = entry.section, i == 0 || table.rows[i - 1].section != section {
                     HStack {
                         Text(section)
-                            .font(.title3.weight(.semibold))
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                             .padding(.leading, Metrics.rowInsetH)
                             .accessibilityIdentifier("division.\(section)")
@@ -107,10 +107,10 @@ struct StandingsSection: View {
     }
 
     private func columnLabels(_ columns: [String]) -> some View {
-        HStack(spacing: 20) {
+        HStack(spacing: Metrics.tableGap) {
             ForEach(columns, id: \.self) { column in
                 Text(LocalizedStringKey("col." + column))
-                    .font(.callout.weight(.semibold))
+                    .font(.caption)
                     .foregroundStyle(.secondary)
                     .frame(width: Metrics.tableCell, alignment: .trailing)
                     .accessibilityIdentifier("col." + column)

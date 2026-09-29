@@ -26,26 +26,29 @@ private struct StandingsRowContent: View {
     @Environment(\.isFocused) private var isFocused
 
     var body: some View {
-        HStack(spacing: 20) {
+        // Apple Sports' table, doubled for the room (docs/design-measures.md):
+        // rank and name at the row's text size, a small crest, rows 80 apart.
+        HStack(spacing: 24) {
             Text("\(entry.pos)")
-                .font(.system(size: 30, weight: .bold))
+                .font(.callout)
                 .monospacedDigit()
-                .frame(width: 64, alignment: .trailing)
+                .frame(width: 44, alignment: .trailing)
             mark
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 0) {
                 Text(entry.name)
-                    .font(.title3.weight(highlighted ? .bold : .semibold))
+                    .font(.callout.weight(highlighted ? .bold : .regular))
                 if let sub = entry.sub {
-                    Text(sub).font(.callout).foregroundStyle(.secondary)
+                    Text(sub).font(.caption).foregroundStyle(.secondary)
                 }
             }
             Spacer()
+            HStack(spacing: Metrics.tableGap) {
             if let cells = entry.cells {
                 // A table read as numbers: one column each, the last — the
                 // points, or the percentage — carrying the weight.
                 ForEach(Array(cells.enumerated()), id: \.offset) { i, cell in
                     Text(cell)
-                        .font(.system(size: i == cells.count - 1 ? 34 : 28, weight: i == cells.count - 1 ? .bold : .regular))
+                        .font(.callout.weight(i == cells.count - 1 ? .semibold : .regular))
                         .monospacedDigit()
                         .lineLimit(1)
                         .minimumScaleFactor(0.7) // "1.000" fits the column rather than wrapping
@@ -54,11 +57,12 @@ private struct StandingsRowContent: View {
                 }
             } else if let v = entry.value {
                 Text(v, format: .number.grouping(.automatic))
-                    .font(.system(size: 34, weight: .bold))
+                    .font(.callout)
                     .monospacedDigit()
             }
+            }
         }
-        .rowSurface(focused: isFocused, resting: plain ? 0 : 0.04)
+        .rowSurface(focused: isFocused, resting: plain ? 0 : 0.04, insetV: Metrics.tableRowPad)
         .environment(\.onLightSurface, isFocused)
         // A game's two sides, a shade lighter, as Apple Sports picks them out.
         .background(
@@ -72,10 +76,10 @@ private struct StandingsRowContent: View {
     private var mark: some View {
         if let logo = entry.logo {
             CachedImage(url: logo) { Color.clear }
-                .frame(width: Metrics.mark, height: Metrics.mark)
+                .frame(width: Metrics.tableMark, height: Metrics.tableMark)
         } else {
             PersonMark(photo: entry.photo, flag: entry.flag, color: Color(hex: entry.color),
-                       monogram: entry.code ?? PersonMark.monogram(for: entry.name), size: Metrics.mark)
+                       monogram: entry.code ?? PersonMark.monogram(for: entry.name), size: Metrics.tableMark * 1.2)
         }
     }
 }

@@ -17,7 +17,7 @@ struct GameInfoSection: View {
         FocusBlock(identifier: "game.information", surface: false) {
             VStack(alignment: .leading, spacing: 16) {
                 Text("game.information")
-                    .font(.headline)
+                    .font(.body.weight(.semibold))
                     .frame(maxWidth: .infinity)
                     .padding(.bottom, 6)
                 line("clock", "game.time", Text(start, format: .dateTime.weekday(.wide).day().month(.wide).hour().minute()))

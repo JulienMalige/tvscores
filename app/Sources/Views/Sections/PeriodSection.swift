@@ -18,7 +18,7 @@ struct PeriodSection: View {
                     }
                     cell(Text("game.total"))
                 }
-                .font(.callout.weight(.semibold))
+                .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
                 line(home?.short, periods.home)
                 Divider().overlay(Color.white.opacity(0.25))
@@ -34,14 +34,14 @@ struct PeriodSection: View {
     private func line(_ name: String?, _ values: [Int]) -> some View {
         GridRow {
             Text(verbatim: name ?? "")
-                .font(.callout.weight(.bold))
+                .font(.caption.weight(.bold))
                 .frame(width: Metrics.periodName, alignment: .leading)
             ForEach(Array(values.enumerated()), id: \.offset) { _, v in
                 cell(Text(verbatim: "\(v)"))
             }
             cell(Text(verbatim: "\(values.reduce(0, +))").bold())
         }
-        .font(.callout.weight(.medium))
+        .font(.caption.weight(.medium))
         .monospacedDigit()
     }
 }

@@ -17,7 +17,7 @@ struct GameHeaderSection: View {
         FocusBlock(identifier: "game.header", surface: false) {
             VStack(spacing: 28) {
                 Text(verbatim: competition)
-                    .font(.callout.weight(.semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
                 Grid(horizontalSpacing: 0, verticalSpacing: 12) {
                     if scored {
@@ -73,11 +73,11 @@ struct GameHeaderSection: View {
     }
 
     /// Smaller under a score, as Apple Sports draws it; larger on its own.
-    private var markSize: CGFloat { scored ? Metrics.markHero : Metrics.markHero * 1.4 }
+    private var markSize: CGFloat { scored ? Metrics.gameMark : Metrics.gameMark * 1.4 }
 
     private func name(_ team: TeamRef?) -> some View {
         Text(verbatim: team?.label ?? "")
-            .font(.title3.weight(.semibold))
+            .font(.body.weight(.semibold))
             .lineLimit(1)
             .minimumScaleFactor(0.7)
             .frame(width: Metrics.gameSide)
@@ -85,7 +85,7 @@ struct GameHeaderSection: View {
 
     private func record(_ value: String?) -> some View {
         Text(verbatim: value ?? "")
-            .font(.callout.weight(.medium))
+            .font(.caption.weight(.medium))
             .monospacedDigit()
             .foregroundStyle(.secondary)
     }

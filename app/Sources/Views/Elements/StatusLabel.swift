@@ -15,7 +15,9 @@ struct StatusLabel: View {
     /// of games all overdue (CI, build 29).
     @Environment(\.boardNow) private var boardNow
 
-    private var mainFont: Font { compact ? .title3.weight(.semibold) : .title2.weight(.semibold) }
+    /// Apple Sports' sizes doubled (docs/design-measures.md): a list's
+    /// "Final" and kickoff at the row's text size, a game page's a little less.
+    private var mainFont: Font { compact ? .callout.weight(.semibold) : .body.weight(.semibold) }
 
     var body: some View {
         VStack(spacing: 4) {
