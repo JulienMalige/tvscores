@@ -102,6 +102,8 @@ enum Metrics {
     static let menuRadius: CGFloat = 40
     /// One column of a table read as numbers — played, won, points.
     static let tableCell: CGFloat = 70
+    /// Between the two columns of games, when there are two.
+    static let columnGap: CGFloat = 32
     /// The gap between two number columns: a column every 82, as Apple's.
     static let tableGap: CGFloat = 12
     /// A table row's crest or portrait (Apple's 19 pt, doubled), and the

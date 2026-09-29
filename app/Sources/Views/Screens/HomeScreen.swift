@@ -23,6 +23,8 @@ struct HomeScreen: View {
                     header
                     BoardCard(day: $day) { content }
                 }
+                .frame(maxWidth: Layout.pageWidth)
+                .frame(maxWidth: .infinity)
                 .pageMargins()
             }
             // Scrolled away from the top, the menu chip drops its name.

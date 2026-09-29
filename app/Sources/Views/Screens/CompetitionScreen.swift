@@ -29,6 +29,8 @@ struct CompetitionScreen: View {
                 }
                 CompetitionSection(ref: ref, store: store, day: $day)
             }
+            .frame(maxWidth: Layout.pageWidth)
+            .frame(maxWidth: .infinity)
             .pageMargins()
         }
         .scrollClipDisabled()

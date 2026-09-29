@@ -95,6 +95,9 @@ struct StandingsSection: View {
                 .padding(.top, Metrics.headingGap)
             }
         }
+        // Option 2 of the layouts on trial: the table kept to the middle.
+        .frame(maxWidth: Layout.rowWidth + 150)
+        .frame(maxWidth: .infinity)
     }
 
     /// The column names over a table read as numbers.
