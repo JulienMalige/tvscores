@@ -88,6 +88,9 @@ enum Metrics {
     static let leagueMark: CGFloat = 52
     /// The same over a list of games, two thirds of a team's crest.
     static let leagueMarkSmall: CGFloat = 43
+    /// A list's league heading, in from the panel's edge: clear of its
+    /// rounded corner (radius 48) and in line with the crests under it.
+    static let leagueHeadingInset: CGFloat = 24
     /// A pill of a switch, the size of the Apple TV app's season pills.
     static let pillInsetV: CGFloat = 10
     static let pillInsetH: CGFloat = 26

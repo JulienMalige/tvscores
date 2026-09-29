@@ -28,12 +28,14 @@ struct LeagueSection: View {
                     openLeague(LeagueRef(group: group))
                 } label: {
                     LeagueHeader(group: group, chevron: true)
+                        .padding(.leading, Metrics.leagueHeadingInset)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("league.\(group.sport).\(group.league.id.raw)")
             } else if showHeader {
                 LeagueHeader(group: group, chevron: false)
+                    .padding(.leading, Metrics.leagueHeadingInset)
             }
             // Tennis names its tournaments, each under a heading with its
             // country's flag, as a race weekend is shown; other sports have
