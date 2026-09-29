@@ -18,6 +18,7 @@ struct BoardCard<Content: View>: View {
             DayTabs(selected: $day) { open = true }
                 .padding(.vertical, Metrics.cardInsetV / 2)
             Divider().overlay(Color.white.opacity(0.15))
+                .padding(.horizontal, 20)
             content()
                 .disabled(!open)
                 .padding(.vertical, Metrics.cardInsetV)
