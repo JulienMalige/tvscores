@@ -187,7 +187,7 @@ struct CachedImage<Placeholder: View>: View {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: contentMode)
-                    .modifier(OnLightMark(image: image, url: url))
+                    .modifier(OnLightMark(image: image, url: url, contentMode: contentMode))
             } else if giveUp {
                 placeholder()
             } else {

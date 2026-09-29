@@ -69,14 +69,23 @@ enum LightMark {
     }
 }
 
-/// A thin outline for a mark that would vanish into what it sits on: dark
-/// on a lit row's white, light on a dark or same-coloured page. Tight
-/// shadows trace the mark's edge.
+/// A fine solid outline for a mark that would vanish into what it sits on:
+/// dark on a lit row's white, white on a dark or same-coloured page. The
+/// mark's silhouette, in the outline's tone, is laid behind it a point and
+/// a half off in eight directions — a crisp edge, not a shadow's blur
+/// (Julien, build 29: "a fine line, solid").
 struct OnLightMark: ViewModifier {
     let image: UIImage
     let url: URL?
+    let contentMode: ContentMode
     @Environment(\.onLightSurface) private var onLight
     @Environment(\.pageTint) private var pageTint
+
+    private static let width: CGFloat = 1.5
+    private static let around: [CGSize] = (0..<8).map { i in
+        let a = Double(i) * .pi / 4
+        return CGSize(width: cos(a) * width, height: sin(a) * width)
+    }
 
     func body(content: Content) -> some View {
         let m = LightMark.measure(image, url: url)
@@ -90,8 +99,16 @@ struct OnLightMark: ViewModifier {
     }
 
     private func outlined(_ content: Content, _ tone: Color) -> some View {
-        content
-            .shadow(color: tone.opacity(0.55), radius: 0.8)
-            .shadow(color: tone.opacity(0.35), radius: 1.5)
+        ZStack {
+            ForEach(Array(Self.around.enumerated()), id: \.offset) { _, shift in
+                Image(uiImage: image)
+                    .renderingMode(.template)
+                    .resizable()
+                    .aspectRatio(contentMode: contentMode)
+                    .foregroundStyle(tone.opacity(0.85))
+                    .offset(shift)
+            }
+            content
+        }
     }
 }
