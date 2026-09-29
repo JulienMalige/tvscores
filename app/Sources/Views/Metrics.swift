@@ -40,9 +40,13 @@ enum Metrics {
     /// it — and the score column beside it. The name gets the column's
     /// width and shrinks a little before it truncates.
     static let matchSide: CGFloat = 220
-    /// A match row's crests, about as tall as its score, as in Apple
-    /// Sports' lists (Julien, build 29).
-    static let matchMark: CGFloat = 88
+    /// A match row, in the proportions measured off Apple Sports' list on
+    /// build 29 (a crest 98 px, its score's type 121, the league's mark 63,
+    /// a row 272): the crest, the score's type about 1.2 times it, and the
+    /// space the row takes above and below its content.
+    static let matchMark: CGFloat = 80
+    static let matchScoreType: CGFloat = 98
+    static let matchRowPad: CGFloat = 18
     static let matchNameGap: CGFloat = 6
     static let matchScore: CGFloat = 150
     /// The same thing blown up for a podium, where it is the subject.
@@ -71,8 +75,8 @@ enum Metrics {
     static let cardGap: CGFloat = 26
     /// Competition marks are wordmarks as often as badges, so they get width.
     static let leagueMark: CGFloat = 52
-    /// The same over a list of games, about half a team's crest.
-    static let leagueMarkSmall: CGFloat = 34
+    /// The same over a list of games, two thirds of a team's crest.
+    static let leagueMarkSmall: CGFloat = 50
     /// A pill of a switch, the size of the Apple TV app's season pills.
     static let pillInsetV: CGFloat = 10
     static let pillInsetH: CGFloat = 26
