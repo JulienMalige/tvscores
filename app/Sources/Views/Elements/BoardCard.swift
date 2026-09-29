@@ -21,6 +21,8 @@ struct BoardCard<Content: View>: View {
                 .padding(.horizontal, 20)
             content()
                 .disabled(!open)
+                // Room for a lit row, which grows 2%, inside the rounded edge.
+                .padding(.horizontal, 16)
                 .padding(.vertical, Metrics.cardInsetV)
         }
         .task {

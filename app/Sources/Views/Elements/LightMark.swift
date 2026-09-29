@@ -17,6 +17,9 @@ enum LightMark {
     struct Measure {
         /// Mostly near-white.
         let light: Bool
+        /// Its edges are clear: a mark, not a picture on a ground. Only a
+        /// mark can be outlined — a picture's silhouette is its rectangle.
+        let cutOut: Bool
         /// The average colour of what is drawn, 0…1.
         let r, g, b: Double
         var luminance: Double { 0.2126 * r + 0.7152 * g + 0.0722 * b }
@@ -44,7 +47,8 @@ enum LightMark {
             return true
         }
         guard drawn else { return nil }
-        var opaque = 0, pale = 0, r = 0, g = 0, b = 0
+        var opaque = 0, pale = 0, r = 0, g = 0, b = 0, clear = 0
+        for i in stride(from: 0, to: pixels.count, by: 4) where pixels[i + 3] < 32 { clear += 1 }
         for i in stride(from: 0, to: pixels.count, by: 4) where pixels[i + 3] > 128 {
             opaque += 1
             let pr = Int(pixels[i]), pg = Int(pixels[i + 1]), pb = Int(pixels[i + 2])
@@ -53,7 +57,8 @@ enum LightMark {
         }
         guard opaque > 0 else { return nil }
         let n = Double(opaque) * 255
-        return Measure(light: Double(pale) / Double(opaque) > 0.6, r: Double(r) / n, g: Double(g) / n, b: Double(b) / n)
+        return Measure(light: Double(pale) / Double(opaque) > 0.6,
+                       cutOut: Double(clear) / Double(side * side) > 0.05, r: Double(r) / n, g: Double(g) / n, b: Double(b) / n)
     }
 
     /// Too near the ground to read: dark on dark, or close to the page's own
@@ -89,9 +94,9 @@ struct OnLightMark: ViewModifier {
 
     func body(content: Content) -> some View {
         let m = LightMark.measure(image, url: url)
-        if onLight, m?.light == true {
+        if onLight, let m, m.light, m.cutOut {
             outlined(content, .black)
-        } else if !onLight, let m, LightMark.lost(m, on: pageTint) {
+        } else if !onLight, let m, m.cutOut, LightMark.lost(m, on: pageTint) {
             outlined(content, .white)
         } else {
             content

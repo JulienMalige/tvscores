@@ -40,6 +40,9 @@ struct LeagueMark: View {
                 content
                     .frame(height: height)
                     .fixedSize(horizontal: true, vertical: false)
+                    // As wide as it is tall while it loads, so the name
+                    // beside it does not jump when the mark arrives.
+                    .frame(minWidth: height, alignment: .leading)
             }
         }
     }

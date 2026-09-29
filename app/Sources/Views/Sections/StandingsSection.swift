@@ -35,7 +35,7 @@ struct StandingsSection: View {
         }
         .frame(maxWidth: .infinity, alignment: carded ? .center : .leading)
         .padding(.vertical, carded ? Metrics.cardInsetV : 0)
-        .padding(.horizontal, carded ? 4 : 0)
+        .padding(.horizontal, carded ? 16 : 0)
         .background { if carded { Color.clear.gameCardSurface() } }
         .task {
             standings = await store.standings(for: ref)
