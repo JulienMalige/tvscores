@@ -34,8 +34,12 @@ struct LeagueMark: View {
             if let square {
                 content.frame(width: square, height: square)
             } else {
-                // Wide marks (F1, MotoGP, ATP) get room; square badges stay compact.
-                content.frame(maxWidth: height * 2.5, minHeight: height, maxHeight: height)
+                // As wide as the mark itself at this height, no wider: a box
+                // sized for the widest wordmark left a gap between the NBA's
+                // narrow logo and its name (Julien, build 29).
+                content
+                    .frame(height: height)
+                    .fixedSize(horizontal: true, vertical: false)
             }
         }
     }
