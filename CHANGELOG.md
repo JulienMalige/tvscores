@@ -8,6 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
+## 1.0 build 29 — 29 September 2026
 - Sizes follow Apple Sports, measured on its screens and scaled for the
   television: "Final" and times no bigger than the names, tables compact
   enough to show twice as many rows, a game's score larger than before.
