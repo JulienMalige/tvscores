@@ -23,7 +23,7 @@ struct HomeScreen: View {
                     header
                     BoardCard(day: $day) { content }
                 }
-                .frame(maxWidth: Layout.pageWidth)
+                .frame(maxWidth: Metrics.pageWidth)
                 .frame(maxWidth: .infinity)
                 .pageMargins()
             }

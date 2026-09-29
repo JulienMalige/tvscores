@@ -56,8 +56,6 @@ private struct MatchRowContent: View {
                 .frame(width: Metrics.matchScore, alignment: .center)
             side(event.away)
         }
-        .frame(maxWidth: Layout.rowWidth)
-        .frame(maxWidth: .infinity)
     }
 
     private enum Winner { case home, away, nobody }

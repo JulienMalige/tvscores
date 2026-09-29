@@ -8,6 +8,12 @@ notes when a version ships.
 
 ## Unreleased
 
+- Sizes follow Apple Sports, measured on its screens and scaled for the
+  television: "Final" and times no bigger than the names, tables compact
+  enough to show twice as many rows, a game's score larger than before.
+  Home and each competition sit in a centred column, so scores no longer
+  stand far from the middle of a wide screen.
+
 - Each competition's page takes its colour, as in Apple Sports — purple
   for the Premier League and the WTA, blue for the NBA, black for F1 — and
   Home is green. The panels take a darker shade of it.

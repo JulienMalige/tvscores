@@ -21,6 +21,10 @@ enum Metrics {
     /// (docs/design-measures.md): the 80 added to it wasted a twelfth of
     /// the screen's width.
     static let screenMargin: CGFloat = 0
+    /// A list page's column, centred: a phone's list stretched to 16:9 left
+    /// a wide gap between each score and the middle. As Apple Sports on an
+    /// iPad (Julien picked it of three tried on build 29).
+    static let pageWidth: CGFloat = 1400
     static let screenTop: CGFloat = 60
     static let screenBottom: CGFloat = 80
 
@@ -102,8 +106,6 @@ enum Metrics {
     static let menuRadius: CGFloat = 40
     /// One column of a table read as numbers — played, won, points.
     static let tableCell: CGFloat = 70
-    /// Between the two columns of games, when there are two.
-    static let columnGap: CGFloat = 32
     /// The gap between two number columns: a column every 82, as Apple's.
     static let tableGap: CGFloat = 12
     /// A table row's crest or portrait (Apple's 19 pt, doubled), and the

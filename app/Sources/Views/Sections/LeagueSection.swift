@@ -50,42 +50,24 @@ struct LeagueSection: View {
                         .padding(.top, 6)
                         .padding(.horizontal, 16)
                 }
-                if Layout.columns {
-                    // Two games a line: the television's width used, not
-                    // stretched (Julien, build 29 — on trial beside the
-                    // single column, `-TVScoresColumns`).
-                    LazyVGrid(columns: [GridItem(.flexible(), spacing: Metrics.columnGap), GridItem(.flexible())], spacing: 0) {
-                        ForEach(run.events) { event in
-                            Group {
-                                switch event.kind {
-                                case .match: MatchRow(event: event)
-                                case .race: RaceRow(event: event, day: day, now: now, onPage: onPage)
-                                }
-                            }
-                            .focused($focusedRow, equals: event.id)
-                            .zIndex(focusedRow == event.id ? 1 : 0)
+                VStack(spacing: 0) {
+                    ForEach(Array(run.events.enumerated()), id: \.element.id) { i, event in
+                        // The line between two rows goes while either is lit,
+                        // and the lit row sits over its neighbours: it grows
+                        // under focus, and a line drawn over it crossed its
+                        // white (Julien, build 28).
+                        if i > 0 {
+                            RowRule()
+                                .opacity(focusedRow == event.id || focusedRow == run.events[i - 1].id ? 0 : 1)
                         }
-                    }
-                } else {
-                    VStack(spacing: 0) {
-                        ForEach(Array(run.events.enumerated()), id: \.element.id) { i, event in
-                            // The line between two rows goes while either is lit,
-                            // and the lit row sits over its neighbours: it grows
-                            // under focus, and a line drawn over it crossed its
-                            // white (Julien, build 28).
-                            if i > 0 {
-                                RowRule()
-                                    .opacity(focusedRow == event.id || focusedRow == run.events[i - 1].id ? 0 : 1)
+                        Group {
+                            switch event.kind {
+                            case .match: MatchRow(event: event)
+                            case .race: RaceRow(event: event, day: day, now: now, onPage: onPage)
                             }
-                            Group {
-                                switch event.kind {
-                                case .match: MatchRow(event: event)
-                                case .race: RaceRow(event: event, day: day, now: now, onPage: onPage)
-                                }
-                            }
-                            .focused($focusedRow, equals: event.id)
-                            .zIndex(focusedRow == event.id ? 1 : 0)
                         }
+                        .focused($focusedRow, equals: event.id)
+                        .zIndex(focusedRow == event.id ? 1 : 0)
                     }
                 }
             }
