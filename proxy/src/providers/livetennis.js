@@ -245,7 +245,8 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
     const byTour = { atp: [], wta: [] };
     for (const p of body?.data || []) {
       if (p.is_doubles_team || !p.ranking || !byTour[p.tour]) continue;
-      byTour[p.tour].push({ pos: p.ranking, name: p.name, sub: p.country?.toUpperCase(), value: p.ranking_points, extra: p.ranking_movement, flag: flagIso3(p.country) });
+      // No country line under the name: the flag says it, and Apple Sports shows none.
+      byTour[p.tour].push({ pos: p.ranking, name: p.name, value: p.ranking_points, extra: p.ranking_movement, flag: flagIso3(p.country) });
     }
     const out = {};
     for (const tour of Object.keys(byTour)) {
