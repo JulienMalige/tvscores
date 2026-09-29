@@ -71,9 +71,9 @@ private struct MatchRowContent: View {
         VStack(spacing: Metrics.matchNameGap) {
             if let team {
                 if team.logo == nil, team.flag != nil || team.photo != nil {
-                    PersonMark(photo: team.photo, flag: team.flag, monogram: team.short)
+                    PersonMark(photo: team.photo, flag: team.flag, monogram: team.short, size: Metrics.matchMark)
                 } else {
-                    TeamMark(code: team.short, logo: team.logo)
+                    TeamMark(code: team.short, logo: team.logo, size: Metrics.matchMark)
                 }
                 Text(team.label)
                     .font(.callout)

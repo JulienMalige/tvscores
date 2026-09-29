@@ -40,6 +40,9 @@ enum Metrics {
     /// it — and the score column beside it. The name gets the column's
     /// width and shrinks a little before it truncates.
     static let matchSide: CGFloat = 220
+    /// A match row's crests, about as tall as its score, as in Apple
+    /// Sports' lists (Julien, build 29).
+    static let matchMark: CGFloat = 88
     static let matchNameGap: CGFloat = 6
     static let matchScore: CGFloat = 150
     /// The same thing blown up for a podium, where it is the subject.
