@@ -86,7 +86,7 @@ final class NavigationFlow: FlowCase {
 
     func testARaceOpensFromItsRowAndBackReturnsToItsCompetition() {
         // A race opened from the Formula 1 page comes back to Formula 1, not
-        // to Home: each competition's page has its own navigation.
+        // to Home: the race is a card over the page it was opened from.
         let app = Flow.launch(tab: "yesterday", league: "f1", extra: ["-TVScoresSample", "race"])
         app.buttons["Drivers"].firstMatch.appears(within: 10)
         Flow.focusThePage()
@@ -96,7 +96,8 @@ final class NavigationFlow: FlowCase {
         app.staticTexts["Race Result"].appears(within: 10)
         Flow.remote.press(.menu)
         app.buttons["Drivers"].firstMatch.appears(within: 8)
-        XCTAssertFalse(app.staticTexts["Race Result"].exists, "back leaves the race, on the competition it was opened from")
+        // The page stays mounted under the card, so wait for the card to go.
+        XCTAssertTrue(app.staticTexts["Race Result"].waitForNonExistence(timeout: 5), "back leaves the race, on the competition it was opened from")
     }
 
     func testAMatchOpensItsPageAndBackPutsItAway() {

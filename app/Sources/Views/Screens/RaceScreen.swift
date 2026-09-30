@@ -35,6 +35,8 @@ struct RaceScreen: View {
                     // feed has it, and the championship going into it.
                     if let sessions = event.sessions, !sessions.isEmpty {
                         SessionSection(sessions: sessions)
+                    } else {
+                        EmptyDay(title: Text("race.noSchedule"), line: nil)
                     }
                     if let group = found?.group, group.league.hasStandings == true {
                         StandingsSection(ref: LeagueRef(group: group), store: store, carded: true)

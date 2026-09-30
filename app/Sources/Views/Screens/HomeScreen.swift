@@ -44,8 +44,9 @@ struct HomeScreen: View {
         guard !openedInitialRace, let board = store.board, let wanted = Self.argument("-TVScoresRace") else { return }
         // "motogp:next" opens its next weekend instead, not yet run.
         let parts = wanted.split(separator: ":")
+        guard let series = parts.first else { return }
         let races = Day.allCases.flatMap { board.groups(for: $0) }
-            .filter { $0.sport == String(parts[0]) }
+            .filter { $0.sport == String(series) }
             .flatMap(\.events)
         let race = parts.last == "next"
             ? races.first { $0.status.state == .scheduled }
