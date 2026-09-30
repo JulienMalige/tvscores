@@ -12,8 +12,8 @@ struct PodiumSection: View {
                     PersonMark(photo: r.photo, flag: r.flag, color: Color(hex: r.teamColor),
                                monogram: r.code ?? PersonMark.monogram(for: r.driver), size: Metrics.markHero)
                     Text("\(r.pos ?? 0)")
-                        .font(.system(size: 30, weight: .bold))
-                    Text(r.driver).font(.title3.weight(.semibold))
+                        .font(.callout.weight(.bold))
+                    Text(r.driver).font(.body.weight(.semibold))
                     Text(r.gap ?? "").font(.callout).foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity)
@@ -21,6 +21,6 @@ struct PodiumSection: View {
         }
         .padding(.vertical, 28)
         .frame(maxWidth: .infinity)
-        .background(RoundedRectangle(cornerRadius: 24, style: .continuous).fill(Color.white.opacity(0.06)))
+        .gameCardSurface(radius: Metrics.gameCardRadius)
     }
 }

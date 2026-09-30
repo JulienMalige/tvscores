@@ -8,18 +8,18 @@ struct SessionRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(.title3.weight(.semibold))
+                .font(.callout)
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
                 Text(session.start, format: .dateTime.weekday(.abbreviated).day().month(.abbreviated))
                     .font(.callout)
-                    .foregroundStyle(.secondary)
                 Text(session.start, format: .dateTime.hour().minute())
-                    .font(.title3.weight(.semibold))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
                     .monospacedDigit()
             }
         }
-        .rowSurface(focused: isFocused)
+        .rowSurface(focused: isFocused, resting: 0, insetV: Metrics.tableRowPad)
         .focusable()
         .focused($isFocused)
         .accessibilityIdentifier("session.\(session.kind)")

@@ -14,9 +14,12 @@ struct RaceRow: View {
     var now: Date = .now
     /// On the series' own page: the weekend's whole schedule under its flag.
     var onPage = false
+    @Environment(\.openGame) private var openGame
 
     var body: some View {
-        NavigationLink(value: event) {
+        Button {
+            openGame(event)
+        } label: {
             RaceRowContent(event: event, sessions: event.status.state == .scheduled ? event.sessions(on: day, now: now) : [], onPage: onPage)
         }
         .buttonStyle(.plain)

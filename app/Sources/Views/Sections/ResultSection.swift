@@ -10,17 +10,24 @@ struct ResultSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Metrics.rowGap) {
-            Text("race.result").font(.title3.weight(.semibold))
+            Text("race.result")
+                .font(.callout.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, Metrics.cardGap - Metrics.rowGap)
             columnTitles
             ForEach(finishers) { ResultRow(result: $0) }
             if !retired.isEmpty {
                 Text("race.retired")
-                    .font(.callout.weight(.semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .padding(.top, Metrics.headingGap)
                 ForEach(retired) { ResultRow(result: $0) }
             }
         }
+        // On a panel, as a game's table is.
+        .padding(.vertical, Metrics.cardInsetV)
+        .padding(.horizontal, 16)
+        .gameCardSurface(radius: Metrics.gameCardRadius)
     }
 
     /// Aligned with the rows below by sharing their inset and column widths.
@@ -31,7 +38,7 @@ struct ResultSection: View {
             Text("race.points").frame(width: ResultRow.numberWidth, alignment: .trailing)
             Text("race.gap").frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .font(.callout)
+        .font(.caption)
         .foregroundStyle(.secondary)
         .padding(.horizontal, Metrics.rowInsetH)
     }

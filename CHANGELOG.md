@@ -7,6 +7,10 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- A Formula 1 or MotoGP race opens like a game: a card over the page,
+  with the next session at the top ("Qualifying · Sat 05:00"), the weekend's
+  schedule and the championship before the race, the podium and result
+  after it, then when and where.
 
 ## 1.0 build 29 — 29 September 2026
 - Sizes follow Apple Sports, measured on its screens and scaled for the

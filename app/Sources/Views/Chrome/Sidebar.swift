@@ -23,8 +23,7 @@ struct Sidebar: View {
     /// The day a competition's page was opened on from the front page, so
     /// Yesterday's La Liga header opens Yesterday's La Liga.
     @State private var leagueDays: [String: Day] = [:]
-    @State private var homePath = NavigationPath()
-    /// The game whose page is up, over whatever page it was opened from.
+    /// The game or race whose page is up, over whatever page it was opened from.
     @State private var game: Event?
     @State private var homeOpenedRace = false
     @State private var expanded = false
@@ -79,7 +78,13 @@ struct Sidebar: View {
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.86), value: expanded)
         .fullScreenCover(item: $game) { event in
-            GameScreen(eventId: event.id, fallback: event, store: store)
+            // One detail level for every event, a race as a game (Julien,
+            // build 30): the card over the page, Back to put it away.
+            if event.kind == .race {
+                RaceScreen(eventId: event.id, fallback: event, store: store)
+            } else {
+                GameScreen(eventId: event.id, fallback: event, store: store)
+            }
         }
         .onChange(of: menuFocus) { _, focused in
             // Focus gone from every row — a press right onto the page.
@@ -113,18 +118,10 @@ struct Sidebar: View {
     private var page: some View {
         switch selection {
         case .home:
-            // Its navigation is held here, not in the screen: the screen is
-            // made afresh each time Home is picked, and a race opened on it
-            // should still be open when you come back.
-            HomeScreen(store: store, day: $day, openLeague: open, path: $homePath, openedInitialRace: $homeOpenedRace)
+            HomeScreen(store: store, day: $day, openLeague: open, openedInitialRace: $homeOpenedRace)
         case .league(let key):
             if let league = store.leagues.first(where: { Self.key($0) == key }) {
-                NavigationStack {
-                    CompetitionScreen(ref: LeagueRef(league), store: store, day: leagueDays[key] ?? Self.initialDay())
-                        .navigationDestination(for: Event.self) { event in
-                            RaceScreen(eventId: event.id, fallback: event, store: store)
-                        }
-                }
+                CompetitionScreen(ref: LeagueRef(league), store: store, day: leagueDays[key] ?? Self.initialDay())
                 // Made afresh for a day picked on the front page.
                 .id("\(key)|\(leagueDays[key].map { "\($0)" } ?? "")")
             }
@@ -220,7 +217,7 @@ enum MenuItem: Hashable {
 extension EnvironmentValues {
     /// Opens the menu; a page calls it on Back, as tvOS's sidebar does.
     @Entry var openMenu: @MainActor () -> Void = {}
-    /// Opens a game's page, from its row.
+    /// Opens a game's or a race's page, from its row.
     @Entry var openGame: @MainActor (Event) -> Void = { _ in }
     /// A page reports whether it is scrolled away from its top, for the menu
     /// chip to shrink to its icon, as tvOS's own does.

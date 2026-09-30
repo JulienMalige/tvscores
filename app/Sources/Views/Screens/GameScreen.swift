@@ -66,16 +66,9 @@ struct GameScreen: View {
                     GameInfoSection(start: event.start, venue: detail?.venue, place: detail?.city)
                 }
             }
-            .padding(.horizontal, Metrics.gameInset)
-            .padding(.top, Metrics.gameInset / 2)
-            .padding(.bottom, Metrics.screenBottom)
+            .eventPageInsets()
         }
-        .background(GameBackdrop(home: tints.home, away: tints.away))
-        .clipShape(UnevenRoundedRectangle(topLeadingRadius: Metrics.gameRadius,
-                                          topTrailingRadius: Metrics.gameRadius, style: .continuous))
-        .padding([.top, .horizontal], Metrics.gameMargin)
-        .ignoresSafeArea()
-        .presentationBackground(Color.black.opacity(0.6))
+        .eventSheet(GameBackdrop(home: tints.home, away: tints.away))
         .accessibilityIdentifier("page.game")
         .task(id: eventId) {
             tints = await TeamTint.pair(event.home, event.away)
@@ -111,5 +104,28 @@ private struct GameBackdrop: View {
                                    .init(color: Color(white: 0.11), location: 0.6)],
                            startPoint: .top, endPoint: .bottom)
         }
+    }
+}
+
+extension View {
+    /// The room inside an event's card, round its blocks.
+    func eventPageInsets() -> some View {
+        self
+            .padding(.horizontal, Metrics.gameInset)
+            .padding(.top, Metrics.gameInset / 2)
+            .padding(.bottom, Metrics.screenBottom)
+    }
+
+    /// An event's page — a game's or a race's — as the card over the page it
+    /// was opened from: inset at the top and sides, running off the bottom,
+    /// on its own backdrop, the page behind dimmed.
+    func eventSheet(_ backdrop: some View) -> some View {
+        self
+            .background(backdrop)
+            .clipShape(UnevenRoundedRectangle(topLeadingRadius: Metrics.gameRadius,
+                                              topTrailingRadius: Metrics.gameRadius, style: .continuous))
+            .padding([.top, .horizontal], Metrics.gameMargin)
+            .ignoresSafeArea()
+            .presentationBackground(Color.black.opacity(0.6))
     }
 }

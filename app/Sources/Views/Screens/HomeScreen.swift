@@ -6,36 +6,31 @@ struct HomeScreen: View {
     @Binding var day: Day
     /// Takes the viewer to a competition's own place in the menu.
     let openLeague: (LeagueRef) -> Void
-    /// Held by the menu's owner, so they outlive this screen.
-    @Binding var path: NavigationPath
+    /// Held by the menu's owner, so it outlives this screen.
     @Binding var openedInitialRace: Bool
     @Environment(\.openMenu) private var openMenu
+    @Environment(\.openGame) private var openGame
     @Environment(\.pageScrolled) private var pageScrolled
 
     var body: some View {
-        NavigationStack(path: $path) {
-            ScrollView {
-                // Title and day switch scroll away with the list. On a
-                // television a pinned bar saves no input, since reaching them
-                // means moving focus up there anyway, and the focus engine
-                // brings them back on screen when it does.
-                VStack(alignment: .leading, spacing: Metrics.sectionGap / 2) {
-                    header
-                    BoardCard(day: $day) { content }
-                }
-                .frame(maxWidth: Metrics.pageWidth)
-                .frame(maxWidth: .infinity)
-                .pageMargins()
+        ScrollView {
+            // Title and day switch scroll away with the list. On a
+            // television a pinned bar saves no input, since reaching them
+            // means moving focus up there anyway, and the focus engine
+            // brings them back on screen when it does.
+            VStack(alignment: .leading, spacing: Metrics.sectionGap / 2) {
+                header
+                BoardCard(day: $day) { content }
             }
-            // Scrolled away from the top, the menu chip drops its name.
-            .onScrollGeometryChange(for: Bool.self, of: { $0.contentOffset.y > 60 }) { _, down in pageScrolled(down) }
-            // Set inside the stack, so a race pushed over Home keeps its own page.
-            .pageTint(.homeTint)
-            // Back on the page opens the menu, as on tvOS's own sidebar; a
-            // race pushed over it takes Back for itself first.
-            .onExitCommand(perform: openMenu)
-            .navigationDestination(for: Event.self) { RaceScreen(eventId: $0.id, fallback: $0, store: store) }
+            .frame(maxWidth: Metrics.pageWidth)
+            .frame(maxWidth: .infinity)
+            .pageMargins()
         }
+        // Scrolled away from the top, the menu chip drops its name.
+        .onScrollGeometryChange(for: Bool.self, of: { $0.contentOffset.y > 60 }) { _, down in pageScrolled(down) }
+        .pageTint(.homeTint)
+        // Back on the page opens the menu, as on tvOS's own sidebar.
+        .onExitCommand(perform: openMenu)
         // `-TVScoresRace f1` opens that series' latest classified race (CI
         // screenshots and the race flow). Checked on appearance as well as on
         // the board arriving: the loader in front of the sidebar means this
@@ -47,15 +42,17 @@ struct HomeScreen: View {
 
     private func openRequestedRace() {
         guard !openedInitialRace, let board = store.board, let wanted = Self.argument("-TVScoresRace") else { return }
-        let race = Day.allCases.flatMap { board.groups(for: $0) }
-            .filter { $0.sport == wanted }
+        // "motogp:next" opens its next weekend instead, not yet run.
+        let parts = wanted.split(separator: ":")
+        let races = Day.allCases.flatMap { board.groups(for: $0) }
+            .filter { $0.sport == String(parts[0]) }
             .flatMap(\.events)
-            .first { !($0.results ?? []).isEmpty }
+        let race = parts.last == "next"
+            ? races.first { $0.status.state == .scheduled }
+            : races.first { !($0.results ?? []).isEmpty }
         guard let race else { return }
-        var next = NavigationPath()
-        next.append(race)
-        path = next
         openedInitialRace = true
+        openGame(race)
     }
 
     private static func argument(_ name: String) -> String? {

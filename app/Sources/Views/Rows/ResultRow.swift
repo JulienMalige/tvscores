@@ -18,13 +18,13 @@ struct ResultRow: View {
         HStack(spacing: 0) {
             HStack(spacing: Metrics.headingGap) {
                 Text(result.pos.map { String($0) } ?? "–")
-                    .font(.system(size: 30, weight: .bold))
-                    .frame(width: 60, alignment: .trailing)
+                    .font(.callout.weight(.bold))
+                    .frame(width: 44, alignment: .trailing)
                 PersonMark(photo: result.photo, flag: result.flag, color: Color(hex: result.teamColor),
-                           monogram: result.code ?? PersonMark.monogram(for: result.driver), size: Metrics.mark)
+                           monogram: result.code ?? PersonMark.monogram(for: result.driver), size: Metrics.tableMark * 1.2)
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 10) {
-                        Text(result.driver).font(.title3.weight(.semibold))
+                        Text(result.driver).font(.callout.weight(.semibold))
                         if result.fastestLap == true {
                             Image(systemName: "stopwatch")
                                 .font(.callout)
@@ -32,7 +32,7 @@ struct ResultRow: View {
                                 .accessibilityLabel(Text("race.fastestLap"))
                         }
                     }
-                    Text(result.team ?? "").font(.callout).foregroundStyle(.secondary)
+                    Text(result.team ?? "").font(.caption).foregroundStyle(.secondary)
                 }
             }
             .frame(width: Self.nameWidth, alignment: .leading)
@@ -44,10 +44,10 @@ struct ResultRow: View {
             Text(result.gap ?? "")
                 .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .font(.title3)
+        .font(.callout)
         .lineLimit(1)
         .minimumScaleFactor(0.7)
-        .rowSurface(focused: isFocused)
+        .rowSurface(focused: isFocused, resting: 0, insetV: Metrics.tableRowPad)
         // tvOS scrolls by moving focus. Without this the page would be stuck
         // at the top and most of the field unreachable.
         .focusable()
