@@ -6,12 +6,8 @@ import Testing
 /// The elements: the atoms with logic in them.
 @Suite("Elements")
 struct ElementsTests {
-    // MARK: StatusLabel
+    // MARK: LeagueMark
 
-    /// Every key the two vocabularies map to, in every language we ship.
-    ///
-    /// The catalogue is read from the bundle so a key that is mapped but never
-    /// translated fails here, not as an English word on a Portuguese screen.
     @Test("a wide wordmark and a tall badge get about the same room")
     func leagueMarksBalance() {
         // ATP's wordmark is 3.4 times as wide as tall; the Nations League's
@@ -25,6 +21,12 @@ struct ElementsTests {
         #expect(atp.height >= (43 * Metrics.leagueMarkShortest).rounded(.down))
     }
 
+    // MARK: StatusLabel
+
+    /// Every key the two vocabularies map to, in every language we ship.
+    ///
+    /// The catalogue is read from the bundle so a key that is mapped but never
+    /// translated fails here, not as an English word on a Portuguese screen.
     @Test("every status the proxy can send has a string in all four languages")
     func statusVocabularyIsTranslated() throws {
         for key in Set(StatusLabel.detailKeys.values).union(StatusLabel.finalCombined.values).union(["status.live", "status.final"]) {
