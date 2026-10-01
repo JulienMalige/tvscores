@@ -16,8 +16,9 @@ struct GameScreen: View {
     let store: ScoreboardStore
     @State private var detail: GameDetail?
     @State private var tints: (home: Color?, away: Color?) = (nil, nil)
-    /// The first answer about the game has come, empty or not.
-    @State private var asked = false
+    @State private var standings: Standings?
+    /// The first answers about the game have come, empty or not.
+    @State private var ready = false
 
     /// Re-read from the store on every pass, so a live score keeps moving.
     private var found: (event: Event, group: LeagueGroup)? { store.board?.find(eventId) }
@@ -30,40 +31,46 @@ struct GameScreen: View {
         return found?.group.league.name ?? ""
     }
 
+    /// The table both sides sit in, when the competition has one.
+    private var standingsRef: LeagueRef? {
+        guard let group = found?.group, group.league.hasStandings == true else { return nil }
+        return LeagueRef(group: group)
+    }
+
+    private func loadTable(_ ref: LeagueRef?) async -> Standings? {
+        guard let ref else { return nil }
+        return await store.standings(for: ref)
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: Metrics.gameGap) {
                 GameHeaderSection(event: event, competition: competition, records: detail?.records)
-                if event.status.state != .scheduled, !asked {
-                    // The room the statistics will take, held while they
-                    // come: they took a few seconds on the television and
-                    // pushed everything under them down when they did
-                    // (Julien, build 28).
-                    if ["nfl", "nba"].contains(event.sport) {
-                        PeriodSection(periods: .placeholder, home: event.home, away: event.away)
-                            .redacted(reason: .placeholder)
+                if !ready {
+                    // One native loader under the score while the rest
+                    // comes, then the rest at once: a skeleton for the
+                    // statistics, and the table and venue arriving
+                    // before them, moved the page about (Julien, build 30).
+                    ProgressView()
+                        .frame(maxWidth: .infinity, minHeight: 320)
+                } else {
+                    if event.status.state != .scheduled {
+                        if let periods = detail?.periods { PeriodSection(periods: periods, home: event.home, away: event.away) }
+                        if let stats = detail?.stats, !stats.isEmpty {
+                            StatsSection(stats: stats, homeTint: tints.home, awayTint: tints.away)
+                        }
+                        if let moments = detail?.timeline, !moments.isEmpty { MomentsSection(moments: moments) }
                     }
-                    if ["football", "nba"].contains(event.sport) {
-                        StatsSection(stats: GameDetail.Stat.placeholders)
-                            .redacted(reason: .placeholder)
+                    // The table both sides sit in: a league's, or a tour's
+                    // ranking with the two players picked out (Julien, build 28).
+                    if let ref = standingsRef {
+                        StandingsSection(ref: ref, store: store,
+                                         highlight: Set([event.home?.name, event.away?.name].compactMap { $0 }),
+                                         carded: true, preloaded: standings)
                     }
-                }
-                if event.status.state != .scheduled {
-                    if let periods = detail?.periods { PeriodSection(periods: periods, home: event.home, away: event.away) }
-                    if let stats = detail?.stats, !stats.isEmpty {
-                        StatsSection(stats: stats, homeTint: tints.home, awayTint: tints.away)
+                    if event.sport != "tennis" {
+                        GameInfoSection(start: event.start, venue: detail?.venue, place: detail?.city)
                     }
-                    if let moments = detail?.timeline, !moments.isEmpty { MomentsSection(moments: moments) }
-                }
-                // The table both sides sit in: a league's, or a tour's
-                // ranking with the two players picked out (Julien, build 28).
-                if let group = found?.group, group.league.hasStandings == true {
-                    StandingsSection(ref: LeagueRef(group: group), store: store,
-                                     highlight: Set([event.home?.name, event.away?.name].compactMap { $0 }),
-                                     carded: true)
-                }
-                if event.sport != "tennis" {
-                    GameInfoSection(start: event.start, venue: detail?.venue, place: detail?.city)
                 }
             }
             .eventPageInsets()
@@ -74,14 +81,20 @@ struct GameScreen: View {
             tints = await TeamTint.pair(event.home, event.away)
         }
         .task(id: eventId) {
-            // Asked when opened; again each minute until the game is over.
+            // Asked when opened, with the table, so the page fills in one
+            // go; then the game again each minute until it is over.
+            async let first = store.detail(for: eventId)
+            async let table = loadTable(standingsRef)
+            (detail, standings) = await (first, table)
+            withAnimation(.easeOut(duration: 0.25)) { ready = true }
+            guard event.status.state != .final else { return }
             while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(60))
+                if Task.isCancelled { return }
                 if let fresh = await store.detail(for: eventId) { detail = fresh }
-                asked = true
                 // Until the whistle: a page opened before kickoff has to see
                 // the game start to fetch its periods, stats and goals.
                 guard event.status.state != .final else { return }
-                try? await Task.sleep(for: .seconds(60))
             }
         }
     }

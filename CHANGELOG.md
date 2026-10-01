@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- A game's or a race's page shows its score at once, with a single loader
+  under it, then everything else together: nothing moves down as the
+  statistics and the table arrive.
 - Competition logos are the same size to the eye: wide ones like ATP and
   F1 are a little shorter, tall badges like the Nations League and the NBA
   a little larger.

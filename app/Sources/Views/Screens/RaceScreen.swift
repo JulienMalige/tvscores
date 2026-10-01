@@ -11,8 +11,9 @@ struct RaceScreen: View {
     /// What the row showed when it was tapped, used until the store answers.
     let fallback: Event
     let store: ScoreboardStore
-    /// The series' colour behind the card, as its page is tinted.
-    @State private var logoTint: Color?
+    @State private var standings: Standings?
+    /// The championship has answered, for a race still to come.
+    @State private var loaded = false
 
     /// Re-read from the store on every pass: the page outlives a refresh, so a
     /// race in progress keeps moving and portraits resolved later turn up.
@@ -22,6 +23,12 @@ struct RaceScreen: View {
     private var results: [RaceResult] { event.results ?? [] }
     private var classified: Bool { !results.filter(\.finished).isEmpty }
 
+    /// The championship going into the race, when the series has one.
+    private var standingsRef: LeagueRef? {
+        guard let group = found?.group, group.league.hasStandings == true else { return nil }
+        return LeagueRef(group: group)
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: Metrics.gameGap) {
@@ -30,6 +37,12 @@ struct RaceScreen: View {
                 if classified {
                     PodiumSection(results: results)
                     ResultSection(results: results)
+                    GameInfoSection(start: event.start, venue: event.circuit, place: event.country)
+                } else if !loaded {
+                    // As a game's page: one loader under the header, then
+                    // the schedule, the table and the place at once.
+                    ProgressView()
+                        .frame(maxWidth: .infinity, minHeight: 320)
                 } else {
                     // Nothing classified yet: the weekend ahead, when the
                     // feed has it, and the championship going into it.
@@ -38,16 +51,20 @@ struct RaceScreen: View {
                     } else {
                         EmptyDay(title: Text("race.noSchedule"), line: nil)
                     }
-                    if let group = found?.group, group.league.hasStandings == true {
-                        StandingsSection(ref: LeagueRef(group: group), store: store, carded: true)
+                    if let ref = standingsRef {
+                        StandingsSection(ref: ref, store: store, carded: true, preloaded: standings)
                     }
+                    GameInfoSection(start: event.start, venue: event.circuit, place: event.country)
                 }
-                GameInfoSection(start: event.start, venue: event.circuit, place: event.country)
             }
             .eventPageInsets()
         }
         .eventSheet(RaceBackdrop(tint: Color(hex: found?.group.league.color)))
         .accessibilityIdentifier("page.race")
+        .task(id: eventId) {
+            if let ref = standingsRef, !classified { standings = await store.standings(for: ref) }
+            withAnimation(.easeOut(duration: 0.25)) { loaded = true }
+        }
     }
 }
 

@@ -12,6 +12,9 @@ struct StandingsSection: View {
     /// On a game's page: the table on a panel under a centred title, as
     /// Apple Sports shows it.
     var carded = false
+    /// The table already fetched by the page, which waits for it so that
+    /// the whole page appears at once; left out, the section asks itself.
+    var preloaded: Standings? = nil
 
     @State private var standings: Standings?
     @State private var loaded = false
@@ -38,7 +41,7 @@ struct StandingsSection: View {
         .padding(.horizontal, carded ? 16 : 0)
         .background { if carded { Color.clear.gameCardSurface() } }
         .task {
-            standings = await store.standings(for: ref)
+            standings = if let preloaded { preloaded } else { await store.standings(for: ref) }
             loaded = true
             if let standings { await ImagePrefetcher.shared.prefetch(standings.imageURLs) }
             // `-TVScoresTable constructors` opens that table (CI screenshots).
