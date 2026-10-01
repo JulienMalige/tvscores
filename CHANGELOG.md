@@ -7,6 +7,7 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- A new app icon: a tennis court seen from above, white lines on blue.
 - A game's or a race's page shows its score at once, with a single loader
   under it, then everything else together: nothing moves down as the
   statistics and the table arrive.

@@ -12,8 +12,7 @@ else.
 app/          tvOS app (SwiftUI). Xcode project generated from app/project.yml with XcodeGen.
 proxy/        caching proxy that runs on Julien's VPS. Owns every provider key.
 docs/         decisions, provider terms, release notes. One markdown file per topic.
-scripts/      repository tooling: the audit, the brand assets, the App Store Connect client.
-design/       source artwork the build scripts read. Not bundled in the app.
+scripts/      repository tooling: the audit, the brand assets (drawn as geometry), the App Store Connect client.
 CHANGELOG.md  what each TestFlight build changed, for whoever installs it.
 .claude/      the source-hygiene skill. Personal settings there are gitignored.
 ```
