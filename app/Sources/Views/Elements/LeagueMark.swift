@@ -14,14 +14,34 @@ struct LeagueMark: View {
     var height: CGFloat = Metrics.leagueMark
 
     var body: some View {
-        Group {
+        // Read for its change alone: the logo's shape is known once it lands.
+        let _ = ImageArrivals.shared.count
+        return Group {
             if let logo {
                 CachedImage(url: logo) { symbol }
             } else {
                 symbol
             }
         }
-        .modifier(Box(square: square, height: height))
+        .modifier(Box(square: square, height: height, size: logo
+            .flatMap { ImageCache.shared.image(for: $0)?.size }
+            .map { Self.size(aspect: $0.width / max($0.height, 1), nominal: height) }))
+    }
+
+    /// The box a mark of this shape gets, so that a wide wordmark and a tall
+    /// badge look the same size: equal area, within bounds, as Apple Sports
+    /// sets its competition marks.
+    static func size(aspect: CGFloat, nominal: CGFloat) -> CGSize {
+        guard aspect > 0 else { return CGSize(width: nominal, height: nominal) }
+        let area = nominal * nominal * Metrics.leagueMarkArea
+        var height = min(max((area / aspect).squareRoot(), nominal * Metrics.leagueMarkShortest),
+                         nominal * Metrics.leagueMarkTallest)
+        var width = height * aspect
+        if width > nominal * Metrics.leagueMarkWidest {
+            width = nominal * Metrics.leagueMarkWidest
+            height = width / aspect
+        }
+        return CGSize(width: width.rounded(), height: height.rounded())
     }
 
     /// Two shapes, one mark: a heading gives a wordmark its width; a sidebar
@@ -29,10 +49,14 @@ struct LeagueMark: View {
     private struct Box: ViewModifier {
         let square: CGFloat?
         let height: CGFloat
+        /// The mark's own box, once its picture is here to measure.
+        let size: CGSize?
 
         func body(content: Content) -> some View {
             if let square {
                 content.frame(width: square, height: square)
+            } else if let size {
+                content.frame(width: size.width, height: size.height)
             } else {
                 // As wide as the mark itself at this height, no wider: a box
                 // sized for the widest wordmark left a gap between the NBA's

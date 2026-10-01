@@ -12,6 +12,19 @@ struct ElementsTests {
     ///
     /// The catalogue is read from the bundle so a key that is mapped but never
     /// translated fails here, not as an English word on a Portuguese screen.
+    @Test("a wide wordmark and a tall badge get about the same room")
+    func leagueMarksBalance() {
+        // ATP's wordmark is 3.4 times as wide as tall; the Nations League's
+        // badge 0.64. At one height the first took five times the second.
+        let atp = LeagueMark.size(aspect: 3.39, nominal: 43)
+        let nations = LeagueMark.size(aspect: 0.64, nominal: 43)
+        let ratio = (atp.width * atp.height) / (nations.width * nations.height)
+        #expect(ratio < 2)
+        #expect(atp.width <= 43 * Metrics.leagueMarkWidest)
+        #expect(nations.height <= (43 * Metrics.leagueMarkTallest).rounded())
+        #expect(atp.height >= (43 * Metrics.leagueMarkShortest).rounded(.down))
+    }
+
     @Test("every status the proxy can send has a string in all four languages")
     func statusVocabularyIsTranslated() throws {
         for key in Set(StatusLabel.detailKeys.values).union(StatusLabel.finalCombined.values).union(["status.live", "status.final"]) {

@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- Competition logos are the same size to the eye: wide ones like ATP and
+  F1 are a little shorter, tall badges like the Nations League and the NBA
+  a little larger.
 
 ## 1.0 build 30 — 30 September 2026
 - A Formula 1 or MotoGP race opens like a game: a card over the page,

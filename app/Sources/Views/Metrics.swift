@@ -88,6 +88,14 @@ enum Metrics {
     static let leagueMark: CGFloat = 52
     /// The same over a list of games, two thirds of a team's crest.
     static let leagueMarkSmall: CGFloat = 43
+    /// A competition mark is sized by the room it covers, not its height:
+    /// at one height ATP's wordmark took five times the Nations League's
+    /// badge (Julien, build 30). As much ink as a square 1.35 times the
+    /// mark's nominal size, held between these bounds of that size.
+    static let leagueMarkArea: CGFloat = 1.35
+    static let leagueMarkShortest: CGFloat = 0.65
+    static let leagueMarkTallest: CGFloat = 1.25
+    static let leagueMarkWidest: CGFloat = 2.55
     /// A list's league heading, in from the panel's edge: clear of its
     /// rounded corner (radius 48) and in line with the crests under it.
     static let leagueHeadingInset: CGFloat = 24
