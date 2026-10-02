@@ -78,7 +78,7 @@ NFL, NBA, friendlies.
 **A hand-kept rights table plus TheSportsDB's daily TV feed on top. No new
 provider, $0 extra.**
 
-1. `proxy/broadcasts.json`, kept like `tennis-calendar.json`: per country, per
+1. A broadcasts file in the proxy (not made yet), kept like `tennis-calendar.json`: per country, per
    competition, an ordered list of names, with `from`/`until` dates so a
    rights change (Libertadores 2027, Serie A 2027-28) is one line. Tennis
    keys by tournament.

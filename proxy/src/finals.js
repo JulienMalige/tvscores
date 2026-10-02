@@ -11,22 +11,40 @@ import { STATE } from "./model.js";
 // 8 a half hour fits a busy day of the 500s inside the 100-a-day tennis
 // budget with the polls.
 const CONFIRM_PER_ROUND = 8;
+// A match that will not answer is let go: three tries, or a day.
+const MAX_TRIES = 3;
+const GIVE_UP_AFTER = 24 * 3600e3;
 
 export async function confirmFinals(s, newIds, now) {
-  const queue = [...new Set([...(s.meta.toConfirm || []), ...newIds])];
+  const queue = [];
+  const seen = new Set();
+  for (const entry of [...(s.meta.toConfirm || []), ...newIds.map((id) => ({ id, tries: 0, since: now }))]) {
+    // Entries from before tries were kept were bare ids.
+    const e = typeof entry === "string" ? { id: entry, tries: 0, since: now } : entry;
+    if (!seen.has(e.id)) { seen.add(e.id); queue.push(e); }
+  }
   const left = [];
   let asked = 0;
-  for (const id of queue) {
-    if (asked >= CONFIRM_PER_ROUND || s.quota.spendable(now) <= 0) { left.push(id); continue; }
+  for (const e of queue) {
+    if (asked >= CONFIRM_PER_ROUND || s.quota.spendable(now) <= 0) { left.push(e); continue; }
     asked++;
+    const retry = () => {
+      if (e.tries + 1 < MAX_TRIES && now - e.since < GIVE_UP_AFTER) left.push({ ...e, tries: e.tries + 1 });
+      else s.log(`${s.p.sport}: gave up confirming ${e.id}`);
+    };
     try {
-      const row = await s.p.byId(id);
-      // Over by its own account; one still in play waits for the live feed.
-      if (row?.status.state === STATE.final) { s.store.upsert([row]); s.noteResults([row]); }
-      else if (row?.status.state === STATE.live) left.push(id);
+      const row = await s.p.byId(e.id);
+      if (!row) s.log(`${s.p.sport}: ${e.id} unknown to the feed, left as last seen`);
+      // Still in play by its own account: asked again next round.
+      else if (row.status.state === STATE.live) retry();
+      else {
+        if (row.status.state !== STATE.final) s.log(`${s.p.sport}: ${e.id} ended as ${row.status.state}`);
+        s.store.upsert([row]);
+        s.noteResults([row]);
+      }
     } catch (err) {
-      left.push(id);
-      s.log(`${s.p.sport}: confirm ${id} failed: ${err.message || err}`);
+      s.log(`${s.p.sport}: confirm ${e.id} failed: ${err.message || err}`);
+      retry();
     }
   }
   s.meta.toConfirm = left.length ? left : undefined;

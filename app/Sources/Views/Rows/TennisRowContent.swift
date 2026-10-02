@@ -12,10 +12,17 @@ struct TennisRowContent: View {
     private var sets: [[Int]] { event.setScores ?? [] }
     private var live: Bool { event.status.state == .live }
 
-    /// Sets won decide the match; nobody has won one still in play.
+    /// The feed's word on who won, else sets won; nobody has won a match
+    /// still in play.
     private var winner: Int? {
-        guard event.status.state == .final, let h = event.score?.home, let a = event.score?.away, h != a else { return nil }
-        return h > a ? 0 : 1
+        guard event.status.state == .final else { return nil }
+        switch event.score?.winner {
+        case "home": return 0
+        case "away": return 1
+        default:
+            guard let h = event.score?.home, let a = event.score?.away, h != a else { return nil }
+            return h > a ? 0 : 1
+        }
     }
 
     var body: some View {

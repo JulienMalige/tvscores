@@ -226,6 +226,9 @@ struct Score: Decodable, Equatable {
     let away: Int?
     /// Tennis: the games of each set, [home, away] — [[6, 2], [6, 3]].
     let sets: [[Int]]?
+    /// Tennis: "home" or "away", from the feed — a player who retires can
+    /// be ahead on sets and still lose.
+    let winner: String?
 }
 
 struct RaceResult: Decodable, Identifiable, Equatable {

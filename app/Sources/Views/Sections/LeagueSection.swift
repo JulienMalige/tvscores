@@ -97,7 +97,7 @@ struct LeagueHeader: View {
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
-        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color.white.opacity(isFocused ? 0.14 : 0)))
+        .focusGlass(isFocused, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         .scaleEffect(isFocused ? 1.03 : 1)
         .animation(.easeOut(duration: 0.15), value: isFocused)
     }

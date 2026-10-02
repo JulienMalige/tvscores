@@ -99,6 +99,9 @@ export function untieredOn(pinned = [], info = {}, calendar = [], day) {
     && ["atp", "wta"].some((tour) => calendarEntry(calendar, { tour, info: info[id], day })));
 }
 
+/** The feed's winner, 1 or 2, by side: a retirement can leave the winner behind on sets. */
+const WINNER = { 1: "home", 2: "away" };
+
 export function normaliseMatch(m, info, calendar = []) {
   const league = TOURS[m.tour];
   if (!league || m.is_doubles) return null;
@@ -131,7 +134,7 @@ export function normaliseMatch(m, info, calendar = []) {
     // Sets won, and the games of every set for the row to show "6-2 6-3"
     // (Julien, build 31: "1-0" said nothing).
     score: known
-      ? { home: m.score?.sets?.[0] ?? null, away: m.score?.sets?.[1] ?? null, sets: setPairs(m.score) }
+      ? { home: m.score?.sets?.[0] ?? null, away: m.score?.sets?.[1] ?? null, sets: setPairs(m.score), winner: WINNER[m.winner] }
       : { home: null, away: null },
   };
 }
@@ -268,8 +271,18 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
   async function byId(id) {
     if (!key) throw new Error("Live Tennis API key missing");
     const { info } = await catalogue();
-    const { body } = await getJson(`${BASE}/matches/${String(id).replace(/^tennis:/, "")}`, { headers });
-    quota.record(undefined);
+    let body;
+    try {
+      ({ body } = await getJson(`${BASE}/matches/${String(id).replace(/^tennis:/, "")}`, { headers }));
+    } catch (err) {
+      // A match the feed no longer knows will never answer: say so, and
+      // the caller stops asking. Anything else may pass, so it throws.
+      if (/HTTP 404/.test(err.message)) return null;
+      throw err;
+    } finally {
+      // Counted whatever came back: a failed call is a call (review, build 32).
+      quota.record(undefined);
+    }
     return body?.id ? normaliseMatch(body, info[String(body.tournament_id)], tennis.calendar) : null;
   }
   return {

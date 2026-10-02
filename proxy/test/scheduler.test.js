@@ -215,8 +215,31 @@ test("finished matches past a round's share wait for the next round", async () =
   s.store.upsert(live);
   await s.live(KICKOFF + 3600e3);
   assert.equal(asked.length, 8);
-  assert.equal(s.meta.toConfirm.length, 2);
+  assert.deepEqual(s.meta.toConfirm.map((e) => e.id), ["tennis:8", "tennis:9"]);
   await s.live(KICKOFF + 2 * 3600e3);
   assert.equal(asked.length, 10);
   assert.equal(s.meta.toConfirm, undefined);
+});
+
+test("a match that keeps failing is let go after three tries", async () => {
+  // Review, build 32: a dead id was asked for eight times a round for ever.
+  const seen = match({ id: "tennis:404", sport: "tennis", status: { state: "live" } });
+  let calls = 0;
+  const provider = { sport: "tennis", finalizeOrphans: true, live: async () => [], byId: async () => { calls++; throw new Error("HTTP 500"); } };
+  const s = scheduler(provider);
+  s.store.upsert([seen]);
+  for (let round = 1; round <= 5; round++) await s.live(KICKOFF + round * 1800e3);
+  assert.equal(calls, 3);
+  assert.equal(s.meta.toConfirm, undefined);
+});
+
+test("a match the feed no longer knows is asked for once", async () => {
+  const seen = match({ id: "tennis:gone", sport: "tennis", status: { state: "live" } });
+  let calls = 0;
+  const provider = { sport: "tennis", finalizeOrphans: true, live: async () => [], byId: async () => { calls++; return null; } };
+  const s = scheduler(provider);
+  s.store.upsert([seen]);
+  await s.live(KICKOFF + 1800e3);
+  await s.live(KICKOFF + 3600e3);
+  assert.equal(calls, 1);
 });
