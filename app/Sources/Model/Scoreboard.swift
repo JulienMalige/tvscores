@@ -224,6 +224,8 @@ struct TeamRef: Decodable, Equatable {
 struct Score: Decodable, Equatable {
     let home: Int?
     let away: Int?
+    /// Tennis: the games of each set, [home, away] — [[6, 2], [6, 3]].
+    let sets: [[Int]]?
 }
 
 struct RaceResult: Decodable, Identifiable, Equatable {

@@ -8,6 +8,9 @@ struct StatusLabel: View {
     /// A list row's middle, smaller than its scores as Apple Sports sets it;
     /// a game's page keeps the larger size.
     var compact = false
+    /// The row shows each set's games beside it: the "6-2 6-3" line under
+    /// "Final" and the "· 4-2" after "Set 3" would say them twice.
+    var setsShown = false
 
     /// Under a date heading the day is said already: the time alone.
     @Environment(\.underDayHeading) private var underDayHeading
@@ -18,6 +21,12 @@ struct StatusLabel: View {
     /// Apple Sports' sizes doubled (docs/design-measures.md): a list's
     /// "Final" and kickoff at the row's text size, a game page's a little less.
     private var mainFont: Font { compact ? .callout.weight(.semibold) : .body.weight(.semibold) }
+
+    /// "Set 3 · 4-2", or "Set 3" when the games are beside it.
+    private var clock: String? {
+        guard setsShown, let c = status.clock else { return status.clock }
+        return c.components(separatedBy: " · ").first
+    }
 
     var body: some View {
         VStack(spacing: 4) {
@@ -39,15 +48,15 @@ struct StatusLabel: View {
                     .font(mainFont)
                 if let d = status.detail { detailText(d) }
             case .live:
-                Text(status.clock ?? localizedDetail(status.note) ?? localizedDetail(status.detail) ?? String(localized: "status.live"))
+                Text(clock ?? localizedDetail(status.note) ?? localizedDetail(status.detail) ?? String(localized: "status.live"))
                     .font(mainFont)
                     .foregroundStyle(status.note == nil ? .green : .orange)
-                if status.clock != nil || status.note != nil, let d = status.detail { detailText(d) }
+                if status.clock != nil || status.note != nil, !setsShown, let d = status.detail { detailText(d) }
             case .final:
                 Text(finalText)
                     .font(mainFont)
                 // "Final/OT" says it on one line; anything else keeps its own.
-                if let d = status.detail, Self.finalCombined[d] == nil { detailText(d) }
+                if !setsShown, let d = status.detail, Self.finalCombined[d] == nil { detailText(d) }
             case .other:
                 Text(localizedDetail(status.detail) ?? "–")
                     .font(mainFont)

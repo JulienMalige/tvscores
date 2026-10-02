@@ -22,9 +22,9 @@ struct GameHeaderSection: View {
                 Grid(horizontalSpacing: 0, verticalSpacing: 12) {
                     if scored {
                         GridRow {
-                            score(event.score?.home, dim: loser == .home)
+                            score(event.score?.home, dim: loser == .home, side: 0)
                             status
-                            score(event.score?.away, dim: loser == .away)
+                            score(event.score?.away, dim: loser == .away, side: 1)
                         }
                     }
                     GridRow {
@@ -50,7 +50,7 @@ struct GameHeaderSection: View {
     }
 
     private var status: some View {
-        StatusLabel(status: event.status, start: event.start)
+        StatusLabel(status: event.status, start: event.start, setsShown: event.setScores != nil)
             .frame(width: Metrics.gameCentre)
     }
 
@@ -98,10 +98,15 @@ struct GameHeaderSection: View {
     }
 
     /// Tall and narrow, as a scoreboard's figures: the loser's greyed.
-    private func score(_ value: Int?, dim: Bool) -> some View {
-        Text(verbatim: value.map(String.init) ?? "–")
-            .font(.system(size: Metrics.gameScore, weight: .bold).width(.condensed))
-            .monospacedDigit()
-            .foregroundStyle(dim ? Color.white.opacity(0.4) : .white)
+    @ViewBuilder
+    private func score(_ value: Int?, dim: Bool, side: Int) -> some View {
+        if let sets = event.setScores {
+            SetScores(sets: sets, side: side, size: Metrics.gameSetScore, inPlay: event.status.state == .live)
+        } else {
+            Text(verbatim: value.map(String.init) ?? "–")
+                .font(.system(size: Metrics.gameScore, weight: .bold).width(.condensed))
+                .monospacedDigit()
+                .foregroundStyle(dim ? Color.white.opacity(0.4) : .white)
+        }
     }
 }

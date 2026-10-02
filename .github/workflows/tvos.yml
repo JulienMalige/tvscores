@@ -153,6 +153,11 @@ jobs:
           race en f1
           race en motogp
           race fr f1
+          # Tennis results as each set's games, "6-4 3-4" (build 32).
+          xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+          SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresSample race -TVScoresTab today -TVScoresLeague wta -AppleLanguages "(en)"
+          sleep 8
+          xcrun simctl io "$UDID" screenshot shots/tennis-sets-en.png
           # A weekend still to come: its schedule and the championship.
           xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
           SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab upcoming -TVScoresRace motogp:next -AppleLanguages "(en)"

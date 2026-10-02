@@ -48,11 +48,11 @@ private struct MatchRowContent: View {
     private var line: some View {
         HStack(spacing: 0) {
             side(event.home)
-            middle(event.score?.home, record: event.records?.home, winner: winner == .home)
+            middle(event.score?.home, record: event.records?.home, winner: winner == .home, side: 0)
                 .frame(width: Metrics.matchScore, alignment: .center)
-            StatusLabel(status: event.status, start: event.start, compact: true, sport: event.sport)
+            StatusLabel(status: event.status, start: event.start, compact: true, setsShown: event.setScores != nil, sport: event.sport)
                 .frame(maxWidth: .infinity)
-            middle(event.score?.away, record: event.records?.away, winner: winner == .away)
+            middle(event.score?.away, record: event.records?.away, winner: winner == .away, side: 1)
                 .frame(width: Metrics.matchScore, alignment: .center)
             side(event.away)
         }
@@ -89,8 +89,10 @@ private struct MatchRowContent: View {
     /// Beside the crest: the score once there is one; before, the side's
     /// record in small grey where the score will go, as Apple Sports.
     @ViewBuilder
-    private func middle(_ value: Int?, record: String?, winner: Bool) -> some View {
-        if event.status.state == .scheduled, let record {
+    private func middle(_ value: Int?, record: String?, winner: Bool, side: Int) -> some View {
+        if let sets = event.setScores {
+            SetScores(sets: sets, side: side, size: Metrics.setScoreType, inPlay: event.status.state == .live)
+        } else if event.status.state == .scheduled, let record {
             Text(verbatim: record)
                 .font(.caption.weight(.medium))
                 .monospacedDigit()

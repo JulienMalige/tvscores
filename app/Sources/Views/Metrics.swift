@@ -56,6 +56,9 @@ enum Metrics {
     static let matchRowPad: CGFloat = 18
     static let matchNameGap: CGFloat = 6
     static let matchScore: CGFloat = 150
+    /// A tennis row's games per set in that slot: up to five figures, so
+    /// smaller than a team's one or two.
+    static let setScoreType: CGFloat = 52
     /// The same thing blown up for a podium, where it is the subject.
     static let markHero: CGFloat = 110
     /// A game page's crests under their scores (Apple's 33 pt, doubled).
@@ -73,6 +76,8 @@ enum Metrics {
     static let gameSide: CGFloat = 560
     static let gameCentre: CGFloat = 460
     static let gameScore: CGFloat = 166
+    /// The same on a tennis match's page.
+    static let gameSetScore: CGFloat = 96
     /// The team code's column in the score by quarter.
     static let periodName: CGFloat = 140
     /// A statistic's figures, the same tall face as the score.

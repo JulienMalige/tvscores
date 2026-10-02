@@ -128,7 +128,11 @@ export function normaliseMatch(m, info, calendar = []) {
     status: { state, clock: state === STATE.live && !interrupted ? liveClock(m.score) : undefined, detail, note: interrupted ? "Interrupted" : undefined },
     home: player(m.players?.p1),
     away: player(m.players?.p2),
-    score: known ? { home: m.score?.sets?.[0] ?? null, away: m.score?.sets?.[1] ?? null } : { home: null, away: null },
+    // Sets won, and the games of every set for the row to show "6-2 6-3"
+    // (Julien, build 31: "1-0" said nothing).
+    score: known
+      ? { home: m.score?.sets?.[0] ?? null, away: m.score?.sets?.[1] ?? null, sets: setPairs(m.score) }
+      : { home: null, away: null },
   };
 }
 
@@ -256,9 +260,22 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
     log(`GET tennis players -> rankings ATP ${out.atp.tables[0].rows.length}, WTA ${out.wta.tables[0].rows.length}`);
     return out; // keyed by league id
   }
+  /**
+   * One match by id — the one call the free tier answers for a match that
+   * is over. The live feed drops a match when it ends, and what we last saw
+   * of it was up to half an hour old: "1-0" for a match won 6-2 6-3.
+   */
+  async function byId(id) {
+    if (!key) throw new Error("Live Tennis API key missing");
+    const { info } = await catalogue();
+    const { body } = await getJson(`${BASE}/matches/${String(id).replace(/^tennis:/, "")}`, { headers });
+    quota.record(undefined);
+    return body?.id ? normaliseMatch(body, info[String(body.tournament_id)], tennis.calendar) : null;
+  }
   return {
     sport: "tennis",
     standings,
+    byId,
     /** Orphans of the live feed are over (no `completed` listing on the free tier). */
     finalizeOrphans: true,
     /** Matches under way are only in the live feed: poll it all day (every 30 min). */

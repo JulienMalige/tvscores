@@ -189,3 +189,34 @@ test("a provider that plays all day is polled live with nothing tracked", async 
   assert.equal(provider.calls.live, 1);
   assert.equal(s.events().length, 1, "the match under way is tracked");
 });
+
+test("a match gone from the live feed is asked for by id to learn how it ended", async () => {
+  // Reproduction, 2 October: Udvardy lost 2-6 3-6, and the board said 0-1 —
+  // the last look, half an hour before the end, kept as the result.
+  const seen = match({ id: "tennis:196994", sport: "tennis", status: { state: "live", clock: "Set 2 · 3-4" }, score: { home: 0, away: 1, sets: [[2, 6], [3, 4]] } });
+  const ended = { ...seen, status: { state: "final" }, score: { home: 0, away: 2, sets: [[2, 6], [3, 6]] } };
+  const asked = [];
+  const provider = { sport: "tennis", finalizeOrphans: true, live: async () => [], byId: async (id) => { asked.push(id); return ended; } };
+  const s = scheduler(provider);
+  s.store.upsert([seen]);
+  await s.live(KICKOFF + 3600e3);
+  assert.deepEqual(asked, ["tennis:196994"]);
+  const row = s.events().find((e) => e.id === "tennis:196994");
+  assert.equal(row.status.state, "final");
+  assert.deepEqual(row.score, { home: 0, away: 2, sets: [[2, 6], [3, 6]] });
+  assert.equal(s.meta.toConfirm, undefined, "nothing left to ask");
+});
+
+test("finished matches past a round's share wait for the next round", async () => {
+  const live = Array.from({ length: 10 }, (_, i) => match({ id: `tennis:${i}`, sport: "tennis", status: { state: "live" } }));
+  const asked = [];
+  const provider = { sport: "tennis", finalizeOrphans: true, live: async () => [], byId: async (id) => { asked.push(id); return { ...live[0], id, status: { state: "final" } }; } };
+  const s = scheduler(provider);
+  s.store.upsert(live);
+  await s.live(KICKOFF + 3600e3);
+  assert.equal(asked.length, 8);
+  assert.equal(s.meta.toConfirm.length, 2);
+  await s.live(KICKOFF + 2 * 3600e3);
+  assert.equal(asked.length, 10);
+  assert.equal(s.meta.toConfirm, undefined);
+});
