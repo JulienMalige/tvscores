@@ -136,6 +136,9 @@ enum Metrics {
     /// room above and below its line: rows 80 apart, as Apple's 40.
     static let tableMark: CGFloat = 40
     static let tableRowPad: CGFloat = 14
+    /// Focus on glass: the pane's white and its edge's.
+    static let glassFill: CGFloat = 0.2
+    static let glassEdge: CGFloat = 0.35
 }
 
 extension View {
@@ -145,10 +148,7 @@ extension View {
         self
             .padding(.vertical, insetV)
             .padding(.horizontal, Metrics.rowInsetH)
-            .background(
-                RoundedRectangle(cornerRadius: Metrics.rowRadius, style: .continuous)
-                    .fill(Color.white.opacity(focused ? 0.14 : resting))
-            )
+            .focusGlass(focused, in: RoundedRectangle(cornerRadius: Metrics.rowRadius, style: .continuous), resting: resting)
             .scaleEffect(focused ? 1.02 : 1)
             .animation(.easeOut(duration: 0.15), value: focused)
     }

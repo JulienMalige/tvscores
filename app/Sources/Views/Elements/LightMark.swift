@@ -1,15 +1,9 @@
 import SwiftUI
 import UIKit
 
-extension EnvironmentValues {
-    /// The row under this view is lit white — the remote is on it. A mark
-    /// drawn in white would vanish there.
-    @Entry var onLightSurface = false
-}
-
 /// A mark's own colour, and whether it can be seen on what it sits on.
 /// Marks come made for one ground: the Champions League's white starball
-/// vanished on a focused row's white, the WTA's deep purple on the WTA's
+/// vanished on a focused row's white (white focus since gone), the WTA's deep purple on the WTA's
 /// purple page (Julien, build 28). Such a mark gets a thin outline in the
 /// opposite tone — his idea over redrawing it: it keeps its colours.
 /// Worked out once per picture, on a 24-point copy.
@@ -75,7 +69,8 @@ enum LightMark {
 }
 
 /// A fine solid outline for a mark that would vanish into what it sits on:
-/// dark on a lit row's white, white on a dark or same-coloured page. The
+/// white on a dark or same-coloured page. (Dark on a focused row's white
+/// went with the white, build 32: focus is glass now.) The
 /// mark's silhouette, in the outline's tone, is laid behind it a point and
 /// a half off in eight directions — a crisp edge, not a shadow's blur
 /// (Julien, build 29: "a fine line, solid").
@@ -83,7 +78,6 @@ struct OnLightMark: ViewModifier {
     let image: UIImage
     let url: URL?
     let contentMode: ContentMode
-    @Environment(\.onLightSurface) private var onLight
     @Environment(\.pageTint) private var pageTint
 
     private static let width: CGFloat = 1.5
@@ -94,9 +88,7 @@ struct OnLightMark: ViewModifier {
 
     func body(content: Content) -> some View {
         let m = LightMark.measure(image, url: url)
-        if onLight, let m, m.light, m.cutOut {
-            outlined(content, .black)
-        } else if !onLight, let m, m.cutOut, LightMark.lost(m, on: pageTint) {
+        if let m, m.cutOut, LightMark.lost(m, on: pageTint) {
             outlined(content, .white)
         } else {
             content

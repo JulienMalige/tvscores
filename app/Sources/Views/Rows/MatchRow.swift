@@ -20,7 +20,7 @@ struct MatchRow: View {
                 MatchRowContent(event: event)
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(QuietButtonStyle())
         .accessibilityIdentifier("match.\(event.id)")
     }
 }
@@ -33,7 +33,6 @@ private struct MatchRowContent: View {
         line
             .padding(.vertical, Metrics.matchRowPad)
             .rowSurface(focused: isFocused, resting: 0)
-            .environment(\.onLightSurface, isFocused)
     }
 
     private var line: some View {

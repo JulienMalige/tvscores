@@ -48,7 +48,6 @@ struct TennisRowContent: View {
         }
         .padding(.vertical, Metrics.tennisRowPad)
         .rowSurface(focused: isFocused, resting: 0)
-        .environment(\.onLightSurface, isFocused)
     }
 
     private var caption: String? {

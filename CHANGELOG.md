@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- The row the remote is on lights up as glass instead of turning white, in
+  the lists and in the menu: white logos, a player's initials and a live
+  game's green clock no longer vanish on it.
 - Tennis matches are listed as in Apple Sports: a line per player with
   each set's games on the right — 6 6 over 2 3 — the lost sets greyed and
   an arrow by the winner. A finished match now has its real final score

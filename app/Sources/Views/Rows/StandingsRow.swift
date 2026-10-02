@@ -14,7 +14,7 @@ struct StandingsRow: View {
         } label: {
             StandingsRowContent(entry: entry, highlighted: highlighted, plain: plain)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(QuietButtonStyle())
         .accessibilityIdentifier("standing.\(entry.pos)")
     }
 }
@@ -63,7 +63,6 @@ private struct StandingsRowContent: View {
             }
         }
         .rowSurface(focused: isFocused, resting: plain ? 0 : 0.04, insetV: Metrics.tableRowPad)
-        .environment(\.onLightSurface, isFocused)
         // A game's two sides, a shade lighter, as Apple Sports picks them out.
         .background(
             RoundedRectangle(cornerRadius: Metrics.rowRadius, style: .continuous)
