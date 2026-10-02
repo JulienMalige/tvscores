@@ -2,14 +2,19 @@ import SwiftUI
 
 /// Upcoming, day by day, as Apple Sports lists it: a date heading
 /// ("Sat, 3 Oct"), then that day's competitions, each row showing its time
-/// alone since the day is said above it (Julien, build 28).
+/// alone since the day is said above it (Julien, build 28), and a rule
+/// between one day and the next (build 32), not Apple's collapsing.
 struct DaySection<Row: View>: View {
     let day: Date
     let groups: [LeagueGroup]
+    /// A rule over the heading, between one day and the next; the first
+    /// day sits under the day switch's own.
+    var ruled = true
     @ViewBuilder var row: (LeagueGroup) -> Row
 
     var body: some View {
         VStack(alignment: .leading, spacing: Metrics.headingGap) {
+            if ruled { RowRule() }
             Text(day, format: .dateTime.weekday(.abbreviated).day().month(.abbreviated))
                 .font(.caption.weight(.semibold))
                 .frame(maxWidth: .infinity)

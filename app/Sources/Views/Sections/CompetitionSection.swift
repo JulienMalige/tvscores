@@ -26,8 +26,9 @@ struct CompetitionSection: View {
                 EmptyDay(day: day)
             }
         } else if day == .upcoming {
-            ForEach(LeagueGroup.byDay(groups), id: \.day) { entry in
-                DaySection(day: entry.day, groups: entry.groups) { group in
+            let days = LeagueGroup.byDay(groups)
+            ForEach(days, id: \.day) { entry in
+                DaySection(day: entry.day, groups: entry.groups, ruled: entry.day != days.first?.day) { group in
                     LeagueSection(group: group, day: day, now: store.board?.generatedAt ?? .now, showHeader: false, onPage: true)
                 }
             }

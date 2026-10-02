@@ -7,12 +7,15 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- Upcoming has a fine rule between one day and the next, under each day's
+  date, and a game to come shows no dash where its score will go.
 - The row the remote is on lights up as glass instead of turning white, in
   the lists and in the menu: white logos, a player's initials and a live
   game's green clock no longer vanish on it.
-- Tennis matches are listed as in Apple Sports: a line per player with
-  each set's games on the right — 6 6 over 2 3 — the lost sets greyed and
-  an arrow by the winner. A finished match now has its real final score
+- Tennis matches are listed as in Apple Sports: a result is a line per
+  player with each set's games on the right — 6 6 over 2 3 — the lost sets
+  greyed and an arrow by the winner; a match to come keeps the two players
+  facing with the time between them, named "C. Gauff". A finished match now has its real final score
   rather than the last one seen while it was being played.
 
 ## 1.0 build 31 — 1 October 2026

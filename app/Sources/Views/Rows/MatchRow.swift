@@ -14,7 +14,10 @@ struct MatchRow: View {
         Button {
             openGame(event)
         } label: {
-            if event.sport == "tennis" {
+            // A result is a line per player with each set's games; a match
+            // to come keeps the two sides facing, its time between them,
+            // as Apple Sports lists both (Julien, build 32).
+            if event.sport == "tennis", event.status.state != .scheduled {
                 TennisRowContent(event: event)
             } else {
                 MatchRowContent(event: event)
@@ -30,9 +33,22 @@ private struct MatchRowContent: View {
     @Environment(\.isFocused) private var isFocused
 
     var body: some View {
-        line
-            .padding(.vertical, Metrics.matchRowPad)
-            .rowSurface(focused: isFocused, resting: 0)
+        VStack(spacing: 6) {
+            // Where a tennis match is, in grey over it: "China Open · Round of 32".
+            if let caption {
+                Text(verbatim: caption)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
+            }
+            line
+        }
+        .padding(.vertical, Metrics.matchRowPad)
+        .rowSurface(focused: isFocused, resting: 0)
+    }
+
+    private var caption: String? {
+        guard let name = event.competition?.name else { return nil }
+        return [name, event.round].compactMap { $0 }.joined(separator: " · ")
     }
 
     private var line: some View {
@@ -66,7 +82,7 @@ private struct MatchRowContent: View {
                 } else {
                     TeamMark(code: team.short, logo: team.logo, size: Metrics.matchMark)
                 }
-                Text(team.label)
+                Text(event.sport == "tennis" ? TennisRowContent.shortName(team) : team.label)
                     .font(.caption.weight(.medium))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
@@ -80,11 +96,15 @@ private struct MatchRowContent: View {
     /// record in small grey where the score will go, as Apple Sports.
     @ViewBuilder
     private func middle(_ value: Int?, record: String?, winner: Bool) -> some View {
-        if event.status.state == .scheduled, let record {
-            Text(verbatim: record)
-                .font(.caption.weight(.medium))
-                .monospacedDigit()
-                .foregroundStyle(.secondary)
+        if event.status.state == .scheduled {
+            // Nothing to come yet: the side's record when its table gives
+            // one, else nothing — a dash read as a score of none.
+            if let record {
+                Text(verbatim: record)
+                    .font(.caption.weight(.medium))
+                    .monospacedDigit()
+                    .foregroundStyle(.secondary)
+            }
         } else {
             scoreText(value, winner: winner)
         }
