@@ -104,3 +104,16 @@ unknown until the regular season starts (~20 Oct): re-check then. If NBA or
 NFL stay weak, Sportmonks (football, €29–99) or SportsDataIO (NFL/NBA,
 sales-quoted) are the paid upgrades. Both still need the alias map, and
 neither replaces the static table for F1, MotoGP or tennis.
+
+## Brazil and France in the same feed (checked 2026-10-02, 2 calls)
+
+`filter/tv/country/{Brazil|France}`, every upcoming row:
+
+| Country | Rows | What is there | Missing |
+|---|---|---|---|
+| Brazil | 23 | Brasileirão on SporTV (São Paulo v Santos) and ESPN Brasil (Série B); internationals on ESPN Brasil, SporTV, Fox Sports BR; Champions League on HBO Max BR (every match of matchday 3); NFL on DAZN Brasil (one game) | Premiere / Globo for most Brasileirão games, Libertadores, NBA, F1, tennis |
+| France | 79 | Ligue 1 on Ligue 1+ and beIN; La Liga, Serie A on DAZN; Bundesliga on beIN; NFL and NBA on beIN (most games); France's internationals on TF1 | Champions League (Canal+), Premier League (Canal+), F1 (Canal+), tennis, Brasileirão |
+
+France is the best covered of the three countries checked; Brazil is thin
+outside the Champions League. The same rights-table fallback would fill
+the single-broadcaster competitions per country.
