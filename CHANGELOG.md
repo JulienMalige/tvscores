@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+
+## 1.0 build 32 — 2 October 2026
 - Upcoming has a fine rule between one day and the next, under each day's
   date, and a game to come shows no dash where its score will go.
 - The row the remote is on lights up as glass instead of turning white, in
