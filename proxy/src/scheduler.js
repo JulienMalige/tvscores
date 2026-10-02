@@ -1,13 +1,11 @@
 import { Quota } from "./quota.js";
+import { confirmFinals } from "./finals.js";
 import { STATE } from "./model.js";
 import { MIN } from "./clock.js";
 import { refreshStandings } from "./standings.js";
 
 /** A kickoff this far past with nothing to show for it deserves a second look. */
 const OVERDUE = 15 * MIN;
-// Finished matches asked for by id in one round: 8 a half hour fits a
-// busy day of the 500s inside the 100-a-day tennis budget with the polls.
-const CONFIRM_PER_ROUND = 8;
 /** However badly upstream is doing, look again within the hour. */
 const MAX_BACKOFF = 60 * 60e3;
 /** A race weekend: worth asking about every half hour. */
@@ -126,7 +124,7 @@ export class TeamSportScheduler {
       // Its score is what the last look saw, so each is asked for by id to
       // learn how it ended — a few a round, while the budget allows, the
       // rest on later rounds.
-      if (this.p.byId) await this.confirmFinals(orphans.map((e) => e.id), now);
+      if (this.p.byId) await confirmFinals(this, orphans.map((e) => e.id), now);
     }
     // A game that kicked off and never appeared in the live feed at all is
     // nobody's business but ours: the daily pass would correct it, and the
@@ -151,27 +149,6 @@ export class TeamSportScheduler {
     }
     this.meta.lastLive = new Date(now).toISOString();
     this.meta.lastOk = this.meta.lastLive;
-  }
-
-  /** Matches finished from a last look and not yet asked for by id. */
-  async confirmFinals(newIds, now) {
-    const queue = [...new Set([...(this.meta.toConfirm || []), ...newIds])];
-    const left = [];
-    let asked = 0;
-    for (const id of queue) {
-      if (asked >= CONFIRM_PER_ROUND || this.quota.spendable(now) <= 0) { left.push(id); continue; }
-      asked++;
-      try {
-        const row = await this.p.byId(id);
-        // Over by its own account; one still in play waits for the live feed.
-        if (row?.status.state === STATE.final) { this.store.upsert([row]); this.noteResults([row]); }
-        else if (row?.status.state === STATE.live) left.push(id);
-      } catch (err) {
-        left.push(id);
-        this.log(`${this.p.sport}: confirm ${id} failed: ${err.message || err}`);
-      }
-    }
-    this.meta.toConfirm = left.length ? left : undefined;
   }
 
   /**
