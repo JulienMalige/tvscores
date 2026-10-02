@@ -7,9 +7,10 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
-- Tennis shows each set's games — 6-2 6-3 — where it showed sets won, and
-  a finished match now has its real final score rather than the last one
-  seen while it was being played.
+- Tennis matches are listed as in Apple Sports: a line per player with
+  each set's games on the right — 6 6 over 2 3 — the lost sets greyed and
+  an arrow by the winner. A finished match now has its real final score
+  rather than the last one seen while it was being played.
 
 ## 1.0 build 31 — 1 October 2026
 - A new app icon: a tennis court seen from above, white lines on blue.

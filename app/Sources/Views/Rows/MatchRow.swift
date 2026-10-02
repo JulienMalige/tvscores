@@ -14,7 +14,11 @@ struct MatchRow: View {
         Button {
             openGame(event)
         } label: {
-            MatchRowContent(event: event)
+            if event.sport == "tennis" {
+                TennisRowContent(event: event)
+            } else {
+                MatchRowContent(event: event)
+            }
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("match.\(event.id)")
@@ -26,33 +30,20 @@ private struct MatchRowContent: View {
     @Environment(\.isFocused) private var isFocused
 
     var body: some View {
-        VStack(spacing: 6) {
-            // Where a tennis match is, in grey over it: "Beijing · Round of 32".
-            if let caption {
-                Text(verbatim: caption)
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(.secondary)
-            }
-            line
-        }
-        .padding(.vertical, Metrics.matchRowPad)
-        .rowSurface(focused: isFocused, resting: 0)
-        .environment(\.onLightSurface, isFocused)
-    }
-
-    private var caption: String? {
-        guard let name = event.competition?.name else { return nil }
-        return [name, event.round].compactMap { $0 }.joined(separator: " · ")
+        line
+            .padding(.vertical, Metrics.matchRowPad)
+            .rowSurface(focused: isFocused, resting: 0)
+            .environment(\.onLightSurface, isFocused)
     }
 
     private var line: some View {
         HStack(spacing: 0) {
             side(event.home)
-            middle(event.score?.home, record: event.records?.home, winner: winner == .home, side: 0)
+            middle(event.score?.home, record: event.records?.home, winner: winner == .home)
                 .frame(width: Metrics.matchScore, alignment: .center)
-            StatusLabel(status: event.status, start: event.start, compact: true, setsShown: event.setScores != nil, sport: event.sport)
+            StatusLabel(status: event.status, start: event.start, compact: true, sport: event.sport)
                 .frame(maxWidth: .infinity)
-            middle(event.score?.away, record: event.records?.away, winner: winner == .away, side: 1)
+            middle(event.score?.away, record: event.records?.away, winner: winner == .away)
                 .frame(width: Metrics.matchScore, alignment: .center)
             side(event.away)
         }
@@ -89,10 +80,8 @@ private struct MatchRowContent: View {
     /// Beside the crest: the score once there is one; before, the side's
     /// record in small grey where the score will go, as Apple Sports.
     @ViewBuilder
-    private func middle(_ value: Int?, record: String?, winner: Bool, side: Int) -> some View {
-        if let sets = event.setScores {
-            SetScores(sets: sets, side: side, size: Metrics.setScoreType, inPlay: event.status.state == .live)
-        } else if event.status.state == .scheduled, let record {
+    private func middle(_ value: Int?, record: String?, winner: Bool) -> some View {
+        if event.status.state == .scheduled, let record {
             Text(verbatim: record)
                 .font(.caption.weight(.medium))
                 .monospacedDigit()
