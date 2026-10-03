@@ -9,7 +9,7 @@ struct GameInfoSection: View {
     let venue: String?
     let place: String?
     /// Where it is on, every channel, while that still helps.
-    var broadcasts: [String]? = nil
+    var broadcasts: [Channel]? = nil
 
     private var location: String? {
         let parts = [venue, place].compactMap { $0 }.filter { !$0.isEmpty }
@@ -28,7 +28,12 @@ struct GameInfoSection: View {
                     InfoLine(symbol: "mappin.and.ellipse", label: "game.location", value: Text(verbatim: location))
                 }
                 if let broadcasts, !broadcasts.isEmpty {
-                    InfoLine(symbol: "tv", label: "game.watchOn", value: Text(verbatim: broadcasts.joined(separator: ", ")))
+                    HStack(spacing: 14) {
+                        Image(systemName: "tv").foregroundStyle(.secondary)
+                        Text("game.watchOn").foregroundStyle(.secondary)
+                        ChannelsLabel(channels: broadcasts, limit: broadcasts.count, font: .callout, color: .primary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
             .font(.callout)

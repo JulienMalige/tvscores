@@ -109,7 +109,7 @@ struct RaceHeaderSection: View {
                 } else {
                     StatusLabel(status: event.status, start: event.start)
                 }
-                if let channels = event.upcomingChannels { ChannelsLabel(names: channels, limit: 3) }
+                if let channels = event.upcomingChannels { ChannelsLabel(channels: channels, limit: 3) }
                 if !frontRow.isEmpty { front }
             }
         }

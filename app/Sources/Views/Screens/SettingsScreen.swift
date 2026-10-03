@@ -40,25 +40,39 @@ struct SettingsScreen: View {
 
 /// "Where to watch": a switch per country whose channels the proxy knows.
 /// Any number may be on, none included — then no channel shows anywhere.
+/// Three layouts while Julien chooses (build 36); `-TVScoresSettingsStyle
+/// rows|tiles|chips` picks one for the CI screenshots.
 private struct ChannelCountriesSection: View {
     @State private var choice = ChannelChoice.shared
+
+    private var style: String {
+        let args = ProcessInfo.processInfo.arguments
+        guard let i = args.firstIndex(of: "-TVScoresSettingsStyle"), i + 1 < args.count else { return "rows" }
+        return args[i + 1]
+    }
 
     var body: some View {
         VStack(spacing: Metrics.rowGap) {
             Text("settings.watch")
                 .font(.body.weight(.semibold))
                 .padding(.bottom, Metrics.cardGap - Metrics.rowGap)
-            ForEach(ChannelChoice.all, id: \.self) { country in
-                Button { choice.toggle(country) } label: {
-                    CountryRow(country: country, on: choice.isOn(country))
+            switch style {
+            case "tiles":
+                HStack(spacing: 28) { ForEach(ChannelChoice.all, id: \.self) { button($0) { CountryTile(country: $0, on: $1) } } }
+                    .padding(.vertical, 12)
+            case "chips":
+                HStack(spacing: 20) { ForEach(ChannelChoice.all, id: \.self) { button($0) { CountryChip(country: $0, on: $1) } } }
+                    .padding(.vertical, 12)
+            default:
+                ForEach(ChannelChoice.all, id: \.self) { country in
+                    if country != ChannelChoice.all.first { RowRule() }
+                    button(country) { CountryRow(country: $0, on: $1) }
                 }
-                .buttonStyle(QuietButtonStyle())
-                .accessibilityIdentifier("settings.country.\(country)")
             }
             Text("settings.countryNote")
                 .font(.caption)
                 .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: style == "rows" ? .leading : .center)
                 .padding(.horizontal, Metrics.rowInsetH)
                 .padding(.top, Metrics.rowGap)
         }
@@ -67,8 +81,19 @@ private struct ChannelCountriesSection: View {
         .frame(maxWidth: .infinity)
         .gameCardSurface(radius: Metrics.gameCardRadius)
     }
+
+    private func button<Label: View>(_ country: String, @ViewBuilder _ label: @escaping (String, Bool) -> Label) -> some View {
+        Button { choice.toggle(country) } label: { label(country, choice.isOn(country)) }
+            .buttonStyle(QuietButtonStyle())
+            .accessibilityIdentifier("settings.country.\(country)")
+    }
 }
 
+private func countryName(_ country: String) -> String {
+    Locale.current.localizedString(forRegionCode: country) ?? country
+}
+
+/// A: as tvOS's own Settings — the name on the left, "On" or "Off" on the right.
 private struct CountryRow: View {
     let country: String
     let on: Bool
@@ -76,15 +101,68 @@ private struct CountryRow: View {
 
     var body: some View {
         HStack(spacing: 18) {
-            Text(verbatim: ChannelChoice.flag(country)).font(.title3)
-            Text(verbatim: Locale.current.localizedString(forRegionCode: country) ?? country)
-                .font(.callout)
+            FlagMark(flag: ChannelChoice.flag(country), size: Metrics.settingsFlag)
+            Text(verbatim: countryName(country)).font(.callout)
             Spacer()
-            Image(systemName: on ? "checkmark.circle.fill" : "circle")
-                .font(.title3)
-                .foregroundStyle(on ? Color.green : Color.secondary)
+            Text(on ? "settings.on" : "settings.off")
+                .font(.callout)
+                .foregroundStyle(.secondary)
         }
         .rowSurface(focused: isFocused, resting: 0, insetV: Metrics.tableRowPad)
+        .accessibilityAddTraits(on ? .isSelected : [])
+    }
+}
+
+/// B: a tile per country, its flag large; the chosen ones lit, with a tick.
+private struct CountryTile: View {
+    let country: String
+    let on: Bool
+    @Environment(\.isFocused) private var isFocused
+
+    var body: some View {
+        VStack(spacing: 16) {
+            FlagMark(flag: ChannelChoice.flag(country), size: Metrics.settingsTileFlag)
+                .overlay(alignment: .bottomTrailing) {
+                    if on {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.title3)
+                            .symbolRenderingMode(.palette)
+                            .foregroundStyle(.white, .green)
+                    }
+                }
+                .opacity(on ? 1 : 0.45)
+            Text(verbatim: countryName(country))
+                .font(.callout.weight(on ? .semibold : .regular))
+                .foregroundStyle(on ? .primary : .secondary)
+        }
+        .frame(width: Metrics.settingsTile)
+        .padding(.vertical, 24)
+        .focusGlass(isFocused, in: RoundedRectangle(cornerRadius: Metrics.rowRadius, style: .continuous), resting: on ? 0.08 : 0)
+        .scaleEffect(isFocused ? 1.05 : 1)
+        .animation(.easeOut(duration: 0.15), value: isFocused)
+        .accessibilityAddTraits(on ? .isSelected : [])
+    }
+}
+
+/// C: a capsule per country, filled when chosen.
+private struct CountryChip: View {
+    let country: String
+    let on: Bool
+    @Environment(\.isFocused) private var isFocused
+
+    var body: some View {
+        HStack(spacing: 12) {
+            FlagMark(flag: ChannelChoice.flag(country), size: Metrics.channelFlag * 1.3)
+            Text(verbatim: countryName(country)).font(.callout.weight(.medium))
+            if on { Image(systemName: "checkmark").font(.caption.weight(.bold)) }
+        }
+        .padding(.vertical, 12)
+        .padding(.horizontal, 22)
+        .foregroundStyle(on ? Color.black : Color.primary)
+        .background(Capsule().fill(on ? Color.white : Color.white.opacity(0.08)))
+        .overlay(Capsule().stroke(Color.white.opacity(isFocused ? 0.6 : 0), lineWidth: 2))
+        .scaleEffect(isFocused ? 1.06 : 1)
+        .animation(.easeOut(duration: 0.15), value: isFocused)
         .accessibilityAddTraits(on ? .isSelected : [])
     }
 }

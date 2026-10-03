@@ -69,6 +69,11 @@ enum Metrics {
     static let tennisArrow: CGFloat = 36
     /// The most a row's channel line may take beside the players.
     static let tennisChannels: CGFloat = 320
+    /// A country's round flag before its channels, and in Settings' list.
+    static let channelFlag: CGFloat = 28
+    static let settingsFlag: CGFloat = 44
+    static let settingsTileFlag: CGFloat = 96
+    static let settingsTile: CGFloat = 300
     /// The same thing blown up for a podium, where it is the subject.
     static let markHero: CGFloat = 110
     /// A race weekend's flag over its caption on the front page, while
