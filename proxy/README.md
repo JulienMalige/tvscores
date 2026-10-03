@@ -79,7 +79,7 @@ for the mirror below. Losing it costs one refetch, nothing else.
 
 Crests and portraits live on other people's CDNs and almost never change, so
 the proxy keeps its own copy (`src/images.js`) and the television fetches every
-picture from one host with a month-long cache header. A URL is registered the
+picture from one host with a year-long cache header. A URL is registered the
 instant it appears in a response and the bytes are pulled in the background,
 six at a time; a request for something not yet mirrored is fetched on the spot,
 and if that fails it is redirected to the original rather than left blank. A

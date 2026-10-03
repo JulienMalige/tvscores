@@ -182,7 +182,7 @@ race or none, and the older "next ten rounds per series" cap rarely bites.
 
 **Images are mirrored locally** (`proxy/src/images.js`, served at `/v1/img/<sha1>`).
 Crests and portraits live on two other CDNs and almost never change, so the
-television now fetches them from this proxy once, with a month-long cache
+television now fetches them from this proxy once, with a year-long cache
 header, instead of opening connections to three hosts. A URL is registered the
 moment it appears in a response and the bytes are fetched in the background; if
 the mirror is cold and the fetch fails, the request is redirected to the

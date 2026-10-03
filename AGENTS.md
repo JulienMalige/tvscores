@@ -119,7 +119,7 @@ This is the mechanic to preserve; `proxy/src/scheduler.js` owns it and
 | Standings | every 6 hours, and within 10 min of a final whistle in that league | 1 per league (the season's results for the leagues the feed has no table for) |
 | Motorsport calendar | every 6 hours, or every 30 min within 6 h of a session and for 3 h after a qualifying or sprint starts | 1 + one per newly finished race, qualifying or sprint |
 | Portraits | once per athlete, kept a month | background, 25/min |
-| Crests, badges | mirrored once, served with a month-long header | none after the first |
+| Crests, badges | mirrored once, rechecked every 90 days, served with a year-long header; bump `VERSION` in `proxy/src/images.js` to replace them everywhere | none after the first |
 | TV channels (`broadcasts.js`) | once per UTC day per source and per country (`broadcastCountries`: France, the US, Brazil, one after another), an hour after `dailyRefreshHourUtc` once the schedules are in; a failed source keeps its last answer and retries after 30 min, then hourly | per country 1 TheSportsDB call + 1 XMLTV download: France ~11 MB, US ~7 MB, Brazil ~0.1 MB gzipped |
 
 A **live window** opens 10 minutes before a stored kickoff and closes

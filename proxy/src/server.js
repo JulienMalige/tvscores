@@ -15,7 +15,7 @@ import { slug } from "./model.js";
 const SHORT_CACHE = "public, max-age=10";
 
 /** Crests and portraits change once in a blue moon; let the TV keep them. */
-const IMAGE_CACHE = "public, max-age=2592000, immutable";
+const IMAGE_CACHE = "public, max-age=31536000, immutable"; // a year: a crest changes at a rebrand, and ImageMirror.VERSION is the lever
 
 /**
  * JSON with an ETag, and a bodyless 304 when the caller already has it.
@@ -158,7 +158,7 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
         return send(res, 404, { error: "no such flag" });
       }
       const png = readFileSync(file);
-      res.writeHead(200, { "content-type": "image/png", "content-length": png.length, "cache-control": "public, max-age=2592000", "access-control-allow-origin": "*" });
+      res.writeHead(200, { "content-type": "image/png", "content-length": png.length, "cache-control": "public, max-age=31536000", "access-control-allow-origin": "*" });
       return res.end(png);
     }
     // `icon/` is the same competition's mark on its own; the alternative is

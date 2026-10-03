@@ -10,6 +10,8 @@ const DAY = 86400e3;
  * Bumped when what the mirror keeps changes shape. It is part of every key, so
  * a television that cached the old copies for a month asks for the new ones,
  * and a manifest from before is dropped rather than refetched for nobody.
+ * Bump it too when a crest or a portrait is wrong or rebranded: the television keeps
+ * a copy for a year, so only a new address replaces it.
  * 2 (2026-10-03): pictures shrunk to 256 px WebP.
  */
 const VERSION = 2;
@@ -26,7 +28,7 @@ const VERSION = 2;
  * so a picture is never lost just because the mirror is cold.
  */
 export class ImageMirror {
-  constructor({ dir, publicBase = "", log = () => {}, fetchImpl = fetch, maxAgeDays = 60, refreshDays = 30, timeoutMs = 20000, shrink = shrinkImage }) {
+  constructor({ dir, publicBase = "", log = () => {}, fetchImpl = fetch, maxAgeDays = 60, refreshDays = 90, timeoutMs = 20000, shrink = shrinkImage }) {
     this.timeoutMs = timeoutMs;
     this.shrink = shrink;
     this.dir = dir;
@@ -88,7 +90,7 @@ export class ImageMirror {
     const key = ImageMirror.key(original);
     const entry = this.entries.get(key);
     if (entry) {
-      // Naming it counts as using it: the television caches these for a month,
+      // Naming it counts as using it: the television caches these for a year,
       // so "nobody asked recently" is not the same as "nobody needs it".
       entry.lastUsed = Date.now();
     } else {
