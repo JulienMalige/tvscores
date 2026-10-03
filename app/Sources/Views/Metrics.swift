@@ -76,6 +76,7 @@ enum Metrics {
     static let settingsMark: CGFloat = 520
     static let settingsGap: CGFloat = 80
     static let settingsMargin: CGFloat = 120
+    static let settingsTitleGap: CGFloat = 40
     /// The same thing blown up for a podium, where it is the subject.
     static let markHero: CGFloat = 110
     /// A race weekend's flag over its caption on the front page, while

@@ -1,13 +1,19 @@
 import SwiftUI
 
 /// Settings, from the gear at the top of the menu, laid out as tvOS's own
-/// settings pages are (Julien, build 36, from TestFlight's): the app's mark
-/// large on the left with what it is and where its facts come from — which
-/// the TV guides' terms ask us to say — and on the right the system's list,
-/// a row per choice with its value at the end. For now it chooses whose TV
-/// channels are shown: none, one country or several.
+/// settings pages are (Julien, build 36, from the Apple TV's Settings): the
+/// page's title on top; on the left a large picture and a sentence saying
+/// what this page is for; on the right the list. Choosing a row slides the
+/// next list in on the right while the left explains it, and Back returns.
+///
+/// - the top: Where to watch (its countries as the value), Sources, Version;
+/// - Where to watch: a checklist of countries — none, one or several.
 struct SettingsScreen: View {
+    private enum Page { case top, countries }
+
+    @State private var page = Page.top
     @State private var choice = ChannelChoice.shared
+    @Environment(\.dismiss) private var dismiss
 
     private var version: String {
         let info = Bundle.main.infoDictionary
@@ -17,61 +23,97 @@ struct SettingsScreen: View {
     }
 
     var body: some View {
-        HStack(alignment: .center, spacing: Metrics.settingsGap) {
-            about
-                .frame(maxWidth: .infinity)
-            List {
-                Section {
-                    ForEach(ChannelChoice.all, id: \.self) { country in
-                        Toggle(isOn: Binding(get: { choice.isOn(country) }, set: { _ in choice.toggle(country) })) {
-                            HStack(spacing: 18) {
-                                FlagMark(flag: ChannelChoice.flag(country), size: Metrics.settingsFlag)
-                                Text(verbatim: Locale.current.localizedString(forRegionCode: country) ?? country)
-                            }
-                        }
-                        .accessibilityIdentifier("settings.country.\(country)")
-                    }
-                } header: {
-                    Text("settings.watch")
-                } footer: {
-                    Text("settings.countryNote")
+        VStack(spacing: Metrics.settingsTitleGap) {
+            Text(page == .top ? "settings.title" : "settings.watch")
+                .font(.title3.weight(.bold))
+            HStack(alignment: .top, spacing: Metrics.settingsGap) {
+                explanation
+                    .frame(maxWidth: .infinity)
+                Group {
+                    if page == .top { topList } else { countryList }
                 }
-                // Facts, not choices: rows the remote can stand on so the
-                // list scrolls, as tvOS's own information rows are.
-                Section("settings.sources") {
-                    fact("settings.scores", "TheSportsDB, Live Tennis API, Orange Cat, Jolpica")
-                    fact("settings.listings", "TheSportsDB, XML TV Fr, epgshare01")
-                }
-                Section("settings.about") {
-                    fact("settings.version", version)
-                }
+                .frame(maxWidth: .infinity, alignment: .top)
+                .transition(.asymmetric(insertion: .move(edge: .trailing).combined(with: .opacity),
+                                        removal: .opacity))
+                .id(page)
             }
-            .frame(maxWidth: .infinity)
         }
+        .animation(.easeOut(duration: 0.25), value: page)
         .padding(.horizontal, Metrics.settingsMargin)
         .padding(.vertical, Metrics.screenBottom)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(PageTint(color: .homeTint))
         .ignoresSafeArea()
+        // Back climbs one level, then puts Settings away.
+        .onExitCommand { if page == .top { dismiss() } else { page = .top } }
         .accessibilityIdentifier("page.settings")
+        .task {
+            // `-TVScoresSettings countries` opens on that list (CI screenshots).
+            let args = ProcessInfo.processInfo.arguments
+            if let i = args.firstIndex(of: "-TVScoresSettings"), i + 1 < args.count, args[i + 1] == "countries" { page = .countries }
+        }
     }
 
-    /// The left column, as tvOS's settings pages open: the mark large, the
-    /// app's name, and what it is in a sentence. (TestFlight adds the
-    /// account's name there; tvOS tells no other app who is signed in.)
-    private var about: some View {
-        VStack(spacing: 28) {
-            CourtMark()
-                .frame(width: Metrics.settingsMark, height: Metrics.settingsMark * 0.6)
-            Text("app.title")
-                .font(.title3.weight(.bold))
-            Text("settings.blurb")
-                .font(.callout)
-                .foregroundStyle(.secondary)
+    /// The left: what this page is for.
+    @ViewBuilder
+    private var explanation: some View {
+        VStack(spacing: 40) {
+            if page == .top {
+                CourtMark()
+                    .frame(width: Metrics.settingsMark, height: Metrics.settingsMark * 0.6)
+            } else {
+                Image(systemName: "tv")
+                    .font(.system(size: Metrics.settingsMark * 0.5, weight: .light))
+                    .frame(height: Metrics.settingsMark * 0.6)
+            }
+            Text(page == .top ? "settings.blurb" : "settings.countryNote")
+                .font(.callout.weight(.medium))
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: Metrics.settingsMark * 1.2)
         }
+        .padding(.top, Metrics.settingsTitleGap)
     }
 
+    private var chosenCountries: String {
+        let names = choice.countries.map { Locale.current.localizedString(forRegionCode: $0) ?? $0 }
+        return names.isEmpty ? String(localized: "settings.none") : names.joined(separator: ", ")
+    }
+
+    private var topList: some View {
+        List {
+            Button { page = .countries } label: {
+                LabeledContent("settings.watch") { Text(verbatim: chosenCountries) }
+            }
+            .accessibilityIdentifier("settings.watch")
+            Section("settings.sources") {
+                fact("settings.scores", "TheSportsDB, Live Tennis API, Orange Cat, Jolpica")
+                fact("settings.listings", "TheSportsDB, XML TV Fr, epgshare01")
+            }
+            Section("settings.about") {
+                fact("settings.version", version)
+            }
+        }
+    }
+
+    /// One row per country, ticked when its channels are shown.
+    private var countryList: some View {
+        List {
+            ForEach(ChannelChoice.all, id: \.self) { country in
+                Button { choice.toggle(country) } label: {
+                    HStack(spacing: 18) {
+                        FlagMark(flag: ChannelChoice.flag(country), size: Metrics.settingsFlag)
+                        Text(verbatim: Locale.current.localizedString(forRegionCode: country) ?? country)
+                        Spacer()
+                        if choice.isOn(country) { Image(systemName: "checkmark") }
+                    }
+                }
+                .accessibilityIdentifier("settings.country.\(country)")
+                .accessibilityAddTraits(choice.isOn(country) ? .isSelected : [])
+            }
+        }
+    }
+
+    /// A fact, not a choice: a row the remote can stand on, as tvOS's own.
     private func fact(_ label: LocalizedStringKey, _ value: String) -> some View {
         Button {} label: {
             LabeledContent(label) { Text(verbatim: value) }

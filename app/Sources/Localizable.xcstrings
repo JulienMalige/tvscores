@@ -1296,25 +1296,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Channels are shown for the countries ticked here — none, one or several."
+            "value": "Tick the countries whose TV channels you want beside each game. None, one or several: with more than one, each country's channels follow its flag."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les chaînes sont celles des pays cochés ici — aucun, un ou plusieurs."
+            "value": "Cochez les pays dont vous voulez les chaînes à côté de chaque match. Aucun, un ou plusieurs : à partir de deux, les chaînes de chaque pays suivent son drapeau."
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Os canais são os dos países marcados aqui — nenhum, um ou vários."
+            "value": "Marque os países cujos canais você quer ao lado de cada jogo. Nenhum, um ou vários: com mais de um, os canais de cada país vêm depois da sua bandeira."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Los canales son los de los países marcados aquí: ninguno, uno o varios."
+            "value": "Marca los países cuyos canales quieres junto a cada partido. Ninguno, uno o varios: con más de uno, los canales de cada país siguen a su bandera."
           }
         }
       }
@@ -1344,6 +1344,35 @@
           "stringUnit": {
             "state": "translated",
             "value": "Programación de TV"
+          }
+        }
+      }
+    },
+    "settings.none": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "None"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ninguno"
           }
         }
       }
