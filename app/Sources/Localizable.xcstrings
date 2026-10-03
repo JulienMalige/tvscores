@@ -1348,35 +1348,6 @@
         }
       }
     },
-    "settings.otherGuides": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "TV guides for the US and Brazil"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "guides TV des États-Unis et du Brésil"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "guias de TV dos EUA e do Brasil"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "guías de TV de EE. UU. y Brasil"
-          }
-        }
-      }
-    },
     "settings.scores": {
       "extractionState": "manual",
       "localizations": {

@@ -23,7 +23,7 @@ struct SettingsScreen: View {
                 GameCard(title: "settings.data", identifier: "settings.data") {
                     VStack(spacing: 14) {
                         InfoLine(symbol: "sportscourt", label: "settings.scores", value: Text(verbatim: "TheSportsDB, Live Tennis API, Orange Cat, Jolpica"))
-                        InfoLine(symbol: "tv", label: "settings.listings", value: Text(verbatim: "TheSportsDB, XML TV Fr, " + String(localized: "settings.otherGuides")))
+                        InfoLine(symbol: "tv", label: "settings.listings", value: Text(verbatim: "TheSportsDB, XML TV Fr, epgshare01"))
                     }
                 }
                 GameCard(title: "settings.about", identifier: "settings.about") {
