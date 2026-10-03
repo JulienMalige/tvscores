@@ -13,6 +13,9 @@ notes when a version ships.
 - The crests and the drivers' and riders' portraits of today's games are
   loaded before the front page opens, so it is drawn whole instead of
   filling in as you look at it.
+- Crests and portraits are several times smaller to download (a game
+  day's pictures went from about 4 MB to under 1 MB), so the opening screen
+  and every new page fill in faster.
 - Changing the app's language in Settings applies at once: the menu, the
   game pages, the dates and the country names all switch, with no need to
   close and reopen the app. You are taken back to Home when it changes.

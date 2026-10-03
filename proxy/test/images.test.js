@@ -174,3 +174,35 @@ test("gives up on a hung upstream instead of hanging the television", async () =
   m.url(src);
   assert.deepEqual(await m.serve(ImageMirror.key(src)), { redirect: src });
 });
+
+test("a crest is kept shrunk, as WebP, and says so", async () => {
+  const small = Buffer.from("tiny webp bytes");
+  const m = mirror(fakeFetch({ body: Buffer.alloc(200000, 1) }), { shrink: async () => small });
+  const src = "https://cdn.example/big.png";
+  const hit = await m.serve(ImageMirror.key(src));
+  assert.equal(hit, null, "unregistered keys are still a miss");
+  const url = m.url(src);
+  const served = await m.serve(url.split("/").pop());
+  assert.equal(served.type, "image/webp");
+  assert.deepEqual(served.body, small);
+  const entry = m.entries.get(ImageMirror.key(src));
+  assert.equal(entry.bytes, small.length);
+  assert.equal(entry.original, 200000);
+});
+
+test("a picture that cannot be shrunk is kept as it came", async () => {
+  const m = mirror(fakeFetch({}), { shrink: async () => null });
+  const url = m.url("https://cdn.example/odd.png");
+  const served = await m.serve(url.split("/").pop());
+  assert.equal(served.type, "image/png");
+  assert.deepEqual(served.body, PNG);
+});
+
+test("a manifest from before the shrinking is dropped, files and all", () => {
+  const dir = mkdtempSync(join(tmpdir(), "tvscores-img-"));
+  writeFileSync(join(dir, "index.json"), JSON.stringify({ images: { aaa: { url: "u", ext: "png" } } }));
+  writeFileSync(join(dir, "aaa.png"), PNG);
+  const m = new ImageMirror({ dir, publicBase: BASE, fetchImpl: fakeFetch({}) });
+  assert.equal(m.entries.size, 0);
+  assert.deepEqual(readdirSync(dir), ["index.json"]);
+});

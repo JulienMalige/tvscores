@@ -4,7 +4,7 @@ The middleman between the Apple TV app and the data providers. It polls on a
 schedule, caches on disk, and serves one JSON shape. The app never talks to a
 provider and never holds a key.
 
-Node 22, no dependencies. `npm test` runs the unit tests (`node --test`).
+Node 22, no npm dependencies; the image mirror calls `python3` with Pillow to shrink pictures, and serves them as they came when that is missing. `npm test` runs the unit tests (`node --test`).
 
 ## Endpoints
 
@@ -14,7 +14,7 @@ Node 22, no dependencies. `npm test` runs the unit tests (`node --test`).
 | `GET /v1/fixtures?date=YYYY-MM-DD&tz=` | flat list of events on one local date |
 | `GET /v1/standings` | every table we hold, keyed `sport:league` |
 | `GET /v1/standings/{sport}/{league}` | one league's tables (drivers, constructors, rankings) |
-| `GET /v1/img/{sha1}` | a mirrored crest or portrait; redirects to the original if the mirror is cold |
+| `GET /v1/img/{sha1}` | a mirrored crest or portrait, shrunk to at most 256 px WebP (`scripts/shrink.py`, Pillow; kept as it came when that is not possible); redirects to the original if the mirror is cold |
 | `GET /v1/assets/leagues/{id}.png` | competition badge we ship |
 | `GET /v1/assets/teams/{sport}/{slug}.png` | constructor or team badge we ship |
 | `GET /v1/health` | uptime, cached event count, image-mirror totals, and per-sport quota: `used / limit / remaining`, last success, last error |

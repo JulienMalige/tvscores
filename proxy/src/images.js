@@ -1,10 +1,18 @@
 import { createHash } from "node:crypto";
 import { mkdirSync, existsSync, readFileSync, writeFileSync, unlinkSync, renameSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { shrinkImage } from "./shrink.js";
 
 const MAX_BYTES = 3 << 20;
 const EXT = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/gif": "gif" };
 const DAY = 86400e3;
+/**
+ * Bumped when what the mirror keeps changes shape. It is part of every key, so
+ * a television that cached the old copies for a month asks for the new ones,
+ * and a manifest from before is dropped rather than refetched for nobody.
+ * 2 (2026-10-03): pictures shrunk to 256 px WebP.
+ */
+const VERSION = 2;
 
 /**
  * Local mirror of the crests and player portraits that live on other people's
@@ -18,8 +26,9 @@ const DAY = 86400e3;
  * so a picture is never lost just because the mirror is cold.
  */
 export class ImageMirror {
-  constructor({ dir, publicBase = "", log = () => {}, fetchImpl = fetch, maxAgeDays = 60, refreshDays = 30, timeoutMs = 20000 }) {
+  constructor({ dir, publicBase = "", log = () => {}, fetchImpl = fetch, maxAgeDays = 60, refreshDays = 30, timeoutMs = 20000, shrink = shrinkImage }) {
     this.timeoutMs = timeoutMs;
+    this.shrink = shrink;
     this.dir = dir;
     this.publicBase = publicBase;
     this.log = log;
@@ -35,7 +44,7 @@ export class ImageMirror {
   }
 
   static key(url) {
-    return createHash("sha1").update(url).digest("hex");
+    return createHash("sha1").update(`v${VERSION}\n${url}`).digest("hex");
   }
 
   get manifestPath() {
@@ -45,6 +54,11 @@ export class ImageMirror {
   #load() {
     try {
       const raw = JSON.parse(readFileSync(this.manifestPath, "utf8"));
+      if (raw.version !== VERSION) {
+        // An older shape: its files are no one's now.
+        for (const name of readdirSync(this.dir)) if (name !== "index.json") { try { unlinkSync(join(this.dir, name)); } catch { /* gone */ } }
+        return;
+      }
       for (const [key, entry] of Object.entries(raw.images || {})) this.entries.set(key, entry);
     } catch {
       /* first run, or a manifest we can rebuild by re-registering URLs */
@@ -53,7 +67,7 @@ export class ImageMirror {
 
   save() {
     if (!this.dirty) return;
-    const body = JSON.stringify({ images: Object.fromEntries(this.entries) });
+    const body = JSON.stringify({ version: VERSION, images: Object.fromEntries(this.entries) });
     const tmp = `${this.manifestPath}.tmp`;
     writeFileSync(tmp, body);
     renameSync(tmp, this.manifestPath);
@@ -105,16 +119,20 @@ export class ImageMirror {
         const type = (res.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
         const ext = EXT[type];
         if (!ext) throw new Error(`content-type ${type || "missing"}`);
-        const buf = Buffer.from(await res.arrayBuffer());
-        if (!buf.length) throw new Error("empty body");
-        if (buf.length > MAX_BYTES) throw new Error(`${buf.length} bytes`);
+        const original = Buffer.from(await res.arrayBuffer());
+        if (!original.length) throw new Error("empty body");
+        if (original.length > MAX_BYTES) throw new Error(`${original.length} bytes`);
+        // What the television draws is small; what the CDN sends is not.
+        const small = await this.shrink(original);
+        const buf = small || original;
+        const kept = small ? { type: "image/webp", ext: "webp" } : { type, ext };
         const old = this.file(key);
-        const target = join(this.dir, `${key}.${ext}`);
+        const target = join(this.dir, `${key}.${kept.ext}`);
         const tmp = `${target}.tmp`;
         writeFileSync(tmp, buf);
         renameSync(tmp, target);
         if (old && old !== target) { try { unlinkSync(old); } catch { /* gone */ } }
-        Object.assign(entry, { type, ext, bytes: buf.length, fetchedAt: Date.now(), fails: 0 });
+        Object.assign(entry, { ...kept, bytes: buf.length, original: original.length, fetchedAt: Date.now(), fails: 0 });
         this.dirty = true;
         return true;
       } catch (err) {
