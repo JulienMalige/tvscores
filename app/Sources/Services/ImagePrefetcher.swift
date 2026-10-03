@@ -11,7 +11,9 @@ actor ImagePrefetcher {
     static let shared = ImagePrefetcher()
 
     private var done: Set<URL> = []
-    private let parallel = 4
+    /// How many pictures are in flight at once. The pictures are a few KB each,
+    /// so a first launch is spent on requests, not bytes: eight at a time.
+    static let parallel = 8
 
     /// Returns how many of the pictures asked for are now in memory. Only a
     /// picture that arrived is remembered as done: one that failed on a cold
@@ -23,8 +25,8 @@ actor ImagePrefetcher {
         guard !wanted.isEmpty else { return urls.compactMap { $0 }.count }
         // A few at a time: an Apple TV on a slow line should not open sixty
         // connections at once, and the visible rows matter more than the tail.
-        for chunk in stride(from: 0, to: wanted.count, by: parallel).map({
-            Array(wanted[$0..<min($0 + parallel, wanted.count)])
+        for chunk in stride(from: 0, to: wanted.count, by: Self.parallel).map({
+            Array(wanted[$0..<min($0 + Self.parallel, wanted.count)])
         }) {
             let arrived = await withTaskGroup(of: URL?.self, returning: [URL].self) { group in
                 for url in chunk {

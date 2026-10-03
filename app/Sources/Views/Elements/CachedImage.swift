@@ -50,6 +50,7 @@ final class ImageCache {
         let config = URLSessionConfiguration.default
         config.waitsForConnectivity = true
         config.timeoutIntervalForResource = 30
+        config.httpMaximumConnectionsPerHost = ImagePrefetcher.parallel
         return URLSession(configuration: config)
     }()
 

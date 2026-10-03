@@ -111,8 +111,9 @@ final class ScoreboardStore {
         if !ready {
             await withTaskGroup(of: Void.self) { group in
                 group.addTask { [prefetch, weak self] in
-                    // In fours, as the prefetcher takes them, so the bar moves as they land.
-                    let chunks = stride(from: 0, to: waited.count, by: 4).map { Array(waited[$0..<min($0 + 4, waited.count)]) }
+                    // As many at a time as the prefetcher takes, so the bar moves as they land.
+                    let step = ImagePrefetcher.parallel
+                    let chunks = stride(from: 0, to: waited.count, by: step).map { Array(waited[$0..<min($0 + step, waited.count)]) }
                     for (i, chunk) in chunks.enumerated() {
                         _ = await prefetch(chunk)
                         await self?.iconsLanded(Double(i + 1) / Double(chunks.count))
