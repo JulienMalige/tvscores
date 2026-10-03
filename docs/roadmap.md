@@ -48,6 +48,12 @@ Noted 2026-10-03.
   right, an arrow at the end. Selecting it opens the app; if it is not
   installed, its App Store page.
 - What it takes:
+  - two many-to-many links (Julien): a game is on several channels, and a
+    channel is on several apps — beIN Sports on beIN CONNECT and CANAL+,
+    TF1 on TF1+, Molotov and CANAL+, ESPN Brasil on Disney+, Vivo Play,
+    SKY+. The second link is hand-kept in `proxy/channel-apps.json`
+    (pre-filled 2026-10-03, Julien maintains it); a game's page shows one
+    card per app, the most direct first;
   - a table, by country, from channel name to app: "Canal+", "Canal+
     Foot", "Canal+ Sport 360" → CANAL+; "beIN Sports 1–3", "beIN Sports
     Max 4–10" → beIN SPORTS CONNECT; "DAZN 1" → DAZN; "Ligue 1+" → Ligue 1+;
