@@ -62,6 +62,15 @@ WTA singles only; a match gone from the live feed is marked final (no
 `completed` listing on the free tier). Quota 100/day, 30/min, tracked like
 API-Sports.
 
+**Tennis match statistics, checked 2026-10-03:** not on our tier. Aces,
+double faults, serve and return points, break points are
+`GET /matches/{id}/statistics`, which answers HTTP 403
+`{"error":"upgrade_required","capability":"statistics","detail":"the
+statistics surface requires the ULTRA tier","upgrade_price_usd_month":"99.99"}`
+(tried on match 196994). The free `/matches/{id}` body carries no
+statistics, only `has_analysis` (the ULTRA `/analysis`). A tennis match's
+page shows no statistics until Julien buys ULTRA ($99.99/month).
+
 ## Tennis (checked 2026-09-14)
 
 Correction 2026-09-14 (second look): there ARE cheap sources for live tennis.

@@ -101,8 +101,10 @@ enum Metrics {
     static let gameSide: CGFloat = 560
     static let gameCentre: CGFloat = 460
     static let gameScore: CGFloat = 166
-    /// The same on a tennis match's page.
-    static let gameSetScore: CGFloat = 96
+    /// A tennis match's set table under the two players: as wide as the
+    /// header above it, so the names start under the first portrait and
+    /// the games end under the second.
+    static let gameSetTable: CGFloat = gameSide * 2 + gameCentre
     /// The team code's column in the score by quarter.
     static let periodName: CGFloat = 140
     /// A statistic's figures, the same tall face as the score.
