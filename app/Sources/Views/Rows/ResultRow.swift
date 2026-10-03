@@ -8,6 +8,7 @@ import SwiftUI
 /// is told directly instead, which works inside a single view.
 struct ResultRow: View {
     let result: RaceResult
+    var showsGrid = true
     @FocusState private var isFocused: Bool
 
     /// Shared with the column titles above the list.
@@ -36,8 +37,10 @@ struct ResultRow: View {
                 }
             }
             .frame(width: Self.nameWidth, alignment: .leading)
-            Text(result.grid.map { String($0) } ?? "")
-                .frame(width: Self.numberWidth, alignment: .trailing)
+            if showsGrid {
+                Text(result.grid.map { String($0) } ?? "")
+                    .frame(width: Self.numberWidth, alignment: .trailing)
+            }
             // A blank reads better than a column of zeros for the non-scorers.
             Text((result.points ?? 0) > 0 ? String(result.points ?? 0) : "")
                 .frame(width: Self.numberWidth, alignment: .trailing)

@@ -9,6 +9,8 @@ struct ResultSection: View {
 
     private var finishers: [RaceResult] { results.filter(\.finished) }
     private var retired: [RaceResult] { results.filter { !$0.finished } }
+    /// A sprint's feed gives no grid: no "Start" column of blanks (build 34).
+    private var showsGrid: Bool { results.contains { $0.grid != nil } }
 
     var body: some View {
         VStack(alignment: .leading, spacing: Metrics.rowGap) {
@@ -17,13 +19,13 @@ struct ResultSection: View {
                 .frame(maxWidth: .infinity)
                 .padding(.bottom, Metrics.cardGap - Metrics.rowGap)
             columnTitles
-            ForEach(finishers) { ResultRow(result: $0) }
+            ForEach(finishers) { ResultRow(result: $0, showsGrid: showsGrid) }
             if !retired.isEmpty {
                 Text("race.retired")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .padding(.top, Metrics.headingGap)
-                ForEach(retired) { ResultRow(result: $0) }
+                ForEach(retired) { ResultRow(result: $0, showsGrid: showsGrid) }
             }
         }
         // On a panel, as a game's table is.
@@ -36,7 +38,9 @@ struct ResultSection: View {
     private var columnTitles: some View {
         HStack(spacing: 0) {
             Text("race.driver").frame(width: ResultRow.nameWidth, alignment: .leading)
-            Text("race.start").frame(width: ResultRow.numberWidth, alignment: .trailing)
+            if showsGrid {
+                Text("race.start").frame(width: ResultRow.numberWidth, alignment: .trailing)
+            }
             Text("race.points").frame(width: ResultRow.numberWidth, alignment: .trailing)
             Text("race.gap").frame(maxWidth: .infinity, alignment: .trailing)
         }
