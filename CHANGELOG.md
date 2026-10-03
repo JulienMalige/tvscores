@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+
+## 1.0 build 35 — 3 October 2026
 - A race weekend no longer waits for Sunday: once qualifying is over, Today
   shows "Qualifying · Final" with the front row and each driver's lap time,
   and on a MotoGP Saturday "Sprint · Final" with the sprint's podium and
