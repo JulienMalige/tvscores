@@ -1261,60 +1261,31 @@
         }
       }
     },
-    "settings.country": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Country:"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pays :"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "País:"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "País:"
-          }
-        }
-      }
-    },
     "settings.countryNote": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Channels are those of France for now; more countries will follow."
+            "value": "Channels are shown for the countries ticked here — none, one or several."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les chaînes sont celles de la France pour l'instant ; d'autres pays suivront."
+            "value": "Les chaînes sont celles des pays cochés ici — aucun, un ou plusieurs."
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Por enquanto, os canais são os da França; outros países virão."
+            "value": "Os canais são os dos países marcados aqui — nenhum, um ou vários."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Por ahora, los canales son los de Francia; vendrán más países."
+            "value": "Los canales son los de los países marcados aquí: ninguno, uno o varios."
           }
         }
       }
@@ -1373,6 +1344,35 @@
           "stringUnit": {
             "state": "translated",
             "value": "Programación de TV:"
+          }
+        }
+      }
+    },
+    "settings.otherGuides": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TV guides for the US and Brazil"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "guides TV des États-Unis et du Brésil"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "guias de TV dos EUA e do Brasil"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "guías de TV de EE. UU. y Brasil"
           }
         }
       }

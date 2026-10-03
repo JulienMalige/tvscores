@@ -22,10 +22,19 @@ struct ChannelsLabel: View {
 }
 
 extension Event {
-    /// The channels to show beside a game still to be played or under way;
-    /// once it is over, where it was on no longer helps.
+    /// The channels to show beside a game still to be played or under way,
+    /// in the countries chosen in Settings; once it is over, where it was on
+    /// no longer helps. With several countries, each name carries its flag:
+    /// "🇫🇷 Canal+", "🇺🇸 Peacock".
+    @MainActor
     var upcomingChannels: [String]? {
-        guard status.state != .final, let broadcasts, !broadcasts.isEmpty else { return nil }
-        return broadcasts
+        guard status.state != .final else { return nil }
+        let chosen = ChannelChoice.shared.countries
+        let byCountry = broadcastsBy ?? (broadcasts.map { ["FR": $0] } ?? [:])
+        let flagged = chosen.count > 1
+        let names = chosen.flatMap { country in
+            (byCountry[country] ?? []).map { flagged ? "\(ChannelChoice.flag(country)) \($0)" : $0 }
+        }
+        return names.isEmpty ? nil : names
     }
 }

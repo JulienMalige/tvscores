@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- Settings chooses whose TV channels are shown: France, the United States,
+  Brazil — none, one or several. With more than one, each channel carries
+  its country's flag: "🇫🇷 Canal+ · 🇺🇸 Peacock".
 
 ## 1.0 build 35 — 3 October 2026
 - A race weekend no longer waits for Sunday: once qualifying is over, Today

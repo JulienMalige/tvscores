@@ -160,6 +160,9 @@ struct Event: Decodable, Identifiable, Equatable {
     let records: GameDetail.Records?
     /// The channels it is on in the proxy's country: "Canal+", "beIN Sports 1".
     let broadcasts: [String]?
+    /// The same by country, "FR", "US", "BR"; `broadcasts` is France's,
+    /// kept for builds before 36.
+    let broadcastsBy: [String: [String]]?
     // race
     let name: String?
     let circuit: String?
