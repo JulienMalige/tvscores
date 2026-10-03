@@ -39,4 +39,14 @@ extension Session {
         default: LocalizedStringKey(name)
         }
     }
+
+    /// The same title as a string, for a caption joined with other words.
+    var localizedTitle: String {
+        switch kind {
+        case "qualifying" where name.lowercased() == "qualifying": String(localized: "session.qualifying")
+        case "sprint" where name.lowercased() == "sprint": String(localized: "session.sprint")
+        case "race": String(localized: "session.race")
+        default: name
+        }
+    }
 }

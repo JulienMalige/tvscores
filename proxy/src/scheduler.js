@@ -204,13 +204,19 @@ export class CalendarScheduler {
   /**
    * F1 and MotoGP race roughly every other weekend, so polling a season
    * calendar every half hour spends most of a month's free allowance on days
-   * when nothing happens. Half-hourly around a session, six-hourly otherwise.
+   * when nothing happens. Half-hourly around the race, and for three hours
+   * after a qualifying or a sprint starts so its result is picked up within
+   * half an hour of the flag; six-hourly otherwise.
    */
   nextDelay(now = Date.now()) {
     const near = this.store.all().some((e) => {
       if (e.sport !== this.p.sport) return false;
       const t = Date.parse(e.start);
-      return now > t - 6 * 3600e3 && now < t + 6 * 3600e3;
+      if (now > t - 6 * 3600e3 && now < t + 6 * 3600e3) return true;
+      return (e.sessions || []).some((s) => {
+        const at = Date.parse(s.start);
+        return s.kind !== "race" && now >= at && now < at + 3 * 3600e3;
+      });
     });
     return backoff(near ? CALENDAR_LIVE : CALENDAR_IDLE, this.meta.failures);
   }
@@ -218,7 +224,10 @@ export class CalendarScheduler {
   async tick() {
     const now = Date.now();
     try {
-      const season = await this.p.season({ hasResults: (id) => this.store.hasResults(id) });
+      const season = await this.p.season({
+        hasResults: (id) => this.store.hasResults(id),
+        cachedSessions: (id) => this.store.events.get(id)?.sessionResults,
+      });
       // Keep cached podiums for rounds the provider did not re-fetch this time.
       const merged = season.map((e) => (e.results ? e : { ...e, results: this.store.events.get(e.id)?.results }));
       this.store.replaceSport(this.p.sport, merged);

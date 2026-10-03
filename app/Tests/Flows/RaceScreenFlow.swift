@@ -27,6 +27,14 @@ final class RaceScreenFlow: FlowCase {
         XCTAssertLessThan(tenth.frame.maxY, 1000, "walking down brought it onto the screen")
     }
 
+    func testARaceStillToComeShowsTheGridOnceQualifyingIsRun() {
+        // The sample's Saturday: Bahrain's qualifying is classified, the race is tomorrow.
+        let app = Flow.launch(tab: "today", extra: ["-TVScoresSample", "race", "-TVScoresRace", "f1:grid"], ready: "Starting Grid")
+        XCTAssertTrue(app.staticTexts.matching(identifier: "grid.1").firstMatch.waitForExistence(timeout: 12), "pole is on the grid")
+        XCTAssertTrue(app.staticTexts["1 M. Verstappen"].exists, "and in the front row under the header")
+        XCTAssertFalse(app.staticTexts["Race Result"].exists, "no result before the race")
+    }
+
     func testBackReturnsToWhereTheRaceWasOpened() {
         let app = Flow.launch(tab: "yesterday", extra: ["-TVScoresSample", "race", "-TVScoresRace", "f1"], ready: "Race Result")
         sleep(1) // let the card settle before asking to leave it

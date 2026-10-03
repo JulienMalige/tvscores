@@ -30,6 +30,12 @@ Event shape: see `src/model.js`. Team events have `home/away {name, nick, short}
 classification in `results`: position (absent for a retirement), driver, team,
 `grid`, `points`, `laps`, `fastestLap` on the one who set it, and `gap`, which
 reads `DNF`, `DNS` or `DSQ` for a car that did not make the flag.
+Before the race, `sessionResults: [{kind, name, start, results}]` carries
+qualifying (the grid in order, each row with its best lap as `time` and the
+gap to pole; MotoGP's Q2 then the rest of Q1, listed at Q2's start) and the
+sprint (rows as a race's). Each kind is fetched once, at the first calendar
+round after all its sessions are completed, and only for a weekend whose race
+is not more than two days past.
 
 `broadcasts: ["beIN Sports Max 5", "beIN Sports Max 6"]` names where an event
 airs in `broadcastCountry` (France), at most four, names only — never a link
@@ -83,7 +89,7 @@ avatar the app draws. Anything unasked-for for 60 days is pruned.
 | nfl | TheSportsDB, same key | shared | 9 calls, same | 30 s, 1 call | 60 s (assumed, as football) | ~800 | yes |
 | nba | TheSportsDB, same key | shared | 9 calls, same | 30 s, 1 call | 60 s (assumed, as football) | ~800 | yes |
 | tennis (ATP/WTA, majors and 1000s) | livetennisapi, free | **100/day** | 1 call daily + catalogue once a month | 30 min, 1 call | seconds | ~55 | free tier only |
-| f1, motogp | Orange Cat Blacktop, free | 7,500/month | calendar every 6 h; 30 min within 6 h of a session | — (results, not live timing) | post-session | ~10 each | **no — non-commercial** |
+| f1, motogp | Orange Cat Blacktop, free | 7,500/month | calendar every 6 h; 30 min within 6 h of the race and for 3 h after a qualifying or sprint starts | — (results, not live timing) | post-session | ~13 each (+1 F1 qualifying, +3 MotoGP Q1, Q2, sprint per weekend) | **no — non-commercial** |
 | portraits | TheSportsDB, same key | 25/min, soft 1,000/day | once per athlete, kept a month | — | static | ~120 on a new sport | yes |
 | crests, badges | mirrored on this proxy | none after first fetch | on first sight | — | static | ~0 | trademark risk accepted |
 | TV channels (France) | TheSportsDB v2 `filter/tv/country/France` (same key), then the XML TV Fr guide, then `broadcasts-fr.json` | — | once per UTC day per source | — | daily | 1 call + 1 download | guide: see `docs/data-providers.md` (2026-10-03) |

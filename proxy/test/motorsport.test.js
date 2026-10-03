@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { normaliseEvent, lapSeconds } from "../src/providers/ocblacktop.js";
+import { sessionResults } from "../src/providers/ocb-sessions.js";
+import { withPhotos } from "../src/scoreboard.js";
 
 const fx = JSON.parse(readFileSync(new URL("./fixtures/ocb-f1.json", import.meta.url)));
 const F1 = { id: "f1", name: "Formula 1", short: "F1" };
@@ -86,4 +88,101 @@ test("lap times parse with and without minutes", () => {
   assert.equal(lapSeconds("58.214"), 58.214);
   assert.equal(lapSeconds(""), undefined);
   assert.equal(lapSeconds("DNF"), undefined);
+});
+
+// Qualifying and sprint, fetched once each is over (real answers, 2026-10-03).
+const sx = JSON.parse(readFileSync(new URL("./fixtures/ocb-sessions.json", import.meta.url)));
+const AFTER = Date.parse("2026-10-03T12:00:00Z");
+/** A fake feed: answers by session id and counts the calls. */
+function feed(bySession) {
+  const asked = [];
+  return { asked, fetch: async (id) => { asked.push(id); return bySession[id] ?? []; } };
+}
+const idOf = (e, name) => e.schedule.find((s) => s.name === name).id;
+
+test("F1 qualifying: the grid with lap times, fetched once", async () => {
+  const e = sx.f1.event;
+  const f = feed({ [idOf(e, "Qualifying")]: sx.f1.qualifying });
+  const { sessionResults: got, calls } = await sessionResults(e, { fetch: f.fetch, now: AFTER, nationalities: { Verstappen: "Dutch" } });
+  assert.equal(calls, 1, "one call: the race is not run yet");
+  assert.equal(got.length, 1);
+  const q = got[0];
+  assert.deepEqual([q.kind, q.name, q.start], ["qualifying", "Qualifying", "2026-10-03T08:00:00.000Z"]);
+  assert.deepEqual(q.results.slice(0, 3).map((r) => [r.pos, r.driver, r.time]), [
+    [1, "M. Verstappen", "1:35.130"], [2, "L. Hamilton", "1:35.428"], [3, "I. Hadjar", "1:35.558"],
+  ]);
+  assert.equal(q.results[0].gap, undefined, "pole has no gap");
+  assert.equal(q.results[1].gap, "+0.298s");
+  assert.equal(q.results[0].flag, "🇳🇱");
+  assert.equal(q.results[0].team, "Red Bull Racing");
+
+  const again = await sessionResults(e, { cached: got, fetch: f.fetch, now: AFTER });
+  assert.equal(again.calls, 0, "cached: never asked twice");
+  assert.deepEqual(again.sessionResults, got);
+});
+
+test("MotoGP: the grid is Q2 then the rest of Q1; the sprint is classified like a race", async () => {
+  const e = sx.motogp.event;
+  const f = feed({
+    [idOf(e, "Qualifying 1")]: sx.motogp.q1,
+    [idOf(e, "Qualifying 2")]: sx.motogp.q2,
+    [idOf(e, "Sprint")]: sx.motogp.sprint,
+  });
+  const { sessionResults: got, calls } = await sessionResults(e, { fetch: f.fetch, now: AFTER });
+  assert.equal(calls, 3);
+  assert.deepEqual(got.map((s) => s.kind), ["qualifying", "sprint"]);
+  const grid = got[0].results;
+  assert.equal(got[0].start, "2026-10-03T02:15:00.000Z", "Q2's start, the session the row is listed with");
+  // Q2 had Martin, M. Marquez, Acosta ... Ogura (11), Quartararo (12); Ogura
+  // and Fernandez came through Q1, so Q1's own rows start at Bagnaia.
+  assert.deepEqual(grid.map((r) => [r.pos, r.driver]), [
+    [1, "J. Martin"], [2, "M. Marquez"], [3, "P. Acosta"], [4, "A. Ogura"], [5, "F. Quartararo"],
+    [6, "R. Fernandez"], [7, "F. Bagnaia"], [8, "F. Morbidelli"],
+  ]);
+  assert.equal(grid[0].time, "1:42.371", "the leading zero goes");
+  assert.equal(grid[1].gap, "+0.110s");
+  const sprint = got[1];
+  assert.equal(sprint.name, "Sprint");
+  assert.deepEqual(sprint.results.slice(0, 3).map((r) => [r.pos, r.driver, r.gap, r.points]), [
+    [1, "M. Marquez", "20:50.376", 12], [2, "D. Moreira", "+2.754s", 9], [3, "J. Martin", "+2.466s", 7],
+  ]);
+  assert.deepEqual(sprint.results.slice(-2).map((r) => [r.pos, r.gap]), [[undefined, "DNF"], [undefined, "DNF"]]);
+});
+
+test("a session still running, or a weekend long done, costs nothing", async () => {
+  const e = structuredClone(sx.motogp.event);
+  e.schedule.find((s) => s.name === "Qualifying 2").status = "ongoing";
+  e.schedule.find((s) => s.name === "Sprint").status = "scheduled";
+  const f = feed({});
+  assert.deepEqual(await sessionResults(e, { fetch: f.fetch, now: AFTER }), { sessionResults: undefined, calls: 0 });
+
+  const done = structuredClone(sx.f1.event);
+  for (const s of done.schedule) s.status = "completed";
+  const later = Date.parse("2026-10-10T00:00:00Z");
+  const kept = [{ kind: "qualifying", name: "Qualifying", start: "2026-10-03T08:00:00.000Z", results: [{ pos: 1, driver: "M. Verstappen" }] }];
+  const r = await sessionResults(done, { cached: kept, fetch: f.fetch, now: later });
+  assert.equal(r.calls, 0);
+  assert.deepEqual(r.sessionResults, kept, "what was cached stays");
+  assert.equal((await sessionResults(done, { fetch: f.fetch, now: later })).calls, 0, "no backfill of past weekends");
+});
+
+test("an empty answer is retried a few times, then left alone; no budget, no call", async () => {
+  const e = sx.f1.event;
+  const f = feed({});
+  let cached;
+  for (let i = 0; i < 5; i += 1) cached = (await sessionResults(e, { cached, fetch: f.fetch, now: AFTER })).sessionResults;
+  assert.equal(f.asked.length, 3);
+  assert.equal(cached[0].tries, 3);
+  const g = feed({ [idOf(e, "Qualifying")]: sx.f1.qualifying });
+  assert.equal((await sessionResults(e, { fetch: g.fetch, budget: () => false, now: AFTER })).calls, 0);
+});
+
+test("the board hands session rows their portraits and keeps the retry count to itself", () => {
+  const e = { id: "x", sport: "f1", kind: "race", sessionResults: [
+    { kind: "qualifying", name: "Qualifying", start: "2026-10-03T08:00:00.000Z", results: [{ pos: 1, driver: "M. Verstappen", fullName: "Max Verstappen" }] },
+    { kind: "sprint", name: "Sprint", start: "2026-10-03T06:00:00.000Z", results: [], tries: 1 },
+  ] };
+  const out = withPhotos(e, () => "https://img/max.png", (u) => u && `mirror:${u}`);
+  assert.equal(out.sessionResults[0].results[0].photo, "mirror:https://img/max.png");
+  assert.equal(out.sessionResults[1].tries, undefined);
 });

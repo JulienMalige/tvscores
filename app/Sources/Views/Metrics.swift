@@ -71,6 +71,13 @@ enum Metrics {
     static let tennisChannels: CGFloat = 320
     /// The same thing blown up for a podium, where it is the subject.
     static let markHero: CGFloat = 110
+    /// A race weekend's flag over its caption on the front page, while
+    /// there is no podium yet: smaller than the series page's.
+    static let raceRowFlag: CGFloat = 52
+    /// The front row of the grid under a race page's header.
+    static let frontRowMark: CGFloat = 80
+    /// A classification's place column, before the portrait.
+    static let placeWidth: CGFloat = 44
     /// A game page's crests under their scores (Apple's 33 pt, doubled).
     static let gameMark: CGFloat = 67
     /// A game's page, drawn as the Apple TV app's show page: a card inset

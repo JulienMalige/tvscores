@@ -42,15 +42,19 @@ struct HomeScreen: View {
 
     private func openRequestedRace() {
         guard !openedInitialRace, let board = store.board, let wanted = Self.argument("-TVScoresRace") else { return }
-        // "motogp:next" opens its next weekend instead, not yet run.
+        // With ":next" it opens the series' next weekend instead, not yet
+        // run; with ":grid", one whose qualifying is run and race is not.
         let parts = wanted.split(separator: ":")
         guard let series = parts.first else { return }
         let races = Day.allCases.flatMap { board.groups(for: $0) }
             .filter { $0.sport == String(series) }
             .flatMap(\.events)
-        let race = parts.last == "next"
-            ? races.first { $0.status.state == .scheduled }
-            : races.first { !($0.results ?? []).isEmpty }
+        let mode = parts.count > 1 ? String(parts[1]) : ""
+        let race: Event? = switch mode {
+        case "next": races.first { $0.status.state == .scheduled }
+        case "grid": races.first { $0.startingGrid != nil && ($0.results ?? []).isEmpty }
+        default: races.first { !($0.results ?? []).isEmpty }
+        }
         guard let race else { return }
         openedInitialRace = true
         openGame(race)

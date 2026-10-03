@@ -1,11 +1,15 @@
 import { getJson } from "../http.js";
 import { STATE, flag, flagIso2, shortName } from "../model.js";
+import { classify } from "./ocb-rows.js";
+import { sessionResults } from "./ocb-sessions.js";
+
+export { lapSeconds } from "./ocb-rows.js";
 
 const BASE = "https://api.ocblacktop.com/v1";
 const RACE_HOURS = 3;
 
 /** Orange Cat Blacktop: one calendar-and-results API for every motorsport. */
-export function normaliseEvent(e, { sport, league, results, nationalities = {}, now = Date.now() }) {
+export function normaliseEvent(e, { league, results, nationalities = {}, now = Date.now() }) {
   const race = (e.schedule || []).find((s) => s.type === "race");
   if (!race) return null; // testing weeks have no race session
   const start = new Date(race.startTime).toISOString();
@@ -14,36 +18,7 @@ export function normaliseEvent(e, { sport, league, results, nationalities = {}, 
   if (race.status === "cancelled" || e.status === "cancelled") state = STATE.other;
   else if (race.status === "completed") state = STATE.final;
   else if (now >= startMs && now < startMs + RACE_HOURS * 3600e3) state = STATE.live;
-  // The whole classification, not just the podium: the row shows the top three
-  // and the race page shows the rest. Drivers who did not finish come last,
-  // the one who covered most laps first, and carry no position number.
-  const quickest = Array.isArray(results) ? fastestLapId(results) : undefined;
-  const row = (r) => {
-    const nat = nationalities[r.driver?.lastName];
-    const finished = /^\d+$/.test(String(r.position));
-    return {
-      pos: finished ? Number(r.position) : undefined,
-      driver: `${(r.driver?.firstName || "?")[0]}. ${r.driver?.lastName || "?"}`,
-      fullName: [r.driver?.firstName, r.driver?.lastName].filter(Boolean).join(" ") || undefined,
-      code: r.driver?.code || undefined,
-      nationality: nat,
-      flag: flag(nat),
-      team: r.team?.shortName || r.team?.name,
-      teamColor: r.team?.color || undefined,
-      // A retirement wants its outcome, not the gap it had when it stopped.
-      gap: finished ? (Number(r.position) === 1 ? r.lapTime : gapText(r)) : (outcomeText(r) || "DNF"),
-      grid: num(r.gridPosition),
-      points: num(r.points),
-      laps: num(r.laps),
-      fastestLap: quickest && (r.id ?? r.driver?.id) === quickest ? true : undefined,
-    };
-  };
-  const classification = Array.isArray(results) && results.length
-    ? [
-        ...results.filter((r) => /^\d+$/.test(String(r.position))).sort((a, b) => Number(a.position) - Number(b.position)),
-        ...results.filter((r) => !/^\d+$/.test(String(r.position))).sort((a, b) => (Number(b.laps) || 0) - (Number(a.laps) || 0)),
-      ].map(row)
-    : undefined;
+  const classification = classify(results, nationalities);
   return {
     id: `${league.id}:ocb:${e.id}`,
     sport: league.id,
@@ -67,62 +42,6 @@ export function normaliseEvent(e, { sport, league, results, nationalities = {}, 
     _eventId: e.id,
     _completed: race.status === "completed",
   };
-}
-
-/** "1:35.587" or "58.214" in seconds; undefined when there is no lap time. */
-export function lapSeconds(raw) {
-  const t = String(raw ?? "").trim();
-  if (!t) return undefined;
-  const m = t.match(/^(?:(\d+):)?(\d+(?:\.\d+)?)$/);
-  if (!m) return undefined;
-  return Number(m[1] || 0) * 60 + Number(m[2]);
-}
-
-/**
- * Who set the fastest lap. The feed carries a `fastestLap` object but leaves
- * it empty, so trust its rank when it has one and otherwise take the quickest
- * best lap in the field.
- */
-function fastestLapId(rows) {
-  const ranked = rows.find((r) => Number(r.fastestLap?.rank) === 1);
-  if (ranked) return ranked.id ?? ranked.driver?.id;
-  let best;
-  for (const r of rows) {
-    const s = lapSeconds(r.bestLapTime);
-    if (s === undefined) continue;
-    if (!best || s < best.s) best = { s, id: r.id ?? r.driver?.id };
-  }
-  return best?.id;
-}
-
-/** A number the provider actually sent, zero included. */
-const num = (v) => (v == null || v === "" || !Number.isFinite(Number(v)) ? undefined : Number(v));
-
-/** Motorsport's own shorthand for a car that did not make the flag. */
-// MotoGP speaks in its own codes (OUTSTND, NOTFINISHFIRST); anything not
-// classified is a retirement unless the feed says something more specific.
-const OUTCOME = {
-  retired: "DNF", dnf: "DNF", outstnd: "DNF", notfinishfirst: "DNF",
-  dns: "DNS", "did not start": "DNS", notstarted: "DNS",
-  dsq: "DSQ", disqualified: "DSQ", excluded: "DSQ",
-};
-
-/** DNF, DNS, DSQ: what a car that did not make the flag gets instead of a gap. */
-function outcomeText(r) {
-  for (const field of [r.status, r.displayTime, r.gap]) {
-    const hit = OUTCOME[String(field || "").toLowerCase().trim()];
-    if (hit) return hit;
-  }
-  return undefined;
-}
-
-/** F1 gives "+4.351s" in `gap`/`displayTime`; MotoGP gives a bare "0.657" in `displayTime`. */
-function gapText(r) {
-  const raw = r.gap || r.displayTime;
-  if (raw == null || raw === "") return outcomeText(r);
-  const t = String(raw).trim();
-  if (/^\+?\d+(\.\d+)?s?$/.test(t)) return `+${t.replace(/^\+/, "").replace(/s$/, "")}s`;
-  return t; // "+1 lap", "LAP 57", etc.
 }
 
 function titleCase(s) {
@@ -197,10 +116,12 @@ export function motorsportProvider({ sport, league, key, quota, log = () => {}, 
       };
     },
     /**
-     * Calendar of the current year with podiums for finished races.
-     * `hasResults(id)` lets the caller skip result calls already cached.
+     * Calendar of the current year with podiums for finished races, and the
+     * qualifying and sprint results of the weekend under way.
+     * `hasResults(id)` lets the caller skip result calls already cached;
+     * `cachedSessions(id)` hands back the session results it holds.
      */
-    async season({ hasResults = () => false, year = new Date().getUTCFullYear() } = {}) {
+    async season({ hasResults = () => false, cachedSessions = () => undefined, year = new Date().getUTCFullYear() } = {}) {
       const list = await get(`/events?limit=100`);
       const nats = nationalities ? await nationalities().catch(() => ({})) : {};
       const events = (list.data || []).filter((e) => String(e.dateStart).startsWith(String(year)));
@@ -215,6 +136,14 @@ export function motorsportProvider({ sport, league, key, quota, log = () => {}, 
           Object.assign(base, normaliseEvent(e, { sport, league, results: Array.isArray(rows) ? rows : rows.data, nationalities: nats }));
           base.resultsFetchedAt = new Date().toISOString();
         }
+        const sessions = await sessionResults(e, {
+          cached: cachedSessions(base.id),
+          fetch: (id) => get(`/events/${e.id}/sessions/${id}/results`),
+          budget: (n) => quota.spendable() >= n,
+          nationalities: nats,
+        });
+        resultCalls += sessions.calls;
+        base.sessionResults = sessions.sessionResults;
         delete base._sessionId; delete base._eventId; delete base._completed;
         out.push(base);
       }

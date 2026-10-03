@@ -130,6 +130,18 @@ test("a race weekend is watched; the fortnight between is not", () => {
   assert.equal(s.nextDelay(race - 3 * 86400e3), 6 * 3600e3, "but three days out, six-hourly");
 });
 
+test("qualifying the day before is watched for three hours, so its grid arrives within half an hour", () => {
+  const store = new Store(mkdtempSync(join(tmpdir(), "tvscores-")));
+  const s = new CalendarScheduler({ provider: { sport: "motogp" }, store, log: () => {}, quota: null });
+  const race = Date.parse("2026-10-04T05:00:00Z");
+  const q2 = Date.parse("2026-10-03T02:15:00Z");
+  store.upsert([{ id: "m:1", sport: "motogp", kind: "race", start: new Date(race).toISOString(), status: { state: "scheduled" },
+    sessions: [{ kind: "qualifying", name: "Qualifying 2", start: new Date(q2).toISOString() }, { kind: "race", name: "Race", start: new Date(race).toISOString() }] }]);
+  assert.equal(s.nextDelay(q2 + 40 * 60e3), 30 * 60e3, "just after Q2");
+  assert.equal(s.nextDelay(q2 - 60 * 60e3), 6 * 3600e3, "not before it");
+  assert.equal(s.nextDelay(q2 + 4 * 3600e3), 6 * 3600e3, "nor long after");
+});
+
 test("a result marks its league's table stale, and only where results make the table", async () => {
   const done = match({ status: { state: "final" }, score: { home: 2, away: 1 } });
   const s = scheduler({ ...fake({ live: [done] }), standingsFollowResults: true });

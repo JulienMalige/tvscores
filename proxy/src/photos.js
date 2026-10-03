@@ -92,6 +92,8 @@ export class PhotoResolver {
       // The podium is on the scoreboard; the rest of the field only shows on
       // the race page, so it can queue behind today's matches.
       (e.results || []).forEach((r, i) => want(r, e.sport, i < 3 ? 0 : 2));
+      // Qualifying's front row and the sprint's podium are on the board too.
+      for (const s of e.sessionResults || []) s.results.forEach((r, i) => want(r, e.sport, i < 3 ? 0 : 2));
       if (e.sport === "tennis") {
         const prio = e.status.state === "live" || String(e.start).startsWith(today) ? 0 : 2;
         for (const side of ["home", "away"]) want(e[side], "tennis", prio);

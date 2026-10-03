@@ -158,6 +158,23 @@ jobs:
           race en f1
           race en motogp
           race fr f1
+          # A weekend's Saturday (build 35): qualifying and the sprint are
+          # classified, the race is tomorrow. The front page's rows (flag,
+          # "Qualifying · Final" and the front row), the Formula 1 page day by
+          # day, and each race page with its grid and the MotoGP sprint.
+          saturday() { # $1 file name, then the launch arguments
+            local name="$1"; shift
+            xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresSample race "$@" -AppleLanguages "(en)" -AppleLocale en
+            sleep 8
+            xcrun simctl io "$UDID" screenshot "shots/saturday-$name-en.png"
+          }
+          saturday today -TVScoresTab today
+          saturday upcoming -TVScoresTab upcoming
+          saturday league-f1-today -TVScoresTab today -TVScoresLeague f1
+          saturday league-f1-upcoming -TVScoresTab upcoming -TVScoresLeague f1
+          saturday race-f1-grid -TVScoresTab today -TVScoresRace f1:grid
+          saturday race-motogp-grid -TVScoresTab today -TVScoresRace motogp:grid
           # Tennis results as each set's games, "6-4 3-4" (build 32).
           xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
           SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresSample race -TVScoresTab today -TVScoresLeague wta -AppleLanguages "(en)"

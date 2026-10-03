@@ -169,31 +169,10 @@ struct Event: Decodable, Identifiable, Equatable {
     /// The weekend's timetable — qualifying, sprint, race — for a race.
     let sessions: [Session]?
     let results: [RaceResult]?
+    /// Qualifying and the sprint once each is classified, before the race is.
+    let sessionResults: [SessionResult]?
 
     enum Kind: String, Decodable, Equatable { case match, race }
-}
-
-struct Session: Decodable, Equatable, Identifiable {
-    let kind: String   // qualifying | sprint | race, or whatever the feed calls it
-    let name: String
-    let start: Date
-    var id: String { "\(kind)-\(start.timeIntervalSince1970)" }
-}
-
-extension Event {
-    /// The weekend's sessions that fall on a day bucket — yesterday's or
-    /// today's — measured from `now` in the viewer's calendar. Upcoming has
-    /// none: a row there shows the race's own day, and the page the rest.
-    func sessions(on day: Day, now: Date = .now, calendar: Calendar = .current) -> [Session] {
-        guard let sessions else { return [] }
-        let reference: Date
-        switch day {
-        case .today: reference = now
-        case .yesterday: reference = calendar.date(byAdding: .day, value: -1, to: now) ?? now
-        case .upcoming: return []
-        }
-        return sessions.filter { calendar.isDate($0.start, inSameDayAs: reference) }
-    }
 }
 
 struct Status: Decodable, Equatable {
@@ -243,6 +222,8 @@ struct RaceResult: Decodable, Identifiable, Equatable {
     let team: String?
     let teamColor: String?
     let gap: String?
+    /// A qualifying lap: "1:35.130". Absent from a race or a sprint.
+    let time: String?
     let photo: URL?
     let grid: Int?
     let points: Int?

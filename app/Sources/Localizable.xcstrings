@@ -1063,6 +1063,34 @@
         }
       }
     },
+    "race.sprintResult": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sprint Result"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Résultat du sprint"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resultado da sprint"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resultado del sprint"
+          }
+        }
+      }
+    },
     "race.start": {
       "extractionState": "manual",
       "localizations": {
@@ -1088,6 +1116,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Parrilla"
+          }
+        }
+      }
+    },
+    "race.startingGrid": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starting Grid"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grille de départ"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grid de largada"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parrilla de salida"
           }
         }
       }

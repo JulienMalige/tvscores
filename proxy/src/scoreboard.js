@@ -107,6 +107,9 @@ export function withPhotos(e, photoFor, mirror) {
     return img(k ? photoFor(k) : undefined);
   };
   if (e.results) out.results = e.results.map((r) => ({ ...r, photo: photo(r) }));
+  if (e.sessionResults) {
+    out.sessionResults = e.sessionResults.map(({ tries, ...s }) => ({ ...s, results: s.results.map((r) => ({ ...r, photo: photo(r) })) }));
+  }
   for (const side of ["home", "away"]) {
     if (!e[side]) continue;
     const team = { ...e[side], logo: img(e[side].logo) };

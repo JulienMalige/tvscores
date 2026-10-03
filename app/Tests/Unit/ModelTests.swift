@@ -180,10 +180,27 @@ struct ModelTests {
         let saturday = Date(timeIntervalSince1970: 1_789_812_000) // 2026-09-19T10:00Z
         #expect(race.sessions(on: .today, now: saturday, calendar: utc).map(\.kind) == ["qualifying", "sprint"], "Saturday: qualifying and the sprint")
         #expect(race.sessions(on: .yesterday, now: saturday, calendar: utc).isEmpty)
-        #expect(race.sessions(on: .upcoming, now: saturday, calendar: utc).isEmpty, "upcoming shows the race's own day instead")
+        #expect(race.sessions(on: .upcoming, now: saturday, calendar: utc).map(\.kind) == ["race"], "upcoming: what is left from tomorrow on")
         let sunday = saturday.addingTimeInterval(86_400)
         #expect(race.sessions(on: .today, now: sunday, calendar: utc).map(\.kind) == ["race"])
         #expect(race.sessions(on: .yesterday, now: sunday, calendar: utc).map(\.kind) == ["qualifying", "sprint"])
+    }
+
+    @Test("qualifying and the sprint, once run, stand in for the race on their day")
+    func sessionResultsByDay() throws {
+        let board = try ScoreboardDecoder.make().decode(Scoreboard.self, from: Self.sample("sample-race"))
+        let today = board.groups(for: .today).flatMap(\.events).filter { $0.kind == .race }
+        let f1 = try #require(today.first { $0.sport == "f1" })
+        let grid = try #require(f1.startingGrid)
+        #expect(grid.prefix(3).map(\.time) == ["1:35.130", "1:35.428", "1:35.558"], "the front row with its laps")
+        #expect(grid.map(\.pos) == grid.indices.map { $0 + 1 }, "every car has its slot")
+        #expect(f1.latestSessionResult(on: .today, now: board.generatedAt)?.kind == "qualifying")
+        #expect(f1.latestSessionResult(on: .upcoming, now: board.generatedAt) == nil, "nothing is classified tomorrow")
+        #expect(f1.sprintResults == nil, "a weekend without a sprint has none")
+        let motogp = try #require(today.first { $0.sport == "motogp" })
+        #expect(motogp.latestSessionResult(on: .today, now: board.generatedAt)?.kind == "sprint", "the sprint ran after qualifying")
+        #expect(motogp.sprintResults?.first?.points == 12)
+        #expect(motogp.startingGrid?.count == 22, "Q2's twelve and the rest of Q1")
     }
 
     @Test("tennis matches fall into runs by tournament, each once, in order of appearance")

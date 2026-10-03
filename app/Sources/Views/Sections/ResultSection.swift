@@ -4,13 +4,15 @@ import SwiftUI
 /// then the retirements under their own heading.
 struct ResultSection: View {
     let results: [RaceResult]
+    /// "Race Result", or "Sprint Result" for the Saturday race.
+    var title: LocalizedStringKey = "race.result"
 
     private var finishers: [RaceResult] { results.filter(\.finished) }
     private var retired: [RaceResult] { results.filter { !$0.finished } }
 
     var body: some View {
         VStack(alignment: .leading, spacing: Metrics.rowGap) {
-            Text("race.result")
+            Text(title)
                 .font(.callout.weight(.semibold))
                 .frame(maxWidth: .infinity)
                 .padding(.bottom, Metrics.cardGap - Metrics.rowGap)

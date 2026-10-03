@@ -4,7 +4,8 @@ import SwiftUI
 /// game's (Julien, build 30), after Apple Sports' race card — the series and
 /// the Grand Prix over the next session, then its blocks on panels.
 ///
-/// - to come: the weekend's schedule, the championship table, when and where;
+/// - to come: the sprint's result and the starting grid once they are run,
+///   the weekend's schedule, the championship table, when and where;
 /// - classified: the podium, the full result, when and where.
 struct RaceScreen: View {
     let eventId: String
@@ -33,7 +34,8 @@ struct RaceScreen: View {
         ScrollView {
             VStack(spacing: Metrics.gameGap) {
                 RaceHeaderSection(event: event, series: found?.group.league.name,
-                                  now: store.board?.generatedAt ?? .now)
+                                  now: store.board?.generatedAt ?? .now,
+                                  frontRow: classified ? [] : Array((event.startingGrid ?? []).prefix(3)))
                 if classified {
                     PodiumSection(results: results)
                     ResultSection(results: results)
@@ -44,8 +46,15 @@ struct RaceScreen: View {
                     ProgressView()
                         .frame(maxWidth: .infinity, minHeight: 320)
                 } else {
-                    // Nothing classified yet: the weekend ahead, when the
-                    // feed has it, and the championship going into it.
+                    // Nothing classified yet: the sprint and the grid once
+                    // Saturday has given them, as Apple Sports' race card,
+                    // then the weekend ahead and the championship going in.
+                    if let sprint = event.sprintResults {
+                        ResultSection(results: sprint, title: "race.sprintResult")
+                    }
+                    if let grid = event.startingGrid {
+                        StartingGridSection(results: grid)
+                    }
                     if let sessions = event.sessions, !sessions.isEmpty {
                         SessionSection(sessions: sessions)
                     } else {
@@ -77,6 +86,8 @@ struct RaceHeaderSection: View {
     let series: String?
     /// The board's clock, so a bundled board reads right.
     let now: Date
+    /// The grid's first three, once qualifying is run and the race is not.
+    var frontRow: [RaceResult] = []
 
     /// The first session still to come, while the race itself is.
     private var next: Session? {
@@ -99,8 +110,26 @@ struct RaceHeaderSection: View {
                     StatusLabel(status: event.status, start: event.start)
                 }
                 if let channels = event.upcomingChannels { ChannelsLabel(names: channels, limit: 3) }
+                if !frontRow.isEmpty { front }
             }
         }
+    }
+}
+
+extension RaceHeaderSection {
+    /// "1 M. Verstappen" under each portrait, as Apple Sports' race card
+    /// shows the grid before the lights go out.
+    private var front: some View {
+        HStack(spacing: Metrics.cardInsetH) {
+            ForEach(frontRow) { r in
+                VStack(spacing: Metrics.rowGap) {
+                    PersonMark(photo: r.photo, flag: r.flag, color: Color(hex: r.teamColor),
+                               monogram: r.code ?? PersonMark.monogram(for: r.driver), size: Metrics.frontRowMark)
+                    Text(verbatim: "\(r.pos ?? 0) \(r.driver)").font(.callout.weight(.semibold))
+                }
+            }
+        }
+        .padding(.top, Metrics.headingGap)
     }
 }
 

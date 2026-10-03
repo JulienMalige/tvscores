@@ -7,6 +7,17 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- A race weekend no longer waits for Sunday: once qualifying is over, Today
+  shows "Qualifying · Final" with the front row and each driver's lap time,
+  and on a MotoGP Saturday "Sprint · Final" with the sprint's podium and
+  gaps. A weekend still to come shows its country's flag over its name.
+- A race's page before the lights shows the first three on the grid under
+  its header, then a "Starting Grid" panel with every car in order, and for
+  MotoGP the sprint's full result above it.
+- On the Formula 1 and MotoGP pages, each day shows that day of the
+  weekend: Today the day's sessions (or what they gave), Upcoming what is
+  still to come, with the channels under them, rather than the whole
+  timetable twice.
 
 ## 1.0 build 34 — 3 October 2026
 - More games show their channels: the Nations League and NBA games that
