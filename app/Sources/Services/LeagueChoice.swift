@@ -83,8 +83,15 @@ enum LanguageChoice {
 
     /// The strings of the chosen language, or the app's own when there is none.
     static var bundle: Bundle {
-        current.flatMap { Bundle.main.path(forResource: $0, ofType: "lproj") }.flatMap(Bundle.init(path:)) ?? .main
+        let code = current
+        if let hit = cached, hit.code == code { return hit.bundle }
+        let found = code.flatMap { Bundle.main.path(forResource: $0, ofType: "lproj") }.flatMap(Bundle.init(path:)) ?? .main
+        cached = (code, found)
+        return found
     }
+
+    /// Strings are read on every redraw; the lookup is made once per choice.
+    private static var cached: (code: String?, bundle: Bundle)?
 
     static var locale: Locale { current.map(Locale.init(identifier:)) ?? .current }
 
