@@ -12,18 +12,8 @@ struct TennisRowContent: View {
     private var sets: [[Int]] { event.setScores ?? [] }
     private var live: Bool { event.status.state == .live }
 
-    /// The feed's word on who won, else sets won; nobody has won a match
-    /// still in play.
-    private var winner: Int? {
-        guard event.status.state == .final else { return nil }
-        switch event.score?.winner {
-        case "home": return 0
-        case "away": return 1
-        default:
-            guard let h = event.score?.home, let a = event.score?.away, h != a else { return nil }
-            return h > a ? 0 : 1
-        }
-    }
+    /// Nobody has won a match still in play.
+    private var winner: Int? { event.tennisWinner }
 
     var body: some View {
         VStack(spacing: Metrics.tennisLineGap) {
@@ -90,26 +80,7 @@ struct TennisRowContent: View {
         return "\(initial). \(surname)"
     }
 
-    /// One player's games per set, each in its own column so the sets line
-    /// up across the two lines and from match to match; the arrow after
-    /// the winner, its room kept on the other line.
     private func games(side: Int) -> some View {
-        HStack(spacing: 0) {
-            ForEach(Array(sets.enumerated()), id: \.offset) { i, pair in
-                let mine = pair.indices.contains(side) ? pair[side] : 0
-                let theirs = pair.indices.contains(1 - side) ? pair[1 - side] : 0
-                let inPlay = live && i == sets.count - 1
-                Text(verbatim: String(mine))
-                    .font(.system(size: Metrics.tennisGames, weight: .bold).width(.condensed))
-                    .monospacedDigit()
-                    .foregroundStyle(inPlay || mine > theirs ? .primary : .secondary)
-                    .frame(width: Metrics.tennisSetColumn)
-            }
-            Image(systemName: "arrowtriangle.left.fill")
-                .font(.system(size: Metrics.tennisGames * 0.45))
-                .opacity(winner == side ? 1 : 0)
-                .frame(width: Metrics.tennisArrow)
-        }
-        .frame(height: Metrics.tennisLine)
+        SetGames(sets: sets, side: side, inPlay: live, won: winner == side)
     }
 }

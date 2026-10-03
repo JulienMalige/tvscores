@@ -184,6 +184,14 @@ jobs:
           SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresSample race -TVScoresTab today -TVScoresLeague wta -AppleLanguages "(en)"
           sleep 8
           xcrun simctl io "$UDID" screenshot shots/tennis-sets-en.png
+          # A tennis match's page, over and in play: the two players either
+          # side of "Final" or "Set 2", and the set table under them.
+          for state in final live; do
+            xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresSample race -TVScoresTab today -TVScoresGame "$state:tennis" -AppleLanguages "(en)" -AppleLocale en
+            sleep 8
+            xcrun simctl io "$UDID" screenshot "shots/game-tennis-$state-en.png"
+          done
           # A weekend still to come: its schedule and the championship.
           xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
           SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab upcoming -TVScoresRace motogp:next -AppleLanguages "(en)"

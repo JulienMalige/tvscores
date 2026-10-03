@@ -12,6 +12,10 @@ notes when a version ships.
   Where to watch chooses whose TV channels are shown: France, the United
   States, Brazil — none, one or several. With more than one, each
   country's channels follow its round flag.
+- A tennis match's page reads like Apple Sports': the two players either
+  side of "Final" (or the set in play), and under them a table of the
+  sets, each player's games in their own column with the lost sets greyed
+  and an arrow after the winner — no more "366" against "600".
 
 ## 1.0 build 35 — 3 October 2026
 - A race weekend no longer waits for Sunday: once qualifying is over, Today

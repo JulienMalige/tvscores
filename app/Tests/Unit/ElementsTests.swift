@@ -129,6 +129,26 @@ struct ElementsTests {
         #expect(Color(hex: nil) == nil)
     }
 
+    // MARK: SetGames
+
+    @Test("a tennis match's winner is the feed's word, else sets won, and nobody's while in play")
+    func tennisWinner() throws {
+        let json = """
+        [{"id":"1","sport":"tennis","kind":"match","start":"2026-10-01T10:00:00Z","status":{"state":"final"},
+          "score":{"home":2,"away":1,"sets":[[3,6],[6,3],[6,2]]}},
+         {"id":"2","sport":"tennis","kind":"match","start":"2026-10-01T10:00:00Z","status":{"state":"final"},
+          "score":{"home":1,"away":0,"sets":[[6,4],[2,1]],"winner":"away"}},
+         {"id":"3","sport":"tennis","kind":"match","start":"2026-10-01T10:00:00Z","status":{"state":"live"},
+          "score":{"home":1,"away":0,"sets":[[6,4],[3,4]]}},
+         {"id":"4","sport":"tennis","kind":"match","start":"2026-10-01T10:00:00Z","status":{"state":"scheduled"},
+          "score":{"home":null,"away":null}}]
+        """
+        let events = try ScoreboardDecoder.make().decode([Event].self, from: Data(json.utf8))
+        #expect(events.map(\.tennisWinner) == [0, 1, nil, nil], "a retirement leaves the winner behind on sets")
+        #expect(events[0].setScores?.count == 3)
+        #expect(events[3].setScores == nil, "no table before the first ball")
+    }
+
     // MARK: Flags
 
     @Test("a flag emoji names the flat flag the proxy serves")
