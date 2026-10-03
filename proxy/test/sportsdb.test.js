@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { normaliseEvent, startOf, datesAround, stateOf } from "../src/providers/sportsdb.js";
+import { normaliseEvent, startOf, datesAround, stateOf } from "../src/providers/sportsdb-events.js";
 
 const events = JSON.parse(readFileSync(new URL("./fixtures/sportsdb-football.json", import.meta.url))).events;
 const SERIE_A = { id: 4332, name: "Serie A", short: "SA" };

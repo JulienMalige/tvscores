@@ -13,7 +13,7 @@
  * what is played from September, `after` in the shape.
  */
 import { STATE } from "./model.js";
-import { stateOf } from "./providers/sportsdb.js";
+import { stateOf } from "./providers/sportsdb-events.js";
 
 /** Column ids the app knows how to label in its four languages. */
 export const POINTS_COLUMNS = ["p", "w", "d", "l", "gd", "pts"];

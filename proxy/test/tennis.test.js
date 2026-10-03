@@ -2,7 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { config } from "../src/config.js";
-import { roundOf, tiersFor, untieredOn, normaliseMatch, liveClock, setsLine, bigEventFilter, tierLabel, TIER_CATEGORY } from "../src/providers/livetennis.js";
+import { roundOf, tiersFor, untieredOn, normaliseMatch, liveClock, setsLine, tierLabel, TIER_CATEGORY } from "../src/providers/livetennis-match.js";
+import { bigEventFilter } from "../src/providers/livetennis.js";
 import { calendarEntry } from "../src/providers/tennis-calendar.js";
 
 const raw = JSON.parse(readFileSync(new URL("./fixtures/tennis.json", import.meta.url))).data[0];

@@ -30,17 +30,7 @@ enum LightMark {
     }
 
     private static func measure(_ image: UIImage) -> Measure? {
-        guard let cg = image.cgImage else { return nil }
-        let side = 24
-        var pixels = [UInt8](repeating: 0, count: side * side * 4)
-        let drawn = pixels.withUnsafeMutableBytes { buffer -> Bool in
-            guard let ctx = CGContext(data: buffer.baseAddress, width: side, height: side, bitsPerComponent: 8,
-                                      bytesPerRow: side * 4, space: CGColorSpaceCreateDeviceRGB(),
-                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return false }
-            ctx.draw(cg, in: CGRect(x: 0, y: 0, width: side, height: side))
-            return true
-        }
-        guard drawn else { return nil }
+        guard let pixels = CrestPixels.sample(image) else { return nil }
         var opaque = 0, pale = 0, r = 0, g = 0, b = 0, clear = 0
         for i in stride(from: 0, to: pixels.count, by: 4) where pixels[i + 3] < 32 { clear += 1 }
         for i in stride(from: 0, to: pixels.count, by: 4) where pixels[i + 3] > 128 {
@@ -52,7 +42,7 @@ enum LightMark {
         guard opaque > 0 else { return nil }
         let n = Double(opaque) * 255
         return Measure(light: Double(pale) / Double(opaque) > 0.6,
-                       cutOut: Double(clear) / Double(side * side) > 0.05, r: Double(r) / n, g: Double(g) / n, b: Double(b) / n)
+                       cutOut: Double(clear) / Double(CrestPixels.side * CrestPixels.side) > 0.05, r: Double(r) / n, g: Double(g) / n, b: Double(b) / n)
     }
 
     /// Too near the ground to read: dark on dark, or close to the page's own

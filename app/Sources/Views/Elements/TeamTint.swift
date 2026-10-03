@@ -53,17 +53,7 @@ enum TeamTint {
 
     /// A crest's strong colours, commonest first: up to three.
     static func palette(_ image: UIImage) -> [Swatch] {
-        guard let cg = image.cgImage else { return [] }
-        let side = 24
-        var pixels = [UInt8](repeating: 0, count: side * side * 4)
-        let drawn = pixels.withUnsafeMutableBytes { buffer -> Bool in
-            guard let ctx = CGContext(data: buffer.baseAddress, width: side, height: side, bitsPerComponent: 8,
-                                      bytesPerRow: side * 4, space: CGColorSpaceCreateDeviceRGB(),
-                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return false }
-            ctx.draw(cg, in: CGRect(x: 0, y: 0, width: side, height: side))
-            return true
-        }
-        guard drawn else { return [] }
+        guard let pixels = CrestPixels.sample(image) else { return [] }
         var buckets: [Int: Bucket] = [:]
         for i in stride(from: 0, to: pixels.count, by: 4) where pixels[i + 3] > 200 {
             let r = Int(pixels[i]), g = Int(pixels[i + 1]), b = Int(pixels[i + 2])
