@@ -135,3 +135,10 @@ test("a live game nobody has asked for in five minutes is let go", async () => {
   assert.equal(seen.length, 0, "no call for a game nobody opens");
   assert.equal(details.leases.size, 0);
 });
+
+test("a game that left the store while it was being refreshed is let go, not a crash", async () => {
+  const { details, event } = liveGame();
+  await details.get(event.id);
+  details.store.events.delete(event.id);
+  assert.equal(await details.load(event.id), undefined);
+});

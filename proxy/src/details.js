@@ -188,6 +188,7 @@ export class EventDetails {
 
   async fetchDetail(id) {
     const event = this.store.events.get(id);
+    if (!event) return undefined; // gone from the store since it was asked for
     const m = /^(football|nfl|nba):tsdb:(\d+)$/.exec(id);
     const raw = m[2];
     const state = event.status?.state;

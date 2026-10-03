@@ -45,6 +45,11 @@ export class LiveBackup {
     if (this.quota.spendable(this.now()) <= 0) return undefined;
     const { body, remaining } = await this.fetch(`${BASE}${path}`, { headers: { "x-apisports-key": this.key } });
     this.quota.record(remaining, this.now());
+    // A refused call is an HTTP 200 with its reason in `errors`, and nothing in `response`.
+    const errors = body?.errors;
+    if (errors && (Array.isArray(errors) ? errors.length : Object.keys(errors).length)) {
+      throw new Error(`API-Sports: ${JSON.stringify(errors)}`);
+    }
     return body;
   }
 
@@ -58,17 +63,25 @@ export class LiveBackup {
     return fixtures;
   }
 
-  /** The API-Sports fixture for one of our games: same kickoff to within 45 minutes, and both clubs. */
+  /**
+   * The API-Sports fixture for one of our games: same kickoff to within 45
+   * minutes, and both clubs. Atlético-MG and Atlético-GO read alike, so when
+   * two fixtures fit, the one with our score wins; two still, none.
+   */
   async findFixture(event) {
     const kickoff = Date.parse(event.start);
     const fixtures = await this.liveFixtures(this.leagues[event.league.id]);
-    return fixtures.find((f) => Math.abs(f.fixture.timestamp * 1000 - kickoff) <= KICKOFF_SLACK
+    const fits = fixtures.filter((f) => Math.abs(f.fixture.timestamp * 1000 - kickoff) <= KICKOFF_SLACK
       && sameClub(f.teams.home.name, event.home.name) && sameClub(f.teams.away.name, event.away.name));
+    if (fits.length <= 1) return fits[0];
+    const same = fits.filter((f) => f.goals?.home === event.score?.home && f.goals?.away === event.score?.away);
+    return same.length === 1 ? same[0] : undefined;
   }
 
   /** { stats, timeline } in the shapes details.js serves, or undefined when there is nothing to add. */
   async detail(event) {
     if (!this.covers(event)) return undefined;
+    if (this.games.size > 50) this.games.delete(this.games.keys().next().value);
     const known = this.games.get(event.id);
     if (known && this.now() - known.at < (known.fixture ? MIN_GAP : LIST_TTL)) return known.result;
     try {

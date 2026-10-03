@@ -89,3 +89,21 @@ test("what the backup found stays on the page after the whistle and when the bud
   assert.equal(again.stats.length, 2, "the last good answer, not an empty page");
   assert.equal(again.timeline.length, 1);
 });
+
+test("two clubs that read alike are told apart by the score, or not at all", async () => {
+  const twin = { ...fixture, fixture: { id: 100, timestamp: fixture.fixture.timestamp }, teams: { home: { id: 5, name: "Atletico-GO" }, away: { id: 2, name: "RB Bragantino" } } };
+  const game = { ...event, home: { name: "Atletico" }, score: { home: 1, away: 0 } };
+  const mine = { ...fixture, goals: { home: 1, away: 0 } };
+  const yours = { ...twin, goals: { home: 0, away: 2 } };
+  const make = (list) => new LiveBackup({ key: "k", meta: { calls: { day: "", used: 0 } }, now: () => 0, fetch: async () => ({ body: { response: list } }) });
+  assert.equal((await make([yours, mine]).findFixture(game)).fixture.id, 99, "the one with our score");
+  assert.equal(await make([{ ...yours, goals: { home: 1, away: 0 } }, mine]).findFixture(game), undefined, "still two: none");
+});
+
+test("a refused call is a failure, not an empty answer", async () => {
+  const { b, meta } = backup({ fetch: async () => ({ body: { errors: { requests: "limit reached" }, response: [] } }) });
+  const result = await b.detail(event);
+  assert.equal(result, undefined);
+  assert.equal(b.games.get(event.id)?.result, undefined);
+  assert.ok(meta.calls.used >= 1);
+});

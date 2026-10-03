@@ -17,7 +17,13 @@ import UIKit
 /// have fixtures: Formula 1 races every other weekend, so its page — and
 /// its championship table — were unreachable for eleven days at a time.
 struct Sidebar: View {
-    @State private var store = ScoreboardStore()
+    /// Owned by the app, not by this view: a new language rebuilds the screens
+    /// and must not take the board and its pictures with them.
+    let store: ScoreboardStore
+
+    init(store: ScoreboardStore = ScoreboardStore()) {
+        self.store = store
+    }
     @State private var selection = MenuItem.home
     @State private var day: Day = Self.initialDay()
     /// The day a competition's page was opened on from the front page, so

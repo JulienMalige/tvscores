@@ -10,10 +10,12 @@ struct TVScoresApp: App {
 
     /// Read here so a new choice in Settings rebuilds the screens in it at once.
     @AppStorage("appLanguage") private var language: String?
+    /// Kept here so rebuilding the screens in a new language keeps the board.
+    @State private var store = ScoreboardStore()
 
     var body: some Scene {
         WindowGroup {
-            Sidebar()
+            Sidebar(store: store)
                 .environment(\.locale, LanguageChoice.locale)
                 .id(language ?? "system")
         }
