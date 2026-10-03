@@ -67,6 +67,8 @@ enum Metrics {
     static let tennisSetColumn: CGFloat = 50
     static let tennisSetGap: CGFloat = 24
     static let tennisArrow: CGFloat = 36
+    /// The most a row's channel line may take beside the players.
+    static let tennisChannels: CGFloat = 320
     /// The same thing blown up for a podium, where it is the subject.
     static let markHero: CGFloat = 110
     /// A game page's crests under their scores (Apple's 33 pt, doubled).

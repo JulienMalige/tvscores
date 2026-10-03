@@ -44,9 +44,14 @@ struct TennisRowContent: View {
                     VStack(spacing: 4) {
                         StatusLabel(status: event.status, start: event.start, compact: true,
                                     setsShown: !sets.isEmpty, sport: event.sport)
-                        if let channels = event.upcomingChannels { ChannelsLabel(names: channels) }
+                            .fixedSize()
+                        // Held to a width, so a long line shrinks or ends in
+                        // "+1" rather than squeezing the players' names.
+                        if let channels = event.upcomingChannels {
+                            ChannelsLabel(names: channels)
+                                .frame(maxWidth: Metrics.tennisChannels)
+                        }
                     }
-                    .fixedSize()
                 }
                 if !sets.isEmpty {
                     VStack(spacing: Metrics.tennisLineGap) {

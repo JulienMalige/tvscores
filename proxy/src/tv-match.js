@@ -27,7 +27,9 @@ const COMPETITIONS = [
   { label: /^football$/, phrase: /^ligue europa\b(?!.*conference)/, sport: "football", league: 4481 },
   { label: /^football$/, phrase: /^ligue des nations\b/, sport: "football", league: 4490 },
   { label: /^football$/, phrase: /^copa libertadores\b/, sport: "football", league: 4501 },
-  { label: /^football$/, phrase: /^match amical\b/, sport: "football", league: 4562 },
+  // We keep only the friendlies of some nations, and a guide's "Match
+  // amical" is as often a club's pre-season: only ever by its description.
+  { label: /^football$/, phrase: /^match amical\b/, sport: "football", league: 4562, named: true },
   { label: /^football$/, phrase: /^(championnat du bresil|brasileirao)\b/, sport: "football", league: 4351 },
   { label: /^football americain$/, phrase: /^nfl\b/, sport: "nfl", league: 4391 },
   { label: /^basket ?ball$/, phrase: /^(pre saison )?nba\b/, sport: "nba", league: 4387 },
@@ -105,7 +107,7 @@ export function matchProgramme(p, index) {
   const comp = COMPETITIONS.find((c) => c.label.test(label) && c.phrase.test(phrase));
   if (!comp) return [];
   const only = near.filter((x) => x.e.sport === comp.sport && String(x.e.league?.id) === String(comp.league));
-  if (only.length === 1) return [only[0].e.id];
+  if (only.length === 1 && !comp.named) return [only[0].e.id];
   return namedIn(p.desc, only);
 }
 
@@ -122,7 +124,19 @@ function namedIn(desc, candidates) {
   // Where a side is first named in full, and where a game is: once both
   // sides are. "…face à la Belgique, l'Italie… en Turquie… au Stade de
   // France" is Italy v Turkey, not France v Belgium.
-  const at = (side) => (side.length && side.every((w) => words.includes(w)) ? Math.max(...side.map((w) => words.indexOf(w))) : -1);
+  // A one-word side is not found inside another side's longer name:
+  // "Irlande du Nord" names Northern Ireland, not Ireland (review, build 34).
+  const covered = new Set();
+  for (const side of candidates.flatMap((x) => [x.home, x.away]).filter((w) => w.length > 1)) {
+    for (let i = 0; i + side.length <= words.length; i++) {
+      if (side.every((w, k) => words[i + k] === w)) side.forEach((_, k) => covered.add(i + k));
+    }
+  }
+  const at = (side) => {
+    if (!side.length) return -1;
+    if (side.length === 1) return words.findIndex((w, i) => w === side[0] && !covered.has(i));
+    return side.every((w) => words.includes(w)) ? Math.max(...side.map((w) => words.indexOf(w))) : -1;
+  };
   const named = candidates
     .map((x) => ({ x, home: at(x.home), away: at(x.away) }))
     .filter((c) => c.home >= 0 && c.away >= 0)

@@ -178,3 +178,18 @@ test("several games at once: the description's first game named in full is the o
   assert.deepEqual(matchProgramme(listing("Après avoir raté son entrée en lice à Rome face à la Belgique, l'Italie s'est rassurée en Turquie… avant le Stade de France."), index), ["b"]);
   assert.deepEqual(matchProgramme(listing("La Croatie accueille l'Angleterre."), index), [], "no game of ours named: no guess");
 });
+
+test("a friendly needs its description, and Ireland is not Northern Ireland", async () => {
+  // Review, build 34: a club's "Match amical" took our one tracked friendly,
+  // and "Irlande du Nord" named Ireland.
+  const { eventIndex, matchProgramme } = await import("../src/tv-match.js");
+  const at = "2026-10-05T18:45:00Z";
+  const game = (id, league, home, away) => ({ id, sport: "football", kind: "match", league: { id: league }, start: at, home: { name: home }, away: { name: away } });
+  const friendly = eventIndex([game("f", 4562, "France", "Chile")]);
+  const amical = (desc) => ({ start: "2026-10-05T18:40:00Z", title: "Football : Match amical", subTitle: "", desc });
+  assert.deepEqual(matchProgramme(amical("Le PSG affronte l'Inter en amical."), friendly), []);
+  assert.deepEqual(matchProgramme(amical("Les Bleus de la France reçoivent le Chili."), friendly), ["f"]);
+  const ni = eventIndex([game("a", 4490, "Ireland", "Hungary"), game("b", 4490, "Northern Ireland", "Bulgaria")]);
+  const nations = { start: "2026-10-05T18:40:00Z", title: "Football : Ligue des Nations UEFA", subTitle: "", desc: "L'Irlande du Nord affronte la Bulgarie, quand la Hongrie attend." };
+  assert.deepEqual(matchProgramme(nations, ni), ["b"]);
+});

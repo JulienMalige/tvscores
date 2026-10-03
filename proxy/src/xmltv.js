@@ -69,8 +69,9 @@ const text = (body, tag) => {
 };
 
 /**
- * What we keep of a programme: channel, start, title and sub-title — the
- * description, pictures and ratings are never read. A rerun says so with
+ * What we read of a programme: channel, start, title, sub-title, and the
+ * description only to tell simultaneous games apart — never stored or
+ * passed on; pictures and ratings are never read. A rerun says so with
  * <previously-shown>.
  */
 export function programme({ attrs, body }) {
