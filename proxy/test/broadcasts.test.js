@@ -42,10 +42,8 @@ const TSDB = {
     { idEvent: "4", strChannel: "BeIn Sports Max 5", strCountry: "France" },
   ],
 };
-const TABLE = [
-  { sport: "football", league: 4328, names: ["Canal+"], until: "2027-06-30" },
-  { sport: "tennis", league: "atp", tier: "Masters 1000", names: ["Eurosport"] },
-];
+// The real table, so its labels are tested against the feed's (review, build 33).
+const TABLE = JSON.parse(readFileSync(new URL("../broadcasts-fr.json", import.meta.url))).rights;
 const NOW = Date.parse("2026-10-09T06:00:00Z");
 
 function setup({ guide = () => chunks(), json = async () => ({ body: TSDB }) } = {}) {
@@ -112,6 +110,11 @@ test("TheSportsDB first, the guide's additions after, the rights table only when
   assert.deepEqual(of("nba:tsdb:4"), ["beIN Sports Max 5"]);
   assert.deepEqual(tv.for({ id: "tennis:9", sport: "tennis", league: { id: "atp" }, start: "2026-10-10T10:00:00Z", competition: { tier: "Masters 1000" } }), ["Eurosport"]);
   assert.deepEqual(tv.for({ id: "tennis:8", sport: "tennis", league: { id: "atp" }, start: "2026-10-10T10:00:00Z", competition: { tier: "ATP 500" } }), []);
+  // The feed's own label for a 1000, not only our calendar's (review, build 33).
+  assert.deepEqual(tv.for({ id: "tennis:7", sport: "tennis", league: { id: "atp" }, start: "2026-10-10T10:00:00Z", competition: { tier: "ATP 1000" } }), ["Eurosport"]);
+  // A WTA match at a major is not beIN's: Roland-Garros is France TV's.
+  assert.deepEqual(tv.for({ id: "tennis:6", sport: "tennis", league: { id: "wta" }, start: "2026-10-10T10:00:00Z", competition: { tier: "Grand Slam" } }), []);
+  assert.deepEqual(tv.for({ id: "tennis:5", sport: "tennis", league: { id: "wta" }, start: "2026-10-10T10:00:00Z", competition: { tier: "WTA 1000" } }), ["beIN Sports"]);
 });
 
 test("once a day per source; a failed download keeps the last answer and backs off", async () => {
@@ -152,4 +155,15 @@ test("the board carries the names, and nothing when there are none", async () =>
   const events = board.days.upcoming.flatMap((g) => g.events);
   assert.deepEqual(events.find((e) => e.id === "nfl:tsdb:3").broadcasts, ["beIN Sports 1"]);
   assert.equal("broadcasts" in events.find((e) => e.id === "nfl:tsdb:1"), false);
+});
+
+test("a listing naming both teams may open an hour before kickoff; a guess by competition may not", async () => {
+  // Review, build 33: Ligue 1+ starts Lens / Lyon at 17:45Z for an 18:45Z
+  // kickoff, and only DAZN's later listing was matched.
+  const { eventIndex, matchProgramme } = await import("../src/tv-match.js");
+  const lens = { id: "football:tsdb:2489515", sport: "football", kind: "match", league: { id: 4334 }, start: "2026-10-09T18:45:00Z", home: { name: "Lens" }, away: { name: "Lyon" } };
+  const nfl = { id: "nfl:tsdb:9", sport: "nfl", kind: "match", league: { id: 4391 }, start: "2026-10-09T18:45:00Z", home: { name: "Dallas Cowboys" }, away: { name: "Tampa Bay Buccaneers" } };
+  const index = eventIndex([lens, nfl]);
+  assert.deepEqual(matchProgramme({ start: "2026-10-09T17:45:00Z", title: "Football : Ligue 1 McDonald's - Lens / Lyon", subTitle: "" }, index), [lens.id]);
+  assert.deepEqual(matchProgramme({ start: "2026-10-09T17:45:00Z", title: "Football américain : NFL", subTitle: "" }, index), [], "an hour early is too early to guess");
 });

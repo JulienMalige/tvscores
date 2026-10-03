@@ -10,6 +10,9 @@ import { MIN } from "./clock.js";
  * When in doubt — two games at once — nothing is guessed.
  */
 const BEFORE = 45 * MIN;
+// A listing that names both teams can open earlier: Ligue 1+ starts Lens /
+// Lyon an hour before kickoff, pre-match included (review, build 33).
+const BEFORE_NAMED = 90 * MIN;
 const AFTER = 15 * MIN;
 
 /** Guide titles of the form "<sport> : <competition>", folded. */
@@ -79,15 +82,16 @@ function teamScore(x, [a, b]) {
 export function matchProgramme(p, index) {
   const t = Date.parse(p.start);
   if (!Number.isFinite(t)) return [];
-  const near = index.filter((x) => x.slots.some((k) => t >= k - BEFORE && t <= k + AFTER));
-  if (!near.length) return [];
+  const within = (before) => index.filter((x) => x.slots.some((k) => t >= k - before && t <= k + AFTER));
   const sides = pairs(p.title, p.subTitle);
   if (sides.length) {
-    const scored = near.filter((x) => x.e.kind !== "race").map((x) => ({ x, score: Math.max(...sides.map((s) => teamScore(x, s))) }));
+    const scored = within(BEFORE_NAMED).filter((x) => x.e.kind !== "race").map((x) => ({ x, score: Math.max(...sides.map((s) => teamScore(x, s))) }));
     const best = Math.max(0, ...scored.map((s) => s.score));
     const winners = scored.filter((s) => best > 0 && s.score === best);
     return winners.length === 1 ? [winners[0].x.e.id] : [];
   }
+  const near = within(BEFORE);
+  if (!near.length) return [];
   const text = fold(`${p.title} ${p.subTitle}`);
   const race = RACES.find((r) => r.test(text));
   if (race) return near.filter((x) => x.e.sport === race.sport).map((x) => x.e.id).slice(0, 1);

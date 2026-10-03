@@ -43,7 +43,7 @@ export class Broadcasts {
     if (names.length) return names;
     const on = String(e.start || "").slice(0, 10);
     const row = this.table.find((r) => r.sport === e.sport && String(r.league) === String(e.league?.id)
-      && (!r.tier || r.tier === e.competition?.tier) && (!r.from || on >= r.from) && (!r.until || on <= r.until));
+      && (!r.tier || [].concat(r.tier).includes(e.competition?.tier)) && (!r.from || on >= r.from) && (!r.until || on <= r.until));
     return row ? row.names.slice(0, MAX_NAMES) : [];
   }
 
@@ -127,11 +127,16 @@ export class Broadcasts {
   }
 
   async tick() {
-    await this.refresh();
-    this.store.save();
-    // Wakes hourly to see whether a source is due; it asks nothing otherwise.
-    this.timer = setTimeout(() => this.tick(), 60 * MIN);
-    this.timer.unref?.();
+    try {
+      await this.refresh();
+      this.store.save();
+    } catch (err) {
+      this.log(`broadcasts: ${err.message || err}`);
+    } finally {
+      // Wakes hourly to see whether a source is due; it asks nothing otherwise.
+      this.timer = setTimeout(() => this.tick(), 60 * MIN);
+      this.timer.unref?.();
+    }
   }
 
   start() {

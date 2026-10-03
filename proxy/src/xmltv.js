@@ -11,7 +11,11 @@ const ENTITIES = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'" };
 
 function decode(text) {
   return String(text).replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (all, e) => {
-    if (e[0] === "#") return String.fromCodePoint(e[1].toLowerCase() === "x" ? parseInt(e.slice(2), 16) : Number(e.slice(1)));
+    if (e[0] === "#") {
+      const code = e[1].toLowerCase() === "x" ? parseInt(e.slice(2), 16) : Number(e.slice(1));
+      // A malformed entity is left as written rather than failing the day's guide.
+      return Number.isInteger(code) && code >= 0 && code <= 0x10ffff ? String.fromCodePoint(code) : all;
+    }
     return ENTITIES[e] ?? all;
   });
 }

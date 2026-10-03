@@ -19,9 +19,9 @@
       "source": "https://fr.motorsport.com/f1/news/f1-motogp-wrc-restent-canal-plus/6657751/" },
     { "sport": "motogp", "league": "motogp", "competition": "MotoGP", "names": ["Canal+"], "until": "2029-12-31",
       "source": "https://www.ariase.com/streaming/actualite/la-saison-2026-de-motogp-demarre-sur-canal-voici-tout-ce-qu-il-faut-savoir" },
-    { "sport": "tennis", "league": "wta", "competition": "WTA Tour", "names": ["beIN Sports"], "until": "2026-12-31",
+    { "sport": "tennis", "league": "wta", "tier": ["WTA 1000", "WTA 500", "WTA Finals"], "competition": "WTA Tour", "names": ["beIN Sports"], "until": "2026-12-31",
       "source": "https://www.sport-tv.org/actualites/droitstv/le-circuit-de-tennis-wta-reste-sur-bein-sports-jusquen-2026/" },
-    { "sport": "tennis", "league": "atp", "tier": "Masters 1000", "competition": "ATP Masters 1000", "names": ["Eurosport"], "until": "2026-12-31",
+    { "sport": "tennis", "league": "atp", "tier": ["ATP 1000", "Masters 1000"], "competition": "ATP Masters 1000", "names": ["Eurosport"], "until": "2026-12-31",
       "source": "https://x.com/Monascope7/status/2104292659271549373" }
   ]
 }
