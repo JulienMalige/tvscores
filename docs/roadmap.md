@@ -42,6 +42,27 @@ Noted 2026-10-03.
 - Allowed by hard rule 4 as reworded 2026-10-03: official broadcasters'
   apps only, never an unofficial stream. Until this is built, channels
   stay names.
+- Design (Julien, 2026-10-03, from the Apple TV app's "How to Watch"): on a
+  game's page, a "How to Watch" block, one card per service: the app's
+  icon on the left, "Open in CANAL+" and "CANAL+ app" in grey on the
+  right, an arrow at the end. Selecting it opens the app; if it is not
+  installed, its App Store page.
+- What it takes:
+  - a table, by country, from channel name to app: "Canal+", "Canal+
+    Foot", "Canal+ Sport 360" → CANAL+; "beIN Sports 1–3", "beIN Sports
+    Max 4–10" → beIN SPORTS CONNECT; "DAZN 1" → DAZN; "Ligue 1+" → Ligue 1+;
+    "ESPN" → ESPN; "Peacock" → Peacock; "Disney+" → Disney+; "Globo",
+    "SporTV" → Globoplay; and so on. Several channels share one app, so a
+    game on "Canal+ · Canal+ Foot" shows one card;
+  - per app, its App Store id and, when it has one, the URL scheme that
+    opens it (checked on a real Apple TV; many tvOS apps register none,
+    and then only the App Store page can open);
+  - the icon and name from Apple's documented iTunes Lookup API
+    (`itunes.apple.com/lookup?id=…&country=…&entity=tvSoftware`), fetched
+    by the proxy once a week, so no app logo is bundled (rule 5's spirit);
+  - opening the app at the game itself is out of reach: no service
+    publishes per-game deep links we could use.
+
 
 ## 4. My Teams (favourites)
 
