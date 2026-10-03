@@ -187,7 +187,7 @@ export class ImageMirror {
   }
 
   /** Fetch a few pending images. Returns how many landed. */
-  async warm(limit = 6) {
+  async warm(limit = 12) {
     const keys = this.pending().slice(0, limit);
     if (!keys.length) return 0;
     const done = await Promise.all(keys.map((k) => this.fetchOne(k)));
@@ -195,7 +195,7 @@ export class ImageMirror {
     return done.filter(Boolean).length;
   }
 
-  startWarming(intervalMs = 20000) {
+  startWarming(intervalMs = 5000) {
     if (this.timer) return;
     const tick = async () => {
       await this.warm();
