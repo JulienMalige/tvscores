@@ -92,7 +92,7 @@ struct ChromePictureTests {
         await store.refresh()
         let waited = Date().timeIntervalSince(began)
         #expect(store.ready)
-        #expect(waited >= 3 && waited < 8, "the marks were given their few seconds, and no more: \(waited)s")
+        #expect(waited >= 3 && waited < 14, "the pictures were given their few seconds, and no more: \(waited)s")
     }
 
     @Test("a board that cannot be read is an error on screen, not a crash")

@@ -10,9 +10,11 @@ notes when a version ships.
 - The screen you see while the app opens shows the app's own mark in the
   middle, gently pulsing, and a bar that fills as it connects and gets the
   menu's pictures ready, in place of a spinner.
-- The crests and the drivers' and riders' portraits of today's games are
-  loaded before the front page opens, so it is drawn whole instead of
-  filling in as you look at it.
+- The crests and the drivers' and riders' portraits of the whole week —
+  today's first, then yesterday's and the coming days' — are loaded before the
+  front page opens, so it is drawn whole instead of filling in as you look
+  at it. The first opening takes a few seconds longer; the next ones are
+  instant.
 - Crests and portraits are several times smaller to download (a game
   day's pictures went from about 4 MB to under 1 MB), so the opening screen
   and every new page fill in faster.
