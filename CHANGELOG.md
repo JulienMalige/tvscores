@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- A finished Brasileirão game's page shows its statistics and goals once
+  the data provider has them, even if you opened the page before they
+  arrived: it no longer keeps showing an empty page for hours.
 
 ## 1.0 build 36 — 3 October 2026
 - Home and Settings are blue, the blue of the app's icon, where Home was

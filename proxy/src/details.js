@@ -100,45 +100,127 @@ export function recordsFor(standings, event) {
   return { home: find(event.home?.name), away: find(event.away?.name) };
 }
 
+const LIVE_REFRESH = 90e3;       // a watched live game is refreshed this often
+const LIVE_SERVE = 120e3;        // ...and a copy this young is served as it is
+const LEASE = 5 * 60e3;          // a game nobody has asked for in this long is let go
+const FILLING = 5 * 60e3;        // a finished football game still missing its numbers
+const FINAL = 12 * 3600e3;       // a finished game, complete
+const OPEN_GAME = 60e3;          // anything else
+const MAX_LEASES = 15;           // most games refreshed on their own at once
+
 /**
- * One game's page: fetched when a television opens it, never on a timer.
- * A finished game is kept twelve hours, anything else a minute, so a page
- * left open during a match costs a call a minute at most.
+ * One game's page. A television opening it is what starts the work, and the
+ * work then belongs to the game, not to the viewer:
+ *   - the first request fetches at once and takes a lease on a live game;
+ *   - while the lease lives (every request renews it, so an open page keeps
+ *     it), the proxy refreshes the game every 90 s on its own, and requests
+ *     are answered from what it holds. A hundred viewers cost what one does;
+ *   - five minutes without a request and the game is let go. Nothing runs
+ *     for a match nobody opens;
+ *   - simultaneous requests for a game share one fetch;
+ *   - a football venue never changes, so it is fetched once, and a live
+ *     football game costs two calls a refresh (statistics, timeline).
+ * A finished game is kept twelve hours, but five minutes while a football
+ * game is still missing its statistics or its goals: TheSportsDB fills the
+ * Brasileirão's in hours after the whistle, and an empty answer must not
+ * outlive the wait (2026-10-03).
  */
 export class EventDetails {
-  constructor({ key, store, log = () => {}, fetch = getJson, now = () => Date.now() }) {
-    Object.assign(this, { key, store, log, fetch, now });
+  constructor({ key, store, log = () => {}, fetch = getJson, now = () => Date.now(), timers = true }) {
+    Object.assign(this, { key, store, log, fetch, now, timers });
     this.cache = new Map();
+    this.venues = new Map();
+    this.pending = new Map();
+    this.leases = new Map();
+    this.timer = null;
   }
 
   async get(id) {
     const event = this.store.events.get(id);
-    const m = /^(football|nfl|nba):tsdb:(\d+)$/.exec(id);
-    if (!event || !m || !this.key) return undefined;
+    if (!event || !/^(football|nfl|nba):tsdb:\d+$/.test(id) || !this.key) return undefined;
+    if (event.status?.state === "live") this.lease(id);
     const hit = this.cache.get(id);
-    const final = event.status?.state === "final";
-    if (hit && this.now() - hit.at < (hit.final ? 12 * 3600e3 : 60e3)) return hit.body;
+    if (hit && this.now() - hit.at < hit.ttl) return hit.body;
+    return this.load(id);
+  }
+
+  /** Takes or renews the lease on a live game, and starts the refresh if it was idle. */
+  lease(id) {
+    this.leases.set(id, this.now());
+    if (this.timers && !this.timer) {
+      this.timer = setTimeout(() => this.refreshLeased().finally(() => { this.timer = null; this.rearm(); }), LIVE_REFRESH);
+      this.timer.unref?.();
+    }
+  }
+
+  rearm() {
+    if (this.timers && this.leases.size && !this.timer) {
+      this.timer = setTimeout(() => this.refreshLeased().finally(() => { this.timer = null; this.rearm(); }), LIVE_REFRESH);
+      this.timer.unref?.();
+    }
+  }
+
+  /** One round: refresh each leased live game, drop the idle, finish the ones that ended. */
+  async refreshLeased() {
+    const now = this.now();
+    const kept = [];
+    for (const [id, seen] of this.leases) {
+      const state = this.store.events.get(id)?.status?.state;
+      if (now - seen > LEASE || (state !== "live" && state !== "final")) { this.leases.delete(id); continue; }
+      kept.push([id, seen, state]);
+    }
+    kept.sort((a, b) => b[1] - a[1]);
+    for (const [id, , state] of kept.slice(0, MAX_LEASES)) {
+      if (state === "final") this.leases.delete(id);
+      await this.load(id).catch((err) => this.log(`detail refresh ${id} failed: ${err.message}`));
+    }
+    for (const [id] of kept.slice(MAX_LEASES)) this.leases.delete(id);
+  }
+
+  /** One fetch per game at a time: whoever arrives meanwhile waits for it. */
+  load(id) {
+    if (!this.pending.has(id)) {
+      const job = this.fetchDetail(id).finally(() => this.pending.delete(id));
+      this.pending.set(id, job);
+    }
+    return this.pending.get(id);
+  }
+
+  async fetchDetail(id) {
+    const event = this.store.events.get(id);
+    const m = /^(football|nfl|nba):tsdb:(\d+)$/.exec(id);
     const raw = m[2];
+    const state = event.status?.state;
+    const football = event.sport === "football";
     const call = async (endpoint) => {
       const { body } = await this.fetch(`${V1}/${this.key}/${endpoint}.php?id=${raw}`);
       return body;
     };
     const [info, stats, timeline] = await Promise.all([
-      call("lookupevent"),
-      final || event.status?.state === "live" ? call("lookupeventstats") : undefined,
-      event.sport === "football" && event.status?.state !== "scheduled" ? call("lookuptimeline") : undefined,
+      football && this.venues.has(id) ? undefined : call("lookupevent"),
+      state === "final" || state === "live" ? call("lookupeventstats") : undefined,
+      football && state !== "scheduled" ? call("lookuptimeline") : undefined,
     ]);
-    const row = info?.events?.[0] || {};
+    if (info) {
+      const row = info.events?.[0] || {};
+      if (this.venues.size >= 500) this.venues.delete(this.venues.keys().next().value);
+      this.venues.set(id, { venue: row.strVenue || undefined, city: row.strCity || undefined, result: row.strResult });
+    }
+    const where = this.venues.get(id) || {};
+    const shown = normaliseStats(event.sport, stats?.eventstats), moments = normaliseTimeline(timeline?.timeline);
     const body = {
       id,
-      venue: row.strVenue || undefined,
-      city: row.strCity || undefined,
-      periods: event.sport === "football" ? undefined : parsePeriods(row.strResult),
-      stats: normaliseStats(event.sport, stats?.eventstats),
-      timeline: normaliseTimeline(timeline?.timeline),
+      venue: where.venue,
+      city: where.city,
+      periods: football ? undefined : parsePeriods(where.result),
+      stats: shown,
+      timeline: moments,
       records: recordsFor(this.store.standings, event),
     };
-    this.cache.set(id, { at: this.now(), final, body });
+    const final = state === "final";
+    const filling = final && football && (!body.stats.length || !body.timeline.length);
+    const ttl = filling ? FILLING : final ? FINAL : state === "live" ? LIVE_SERVE : OPEN_GAME;
+    this.cache.set(id, { at: this.now(), ttl, body });
     this.log(`GET sportsdb detail ${id} -> ${body.stats.length} stats, ${body.timeline.length} moments`);
     return body;
   }
