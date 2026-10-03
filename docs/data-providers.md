@@ -463,3 +463,31 @@ guides. Nothing is bought for a public release yet. Before the app goes to
 anyone else, the licensing of every source is reviewed again
 (docs/motorsport-sources.md, docs/tennis-stats-sources.md,
 docs/broadcast-sources.md hold what was found).
+
+## Live numbers for the Brasileirão from API-Sports (2026-10-03)
+
+TheSportsDB answers `lookupeventstats` and `lookuptimeline` with nothing while
+a Brasileirão game is on (checked on Atlético Mineiro v Bragantino, 57'), and
+fills the finished game in hours later. API-Sports, on the free plan we
+already hold (key valid to 2027-09-13, **100 calls a day**, same terms as
+above: usable, rights on the data are ours to carry), served both for that
+game while it was in play: `fixtures?live=all&league=71`,
+`fixtures/statistics` and `fixtures/events`, with the same stat names.
+
+`proxy/src/providers/live-backup.js` uses it as a fallback, never as a
+source of scores:
+
+- only for a live game of a covered competition (the Brasileirão, league 71)
+  whose TheSportsDB answer was empty;
+- the game is matched by kickoff (45 minutes) and both club names;
+- one game is asked no more than every five minutes: the live list once,
+  then two calls per refresh, about 45 calls for a whole match;
+- it stops at the day's budget less a reserve of 10, so **about two games a
+  day** are covered. Past that the page shows the score and the clock only.
+  A paid plan ($19 a month for football) would lift it; not needed while
+  Julien is the only user.
+
+The detail cache now takes a lease on a live game: the proxy refreshes it
+every 90 s while someone has asked for it in the last five minutes, so the
+calls follow the games being watched, not the number of viewers
+(`proxy/src/details.js`).

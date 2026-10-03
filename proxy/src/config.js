@@ -75,6 +75,8 @@ export const config = {
   port: Number(env.TVSCORES_PORT || 8787),
   cacheDir: env.TVSCORES_CACHE_DIR || join(homedir(), ".local/state/tvscores"),
   liveTennisKey: readKey("TVSCORES_LIVETENNIS_KEY", "livetennisapi.key"),
+  /** API-Sports (free plan, 100 calls a day): only the live-numbers backup for the Brasileirão. */
+  apiSportsKey: readKey("TVSCORES_APISPORTS_KEY", "api-sports.key"),
   ocBlacktopKey: readKey("TVSCORES_OCBLACKTOP_KEY", "ocblacktop.key"),
   /** TheSportsDB key for athlete cutouts and schedules; "3" is the public test key, capped so hard it is unusable for anything but a demo. */
   theSportsDbKey: readKey("TVSCORES_TSDB_KEY", "thesportsdb.key") || "3",

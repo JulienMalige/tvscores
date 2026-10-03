@@ -11,6 +11,7 @@ import { createApp } from "./server.js";
 import { PhotoResolver } from "./photos.js";
 import { ImageMirror } from "./images.js";
 import { EventDetails } from "./details.js";
+import { LiveBackup } from "./providers/live-backup.js";
 import { TvChannels } from "./broadcasts.js";
 
 const log = (msg) => console.log(`${new Date().toISOString()} ${msg}`);
@@ -66,7 +67,9 @@ const photos = new PhotoResolver({ store, key: config.theSportsDbKey, log });
 const images = new ImageMirror({ dir: join(config.cacheDir, "images"), publicBase: config.publicBase, log });
 const limits = Object.fromEntries(schedulers.filter((s) => s.quota).map((s) => [s.p.sport, s.quota.dailyQuota]));
 limits.photos = 1000; // TheSportsDB test key: ~30/min; a soft daily line for the health page
-const details = new EventDetails({ key: config.theSportsDbKey, store, log });
+limits.footballBackup = 100; // API-Sports' free plan, for the Brasileirão's live numbers
+const backup = new LiveBackup({ key: config.apiSportsKey, meta: store.sportMeta("footballBackup"), log });
+const details = new EventDetails({ key: config.theSportsDbKey, store, log, backup });
 // The test key "3" has no v2 access: without a real key the TV rows are skipped.
 const broadcasts = new TvChannels({
   store,

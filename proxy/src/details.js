@@ -126,8 +126,8 @@ const MAX_LEASES = 15;           // most games refreshed on their own at once
  * outlive the wait (2026-10-03).
  */
 export class EventDetails {
-  constructor({ key, store, log = () => {}, fetch = getJson, now = () => Date.now(), timers = true }) {
-    Object.assign(this, { key, store, log, fetch, now, timers });
+  constructor({ key, store, log = () => {}, fetch = getJson, now = () => Date.now(), timers = true, backup }) {
+    Object.assign(this, { key, store, log, fetch, now, timers, backup });
     this.cache = new Map();
     this.venues = new Map();
     this.pending = new Map();
@@ -207,7 +207,13 @@ export class EventDetails {
       this.venues.set(id, { venue: row.strVenue || undefined, city: row.strCity || undefined, result: row.strResult });
     }
     const where = this.venues.get(id) || {};
-    const shown = normaliseStats(event.sport, stats?.eventstats), moments = normaliseTimeline(timeline?.timeline);
+    let [shown, moments] = [normaliseStats(event.sport, stats?.eventstats), normaliseTimeline(timeline?.timeline)];
+    // TheSportsDB had nothing for a live game of a competition the backup covers.
+    // After the whistle it keeps showing what the backup last held until TheSportsDB fills the game in.
+    if (!shown.length && !moments.length && this.backup) {
+      const more = this.backup.covers(event) ? await this.backup.detail(event) : this.backup.last(event);
+      if (more) [shown, moments] = [more.stats, more.timeline];
+    }
     const body = {
       id,
       venue: where.venue,

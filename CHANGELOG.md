@@ -10,6 +10,9 @@ notes when a version ships.
 - A finished Brasileirão game's page shows its statistics and goals once
   the data provider has them, even if you opened the page before they
   arrived: it no longer keeps showing an empty page for hours.
+- A Brasileirão game in play now shows its statistics and its goals and
+  cards on its page, where it showed only the score and the clock. They
+  refresh about every five minutes, for the games being watched.
 
 ## 1.0 build 36 — 3 October 2026
 - Home and Settings are blue, the blue of the app's icon, where Home was
