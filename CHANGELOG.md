@@ -11,7 +11,13 @@ notes when a version ships.
   is on the left, and on the right a list — Where to watch, Sources, About.
   Where to watch chooses whose TV channels are shown: France, the United
   States, Brazil — none, one or several. With more than one, each
-  country's channels follow its round flag.
+  country's channels follow its round flag. By default the channels are
+  the Apple TV's country's (or its language's: English the US, Portuguese
+  Brazil, French France).
+- Settings chooses the competitions: tick those you want in the menu and
+  on Home, and move them up or down to set their order.
+- Settings chooses the app's language — the Apple TV's, or English,
+  French, Portuguese or Spanish — from the next time the app opens.
 
 ## 1.0 build 35 — 3 October 2026
 - A race weekend no longer waits for Sunday: once qualifying is over, Today

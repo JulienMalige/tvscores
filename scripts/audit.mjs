@@ -20,7 +20,7 @@ import { checks as secrets } from "./audit/secrets.mjs";
 import { checks as tests } from "./audit/tests.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SKIP = new Set(["node_modules", ".git", "build", "DerivedData", "fixtures", "assets", ".github"]);
+const SKIP = new Set(["node_modules", ".git", "build", "DerivedData", "fixtures", "assets", ".github", "worktrees"]);
 
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {

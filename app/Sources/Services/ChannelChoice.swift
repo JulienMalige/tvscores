@@ -17,13 +17,25 @@ final class ChannelChoice {
     private(set) var countries: [String]
 
     init(defaults: UserDefaults = .standard) {
-        // France until the viewer says otherwise: the only country before build 36.
+        // Until the viewer chooses: the Apple TV's own country, or failing
+        // that its language's — English the US, Portuguese Brazil, French
+        // France (Julien, build 36).
         let saved = defaults.stringArray(forKey: Self.key)
-        countries = (saved ?? ["FR"]).filter(Self.all.contains)
+        countries = (saved ?? Self.deviceDefault()).filter(Self.all.contains)
         self.defaults = defaults
     }
 
     @ObservationIgnored private let defaults: UserDefaults
+
+    static func deviceDefault(_ locale: Locale = .current) -> [String] {
+        if let region = locale.region?.identifier, all.contains(region) { return [region] }
+        switch locale.language.languageCode?.identifier {
+        case "en": return ["US"]
+        case "pt": return ["BR"]
+        case "fr": return ["FR"]
+        default: return []
+        }
+    }
 
     func isOn(_ country: String) -> Bool { countries.contains(country) }
 

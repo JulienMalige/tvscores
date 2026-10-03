@@ -60,6 +60,19 @@ struct HomeScreen: View {
         openGame(race)
     }
 
+    /// The day's competitions as the viewer chose them in Settings: hidden
+    /// ones left out, the rest in the menu's order (build 36).
+    @MainActor
+    static func arranged(_ groups: [LeagueGroup], leagues: [LeagueSummary]) -> [LeagueGroup] {
+        let key = { (g: LeagueGroup) in "\(g.sport):\(g.league.id.raw)" }
+        let order = SportSection.grouped(leagues).flatMap(\.leagues).map(Sidebar.key)
+        let rank = Dictionary(order.enumerated().map { ($1, $0) }, uniquingKeysWith: { a, _ in a })
+        return groups.enumerated()
+            .filter { LeagueChoice.shared.isShown(key($0.element)) }
+            .sorted { (rank[key($0.element)] ?? Int.max, $0.offset) < (rank[key($1.element)] ?? Int.max, $1.offset) }
+            .map(\.element)
+    }
+
     private static func argument(_ name: String) -> String? {
         let args = ProcessInfo.processInfo.arguments
         if let i = args.firstIndex(of: name), i + 1 < args.count { return args[i + 1] }
@@ -83,7 +96,7 @@ struct HomeScreen: View {
     @ViewBuilder
     private var content: some View {
         if let board = store.board {
-            let groups = board.groups(for: day)
+            let groups = Self.arranged(board.groups(for: day), leagues: board.leagues)
             if groups.isEmpty {
                 EmptyDay(day: day)
             } else {

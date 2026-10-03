@@ -142,7 +142,7 @@ jobs:
           # Settings, from the gear at the top of the menu.
           xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
           xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
-          for page in top countries; do
+          for page in top competitions countries language; do
             xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
             SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab today -TVScoresSettings "$page" -channelCountries "(FR,US)" -AppleLanguages "(fr)"
             sleep 8

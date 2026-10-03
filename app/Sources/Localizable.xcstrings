@@ -1290,6 +1290,64 @@
         }
       }
     },
+    "settings.competitions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Competitions"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compétitions"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Competições"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Competiciones"
+          }
+        }
+      }
+    },
+    "settings.competitionsNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tick the competitions you want in the menu and on Home. To change their order, select the handle at the end of a row, move it up or down, then select again."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cochez les compétitions à garder dans le menu et sur l'accueil. Pour changer leur ordre, sélectionnez la poignée au bout d'une ligne, déplacez-la vers le haut ou le bas, puis sélectionnez à nouveau."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marque as competições que quer no menu e na tela inicial. Para mudar a ordem, selecione a alça no fim de uma linha, mova para cima ou para baixo e selecione de novo."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marca las competiciones que quieres en el menú y en Inicio. Para cambiar su orden, selecciona el asa al final de una fila, muévela arriba o abajo y vuelve a seleccionar."
+          }
+        }
+      }
+    },
     "settings.countryNote": {
       "extractionState": "manual",
       "localizations": {
@@ -1319,6 +1377,93 @@
         }
       }
     },
+    "settings.language": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Language"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Langue"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idioma"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idioma"
+          }
+        }
+      }
+    },
+    "settings.languageNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TV Scores follows the Apple TV's language unless you choose one here. A new language shows the next time you open the app."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TV Scores suit la langue de l'Apple TV, sauf si vous en choisissez une ici. Une nouvelle langue s'affiche à la prochaine ouverture de l'app."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O TV Scores segue o idioma da Apple TV, a menos que você escolha um aqui. Um novo idioma aparece na próxima vez que abrir o app."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TV Scores sigue el idioma del Apple TV salvo que elijas uno aquí. Un idioma nuevo se ve la próxima vez que abras la app."
+          }
+        }
+      }
+    },
+    "settings.languageSystem": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV language"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Langue de l'Apple TV"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idioma da Apple TV"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idioma del Apple TV"
+          }
+        }
+      }
+    },
     "settings.listings": {
       "extractionState": "manual",
       "localizations": {
@@ -1344,6 +1489,64 @@
           "stringUnit": {
             "state": "translated",
             "value": "Programación de TV"
+          }
+        }
+      }
+    },
+    "settings.move": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déplacer"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mover"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mover"
+          }
+        }
+      }
+    },
+    "settings.movingNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move it with up and down, then select to set it down."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déplacez-la avec haut et bas, puis sélectionnez pour la poser."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mova com cima e baixo, depois selecione para soltar."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muévela con arriba y abajo y selecciona para soltarla."
           }
         }
       }
@@ -1402,6 +1605,35 @@
           "stringUnit": {
             "state": "translated",
             "value": "Resultados y calendarios"
+          }
+        }
+      }
+    },
+    "settings.shownCount %lld %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld of %2$lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld sur %2$lld"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld de %2$lld"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld de %2$lld"
           }
         }
       }

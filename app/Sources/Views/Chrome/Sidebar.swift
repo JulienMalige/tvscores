@@ -87,7 +87,7 @@ struct Sidebar: View {
                 GameScreen(eventId: event.id, fallback: event, store: store)
             }
         }
-        .fullScreenCover(isPresented: $settingsOpen) { SettingsScreen() }
+        .fullScreenCover(isPresented: $settingsOpen) { SettingsScreen(leagues: store.leagues) }
         .onChange(of: menuFocus) { _, focused in
             // Focus gone from every row — a press right onto the page.
             if focused == nil, expanded, !moving { shut() }
@@ -135,11 +135,7 @@ struct Sidebar: View {
     }
 
     private var sections: [(section: SportSection, leagues: [LeagueSummary])] {
-        SportSection.all.compactMap { section in
-            // A league naming its own section goes there, not in its sport's.
-            let mine = store.leagues.filter { $0.section.map { $0 == section.id } ?? section.sports.contains($0.sport) }
-            return mine.isEmpty ? nil : (section, mine)
-        }
+        SportSection.grouped(store.leagues)
     }
 
     // MARK: Opening and shutting
