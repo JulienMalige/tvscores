@@ -45,7 +45,8 @@ export const topSection = (markdown) => section(markdown);
 
 export { setNote, waitForBuild };
 
-async function waitForBuild(version, minutes = 15) {
+// Apple took more than 15 minutes to list build 33 (3 October 2026): 30.
+async function waitForBuild(version, minutes = 30) {
   const deadline = Date.now() + minutes * 60e3;
   while (Date.now() < deadline) {
     const { data } = await asc(`/v1/apps/${APP_ID}/builds?limit=20`);

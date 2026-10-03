@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+
+## 1.0 build 33 — 3 October 2026
 - A gear at the top right of the menu opens Settings: the country whose
   channels are shown (France for now), where the scores and TV listings
   come from, and the app's version. The menu's symbols are a lighter
