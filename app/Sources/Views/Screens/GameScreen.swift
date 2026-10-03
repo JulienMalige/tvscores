@@ -69,7 +69,7 @@ struct GameScreen: View {
                                          carded: true, preloaded: standings)
                     }
                     if event.sport != "tennis" {
-                        GameInfoSection(start: event.start, venue: detail?.venue, place: detail?.city)
+                        GameInfoSection(start: event.start, venue: detail?.venue, place: detail?.city, broadcasts: event.upcomingChannels)
                     }
                 }
             }

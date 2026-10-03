@@ -2,11 +2,14 @@ import SwiftUI
 
 /// When and where, as Apple Sports closes its game pages: a centred title,
 /// then "Time:" and "Location:" in grey before their values — a game's
-/// venue and town, or a race's circuit and country.
+/// venue and town, or a race's circuit and country — and, before it is
+/// over, the channels it is on.
 struct GameInfoSection: View {
     let start: Date
     let venue: String?
     let place: String?
+    /// Where it is on, every channel, while that still helps.
+    var broadcasts: [String]? = nil
 
     private var location: String? {
         let parts = [venue, place].compactMap { $0 }.filter { !$0.isEmpty }
@@ -23,6 +26,9 @@ struct GameInfoSection: View {
                 line("clock", "game.time", Text(start, format: .dateTime.weekday(.wide).day().month(.wide).hour().minute()))
                 if let location {
                     line("mappin.and.ellipse", "game.location", Text(verbatim: location))
+                }
+                if let broadcasts, !broadcasts.isEmpty {
+                    line("tv", "game.watchOn", Text(verbatim: broadcasts.joined(separator: ", ")))
                 }
             }
             .font(.callout)

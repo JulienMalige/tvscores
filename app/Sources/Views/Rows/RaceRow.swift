@@ -53,6 +53,7 @@ private struct RaceRowContent: View {
             VStack(spacing: 6) {
                 caption(String(localized: "session.race"))
                 StatusLabel(status: event.status, start: event.start)
+                if let channels = event.upcomingChannels { ChannelsLabel(names: channels) }
             }
             .frame(maxWidth: .infinity)
         } else {

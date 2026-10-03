@@ -158,6 +158,8 @@ struct Event: Decodable, Identifiable, Equatable {
     let competition: Competition?
     /// Each side's record from its table, for a game to come: "1-2".
     let records: GameDetail.Records?
+    /// The channels it is on in the proxy's country: "Canal+", "beIN Sports 1".
+    let broadcasts: [String]?
     // race
     let name: String?
     let circuit: String?

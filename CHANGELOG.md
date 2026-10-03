@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- Where to watch, for France: a game or race still to come shows its
+  channels in small grey type under the time — "Canal+ · beIN Sports 1" —
+  and its page lists them all under Information, "À voir sur".
 
 ## 1.0 build 32 — 2 October 2026
 - Upcoming has a fine rule between one day and the next, under each day's

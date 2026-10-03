@@ -37,7 +37,7 @@ struct RaceScreen: View {
                 if classified {
                     PodiumSection(results: results)
                     ResultSection(results: results)
-                    GameInfoSection(start: event.start, venue: event.circuit, place: event.country)
+                    GameInfoSection(start: event.start, venue: event.circuit, place: event.country, broadcasts: event.upcomingChannels)
                 } else if !loaded {
                     // As a game's page: one loader under the header, then
                     // the schedule, the table and the place at once.
@@ -54,7 +54,7 @@ struct RaceScreen: View {
                     if let ref = standingsRef {
                         StandingsSection(ref: ref, store: store, carded: true, preloaded: standings)
                     }
-                    GameInfoSection(start: event.start, venue: event.circuit, place: event.country)
+                    GameInfoSection(start: event.start, venue: event.circuit, place: event.country, broadcasts: event.upcomingChannels)
                 }
             }
             .eventPageInsets()
