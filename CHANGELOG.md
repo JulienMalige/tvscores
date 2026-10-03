@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- Home and Settings are blue, the blue of the app's icon, where Home was
+  green.
 - Settings is laid out as the Apple TV's own: the app's mark and what it
   is on the left, and on the right a list — Where to watch, Sources, About.
   Where to watch chooses whose TV channels are shown: France, the United

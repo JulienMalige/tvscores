@@ -9,8 +9,10 @@ extension EnvironmentValues {
 }
 
 extension Color {
-    /// Home's green, taken from Apple Sports' Home (#1f5a28).
-    static let homeTint = Color(red: 0x1f / 255, green: 0x5a / 255, blue: 0x28 / 255)
+    /// Home's blue, the app icon's (Julien, build 36; it was Apple Sports'
+    /// green, #1f5a28): the icon's deep end, #0b48a8, dark enough for white
+    /// type and white panels' glass.
+    static let homeTint = Color(red: 0x0b / 255, green: 0x48 / 255, blue: 0xa8 / 255)
 }
 
 /// Behind a tinted page: its colour at the top, running down the whole page

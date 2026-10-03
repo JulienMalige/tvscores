@@ -91,7 +91,7 @@ struct SettingsScreen: View {
             case .top:
                 CourtMark()
                     .frame(width: Metrics.settingsMark, height: Metrics.settingsMark * 0.6)
-            case .competitions: symbol("sportscourt")
+            case .competitions: symbol("trophy")
             case .countries: symbol("tv")
             case .language: symbol("globe")
             }
