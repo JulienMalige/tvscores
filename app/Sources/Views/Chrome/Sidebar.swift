@@ -88,6 +88,11 @@ struct Sidebar: View {
             }
         }
         .fullScreenCover(isPresented: $settingsOpen) { SettingsScreen(leagues: store.leagues) }
+        // A competition hidden in Settings while its page was up: back to
+        // Home, as for one gone from the list (review, build 36).
+        .onChange(of: LeagueChoice.shared.hidden) { _, hidden in
+            if case .league(let key) = selection, hidden.contains(key) { selection = .home }
+        }
         .onChange(of: menuFocus) { _, focused in
             // Focus gone from every row — a press right onto the page.
             if focused == nil, expanded, !moving { shut() }
@@ -177,7 +182,7 @@ struct Sidebar: View {
     /// front page was showing.
     private func open(_ ref: LeagueRef) {
         let key = "\(ref.sport):\(ref.leagueId)"
-        guard store.leagues.contains(where: { Self.key($0) == key }) else { return }
+        guard store.leagues.contains(where: { Self.key($0) == key }), LeagueChoice.shared.isShown(key) else { return }
         leagueDays[key] = day
         selection = .league(key)
     }
