@@ -8,9 +8,14 @@ struct TVScoresApp: App {
         URLCache.shared = URLCache(memoryCapacity: 32 << 20, diskCapacity: 256 << 20)
     }
 
+    /// Read here so a new choice in Settings rebuilds the screens in it at once.
+    @AppStorage("appLanguage") private var language: String?
+
     var body: some Scene {
         WindowGroup {
             Sidebar()
+                .environment(\.locale, LanguageChoice.locale)
+                .id(language ?? "system")
         }
     }
 }

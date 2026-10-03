@@ -131,8 +131,8 @@ struct TournamentHeader: View {
         if let dates = competition.dates {
             // The interval style says the month once when both days share it
             // ("30 Sep – 11 Oct", "5 – 11 Oct") in the viewer's own order.
-            let span = dates.formatted(.interval.day().month(.abbreviated))
-            let country = competition.country.flatMap { Locale.current.localizedString(forRegionCode: $0) }
+            let span = dates.formatted(.interval.day().month(.abbreviated).locale(LanguageChoice.locale))
+            let country = competition.country.flatMap { LanguageChoice.locale.localizedString(forRegionCode: $0) }
             let place = [competition.city, country].compactMap { $0 }.joined(separator: ", ")
             return Text(verbatim: place.isEmpty ? span : "\(span) · \(place)")
         }

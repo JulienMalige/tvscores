@@ -59,8 +59,10 @@ final class LeagueChoice {
 }
 
 /// The app's language, chosen in Settings, or the Apple TV's own (Julien,
-/// build 36). tvOS reads an app's language when the app starts, so a change
-/// shows the next time it is opened.
+/// build 36). tvOS reads an app's language when the app starts, so the choice
+/// is also applied live (Julien, 2026-10-03: a change needed a restart): the
+/// root sets the environment's locale, and the strings read outside a view
+/// come from `bundle`.
 enum LanguageChoice {
     static let codes = ["en", "fr", "pt", "es"]
     private static let key = "appLanguage"
@@ -78,6 +80,13 @@ enum LanguageChoice {
             d.removeObject(forKey: "AppleLanguages")
         }
     }
+
+    /// The strings of the chosen language, or the app's own when there is none.
+    static var bundle: Bundle {
+        current.flatMap { Bundle.main.path(forResource: $0, ofType: "lproj") }.flatMap(Bundle.init(path:)) ?? .main
+    }
+
+    static var locale: Locale { current.map(Locale.init(identifier:)) ?? .current }
 
     /// "Français", in its own language.
     static func name(_ code: String) -> String {

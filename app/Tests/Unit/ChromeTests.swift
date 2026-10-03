@@ -116,4 +116,15 @@ struct ChromePictureTests {
         try await Task.sleep(for: .milliseconds(300))
         #expect(store.iconsVersion == 1, "and not again for a refresh that brings nothing new")
     }
+
+    @Test("a language chosen in Settings is the one every string is read in, at once")
+    func chosenLanguageIsLive() {
+        let before = LanguageChoice.current
+        defer { LanguageChoice.set(before) }
+        LanguageChoice.set("pt")
+        #expect(LanguageChoice.locale.identifier == "pt")
+        #expect(String(localized: "status.final", bundle: LanguageChoice.bundle) != String(localized: "status.final", bundle: Bundle.main.path(forResource: "en", ofType: "lproj").flatMap(Bundle.init(path:)) ?? .main))
+        LanguageChoice.set(nil)
+        #expect(LanguageChoice.bundle == Bundle.main, "the Apple TV's own when none is chosen")
+    }
 }

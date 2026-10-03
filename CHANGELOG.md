@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- Changing the app's language in Settings applies at once: the menu, the
+  game pages, the dates and the country names all switch, with no need to
+  close and reopen the app. You are taken back to Home when it changes.
 - A finished Brasileirão game's page shows its statistics and goals once
   the data provider has them, even if you opened the page before they
   arrived: it no longer keeps showing an empty page for hours.

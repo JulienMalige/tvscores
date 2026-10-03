@@ -43,9 +43,9 @@ extension Session {
     /// The same title as a string, for a caption joined with other words.
     var localizedTitle: String {
         switch kind {
-        case "qualifying" where name.lowercased() == "qualifying": String(localized: "session.qualifying")
-        case "sprint" where name.lowercased() == "sprint": String(localized: "session.sprint")
-        case "race": String(localized: "session.race")
+        case "qualifying" where name.lowercased() == "qualifying": String(localized: "session.qualifying", bundle: LanguageChoice.bundle)
+        case "sprint" where name.lowercased() == "sprint": String(localized: "session.sprint", bundle: LanguageChoice.bundle)
+        case "race": String(localized: "session.race", bundle: LanguageChoice.bundle)
         default: name
         }
     }

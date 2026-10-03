@@ -1412,25 +1412,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "TV Scores follows the Apple TV's language unless you choose one here. A new language shows the next time you open the app."
+            "value": "TV Scores follows the Apple TV's language unless you choose one here."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "TV Scores suit la langue de l'Apple TV, sauf si vous en choisissez une ici. Une nouvelle langue s'affiche à la prochaine ouverture de l'app."
+            "value": "TV Scores suit la langue de l'Apple TV, sauf si vous en choisissez une ici."
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "O TV Scores segue o idioma da Apple TV, a menos que você escolha um aqui. Um novo idioma aparece na próxima vez que abrir o app."
+            "value": "O TV Scores segue o idioma da Apple TV, a menos que você escolha um aqui."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "TV Scores sigue el idioma del Apple TV salvo que elijas uno aquí. Un idioma nuevo se ve la próxima vez que abras la app."
+            "value": "TV Scores sigue el idioma del Apple TV salvo que elijas uno aquí."
           }
         }
       }

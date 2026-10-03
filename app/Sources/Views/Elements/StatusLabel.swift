@@ -48,7 +48,7 @@ struct StatusLabel: View {
                     .font(mainFont)
                 if let d = status.detail { detailText(d) }
             case .live:
-                Text(clock ?? localizedDetail(status.note) ?? localizedDetail(status.detail) ?? String(localized: "status.live"))
+                Text(clock ?? localizedDetail(status.note) ?? localizedDetail(status.detail) ?? String(localized: "status.live", bundle: LanguageChoice.bundle))
                     .font(mainFont)
                     .foregroundStyle(status.note == nil ? .green : .orange)
                 if status.clock != nil || status.note != nil, !setsShown, let d = status.detail { detailText(d) }
@@ -82,9 +82,9 @@ struct StatusLabel: View {
 
     private var finalText: String {
         if let d = status.detail, let key = Self.finalCombined[d] {
-            return String(localized: String.LocalizationValue(key))
+            return String(localized: String.LocalizationValue(key), bundle: LanguageChoice.bundle)
         }
-        return String(localized: "status.final")
+        return String(localized: "status.final", bundle: LanguageChoice.bundle)
     }
 
     private func detailText(_ d: String) -> some View {
@@ -118,7 +118,7 @@ struct StatusLabel: View {
     private func localizedDetail(_ d: String?) -> String? {
         guard let d else { return nil }
         guard let key = Self.detailKeys[d] else { return d }
-        return String(localized: String.LocalizationValue(key))
+        return String(localized: String.LocalizationValue(key), bundle: LanguageChoice.bundle)
     }
 }
 

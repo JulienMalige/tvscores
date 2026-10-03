@@ -76,7 +76,7 @@ private struct RaceRowContent: View {
 
     /// "Qualifying · Final".
     private func finalCaption(_ result: SessionResult) -> String {
-        [result.session.localizedTitle, String(localized: "status.final")].joined(separator: " · ")
+        [result.session.localizedTitle, String(localized: "status.final", bundle: LanguageChoice.bundle)].joined(separator: " · ")
     }
 
     @ViewBuilder
@@ -90,7 +90,7 @@ private struct RaceRowContent: View {
                 caption(finalCaption(finished))
                 if let channels = event.upcomingChannels { ChannelsLabel(channels: channels) }
             } else if shown.isEmpty {
-                caption(String(localized: "session.race"))
+                caption(String(localized: "session.race", bundle: LanguageChoice.bundle))
                 StatusLabel(status: event.status, start: event.start)
                 if let channels = event.upcomingChannels { ChannelsLabel(channels: channels) }
             } else {

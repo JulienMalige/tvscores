@@ -119,8 +119,8 @@ struct SettingsScreen: View {
     }
 
     private var chosenCountries: String {
-        let names = choice.countries.map { Locale.current.localizedString(forRegionCode: $0) ?? $0 }
-        return names.isEmpty ? String(localized: "settings.none") : names.joined(separator: ", ")
+        let names = choice.countries.map { LanguageChoice.locale.localizedString(forRegionCode: $0) ?? $0 }
+        return names.isEmpty ? String(localized: "settings.none", bundle: LanguageChoice.bundle) : names.joined(separator: ", ")
     }
 
     private var topList: some View {
@@ -134,7 +134,7 @@ struct SettingsScreen: View {
             }
             .accessibilityIdentifier("settings.watch")
             Button { page = .language } label: {
-                LabeledContent("settings.language") { Text(verbatim: language.map(LanguageChoice.name) ?? String(localized: "settings.languageSystem")) }
+                LabeledContent("settings.language") { Text(verbatim: language.map(LanguageChoice.name) ?? String(localized: "settings.languageSystem", bundle: LanguageChoice.bundle)) }
             }
             .accessibilityIdentifier("settings.language")
             Section("settings.sources") {
@@ -154,7 +154,7 @@ struct SettingsScreen: View {
                 Button { choice.toggle(country) } label: {
                     HStack(spacing: 18) {
                         FlagMark(flag: ChannelChoice.flag(country), size: Metrics.settingsFlag)
-                        Text(verbatim: Locale.current.localizedString(forRegionCode: country) ?? country)
+                        Text(verbatim: LanguageChoice.locale.localizedString(forRegionCode: country) ?? country)
                         Spacer()
                         if choice.isOn(country) { Image(systemName: "checkmark") }
                     }
@@ -167,7 +167,7 @@ struct SettingsScreen: View {
 
     private var shownCount: String {
         let shown = leagues.filter { leagueChoice.isShown(Sidebar.key($0)) }.count
-        return String(localized: "settings.shownCount \(shown) \(leagues.count)")
+        return String(localized: "settings.shownCount \(shown) \(leagues.count)", bundle: LanguageChoice.bundle)
     }
 
     /// Every competition by family: select its row to show or hide it;
@@ -226,7 +226,7 @@ struct SettingsScreen: View {
                     language = code
                 } label: {
                     HStack {
-                        Text(verbatim: code.map(LanguageChoice.name) ?? String(localized: "settings.languageSystem"))
+                        Text(verbatim: code.map(LanguageChoice.name) ?? String(localized: "settings.languageSystem", bundle: LanguageChoice.bundle))
                         Spacer()
                         if language == code { Image(systemName: "checkmark") }
                     }

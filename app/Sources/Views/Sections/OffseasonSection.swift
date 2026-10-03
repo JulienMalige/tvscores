@@ -41,11 +41,11 @@ struct OffseasonSection: View {
     private var title: String {
         let gap = next.start.timeIntervalSinceNow
         if gap < Self.upcomingReach {
-            return String(format: String(localized: "offseason.startsDay"), season, next.start.formatted(.dateTime.weekday(.wide)))
+            return String(format: String(localized: "offseason.startsDay", bundle: LanguageChoice.bundle), season, next.start.formatted(.dateTime.weekday(.wide).locale(LanguageChoice.locale)))
         }
         if gap < 45 * 86400 {
-            return String(format: String(localized: "offseason.startsDate"), season, next.start.formatted(.dateTime.day().month(.wide)))
+            return String(format: String(localized: "offseason.startsDate", bundle: LanguageChoice.bundle), season, next.start.formatted(.dateTime.day().month(.wide).locale(LanguageChoice.locale)))
         }
-        return String(format: String(localized: "offseason.startsMonth"), season, next.start.formatted(.dateTime.month(.wide)))
+        return String(format: String(localized: "offseason.startsMonth", bundle: LanguageChoice.bundle), season, next.start.formatted(.dateTime.month(.wide).locale(LanguageChoice.locale)))
     }
 }
