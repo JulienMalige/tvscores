@@ -20,6 +20,21 @@ function readCalendar() {
   }
 }
 
+/**
+ * The hand-kept rights table for one country (`broadcasts-<cc>.json`): the
+ * competitions a single broadcaster carries, used only when neither feed
+ * names a channel. Missing or broken means no fallback, not no proxy.
+ */
+function readRights(country) {
+  try {
+    const file = new URL(`../broadcasts-${country.toLowerCase()}.json`, import.meta.url);
+    const rights = JSON.parse(readFileSync(file, "utf8")).rights;
+    return Array.isArray(rights) ? rights : [];
+  } catch {
+    return [];
+  }
+}
+
 function readKey(envName, fileName) {
   if (env[envName]) return env[envName].trim();
   const file = env[`${envName}_FILE`] || join(homedir(), ".config/tvscores", fileName);
@@ -52,6 +67,8 @@ const LEAGUE_PHASE = [
   { from: 17, to: 24, key: "playoff-unseeded", line: "dashed" },
   { from: 25, key: "eliminated" },
 ];
+
+const BROADCAST_COUNTRY = "FR";
 
 export const config = {
   host: env.TVSCORES_HOST || "127.0.0.1",
@@ -167,6 +184,13 @@ export const config = {
       1517, 1533, // Montreal (WTA)
     ],
   },
+  /**
+   * The country whose channels the board names (Julien, 2026-10-03: France).
+   * Another country needs an entry in `COUNTRIES` (src/tv-names.js) and its
+   * own rights table.
+   */
+  broadcastCountry: BROADCAST_COUNTRY,
+  broadcastRights: readRights(BROADCAST_COUNTRY),
   /** Display order of sports on the scoreboard. */
   sportOrder: ["football", "f1", "motogp", "tennis", "nba", "nfl"],
   schedule: {

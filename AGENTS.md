@@ -120,6 +120,7 @@ This is the mechanic to preserve; `proxy/src/scheduler.js` owns it and
 | Motorsport calendar | every 6 hours, or every 30 min within 6 h of a session | 1 + one per newly finished race |
 | Portraits | once per athlete, kept a month | background, 25/min |
 | Crests, badges | mirrored once, served with a month-long header | none after the first |
+| TV channels (`broadcasts.js`) | once per UTC day per source, an hour after `dailyRefreshHourUtc` once the schedules are in; a failed source keeps its last answer and retries after 30 min, then hourly | 1 TheSportsDB call + 1 XMLTV download (~11 MB gzipped) |
 
 A **live window** opens 10 minutes before a stored kickoff and closes
 `liveWindowHours` (4 h) after it — twice that for a game already reported

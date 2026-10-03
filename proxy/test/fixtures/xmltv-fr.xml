@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tv SYSTEM "xmltv.dtd">
+<tv source-info-name="XML TV Fr">
+  <channel id="beINSPORTSMAX5.fr">
+    <display-name>beIN SPORTS MAX 5</display-name>
+    <icon src="https://example.invalid/logo.png"/>
+  </channel>
+  <channel id="LaUne.be">
+    <display-name>La Une</display-name>
+  </channel>
+  <programme start="20261010153000 +0200" stop="20261010173000 +0200" channel="beINSPORTSMAX5.fr">
+    <title lang="fr">Football : Bundesliga</title>
+    <sub-title lang="fr">Augsbourg / Bayern Munich. Bundesliga. 6e journée.</sub-title>
+    <desc lang="fr">Never read.</desc>
+  </programme>
+  <programme start="20261010152000 +0200" stop="20261010173000 +0200" channel="beINSPORTSMAX6.fr">
+    <title lang="fr">Mayence / Fribourg</title>
+    <sub-title lang="fr">Football. Bundesliga. 6e journée.</sub-title>
+  </programme>
+  <programme start="20261010153000 +0200" stop="20261010173000 +0200" channel="LaUne.be">
+    <title lang="fr">Augsbourg / Bayern Munich</title>
+  </programme>
+  <programme start="20261010133000 +0200" stop="20261010153000 +0200" channel="CanalPlusFoot.fr">
+    <title lang="fr">Manchester City / Sunderland</title>
+    <sub-title lang="fr">Premier League - 7e journ&#233;e</sub-title>
+    <previously-shown/>
+  </programme>
+  <programme start="20261011190000 +0200" stop="20261011220000 +0200" channel="beINSPORTS1.fr">
+    <title lang="fr">Football am&#233;ricain : NFL</title>
+  </programme>
+  <programme start="20261012021500 +0200" stop="20261012053000 +0200" channel="beINSPORTS1.fr">
+    <title lang="fr">Football am&#233;ricain : NFL</title>
+  </programme>
+  <programme start="20261010145500 +0200" stop="20261010160000 +0200" channel="CanalPlusSport.fr">
+    <title lang="fr">Formule 1 : Grand Prix de Singapour</title>
+    <sub-title lang="fr">Grand Prix de Singapour. Essais qualificatifs. Championnat du monde.</sub-title>
+  </programme>
+  <programme start="20261010090000 +0200" stop="20261010100000 +0200" channel="CanalPlusSport.fr">
+    <title lang="fr">Formule 1 : Grand Prix de Bahre&#239;n</title>
+  </programme>
+  <programme start="20261010160000 +0200" stop="20261010180000 +0200" channel="beINSPORTS2.fr">
+    <title lang="fr">Basket-ball : Pr&#233;-saison NBA</title>
+    <sub-title lang="fr">Denver Nuggets / Utah Jazz</sub-title>
+  </programme>
+</tv>

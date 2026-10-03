@@ -1,0 +1,27 @@
+{
+  "comment": "France, 2026-27. Competitions one broadcaster carries whole, used only when neither TheSportsDB nor the TV guide names a channel for a game. Checked 2026-10-03 against the sources listed per row; anything not confirmed is left out (NFL and NBA are split game by game, the Nations League and friendlies depend on the match, ATP 500s are only partly on Eurosport, Brasileirão and Libertadores have no French broadcaster). 'until' is the end of the season or contract we could confirm.",
+  "rights": [
+    { "sport": "football", "league": 4328, "competition": "Premier League", "names": ["Canal+"], "until": "2027-06-30",
+      "source": "https://selectra.info/telecom/tv/sport" },
+    { "sport": "football", "league": 4480, "competition": "Champions League", "names": ["Canal+"], "until": "2027-06-30",
+      "source": "https://www.cnews.fr/shopping-sport/2026-09-08/ligue-des-champions-2026-2027-sur-quelles-chaines-voir-tous-les-matchs" },
+    { "sport": "football", "league": 4481, "competition": "Europa League", "names": ["Canal+"], "until": "2027-06-30",
+      "source": "https://www.tv-direct.fr/actualites/europa-league-2026-2027-chaine-tv-calendrier-des-matchs/" },
+    { "sport": "football", "league": 4334, "competition": "Ligue 1", "names": ["Ligue 1+"], "until": "2027-06-30",
+      "source": "https://www.ariase.com/streaming/actualite/ligue-1-seule-a-diffuser-le-championnat-en-2026-2027-voici-de-combien-votre-abonnement-foot-va-augmenter" },
+    { "sport": "football", "league": 4331, "competition": "Bundesliga", "names": ["beIN Sports"], "until": "2029-06-30",
+      "source": "https://beinregie.beinsports.com/bein-sports-bundesliga-renouvellent-accord-exclusif/" },
+    { "sport": "football", "league": 4335, "competition": "La Liga", "names": ["DAZN", "Disney+"], "until": "2029-06-30",
+      "source": "https://www.mediasportif.fr/2026/08/06/dazn-et-disney-deviennent-les-diffuseurs-de-la-liga-en-france-des-la-saison-2026-2027/" },
+    { "sport": "football", "league": 4332, "competition": "Serie A", "names": ["DAZN"], "until": "2029-06-30",
+      "source": "https://www.dazn.com/fr-FR/news/football/dazn-renouvelle-les-droits-de-la-serie-a-en-france-jusquen-2029-et-confirme-son-ambition-de-long-terme-pour-le-football-en-france/1nj4d80notchj14ylitm515ce3" },
+    { "sport": "f1", "league": "f1", "competition": "Formula 1", "names": ["Canal+"], "until": "2029-12-31",
+      "source": "https://fr.motorsport.com/f1/news/f1-motogp-wrc-restent-canal-plus/6657751/" },
+    { "sport": "motogp", "league": "motogp", "competition": "MotoGP", "names": ["Canal+"], "until": "2029-12-31",
+      "source": "https://www.ariase.com/streaming/actualite/la-saison-2026-de-motogp-demarre-sur-canal-voici-tout-ce-qu-il-faut-savoir" },
+    { "sport": "tennis", "league": "wta", "competition": "WTA Tour", "names": ["beIN Sports"], "until": "2026-12-31",
+      "source": "https://www.sport-tv.org/actualites/droitstv/le-circuit-de-tennis-wta-reste-sur-bein-sports-jusquen-2026/" },
+    { "sport": "tennis", "league": "atp", "tier": "Masters 1000", "competition": "ATP Masters 1000", "names": ["Eurosport"], "until": "2026-12-31",
+      "source": "https://x.com/Monascope7/status/2104292659271549373" }
+  ]
+}

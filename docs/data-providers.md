@@ -364,3 +364,33 @@ rasterised once by `proxy/scripts/build-flags.mjs` into
 `proxy/assets/flags/<iso2>.png` and served from there. The app names a flag
 by the emoji the proxy already sends — two regional-indicator letters — and
 clips the picture to a circle; the emoji stands in until it has loaded.
+
+## TV channels for France (decided 2026-10-03)
+
+Julien chose France as the one country whose channels the board names
+(`broadcastCountry: "FR"` in `proxy/src/config.js`; another country is an
+entry in `COUNTRIES` in `proxy/src/tv-names.js` plus its own rights table).
+Research: `docs/broadcast-sources.md`. Three sources, in this order:
+
+1. **TheSportsDB v2** `filter/tv/country/France`, on the key we already pay
+   for: one call a day, joined on `idEvent`. Channel names are normalised
+   ("BeIn Sports HD 1 France" → "beIN Sports 1"); `strLogo` and any URL are
+   dropped.
+2. **XML TV Fr** (`https://xmltvfr.fr/xmltv/xmltv_fr.xml.gz`, credit
+   "XML TV Fr", github.com/racacax/XML-TV-Fr). Julien accepted it knowingly
+   on 2026-10-03 although it is compiled from TV-guide sites, which sits
+   uneasily with hard rule 3. Conditions: we keep **names and times only** —
+   channel name, start, title and sub-title are read to match a programme
+   to a game, and only the channel name reaches the app; descriptions,
+   images and the file itself are never stored or served; **one download a
+   day**. Only French national sports channels and the free channels that
+   carry big games are read; reruns (`<previously-shown>`) are skipped.
+   Revisit before any public release.
+3. **`proxy/broadcasts-fr.json`**, our rights table for the competitions one
+   broadcaster carries whole in 2026-27, each row with its source, used only
+   when 1 and 2 name nothing. Left out on purpose: NFL and NBA (game by game
+   on beIN, DAZN, L'Équipe, France TV), the Nations League and friendlies
+   (depends on the match), ATP 500s (only some on Eurosport), Brasileirão and
+   Libertadores (no French broadcaster found). Tennis rows end 2026-12-31,
+   when the WTA (beIN) and ATP Masters 1000 (Eurosport) contracts end.
+

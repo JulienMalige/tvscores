@@ -21,6 +21,7 @@ export class Store {
     this.events = new Map();
     this.standings = {}; // "sport:leagueId" -> { updatedAt, tables }
     this.photos = {}; // athlete name -> { url|null, at }
+    this.broadcasts = {}; // { tsdb: { idEvent: [names] }, xmltv: { eventId: [names] } }, see broadcasts.js
     this.meta = {};
     this.dirty = false; // per sport: { lastDaily, lastLive, lastOk, lastError, calls: { day, used } }
     mkdirSync(dir, { recursive: true });
@@ -33,14 +34,17 @@ export class Store {
       for (const e of raw.events || []) this.events.set(e.id, e);
       this.standings = raw.standings || {};
       this.photos = raw.photos || {};
+      this.broadcasts = raw.broadcasts || {};
       this.meta = raw.meta || {};
       if (raw.schemaVersion !== SCHEMA_VERSION) {
         this.events.clear();
         this.photos = {};
+        this.broadcasts = {};
         for (const m of Object.values(this.meta)) {
           delete m.lastStandings;
           delete m.lastDaily;
           delete m.lastToday;
+          delete m.sources; // the TV channels' fetch stamps
         }
         this.dirty = true;
       }
@@ -53,7 +57,7 @@ export class Store {
   save() {
     if (!this.dirty) return;
     const tmp = this.file + ".tmp";
-    writeFileSync(tmp, JSON.stringify({ schemaVersion: SCHEMA_VERSION, events: [...this.events.values()], standings: this.standings, photos: this.photos, meta: this.meta }));
+    writeFileSync(tmp, JSON.stringify({ schemaVersion: SCHEMA_VERSION, events: [...this.events.values()], standings: this.standings, photos: this.photos, broadcasts: this.broadcasts, meta: this.meta }));
     renameSync(tmp, this.file);
     this.dirty = false;
   }

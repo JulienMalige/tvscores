@@ -11,6 +11,7 @@ import { createApp } from "./server.js";
 import { PhotoResolver } from "./photos.js";
 import { ImageMirror } from "./images.js";
 import { EventDetails } from "./details.js";
+import { Broadcasts } from "./broadcasts.js";
 
 const log = (msg) => console.log(`${new Date().toISOString()} ${msg}`);
 const store = new Store(config.cacheDir);
@@ -66,12 +67,15 @@ const images = new ImageMirror({ dir: join(config.cacheDir, "images"), publicBas
 const limits = Object.fromEntries(schedulers.filter((s) => s.quota).map((s) => [s.p.sport, s.quota.dailyQuota]));
 limits.photos = 1000; // TheSportsDB test key: ~30/min; a soft daily line for the health page
 const details = new EventDetails({ key: config.theSportsDbKey, store, log });
-const app = createApp({ store, config, photos, images, details, activeSports: schedulers.map((s) => s.p.sport), limits });
+// The test key "3" has no v2 access: without a real key the TV rows are skipped.
+const broadcasts = new Broadcasts({ store, country: config.broadcastCountry, key: config.theSportsDbKey === "3" ? "" : config.theSportsDbKey, table: config.broadcastRights, cfg: config.schedule, log });
+const app = createApp({ store, config, photos, images, details, broadcasts, activeSports: schedulers.map((s) => s.p.sport), limits });
 app.listen(config.port, config.host, () => {
   log(`tvscores proxy listening on http://${config.host}:${config.port} (prefix ${config.pathPrefix || "none"})`);
   for (const s of schedulers) s.start();
   setTimeout(() => photos.start(), 15000); // after the first fetches land
   setTimeout(() => images.startWarming(), 25000); // after the board has named its images
+  setTimeout(() => broadcasts.start(), 60000); // after the schedules' first pass
   setInterval(() => images.prune(), 12 * 3600e3).unref?.();
 });
 
@@ -80,6 +84,7 @@ for (const sig of ["SIGINT", "SIGTERM"]) {
     for (const s of schedulers) s.stop();
     photos.stop();
     images.stop();
+    broadcasts.stop();
     store.save();
     app.close(() => process.exit(0));
   });

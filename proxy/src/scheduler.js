@@ -19,7 +19,7 @@ const CALENDAR_IDLE = 6 * 60 * MIN;
  * the interval itself — a loop that already waits six hours between polls is
  * not made hungrier by failing.
  */
-function backoff(base, failures = 0) {
+export function backoff(base, failures = 0) {
   return Math.min(base * 2 ** Math.min(failures, 10), Math.max(base, MAX_BACKOFF));
 }
 

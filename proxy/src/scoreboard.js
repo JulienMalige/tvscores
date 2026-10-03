@@ -140,8 +140,14 @@ export function withTablePhotos(standings, photoFor, mirror, badgeFor) {
   return { ...standings, tables: standings.tables.map((t) => ({ ...t, rows: t.rows.map(decorate) })) };
 }
 
-export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, mirror, activeSports = [], upcomingDays = 7 } = {}) {
-  events = events.map((e) => withPhotos(e, photoFor, mirror));
+/** The channels an event airs on, named at serve time; absent when there are none. */
+export function withBroadcasts(e, broadcastsFor) {
+  const names = broadcastsFor?.(e);
+  return names?.length ? { ...e, broadcasts: names } : e;
+}
+
+export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, mirror, broadcastsFor, activeSports = [], upcomingDays = 7 } = {}) {
+  events = events.map((e) => withBroadcasts(withPhotos(e, photoFor, mirror), broadcastsFor));
   const today = localDate(new Date(now).toISOString(), tz);
   const yesterday = localDate(new Date(now - 86400e3).toISOString(), tz);
   // Upcoming is a window, not the whole calendar: a fixture list weeks out is

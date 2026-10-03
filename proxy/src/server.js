@@ -5,7 +5,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ASSETS = join(dirname(fileURLToPath(import.meta.url)), "..", "assets");
-import { buildScoreboard, localDate, withTablePhotos } from "./scoreboard.js";
+import { buildScoreboard, localDate, withTablePhotos, withBroadcasts } from "./scoreboard.js";
 import { slug } from "./model.js";
 
 /**
@@ -60,7 +60,8 @@ function appendTrace(cacheDir, device, lines) {
   } catch { /* the file is a convenience; losing a line of it is fine */ }
 }
 
-export function createApp({ store, config, startedAt = Date.now(), photos, images, details, activeSports = [], limits = {} }) {
+export function createApp({ store, config, startedAt = Date.now(), photos, images, details, broadcasts, activeSports = [], limits = {} }) {
+  const broadcastsFor = broadcasts ? (e) => broadcasts.for(e) : undefined;
   const photoFor = photos ? (name) => photos.photoFor(name) : undefined;
   const mirror = images ? (url) => images.url(url) : undefined;
   // Constructor badges are files we shipped; list them once so a missing one
@@ -91,7 +92,7 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
     if (path === "/v1/scoreboard") {
       const hit = memo.get(tz);
       if (hit && Date.now() - hit.at < MEMO_MS) return send(res, 200, hit.body, {}, req);
-      const body = buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, mirror, activeSports, upcomingDays: config.schedule.upcomingDays });
+      const body = buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, mirror, broadcastsFor, activeSports, upcomingDays: config.schedule.upcomingDays });
       // The tables' crests and portraits are registered with the mirror here
       // too, so the warmer has them before any television opens a table:
       // a crest first mirrored while a page waits for it is the one that
@@ -103,7 +104,7 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
     if (path === "/v1/fixtures") {
       const date = url.searchParams.get("date");
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date || "")) return send(res, 400, { error: "date=YYYY-MM-DD required" });
-      const events = store.all().filter((e) => localDate(e.start, tz) === date);
+      const events = store.all().filter((e) => localDate(e.start, tz) === date).map((e) => withBroadcasts(e, broadcastsFor));
       return send(res, 200, { date, tz, events }, {}, req);
     }
     if (path === "/v1/standings") {
