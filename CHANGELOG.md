@@ -7,6 +7,10 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- A gear at the top right of the menu opens Settings: the country whose
+  channels are shown (France for now), where the scores and TV listings
+  come from, and the app's version. The menu's symbols are a lighter
+  weight, as Apple Sports draws them.
 - Men's tennis is back to the Masters 1000s, the majors and the Finals:
   the ATP 500s (this week Tokyo and Beijing) are gone. The WTA's 500s stay.
 - Where to watch, for France: a game or race still to come shows its

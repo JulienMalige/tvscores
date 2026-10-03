@@ -25,6 +25,7 @@ struct Sidebar: View {
     @State private var leagueDays: [String: Day] = [:]
     /// The game or race whose page is up, over whatever page it was opened from.
     @State private var game: Event?
+    @State private var settingsOpen = false
     @State private var homeOpenedRace = false
     @State private var expanded = false
     /// Set while the menu opens or shuts, when focus moves under our feet.
@@ -86,6 +87,7 @@ struct Sidebar: View {
                 GameScreen(eventId: event.id, fallback: event, store: store)
             }
         }
+        .fullScreenCover(isPresented: $settingsOpen) { SettingsScreen() }
         .onChange(of: menuFocus) { _, focused in
             // Focus gone from every row — a press right onto the page.
             if focused == nil, expanded, !moving { shut() }
@@ -103,7 +105,7 @@ struct Sidebar: View {
                 // A game's page over everything owns the remote: a press left
                 // on it is not the page underneath asking for the menu (build 28).
                 guard let context = note.userInfo?[UIFocusSystem.focusUpdateContextUserInfoKey] as? UIFocusUpdateContext,
-                      !moving, game == nil else { continue }
+                      !moving, game == nil, !settingsOpen else { continue }
                 if context.focusHeading.contains(.left), !expanded { openMenu() }
                 if context.focusHeading.contains(.right), expanded { shut() }
             }
@@ -111,6 +113,8 @@ struct Sidebar: View {
         .task {
             try? await Task.sleep(for: .seconds(1.5))
             if Self.argument("-TVScoresMenuOpen") != nil { openMenu() }
+            // `-TVScoresSettings` opens the settings card (CI screenshots).
+            if Self.argument("-TVScoresSettings") != nil { settingsOpen = true }
         }
     }
 
@@ -125,6 +129,8 @@ struct Sidebar: View {
                 // Made afresh for a day picked on the front page.
                 .id("\(key)|\(leagueDays[key].map { "\($0)" } ?? "")")
             }
+        case .settings:
+            EmptyView() // never a page: picking it opens the card
         }
     }
 
@@ -162,6 +168,11 @@ struct Sidebar: View {
     }
 
     private func pick(_ item: MenuItem) {
+        if item == .settings {
+            shut()
+            settingsOpen = true
+            return
+        }
         selection = item
         shut()
     }
@@ -214,6 +225,8 @@ struct Sidebar: View {
 enum MenuItem: Hashable {
     case home
     case league(String)
+    /// The gear at the top: opens settings over the page, not a page.
+    case settings
 }
 
 extension EnvironmentValues {

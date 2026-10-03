@@ -31,10 +31,20 @@ struct MenuPanel: View {
                 // name: tvOS gives an app neither the profile's name nor its
                 // picture (researched 2026-09-21), and the page above already
                 // shows the day and time (Julien, 2026-09-28).
-                Text("app.title")
-                    .font(.system(size: Metrics.menuFont * 1.4, weight: .bold))
-                    .padding(.horizontal, Metrics.menuRowInsetH)
-                    .padding(.vertical, Metrics.menuRowInsetV)
+                // Settings at the top right, where Apple Sports puts its gear.
+                HStack {
+                    Text("app.title")
+                        .font(.system(size: Metrics.menuFont * 1.4, weight: .bold))
+                    Spacer()
+                    Button { pick(.settings) } label: { GearButton() }
+                        .buttonStyle(QuietButtonStyle())
+                        .focusEffectDisabled()
+                        .focused(focus, equals: .settings)
+                        .accessibilityIdentifier("menu.settings")
+                        .accessibilityLabel(Text("settings.title"))
+                }
+                .padding(.leading, Metrics.menuRowInsetH)
+                .padding(.vertical, Metrics.menuRowInsetV)
                 row(.home, title: Text("tab.home"), icon: .symbol("house.fill"), id: "menu.home")
                 ForEach(sections, id: \.section.id) { entry in
                     Text(entry.section.title)
@@ -123,7 +133,8 @@ enum MenuIcon {
         switch self {
         case .symbol(let name):
             Image(systemName: name)
-                .font(.system(size: size * 0.7, weight: .semibold))
+                // Medium, as Apple Sports draws its menu's symbols.
+                .font(.system(size: size * 0.7, weight: .medium))
                 .frame(width: size, height: size)
         case .league(let league):
             CachedImage(url: league.icon ?? league.logo) {
@@ -161,5 +172,20 @@ private struct MenuRow: View {
         .focusGlass(isFocused, in: Capsule(), resting: current ? 0.16 : 0)
         .scaleEffect(isFocused ? 1.04 : 1)
         .animation(.easeOut(duration: 0.15), value: isFocused)
+    }
+}
+
+/// The gear, lit on glass like a row when the remote is on it.
+private struct GearButton: View {
+    @Environment(\.isFocused) private var isFocused
+
+    var body: some View {
+        Image(systemName: "gearshape")
+            .font(.system(size: Metrics.menuIcon * 0.75, weight: .medium))
+            .foregroundStyle(.secondary)
+            .frame(width: Metrics.menuIcon * 1.5, height: Metrics.menuIcon * 1.5)
+            .focusGlass(isFocused, in: Circle())
+            .scaleEffect(isFocused ? 1.08 : 1)
+            .animation(.easeOut(duration: 0.15), value: isFocused)
     }
 }
