@@ -20,7 +20,7 @@ struct SettingsScreen: View {
                     .padding(.top, Metrics.gameInset / 2)
                 GameCard(title: "settings.watch", identifier: "settings.watch") {
                     VStack(spacing: 14) {
-                        line("tv", "settings.country", Text(verbatim: Locale.current.localizedString(forRegionCode: "FR") ?? "France"))
+                        InfoLine(symbol: "tv", label: "settings.country", value: Text(verbatim: Locale.current.localizedString(forRegionCode: "FR") ?? "France"))
                         Text("settings.countryNote")
                             .font(.caption)
                             .foregroundStyle(.secondary)
@@ -29,12 +29,12 @@ struct SettingsScreen: View {
                 }
                 GameCard(title: "settings.data", identifier: "settings.data") {
                     VStack(spacing: 14) {
-                        line("sportscourt", "settings.scores", Text(verbatim: "TheSportsDB, Live Tennis API, Orange Cat, Jolpica"))
-                        line("tv", "settings.listings", Text(verbatim: "TheSportsDB, XML TV Fr"))
+                        InfoLine(symbol: "sportscourt", label: "settings.scores", value: Text(verbatim: "TheSportsDB, Live Tennis API, Orange Cat, Jolpica"))
+                        InfoLine(symbol: "tv", label: "settings.listings", value: Text(verbatim: "TheSportsDB, XML TV Fr"))
                     }
                 }
                 GameCard(title: "settings.about", identifier: "settings.about") {
-                    line("info.circle", "settings.version", Text(verbatim: version))
+                    InfoLine(symbol: "info.circle", label: "settings.version", value: Text(verbatim: version))
                 }
             }
             .font(.callout)
@@ -42,14 +42,5 @@ struct SettingsScreen: View {
         }
         .eventSheet(Color(white: 0.11))
         .accessibilityIdentifier("page.settings")
-    }
-
-    /// "Country: France", as a game's Information block lines up its facts.
-    private func line(_ symbol: String, _ label: LocalizedStringKey, _ value: Text) -> some View {
-        HStack(spacing: 14) {
-            Image(systemName: symbol).foregroundStyle(.secondary)
-            Text(label).foregroundStyle(.secondary) + Text(verbatim: " ") + value
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

@@ -23,23 +23,15 @@ struct GameInfoSection: View {
                     .font(.body.weight(.semibold))
                     .frame(maxWidth: .infinity)
                     .padding(.bottom, 6)
-                line("clock", "game.time", Text(start, format: .dateTime.weekday(.wide).day().month(.wide).hour().minute()))
+                InfoLine(symbol: "clock", label: "game.time", value: Text(start, format: .dateTime.weekday(.wide).day().month(.wide).hour().minute()))
                 if let location {
-                    line("mappin.and.ellipse", "game.location", Text(verbatim: location))
+                    InfoLine(symbol: "mappin.and.ellipse", label: "game.location", value: Text(verbatim: location))
                 }
                 if let broadcasts, !broadcasts.isEmpty {
-                    line("tv", "game.watchOn", Text(verbatim: broadcasts.joined(separator: ", ")))
+                    InfoLine(symbol: "tv", label: "game.watchOn", value: Text(verbatim: broadcasts.joined(separator: ", ")))
                 }
             }
             .font(.callout)
         }
-    }
-
-    private func line(_ symbol: String, _ label: LocalizedStringKey, _ value: Text) -> some View {
-        HStack(spacing: 14) {
-            Image(systemName: symbol).foregroundStyle(.secondary)
-            Text(label).foregroundStyle(.secondary) + Text(verbatim: " ") + value
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
