@@ -11,7 +11,7 @@ import { createApp } from "./server.js";
 import { PhotoResolver } from "./photos.js";
 import { ImageMirror } from "./images.js";
 import { EventDetails } from "./details.js";
-import { Broadcasts } from "./broadcasts.js";
+import { TvChannels } from "./broadcasts.js";
 
 const log = (msg) => console.log(`${new Date().toISOString()} ${msg}`);
 const store = new Store(config.cacheDir);
@@ -68,7 +68,14 @@ const limits = Object.fromEntries(schedulers.filter((s) => s.quota).map((s) => [
 limits.photos = 1000; // TheSportsDB test key: ~30/min; a soft daily line for the health page
 const details = new EventDetails({ key: config.theSportsDbKey, store, log });
 // The test key "3" has no v2 access: without a real key the TV rows are skipped.
-const broadcasts = new Broadcasts({ store, country: config.broadcastCountry, key: config.theSportsDbKey === "3" ? "" : config.theSportsDbKey, table: config.broadcastRights, cfg: config.schedule, log });
+const broadcasts = new TvChannels({
+  store,
+  countries: config.broadcastCountries ?? [config.broadcastCountry ?? "FR"],
+  key: config.theSportsDbKey === "3" ? "" : config.theSportsDbKey,
+  rights: config.broadcastRights,
+  cfg: config.schedule,
+  log,
+});
 const app = createApp({ store, config, photos, images, details, broadcasts, activeSports: schedulers.map((s) => s.p.sport), limits });
 app.listen(config.port, config.host, () => {
   log(`tvscores proxy listening on http://${config.host}:${config.port} (prefix ${config.pathPrefix || "none"})`);

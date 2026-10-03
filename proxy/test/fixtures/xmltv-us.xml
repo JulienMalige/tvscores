@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<tv generator-info-name="none">
+  <channel id="ESPN.HD.us2"><display-name lang="en">ESPN HD</display-name></channel>
+  <channel id="NBC.East.Stream.us2"><display-name lang="en">NBC East Stream</display-name></channel>
+  <channel id="CBS.Streaming.SD.East.feed.us2"><display-name lang="en">CBS Streaming SD East feed</display-name></channel>
+  <channel id="FS1.Fox.Sports.1.HD.us2"><display-name lang="en">FS1 Fox Sports 1 HD</display-name></channel>
+  <channel id="MSG.Plus.us2"><display-name lang="en">MSG Plus</display-name></channel>
+  <programme start="20261010230000 +0000" channel="ESPN.HD.us2">
+    <title lang="en">Live: NBA Preseason Basketball</title>
+    <sub-title lang="en">Utah Jazz at Denver Nuggets</sub-title>
+    <category lang="en">Basketball</category>
+  </programme>
+  <programme start="20261010230000 +0000" channel="MSG.Plus.us2">
+    <title lang="en">Live: NBA Basketball</title>
+    <sub-title lang="en">Utah Jazz at Denver Nuggets</sub-title>
+  </programme>
+  <programme start="20261011170000 +0000" channel="CBS.Streaming.SD.East.feed.us2">
+    <title lang="en">Live: NFL Football</title>
+    <desc lang="en">Football action from around the National Football League.</desc>
+  </programme>
+  <programme start="20261011201500 -0400" channel="NBC.East.Stream.us2">
+    <title lang="en">Live: NFL Football</title>
+    <desc lang="en">The Detroit Lions clash with the Carolina Panthers at Bank of America Stadium.</desc>
+    <premiere />
+  </programme>
+  <programme start="20261010183000 +0000" channel="FS1.Fox.Sports.1.HD.us2">
+    <title lang="en">UEFA Nations League Soccer</title>
+    <desc lang="en">League A, Group 1.</desc>
+    <previously-shown />
+  </programme>
+  <programme start="20261010183000 +0000" channel="FS1.Fox.Sports.1.HD.us2">
+    <title lang="en">Live: Women's Italian Serie A Soccer</title>
+  </programme>
+  <programme start="20261011043000 +0000" channel="FS1.Fox.Sports.1.HD.us2">
+    <title lang="en">Live: MotoGP Racing</title>
+    <desc lang="en">From Mobility Resort Motegi in Japan.</desc>
+  </programme>
+</tv>

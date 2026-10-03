@@ -68,7 +68,7 @@ const LEAGUE_PHASE = [
   { from: 25, key: "eliminated" },
 ];
 
-const BROADCAST_COUNTRY = "FR";
+const BROADCAST_COUNTRIES = ["FR", "US", "BR"];
 
 export const config = {
   host: env.TVSCORES_HOST || "127.0.0.1",
@@ -186,12 +186,13 @@ export const config = {
     ],
   },
   /**
-   * The country whose channels the board names (Julien, 2026-10-03: France).
-   * Another country needs an entry in `COUNTRIES` (src/tv-names.js) and its
-   * own rights table.
+   * The countries whose channels the board names, side by side (Julien,
+   * 2026-10-03: France, then the US and Brazil). Another country needs an
+   * entry in `COUNTRIES` (src/tv-channels.js) and its own rights table. The
+   * single `broadcastCountry` this replaced still works on its own (src/index.js).
    */
-  broadcastCountry: BROADCAST_COUNTRY,
-  broadcastRights: readRights(BROADCAST_COUNTRY),
+  broadcastCountries: BROADCAST_COUNTRIES,
+  broadcastRights: Object.fromEntries(BROADCAST_COUNTRIES.map((cc) => [cc, readRights(cc)])),
   /** Display order of sports on the scoreboard. */
   sportOrder: ["football", "f1", "motogp", "tennis", "nba", "nfl"],
   schedule: {

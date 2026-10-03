@@ -6,7 +6,8 @@ import { join } from "node:path";
 import { Store } from "../src/cache.js";
 import { Broadcasts } from "../src/broadcasts.js";
 import { buildScoreboard } from "../src/scoreboard.js";
-import { tsdbChannelName, english } from "../src/tv-names.js";
+import { english } from "../src/tv-names.js";
+import { tsdbChannelName } from "../src/tv-channels.js";
 import { xmltvElements, xmltvTime, programme } from "../src/xmltv.js";
 
 const GUIDE = readFileSync(new URL("./fixtures/xmltv-fr.xml", import.meta.url), "utf8");
@@ -133,25 +134,25 @@ test("once a day per source; a failed download keeps the last answer and backs o
   await tv.refresh(later);
   assert.deepEqual([calls.json, calls.guide], [2, 2]);
   assert.deepEqual(of("football:tsdb:2508376"), ["beIN Sports Max 6"]);
-  assert.match(store.meta.broadcasts.lastError.message, /xmltv: HTTP 503/);
+  assert.match(store.meta["broadcasts:FR"].lastError.message, /xmltv: HTTP 503/);
   await tv.refresh(later + 10 * 60e3);
   assert.equal(calls.guide, 2);
   broken = false;
   await tv.refresh(later + 31 * 60e3);
   assert.equal(calls.guide, 3);
-  assert.equal(store.meta.broadcasts.sources.xmltv.failures, 0);
+  assert.equal(store.meta["broadcasts:FR"].sources.xmltv.failures, 0);
 });
 
 test("a guide with none of our channels is a failure, not an empty week", async () => {
   const { tv, store } = setup({ guide: () => chunks('<tv><programme start="20261010153000 +0200" channel="LaUne.be"><title>x</title></programme></tv>') });
   await tv.refresh(NOW);
-  assert.match(store.meta.broadcasts.lastError.message, /none of our channels/);
+  assert.match(store.meta["broadcasts:FR"].lastError.message, /none of our channels/);
 });
 
 test("the board carries the names, and nothing when there are none", async () => {
   const { tv, store } = setup();
   await tv.refresh(NOW);
-  const board = buildScoreboard(store.all(), { now: NOW, broadcastsFor: (e) => tv.for(e), upcomingDays: 7 });
+  const board = buildScoreboard(store.all(), { now: NOW, broadcastsFor: (e) => (tv.for(e).length ? { FR: tv.for(e) } : {}), upcomingDays: 7 });
   const events = board.days.upcoming.flatMap((g) => g.events);
   assert.deepEqual(events.find((e) => e.id === "nfl:tsdb:3").broadcasts, ["beIN Sports 1"]);
   assert.equal("broadcasts" in events.find((e) => e.id === "nfl:tsdb:1"), false);

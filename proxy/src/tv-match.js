@@ -7,8 +7,9 @@ import { MIN } from "./clock.js";
  * between 45 minutes before a kickoff (the build-up) and 15 minutes after it,
  * and then only when it names both teams, is a race weekend's session, or
  * names a competition that has exactly one game of ours at that moment —
- * or several, and its description names one first. When in doubt, nothing
- * is guessed.
+ * or several, and its description names one first. Women's and youth games
+ * never count. When in doubt, nothing is guessed. French, American and
+ * Brazilian guides each write these their own way (VOCAB).
  */
 const BEFORE = 45 * MIN;
 // A listing that names both teams can open earlier: Ligue 1+ starts Lens /
@@ -16,31 +17,79 @@ const BEFORE = 45 * MIN;
 const BEFORE_NAMED = 90 * MIN;
 const AFTER = 15 * MIN;
 
-/** Guide titles of the form "<sport> : <competition>", folded. */
-const COMPETITIONS = [
-  { label: /^football$/, phrase: /^premier league\b/, sport: "football", league: 4328 },
-  { label: /^football$/, phrase: /^(la ?liga|liga)( ea sports)?$/, sport: "football", league: 4335 },
-  { label: /^football$/, phrase: /^serie a\b/, sport: "football", league: 4332 },
-  { label: /^football$/, phrase: /^bundesliga$/, sport: "football", league: 4331 },
-  { label: /^football$/, phrase: /^ligue 1\b/, sport: "football", league: 4334 },
-  { label: /^football$/, phrase: /^ligue des champions\b/, sport: "football", league: 4480 },
-  { label: /^football$/, phrase: /^ligue europa\b(?!.*conference)/, sport: "football", league: 4481 },
-  { label: /^football$/, phrase: /^ligue des nations\b/, sport: "football", league: 4490 },
-  { label: /^football$/, phrase: /^copa libertadores\b/, sport: "football", league: 4501 },
-  // We keep only the friendlies of some nations, and a guide's "Match
-  // amical" is as often a club's pre-season: only ever by its description.
-  { label: /^football$/, phrase: /^match amical\b/, sport: "football", league: 4562, named: true },
-  { label: /^football$/, phrase: /^(championnat du bresil|brasileirao)\b/, sport: "football", league: 4351 },
-  { label: /^football americain$/, phrase: /^nfl\b/, sport: "nfl", league: 4391 },
-  { label: /^basket ?ball$/, phrase: /^(pre saison )?nba\b/, sport: "nba", league: 4387 },
-];
-/** Not the competition we follow, whatever its name starts with. */
-const OTHER_SIDE = /\b(feminin\w*|women|u\d\d|espoirs|jeunes|youth|caf|afc|concacaf)\b/;
-
-const RACES = [
-  { sport: "f1", test: (t) => /\bformule 1\b/.test(t) && /\bgrand prix\b/.test(t) },
-  { sport: "motogp", test: (t) => /\bmoto ?gp\b/.test(t) && /\bgrand prix\b/.test(t) },
-];
+/**
+ * What each guide's language calls a competition, how it writes a game
+ * ("Lens / Lyon", "Knicks at 76ers", "Flamengo x Palmeiras"), and a race
+ * weekend's sessions. Competitions are tested on the folded title, once a
+ * "Live:" or "- Ao Vivo" marker is gone. `named`: only ever by the
+ * description — a guide's friendly is as often a club's pre-season.
+ */
+const FOOT = (league, test, named) => ({ sport: "football", league, test, named });
+const VOCAB = {
+  fr: {
+    sep: /^(.+?)\s+(?:\/|vs\.?|contre)\s+(.+)$/i,
+    competitions: [
+      FOOT(4328, /^football premier league\b/),
+      FOOT(4335, /^football (la ?liga|liga)( ea sports)?$/),
+      FOOT(4332, /^football serie a\b/),
+      FOOT(4331, /^football bundesliga$/),
+      FOOT(4334, /^football ligue 1\b/),
+      FOOT(4480, /^football ligue des champions\b/),
+      FOOT(4481, /^football ligue europa\b(?!.*conference)/),
+      FOOT(4490, /^football ligue des nations\b/),
+      FOOT(4501, /^football copa libertadores\b/),
+      FOOT(4562, /^football match amical\b/, true),
+      FOOT(4351, /^football (championnat du bresil|brasileirao)\b/),
+      { sport: "nfl", league: 4391, test: /^football americain nfl\b/ },
+      { sport: "nba", league: 4387, test: /^basket ?ball (pre saison )?nba\b/ },
+    ],
+    races: { f1: (t) => /\bformule 1\b/.test(t) && /\bgrand prix\b/.test(t), motogp: (t) => /\bmoto ?gp\b/.test(t) && /\bgrand prix\b/.test(t) },
+  },
+  en: {
+    sep: /^(.+?)\s+(?:vs\.?|v\.?|at)\s+(.+)$/i,
+    competitions: [
+      FOOT(4328, /^(english )?premier league soccer\b/),
+      FOOT(4335, /^(spanish )?la ?liga soccer\b/),
+      FOOT(4332, /^(italian )?serie a soccer\b/),
+      FOOT(4331, /^(german )?bundesliga soccer\b/),
+      FOOT(4334, /^(french )?ligue 1 soccer\b/),
+      FOOT(4480, /^uefa champions league soccer\b/),
+      FOOT(4481, /^uefa europa league soccer\b/),
+      FOOT(4490, /^uefa nations league soccer\b/),
+      FOOT(4501, /^(conmebol )?(copa )?libertadores soccer\b/),
+      FOOT(4562, /^(international )?(soccer )?friendl(y|ies)\b|^international friendly soccer\b/, true),
+      FOOT(4351, /^(brazilian serie a|brasileirao) soccer\b/),
+      { sport: "nfl", league: 4391, test: /^nfl football\b/ },
+      { sport: "nba", league: 4387, test: /^nba (preseason )?basketball\b/ },
+    ],
+    races: {
+      f1: (t) => /\b(formula (1|one)|f1)\b/.test(t) && /\b(racing|race|grand prix|qualifying|sprint)\b/.test(t),
+      motogp: (t) => /\bmoto ?gp\b/.test(t) && /\b(racing|race|grand prix|qualifying|sprint)\b/.test(t),
+    },
+  },
+  pt: {
+    sep: /^(.+?)\s+(?:x|vs\.?|\/)\s+(.+)$/i,
+    competitions: [
+      FOOT(4328, /^premier league\b/),
+      FOOT(4480, /^(uefa )?champions league\b|^liga dos campeoes\b/),
+      FOOT(4481, /^(uefa )?liga europa\b/),
+      FOOT(4490, /^(uefa )?liga das nacoes\b/),
+      FOOT(4501, /^(conmebol )?(copa )?libertadores\b/),
+      FOOT(4562, /^amistoso internacional\b/, true),
+      FOOT(4351, /^(campeonato brasileiro|brasileirao)\b/),
+      // "NFL Redzone" jumps between every game at once: none of them.
+      { sport: "nfl", league: 4391, test: /^nfl\b(?! redzone)/ },
+      { sport: "nba", league: 4387, test: /^nba\b/ },
+    ],
+    races: { f1: (t) => /\bformula 1\b/.test(t) && /\b(gp|grande premio)\b/.test(t), motogp: (t) => /^motogp\b/.test(t) && /\b(gp|grande premio)\b/.test(t) },
+  },
+};
+/** Not the side we follow, whatever the names: women's, youth and under-21 games. */
+const OTHER_TEAM = /\b(feminin\w*|women|womens|u\d\d|sub \d\d|espoirs|jeunes|youth)\b/;
+/** Not the competition we follow either: another confederation's, or a magazine about it. */
+const OTHER_COMPETITION = /\b(caf|afc|concacaf|highlights?|stories|countdown|resumo|melhores momentos)\b/;
+/** A live marker around a title: "Live: NFL Football", "São Paulo x Santos - Ao Vivo". */
+const cleanTitle = (t) => String(t || "").replace(/^\s*(live|ao vivo|en direct)\s*:\s*/i, "").replace(/\s+-\s+(ao vivo|live|en direct)\s*$/i, "");
 
 /** The moments an event can be on air live: a match's kickoff, a weekend's qualifying, sprint and race. */
 function slots(e) {
@@ -55,16 +104,16 @@ function slots(e) {
 export function eventIndex(events) {
   return events
     .filter((e) => Number.isFinite(Date.parse(e.start)))
-    .map((e) => ({ e, slots: slots(e), home: teamWords(e.home?.name), away: teamWords(e.away?.name) }));
+    .map((e) => ({ e, slots: slots(e), home: teamWords(e.home?.name), away: teamWords(e.away?.name), nicknames: NICKNAMED.has(e.sport) }));
 }
 
-/** "Levante / FC Barcelone", in a title or a sub-title, as two sets of English words. */
-function pairs(...texts) {
+/** "Levante / FC Barcelone", "Knicks at 76ers", "Flamengo x Palmeiras", in a title or a sub-title, as two sets of English words. */
+function pairs(vocab, lang, ...texts) {
   const out = [];
   for (const t of texts) {
     for (const part of String(t || "").split(/[|:]/)) {
-      const m = /^(.+?)\s+(?:\/|vs\.?|contre)\s+(.+)$/i.exec(part.trim());
-      if (m) out.push([m[1], m[2].split(/\.\s/)[0]].map((side) => new Set(english(side).split(" ").filter(Boolean))));
+      const m = vocab.sep.exec(part.trim());
+      if (m) out.push([m[1], m[2].split(/\.\s/)[0]].map((side) => new Set(english(side, lang).split(" ").filter(Boolean))));
     }
   }
   return out;
@@ -76,18 +125,25 @@ function fits(side, words) {
   return side.size === words.length ? 2 : 1;
 }
 
+/** American leagues, where "Commanders at Colts" names two teams in full. */
+const NICKNAMED = new Set(["nfl", "nba"]);
+
 function teamScore(x, [a, b]) {
-  const straight = Math.min(fits(a, x.home), fits(b, x.away)) && fits(a, x.home) + fits(b, x.away);
-  const swapped = Math.min(fits(a, x.away), fits(b, x.home)) && fits(a, x.away) + fits(b, x.home);
+  const fit = (side, words) => fits(side, words) || (x.nicknames && words.length > 1 && side.size === 1 && side.has(words.at(-1)) ? 1 : 0);
+  const straight = Math.min(fit(a, x.home), fit(b, x.away)) && fit(a, x.home) + fit(b, x.away);
+  const swapped = Math.min(fit(a, x.away), fit(b, x.home)) && fit(a, x.away) + fit(b, x.home);
   return Math.max(straight, swapped);
 }
 
 /** The ids of our events this programme shows live; usually none, at most one. */
-export function matchProgramme(p, index) {
+export function matchProgramme(p, index, lang = "fr") {
   const t = Date.parse(p.start);
   if (!Number.isFinite(t)) return [];
+  const vocab = VOCAB[lang] || VOCAB.fr;
+  const title = cleanTitle(p.title);
+  if (OTHER_TEAM.test(fold(`${title} ${p.subTitle} ${(p.categories || []).join(" ")}`))) return [];
   const within = (before) => index.filter((x) => x.slots.some((k) => t >= k - before && t <= k + AFTER));
-  const sides = pairs(p.title, p.subTitle);
+  const sides = pairs(vocab, lang, title, p.subTitle);
   if (sides.length) {
     const scored = within(BEFORE_NAMED).filter((x) => x.e.kind !== "race").map((x) => ({ x, score: Math.max(...sides.map((s) => teamScore(x, s))) }));
     const best = Math.max(0, ...scored.map((s) => s.score));
@@ -96,19 +152,16 @@ export function matchProgramme(p, index) {
   }
   const near = within(BEFORE);
   if (!near.length) return [];
-  const text = fold(`${p.title} ${p.subTitle}`);
-  const race = RACES.find((r) => r.test(text));
-  if (race) return near.filter((x) => x.e.sport === race.sport).map((x) => x.e.id).slice(0, 1);
-  const m = /^([^:]+?)\s*:\s*(.+)$/.exec(p.title);
-  if (!m) return [];
-  const label = fold(m[1]);
-  const phrase = fold(m[2]);
-  if (OTHER_SIDE.test(phrase)) return [];
-  const comp = COMPETITIONS.find((c) => c.label.test(label) && c.phrase.test(phrase));
+  const text = fold(`${title} ${p.subTitle}`);
+  const race = Object.keys(vocab.races).find((sport) => vocab.races[sport](text));
+  if (race) return near.filter((x) => x.e.sport === race).map((x) => x.e.id).slice(0, 1);
+  const folded = fold(title);
+  if (OTHER_COMPETITION.test(folded)) return [];
+  const comp = vocab.competitions.find((c) => c.test.test(folded));
   if (!comp) return [];
   const only = near.filter((x) => x.e.sport === comp.sport && String(x.e.league?.id) === String(comp.league));
   if (only.length === 1 && !comp.named) return [only[0].e.id];
-  return namedIn(p.desc, only);
+  return namedIn(p.desc, only, lang);
 }
 
 /**
@@ -118,8 +171,8 @@ export function matchProgramme(p, index) {
  * build 34: the Nations League and the NBA had no channel). The game whose
  * two sides are both named soonest is the one; none named, no guess.
  */
-function namedIn(desc, candidates) {
-  const words = english(desc || "").split(" ");
+function namedIn(desc, candidates, lang) {
+  const words = english(desc || "", lang).split(" ");
   if (words.length < 2) return [];
   // Where a side is first named in full, and where a game is: once both
   // sides are. "…face à la Belgique, l'Italie… en Turquie… au Stade de

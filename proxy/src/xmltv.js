@@ -3,7 +3,8 @@ import { createGunzip } from "node:zlib";
 
 /**
  * A small streaming reader for XMLTV guides: the French file is ~80 MB of
- * text, so it is read element by element and never held whole. Only
+ * text and the American one ~75 MB, so each is read element by element and
+ * never held whole. Only
  * <channel> and <programme> are of interest; anything else is skipped.
  */
 
@@ -70,9 +71,10 @@ const text = (body, tag) => {
 
 /**
  * What we read of a programme: channel, start, title, sub-title, and the
- * description only to tell simultaneous games apart — never stored or
- * passed on; pictures and ratings are never read. A rerun says so with
- * <previously-shown>.
+ * description and categories only to tell simultaneous games and women's
+ * games apart — never stored or passed on; pictures and ratings are never
+ * read. A rerun says so with <previously-shown>, or, in Brazilian guides,
+ * with "VT" (videotape) before or after the title.
  */
 export function programme({ attrs, body }) {
   return {
@@ -82,7 +84,8 @@ export function programme({ attrs, body }) {
     subTitle: text(body, "sub-title"),
     // Read to tell simultaneous games apart, never passed on.
     desc: text(body, "desc"),
-    rerun: /<previously-shown\b/.test(body),
+    categories: [...body.matchAll(/<category\b[^>]*>([^<]*)<\/category>/g)].map((m) => decode(m[1]).trim()),
+    rerun: /<previously-shown\b/.test(body) || /^\s*VT\s+-|\s-\s+VT\s*$/.test(text(body, "title")),
   };
 }
 

@@ -1,7 +1,8 @@
 import { getJson } from "./http.js";
 import { MIN } from "./clock.js";
 import { backoff } from "./scheduler.js";
-import { COUNTRIES, tsdbChannelName, fold } from "./tv-names.js";
+import { fold } from "./tv-names.js";
+import { COUNTRIES, tsdbChannelName } from "./tv-channels.js";
 import { xmltvElements, programme, fetchXmltv } from "./xmltv.js";
 import { eventIndex, matchProgramme } from "./tv-match.js";
 
@@ -17,20 +18,22 @@ const day = (t) => new Date(t).toISOString().slice(0, 10);
  * the national TV guide (XMLTV), then our hand-kept rights table for a
  * competition that has one broadcaster. Each source is fetched once per UTC
  * day, after the schedules' own daily pass, and the result is kept in the
- * store, so a restart or a failed download serves the last good answer.
+ * store (`broadcasts[cc]`, its fetch stamps in `meta["broadcasts:cc"]`), so a
+ * restart or a failed download serves the last good answer.
  */
 export class Broadcasts {
   constructor({ store, country = "FR", key, table = [], cfg = {}, log = () => {}, fetchJson = getJson, openGuide = fetchXmltv }) {
-    Object.assign(this, { store, key, table, log, fetchJson, openGuide });
+    Object.assign(this, { store, key, table, fetchJson, openGuide });
+    this.cc = country;
     this.country = COUNTRIES[country];
+    this.log = (line) => log(`broadcasts ${country}: ${line}`);
     this.refreshHour = (cfg.dailyRefreshHourUtc ?? 4) + 1;
-    this.meta = store.sportMeta("broadcasts");
+    this.meta = store.sportMeta(`broadcasts:${country}`);
     this.meta.sources ??= {};
-    this.timer = null;
   }
 
   get state() {
-    return this.store.broadcasts;
+    return (this.store.broadcasts[this.cc] ??= {});
   }
 
   /** The names to show for one event, or an empty list. */
@@ -42,8 +45,11 @@ export class Broadcasts {
       .slice(0, MAX_NAMES);
     if (names.length) return names;
     const on = String(e.start || "").slice(0, 10);
+    // Rows are read in order: a tournament's own row (Roland-Garros, by its
+    // city) sits before its tier's.
     const row = this.table.find((r) => r.sport === e.sport && String(r.league) === String(e.league?.id)
-      && (!r.tier || [].concat(r.tier).includes(e.competition?.tier)) && (!r.from || on >= r.from) && (!r.until || on <= r.until));
+      && (!r.tier || [].concat(r.tier).includes(e.competition?.tier)) && (!r.city || r.city === e.competition?.city)
+      && (!r.from || on >= r.from) && (!r.until || on <= r.until));
     return row ? row.names.slice(0, MAX_NAMES) : [];
   }
 
@@ -73,7 +79,7 @@ export class Broadcasts {
     const rows = Array.isArray(body?.filter) ? body.filter : Object.values(body || {}).find(Array.isArray) || [];
     const fresh = {};
     for (const r of rows) {
-      const name = tsdbChannelName(r.strChannel);
+      const name = tsdbChannelName(r.strChannel, this.cc);
       if (!r.idEvent || !name || (r.strCountry && r.strCountry !== this.country.tsdb)) continue;
       const list = (fresh[r.idEvent] ??= []);
       if (!list.includes(name)) list.push(name);
@@ -92,7 +98,7 @@ export class Broadcasts {
       const p = programme(el);
       if (p.rerun) continue;
       kept++;
-      for (const id of matchProgramme(p, index)) {
+      for (const id of matchProgramme(p, index, this.country.lang)) {
         const list = (fresh[id] ??= []);
         if (!list.includes(channels[p.channel])) list.push(channels[p.channel]);
       }
@@ -115,15 +121,43 @@ export class Broadcasts {
         Object.assign(s, { ok: new Date(now).toISOString(), failures: 0, retryAt: undefined });
         this.meta.lastOk = s.ok;
         this.meta.lastError = undefined;
-        this.log(`broadcasts: ${name} -> ${n} events with a channel`);
+        this.log(`${name} -> ${n} events with a channel`);
       } catch (err) {
         s.failures = (s.failures || 0) + 1;
         s.retryAt = new Date(now + backoff(30 * MIN, s.failures - 1)).toISOString();
         this.meta.lastError = { at: new Date(now).toISOString(), message: `${name}: ${err.message || err}` };
-        this.log(`broadcasts: ${name} ${err.message || err} (failure ${s.failures})`);
+        this.log(`${name} ${err.message || err} (failure ${s.failures})`);
       }
       this.store.touch();
     }
+  }
+}
+
+/**
+ * Every country whose channels the board names (`broadcastCountries`), side
+ * by side: one `Broadcasts` each, refreshed one after another so only one
+ * guide is ever being read.
+ */
+export class TvChannels {
+  constructor({ countries = ["FR"], rights = {}, ...rest }) {
+    this.countries = countries.filter((cc) => COUNTRIES[cc]).map((cc) => new Broadcasts({ ...rest, country: cc, table: rights[cc] || [] }));
+    this.log = rest.log || (() => {});
+    this.store = rest.store;
+    this.timer = null;
+  }
+
+  /** `{ FR: [...], US: [...] }` for one event, countries with no name left out. */
+  for(e) {
+    const out = {};
+    for (const c of this.countries) {
+      const names = c.for(e);
+      if (names.length) out[c.cc] = names;
+    }
+    return out;
+  }
+
+  async refresh(now = Date.now()) {
+    for (const c of this.countries) await c.refresh(now);
   }
 
   async tick() {

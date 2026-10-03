@@ -8,7 +8,7 @@ import { join } from "node:path";
  * keyed by the old provider's ids would otherwise sit alongside the new ones
  * and show the same match twice.
  */
-const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 6;
 
 /**
  * Event store persisted to disk so a restart or an upstream outage
@@ -21,7 +21,7 @@ export class Store {
     this.events = new Map();
     this.standings = {}; // "sport:leagueId" -> { updatedAt, tables }
     this.photos = {}; // athlete name -> { url|null, at }
-    this.broadcasts = {}; // { tsdb: { idEvent: [names] }, xmltv: { eventId: [names] } }, see broadcasts.js
+    this.broadcasts = {}; // per country: { FR: { tsdb: { idEvent: [names] }, xmltv: { eventId: [names] } } }, see broadcasts.js
     this.meta = {};
     this.dirty = false; // per sport: { lastDaily, lastLive, lastOk, lastError, calls: { day, used } }
     mkdirSync(dir, { recursive: true });
@@ -36,6 +36,7 @@ export class Store {
       this.photos = raw.photos || {};
       this.broadcasts = raw.broadcasts || {};
       this.meta = raw.meta || {};
+      this.migrateBroadcasts();
       if (raw.schemaVersion !== SCHEMA_VERSION) {
         this.events.clear();
         this.photos = {};
@@ -50,6 +51,24 @@ export class Store {
       }
     } catch {
       /* first run */
+    }
+  }
+
+  /**
+   * Before 2026-10-03 the channels were France's alone, at the top of
+   * `broadcasts` and under `meta.broadcasts`; they move under "FR" as they
+   * are, so nothing is fetched again.
+   */
+  migrateBroadcasts() {
+    const { tsdb, xmltv } = this.broadcasts;
+    if (tsdb || xmltv) {
+      this.broadcasts = { FR: { tsdb, xmltv } };
+      this.dirty = true;
+    }
+    if (this.meta.broadcasts) {
+      this.meta["broadcasts:FR"] ??= this.meta.broadcasts;
+      delete this.meta.broadcasts;
+      this.dirty = true;
     }
   }
 

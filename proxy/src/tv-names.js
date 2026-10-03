@@ -1,68 +1,8 @@
 /**
- * Names for where a game airs: the channels we read per country, how the
- * feeds spell them, and how team names are compared across languages.
- * Names only: no link and no logo is passed on (opening an official app
- * is a roadmap item, docs/roadmap.md).
+ * How team names are compared across languages: a guide's "Naples",
+ * "Alemanha" or "United States" against the English names our feeds use.
+ * The channels themselves are in src/tv-channels.js.
  */
-
-const range = (from, to, id, name) => Array.from({ length: to - from + 1 }, (_, i) => [id(from + i), name(from + i)]);
-
-/**
- * XMLTV channel id -> the name we show. Only national French sports outlets
- * and the free channels that carry big games; Belgian and Swiss channels in
- * the same file (RTS, Tipik, RTL TVI, La Une) are left out on purpose.
- */
-const CHANNELS_FR = Object.fromEntries([
-  ...range(1, 3, (n) => `beINSPORTS${n}.fr`, (n) => `beIN Sports ${n}`),
-  ...range(4, 10, (n) => `beINSPORTSMAX${n}.fr`, (n) => `beIN Sports Max ${n}`),
-  ["CanalPlus.fr", "Canal+"],
-  ["CanalPlusFoot.fr", "Canal+ Foot"],
-  ["CanalPlusSport.fr", "Canal+ Sport"],
-  ["CanalPlusSport360.fr", "Canal+ Sport 360"],
-  ["CanalPlusPremierLeague.fr", "Canal+ Premier League"],
-  ["CanalPlusLigue1.fr", "Canal+ Ligue 1"],
-  ["Ligue1Plus.fr", "Ligue 1+"],
-  ...range(2, 10, (n) => `Ligue1Plus${n}.fr`, (n) => `Ligue 1+ ${n}`),
-  ["DAZN.fr", "DAZN 1"],
-  ["DAZN2.fr", "DAZN 2"],
-  ["TF1.fr", "TF1"],
-  ["France2.fr", "France 2"],
-  ["France3.fr", "France 3"],
-  ["France4.fr", "France 4"],
-  ["M6.fr", "M6"],
-  ["W9.fr", "W9"],
-  ["LEquipe21.fr", "L'Équipe"],
-  ["RMCSport1.fr", "RMC Sport 1"],
-  ["RMCSport2.fr", "RMC Sport 2"],
-  ["Eurosport1.fr", "Eurosport 1"],
-  ["Eurosport2.fr", "Eurosport 2"],
-]);
-
-/**
- * Per country: the name TheSportsDB files its TV rows under, and the XMLTV
- * guide with the channels we keep from it. Another country is another entry
- * here plus its own `broadcasts-<cc>.json` rights table.
- */
-export const COUNTRIES = {
-  FR: { tsdb: "France", xmltv: "https://xmltvfr.fr/xmltv/xmltv_fr.xml.gz", channels: CHANNELS_FR },
-};
-
-/**
- * TheSportsDB's spelling -> ours: "BeIn Sports HD 1 France" -> "beIN Sports 1",
- * "Ligue 1+ 2 FR" -> "Ligue 1+ 2", "Canal+ France" -> "Canal+". Anything that
- * carries a link comes back empty.
- */
-export function tsdbChannelName(raw) {
-  const name = String(raw || "").trim();
-  if (!name || /https?:|www\./i.test(name)) return "";
-  return name
-    .replace(/\s+(France|FR)$/i, "")
-    .replace(/\bHD\b/g, "")
-    .replace(/^bein\s+sports/i, "beIN Sports")
-    .replace(/^Ligue 1\+ 1$/, "Ligue 1+")
-    .replace(/\s+/g, " ")
-    .trim();
-}
 
 /** Lower case, no accents, punctuation as spaces: "Paris-SG" -> "paris sg". */
 export function fold(text) {
@@ -75,8 +15,9 @@ export function fold(text) {
 }
 
 /**
- * French names in the guide -> the English ones our feeds use. Phrases, folded,
- * replaced as whole words, longest first. Extend as games turn up unmatched.
+ * Guide names -> the English ones our feeds use, per language. Phrases,
+ * folded, replaced as whole words, longest first. Extend as games turn up
+ * unmatched.
  */
 const FRENCH = {
   naples: "napoli", fribourg: "freiburg", breme: "bremen", augsbourg: "augsburg", hambourg: "hamburg", mayence: "mainz",
@@ -98,17 +39,42 @@ const FRENCH = {
   bielorussie: "belarus", chypre: "cyprus", moldavie: "moldova", azerbaidjan: "azerbaijan", bulgarie: "bulgaria",
   malte: "malta", andorre: "andorra", "iles feroe": "faroe islands", "saint marin": "san marino",
 };
-const PHRASES = Object.keys(FRENCH).sort((a, b) => b.length - a.length);
+/** Brazilian guides: nations, and clubs as Globo and ESPN abbreviate them ("Atlético-MG"). */
+const PORTUGUESE = {
+  alemanha: "germany", inglaterra: "england", espanha: "spain", franca: "france", italia: "italy", belgica: "belgium",
+  holanda: "netherlands", "paises baixos": "netherlands", croacia: "croatia", "estados unidos": "usa", brasil: "brazil",
+  escocia: "scotland", "irlanda do norte": "northern ireland", irlanda: "ireland", "pais de gales": "wales",
+  suica: "switzerland", dinamarca: "denmark", noruega: "norway", polonia: "poland", suecia: "sweden",
+  mexico: "mexico", japao: "japan", "coreia do sul": "south korea", marrocos: "morocco", egito: "egypt",
+  equador: "ecuador", uruguai: "uruguay", paraguai: "paraguay", servia: "serbia", grecia: "greece", turquia: "turkey",
+  hungria: "hungary", "republica tcheca": "czech republic", tchequia: "czech republic", romenia: "romania",
+  eslovaquia: "slovakia", eslovenia: "slovenia", finlandia: "finland", islandia: "iceland", lituania: "lithuania",
+  letonia: "latvia", estonia: "estonia", "bosnia e herzegovina": "bosnia herzegovina", "macedonia do norte": "north macedonia",
+  bielorrussia: "belarus", chipre: "cyprus", moldavia: "moldova", azerbaijao: "azerbaijan", bulgaria: "bulgaria",
+  "ilhas faroe": "faroe islands", "sao marino": "san marino", cazaquistao: "kazakhstan", ucrania: "ukraine",
+  "africa do sul": "south africa", gana: "ghana", "burkina faso": "burkina faso", comores: "comoros", benin: "benin",
+  russia: "russia", uzbequistao: "uzbekistan", india: "india", canada: "canada",
+  "atletico mg": "atletico mineiro", "athletico pr": "athletico paranaense", vasco: "vasco da gama",
+  "vasco da gama": "vasco da gama", "red bull bragantino": "bragantino", "rb bragantino": "bragantino",
+};
+/** American guides already write English; only a few names differ from our feeds'. */
+const ENGLISH = {
+  "united states": "usa", usmnt: "usa", czechia: "czech republic", turkiye: "turkey", "korea republic": "south korea",
+};
+const NAMES = { fr: FRENCH, pt: PORTUGUESE, en: ENGLISH };
+const PHRASES = Object.fromEntries(Object.entries(NAMES).map(([lang, dict]) => [lang, Object.keys(dict).sort((a, b) => b.length - a.length)]));
 
-/** A folded side of a guide title with its French names put into English. */
-export function english(side) {
+/** A folded side of a guide title with its names put into our feeds' English. */
+export function english(side, lang = "fr") {
+  const dict = NAMES[lang] || {};
+  const phrases = PHRASES[lang] || [];
   let s = ` ${fold(side)} `;
   // One pass over the original words: a replacement is never translated twice.
   const out = [];
   while (s.trim()) {
-    const hit = PHRASES.find((p) => s.startsWith(` ${p} `));
+    const hit = phrases.find((p) => s.startsWith(` ${p} `));
     const word = hit || s.trim().split(" ")[0];
-    out.push(hit ? FRENCH[hit] : word);
+    out.push(hit ? dict[hit] : word);
     s = s.slice(word.length + 1);
   }
   return out.filter(Boolean).join(" ");
@@ -119,5 +85,6 @@ const GENERIC = new Set(["fc", "cf", "ac", "as", "sc", "afc", "ssc", "sv", "vfl"
 
 /** The words that pick a team out: "Borussia Dortmund" -> ["dortmund"], "Mainz 05" -> ["mainz"]. */
 export function teamWords(name) {
-  return fold(name).split(" ").filter((w) => w && !GENERIC.has(w) && !/^\d+$/.test(w));
+  // Our feed spells one nation "N.Ireland", which no guide does.
+  return fold(name).replace(/^n ireland$/, "northern ireland").split(" ").filter((w) => w && !GENERIC.has(w) && !/^\d+$/.test(w));
 }

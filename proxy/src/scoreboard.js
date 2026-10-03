@@ -143,10 +143,15 @@ export function withTablePhotos(standings, photoFor, mirror, badgeFor) {
   return { ...standings, tables: standings.tables.map((t) => ({ ...t, rows: t.rows.map(decorate) })) };
 }
 
-/** The channels an event airs on, named at serve time; absent when there are none. */
+/**
+ * The channels an event airs on, per country, named at serve time:
+ * `broadcastsBy: { FR: [...], US: [...] }`, and France's list again as
+ * `broadcasts`, which builds before 2026-10-03 read. Absent when none.
+ */
 export function withBroadcasts(e, broadcastsFor) {
-  const names = broadcastsFor?.(e);
-  return names?.length ? { ...e, broadcasts: names } : e;
+  const by = broadcastsFor?.(e);
+  if (!by || !Object.keys(by).length) return e;
+  return by.FR ? { ...e, broadcasts: by.FR, broadcastsBy: by } : { ...e, broadcastsBy: by };
 }
 
 export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, mirror, broadcastsFor, activeSports = [], upcomingDays = 7 } = {}) {

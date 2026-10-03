@@ -19,14 +19,16 @@ Noted 2026-10-03.
 
 - In Settings, choose one or more countries whose channels are shown, for
   example France, the US and Brazil.
-- Today the country is fixed to France in the proxy (`broadcastCountry`).
-- The proxy would serve each country's channels side by side, for example
-  `broadcasts: { FR: [...], US: [...] }`. The app shows the ones chosen,
-  labelled by country when there is more than one.
+- The proxy serves France, the US and Brazil side by side since
+  2026-10-03 (`broadcastCountries`, `broadcastsBy` on each event); the app
+  still shows France's list (`broadcasts`) until the Settings choice exists.
+- The app would show the countries chosen from `broadcastsBy: { FR: [...],
+  US: [...] }`, labelled by country when there is more than one.
 - Each new country needs:
   - TheSportsDB's TV rows for it;
   - its own rights table, like `broadcasts-fr.json`;
-  - a TV guide if one exists. XML TV Fr covers France only.
+  - a TV guide if one exists (XML TV Fr for France, epgshare01 for the US
+    and Brazil).
 - What we found for each country is in `docs/broadcast-sources.md`.
 
 ## 3. Open the channel's app (later, complex)

@@ -368,8 +368,9 @@ clips the picture to a circle; the emoji stands in until it has loaded.
 ## TV channels for France (decided 2026-10-03)
 
 Julien chose France as the one country whose channels the board names
-(`broadcastCountry: "FR"` in `proxy/src/config.js`; another country is an
-entry in `COUNTRIES` in `proxy/src/tv-names.js` plus its own rights table).
+(then `broadcastCountry: "FR"`; since the US and Brazil joined it is one
+entry of `broadcastCountries` in `proxy/src/config.js`, and a country is an
+entry in `COUNTRIES` in `proxy/src/tv-channels.js` plus its own rights table).
 Research: `docs/broadcast-sources.md`. Three sources, in this order:
 
 1. **TheSportsDB v2** `filter/tv/country/France`, on the key we already pay
@@ -393,4 +394,50 @@ Research: `docs/broadcast-sources.md`. Three sources, in this order:
    (depends on the match), ATP 500s (only some on Eurosport), Brasileirão and
    Libertadores (no French broadcaster found). Tennis rows end 2026-12-31,
    when the WTA (beIN) and ATP Masters 1000 (Eurosport) contracts end.
+
+## TV channels for the US and Brazil (decided 2026-10-03)
+
+Julien extended the channels to the United States and Brazil, side by side
+with France (`broadcastCountries: ["FR", "US", "BR"]`; the board carries
+`broadcastsBy: { FR, US, BR }` and keeps `broadcasts` as France's list for
+older builds). Same three sources per country, in the same order, each
+refreshed once a UTC day with its own back-off, countries one after another:
+
+1. **TheSportsDB v2** `filter/tv/country/United States` and `.../Brazil`, on
+   our key. Names normalised per country ("Fox Sports 1 HD US" → "FS1",
+   "ESPN Brasil" → "ESPN"); local stations (call signs such as "WBAL TV"),
+   regional sports networks and "NFL Sunday Ticket" are dropped. TheSportsDB
+   still files Brazil's ESPN 4 as "Fox Sports 1 BR"; we show "ESPN 4" (the
+   same games are on ESPN 4 in the guide).
+2. **epgshare01** guides, credit "epgshare01.online". Julien accepted
+   community-compiled guides for these two countries on 2026-10-03, on the
+   same conditions as XML TV Fr: **names and times only**, one download a
+   day, descriptions and categories read only to tell games apart and never
+   stored or served, reruns skipped. The site publishes no licence or terms;
+   its listings are compiled from other guides (the US file carries
+   Gracenote-style data). Revisit before any public release.
+   - US: `https://epgshare01.online/epgshare01/epg_ripper_US2.xml.gz`
+     (6.7 MB gzipped, 75 MB of text, ~770 channels, 5 days). Read: the
+     national networks' East feeds (ABC, CBS, NBC), ESPN, ESPN2, ESPN
+     Deportes, FS1, FS2, Fox Soccer Plus, Fox Deportes, CBS Sports Network,
+     CBS Sports Golazo, TNT, TBS, truTV, NBA TV, NFL Network, Golf Channel,
+     Tennis Channel, beIN Sports (and en Español), USA Network, Telemundo,
+     Universo, Univision, UniMás, TUDN. FOX's broadcast network is only in
+     the 60 MB locals file and is not read. Listings say "Live: NFL
+     Football", "Live: UEFA Nations League Soccer", sometimes a sub-title
+     "New York Knicks at Philadelphia 76ers"; reruns carry
+     `<previously-shown>`.
+     Rejected: epg.pw's US file (the same data, 23 MB, 3 days) and
+     iptv-epg.org's (62 MB gzipped, 534 MB of text).
+   - Brazil: `https://epgshare01.online/epgshare01/epg_ripper_BR2.xml.gz`
+     (0.13 MB gzipped, 97 channels, 5 days): Globo, SporTV 1–3, Premiere
+     (Premiere Clubes only), ESPN 1–5, Band, BandSports, TNT, Record, SBT.
+     Listings say "Flamengo x Palmeiras - Ao Vivo", "NFL: Rams x Eagles - Ao
+     Vivo"; reruns say "VT -", and there is no description. Rejected: BR1
+     (São Paulo's cable lineup, Globo and Premiere empty) and epg.pw's BR
+     file (no Globo).
+3. **`proxy/broadcasts-us.json`** and **`proxy/broadcasts-br.json`**, rights
+   tables for competitions one broadcaster carries whole in 2026-27, each
+   row with its source (checked 2026-10-03; details in
+   `docs/broadcast-sources.md`).
 

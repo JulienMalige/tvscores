@@ -37,15 +37,21 @@ sprint (rows as a race's). Each kind is fetched once, at the first calendar
 round after all its sessions are completed, and only for a weekend whose race
 is not more than two days past.
 
-`broadcasts: ["beIN Sports Max 5", "beIN Sports Max 6"]` names where an event
-airs in `broadcastCountry` (France), at most four, names only — never a link
-or a logo; absent when nothing is known. TheSportsDB's TV rows come first,
-then the national TV guide (a programme counts only when it starts 45 min
-before to 15 min after a kickoff or session, is not a rerun, and names both
-teams, is a race weekend's session, or names a competition with exactly one
-game of ours at that moment), then the rights table `broadcasts-fr.json` for
-competitions with one broadcaster. Matches are kept in the store, so a failed
-download serves yesterday's answer.
+`broadcastsBy: { "FR": ["beIN Sports Max 5"], "US": ["ESPN"], "BR": ["SporTV 2"] }`
+names where an event airs in each of `broadcastCountries` (France, the US,
+Brazil), at most four per country, names only — never a link or a logo; a
+country with nothing known is left out, and so is the whole object when no
+country has anything. `broadcasts: [...]` repeats France's list for builds
+that predate the other countries. Per country, TheSportsDB's TV rows come
+first, then the national TV guide (a programme counts only when it starts
+45 min before to 15 min after a kickoff or session, is not a rerun or a
+women's or youth game, and names both teams — "Lens / Lyon", "Jazz at
+Nuggets", "Flamengo x Palmeiras" — is a race weekend's session, or names a
+competition with exactly one game of ours at that moment), then the rights
+table `broadcasts-<cc>.json` for competitions with one broadcaster. Guides:
+XML TV Fr, and epgshare01's US2 and BR2 files (see
+`docs/data-providers.md`). Matches are kept in the store per country, so a
+failed download serves yesterday's answer.
 
 `days.upcoming` stops `schedule.upcomingDays` local days out, seven by default.
 
@@ -66,7 +72,7 @@ with no marque in its lockup is left out on purpose and keeps the monogram the
 app already draws.
 
 `~/.local/state/tvscores/` holds **cache**, never committed and safe to delete:
-`store.json` for events, standings, resolved portrait URLs and the matched TV channels, and `images/`
+`store.json` for events, standings, resolved portrait URLs and the matched TV channels per country, and `images/`
 for the mirror below. Losing it costs one refetch, nothing else.
 
 ## The image mirror
@@ -92,7 +98,7 @@ avatar the app draws. Anything unasked-for for 60 days is pruned.
 | f1, motogp | Orange Cat Blacktop, free | 7,500/month | calendar every 6 h; 30 min within 6 h of the race and for 3 h after a qualifying or sprint starts | — (results, not live timing) | post-session | ~13 each (+1 F1 qualifying, +3 MotoGP Q1, Q2, sprint per weekend) | **no — non-commercial** |
 | portraits | TheSportsDB, same key | 25/min, soft 1,000/day | once per athlete, kept a month | — | static | ~120 on a new sport | yes |
 | crests, badges | mirrored on this proxy | none after first fetch | on first sight | — | static | ~0 | trademark risk accepted |
-| TV channels (France) | TheSportsDB v2 `filter/tv/country/France` (same key), then the XML TV Fr guide, then `broadcasts-fr.json` | — | once per UTC day per source | — | daily | 1 call + 1 download | guide: see `docs/data-providers.md` (2026-10-03) |
+| TV channels (France, US, Brazil) | TheSportsDB v2 `filter/tv/country/{France,United States,Brazil}` (same key), then each country's XMLTV guide (XML TV Fr; epgshare01 US2 and BR2), then `broadcasts-<cc>.json` | — | once per UTC day per source and country, countries one after another | — | daily | 3 calls + 3 downloads | guides: community-compiled, see `docs/data-providers.md` (2026-10-03) |
 
 TheSportsDB is capped per **minute** (100 on the paid tier), not per day, which
 is what lets the team sports poll half a minute apart. Their pricing page calls

@@ -1,0 +1,21 @@
+{
+  "comment": "Brazil, 2026-27. Competitions one broadcaster carries whole, used only when neither TheSportsDB nor the TV guide names a channel for a game. Checked 2026-10-03 against the sources listed per row; anything not confirmed is left out: the Brasileirão is split each round between Globo/SporTV, Premiere, Record/CazéTV and one Prime Video exclusive; the Libertadores between Globo, ESPN/Disney+ and Paramount+; the Nations League between SporTV and ESPN; NBA (ESPN, Prime Video) and NFL (ESPN, SporTV, Netflix, DAZN) game by game; La Liga and Ligue 1 moved to CazéTV but no source says every match is shown; the Bundesliga is spread over OneFootball and a dozen outlets. 'until' is the end of the season or contract we could confirm; tennis and motorsport rows end with 2026 where no end date was found (WTA moves to CazéTV in 2027).",
+  "rights": [
+    { "sport": "football", "league": 4480, "competition": "Champions League", "names": ["HBO Max"], "until": "2031-06-30",
+      "source": "https://trivela.com.br/europa/futebol-europeu-tv-transmissoes-assistir-temporada-2026-27/" },
+    { "sport": "football", "league": 4481, "competition": "Europa League", "names": ["CazéTV"], "until": "2027-06-30",
+      "source": "https://www.portalmidiaesporte.com/2026/04/espn-supera-cazetv-e-adquire-direitos.html" },
+    { "sport": "football", "league": 4328, "competition": "Premier League", "names": ["Disney+"], "until": "2031-06-30",
+      "source": "https://www.diariodepernambuco.com.br/esportes-dp/internacional/2026/08/11721857-onde-assistir-a-premier-league-2026-27-veja-a-divisao-de-transmissoes.html" },
+    { "sport": "football", "league": 4332, "competition": "Serie A", "names": ["Disney+"], "until": "2027-06-30",
+      "source": "https://maquinadoesporte.com.br/midia/sportynet-exibira-serie-a-italiana-apos-acordo-de-sublicenciamento-com-a-espn/" },
+    { "sport": "f1", "league": "f1", "competition": "Formula 1", "names": ["SporTV", "Globoplay"], "until": "2026-12-31",
+      "source": "https://www.grandepremio.com.br/f1/noticias/f1-2026-calendario-saiba-quais-corridas-globo-transmite-tv-aberta/" },
+    { "sport": "motogp", "league": "motogp", "competition": "MotoGP", "names": ["Disney+"], "until": "2026-12-31",
+      "source": "https://www.techtudo.com.br/dicas-e-tutoriais/2026/03/onde-assistir-motogp-ao-vivo-e-como-acompanhar-classificacao-2026-veja-apps-edapps.ghtml" },
+    { "sport": "tennis", "league": "atp", "tier": ["Masters 1000", "ATP 1000", "ATP 500", "Grand Slam"], "competition": "ATP Masters 1000, 500 and the majors", "names": ["Disney+"], "until": "2026-12-31",
+      "source": "https://www.sportcal.com/media/cazetv-supplants-espn-to-take-wta-tour-rights-in-brazil/" },
+    { "sport": "tennis", "league": "wta", "tier": ["WTA 1000", "WTA 500", "Grand Slam"], "competition": "WTA 1000, 500 and the majors", "names": ["Disney+"], "until": "2026-12-31",
+      "source": "https://www.sportcal.com/media/cazetv-supplants-espn-to-take-wta-tour-rights-in-brazil/" }
+  ]
+}

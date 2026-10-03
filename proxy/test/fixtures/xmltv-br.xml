@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<tv generator-info-name="none">
+  <channel id="SporTV.2.br"><display-name>SporTV 2</display-name></channel>
+  <channel id="ESPN.br"><display-name>ESPN</display-name></channel>
+  <channel id="Premiere.Clubes.br"><display-name>Premiere Clubes</display-name></channel>
+  <channel id="Globo.br"><display-name>Globo</display-name></channel>
+  <channel id="AMC.br"><display-name>AMC</display-name></channel>
+  <programme start="20261011133000 -0300" channel="SporTV.2.br">
+    <title lang="pt">NFL: New England Patriots x Buffalo Bills - Ao Vivo</title>
+    <category lang="pt">Futebol Americano</category>
+  </programme>
+  <programme start="20261011140000 -0300" channel="ESPN.br">
+    <title lang="pt">VT - NFL: Chicago Bears x New York Jets</title>
+  </programme>
+  <programme start="20261010153000 -0300" channel="ESPN.br">
+    <title lang="pt">Alemanha x Inglaterra - Ao Vivo</title>
+    <category lang="pt">Futebol</category>
+  </programme>
+  <programme start="20261010190000 -0300" channel="Globo.br">
+    <title lang="pt">São Paulo x Corinthians - Ao Vivo</title>
+    <category lang="pt">Futebol Feminino</category>
+  </programme>
+  <programme start="20261010180000 -0300" channel="Premiere.Clubes.br">
+    <title lang="pt">Atlético-MG x Bragantino - Ao Vivo</title>
+    <category lang="pt">Futebol</category>
+  </programme>
+  <programme start="20261010180000 -0300" channel="AMC.br">
+    <title lang="pt">Atlético-MG x Bragantino</title>
+  </programme>
+</tv>

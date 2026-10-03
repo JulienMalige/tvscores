@@ -117,3 +117,71 @@ neither replaces the static table for F1, MotoGP or tennis.
 France is the best covered of the three countries checked; Brazil is thin
 outside the Champions League. The same rights-table fallback would fill
 the single-broadcaster competitions per country.
+
+## US and Brazil guides and rights, checked 2026-10-03
+
+Built: the proxy now names channels for France, the US and Brazil
+(`docs/data-providers.md`, 2026-10-03). What was found on the way.
+
+### Free XMLTV guides
+
+| File | Size (gzipped / text) | Days | Sports channels | Verdict |
+|---|---|---|---|---|
+| epgshare01 `epg_ripper_US2.xml.gz` | 6.7 MB / 75 MB | 5 | ESPN, ESPN2, FS1, FS2, ABC, CBS, NBC (East feeds), TNT, TBS, truTV, NBA TV, NFL Network, Golf, Tennis Channel, beIN, USA Network, Telemundo, Universo, Univision, TUDN; no FOX network | **chosen for the US** |
+| epgshare01 `epg_ripper_US_LOCALS1.xml.gz` | 62 MB | – | local affiliates, incl. FOX | too big for one network |
+| epg.pw `epg_US.xml.gz` | 23 MB / 151 MB | 3 | the same channels as US2 | same data, larger, shorter |
+| iptv-epg.org `epg-us.xml.gz` | 62 MB / 534 MB | – | 13,000 channels | too big |
+| epgshare01 `epg_ripper_BR2.xml.gz` | 0.13 MB / 2.3 MB | 5 | Globo, SporTV 1–3, Premiere Clubes, ESPN 1–5, Band, BandSports, TNT, Record, SBT | **chosen for Brazil** |
+| epgshare01 `epg_ripper_BR1.xml.gz` | 0.7 MB / 6.5 MB | 5 | São Paulo cable lineup; Globo, Premiere 2–7 listed but empty | no |
+| epg.pw `epg_BR.xml.gz` | 0.5 MB | 4 | SporTV, ESPN, no Globo | no |
+
+How they write a game: the US guide titles "Live: NFL Football", "Live: UEFA
+Nations League Soccer", "Live: MotoGP Racing", with the teams in the
+description ("The Detroit Lions clash with the Carolina Panthers…") or a
+sub-title ("New York Knicks at Philadelphia 76ers"); reruns carry
+`<previously-shown>`. The Brazilian guide titles "Croácia x Inglaterra - Ao
+Vivo", "NFL: Denver Broncos x San Francisco 49ers - Ao Vivo", "Fórmula 1 -
+GP do Bahrein - Classificação - Ao Vivo", reruns "VT - …", no descriptions,
+and women's games only by category ("Futebol Feminino"). Hence a vocabulary
+per language in `proxy/src/tv-match.js` and Portuguese names in
+`tv-names.js` (Alemanha → Germany, Atlético-MG → Atletico Mineiro).
+
+On 2026-10-03 (five days, our events): the US guide added 9 games (NFL on
+NBC, ESPN, ESPN2, NFL Network; NBA TV; Nations League on FS2; MotoGP on
+FS1/FS2); the Brazilian one 29 (Nations League on SporTV and ESPN, NFL on
+ESPN 2 and SporTV 2, Brasileirão on Premiere and SporTV, F1 on SporTV 3,
+MotoGP on ESPN 4). Every match was checked by hand against its listing.
+
+TheSportsDB that day: 192 US rows (NFL complete but CBS as "Paramount+ US",
+SNF as local stations; NBA preseason only regional networks), 44 Brazilian
+rows (internationals on ESPN/SporTV, Champions League on HBO Max, still
+"Fox Sports 1 BR" for what is now ESPN 4).
+
+### Rights, 2026-27
+
+US, kept in `proxy/broadcasts-us.json`: La Liga ESPN+ (to 2028-29, high),
+Ligue 1 beIN Sports (to 2028-29, medium-high), Serie A Paramount+
+(extension to 2026-27 confirmed, high), Bundesliga USA Network + Fandango
+(Versant, to 2030-31, high), Champions League and Europa League Paramount+
+(to 2029-30, high), Nations League FOX Sports (medium), Libertadores beIN
+Sports (2026, medium-high), F1 Apple TV (to 2030, high), MotoGP FOX Sports
+(2026, high), ATP 1000/500 and WTA 1000/500 Tennis Channel (2026, medium),
+Roland-Garros HBO Max/TNT, the other majors ESPN (high). Left out: NFL, NBA
+(game by game), Premier League (NBC, USA Network and Peacock: since the
+Versant spin-off USA Network games are not on Peacock, so no single name),
+Brasileirão (one game a week on Creator Sports Network), friendlies.
+
+Brazil, kept in `proxy/broadcasts-br.json`: Champions League HBO Max
+(Warner renewed to 2031, high), Europa League CazéTV (2026-27; ESPN from
+2027-28, high), Premier League Disney+ (all 380, to 2030-31, high), Serie A
+Disney+ (to 2027, high), F1 SporTV/Globoplay (Globo back from 2026, every
+race on SporTV, high), MotoGP Disney+ (high), tennis Disney+ for ATP and WTA
+1000/500 and the majors (2026; the WTA goes to CazéTV in 2027, medium).
+Left out: Brasileirão (each round split between Globo/SporTV, Premiere,
+Record/CazéTV and one Prime Video exclusive), Libertadores (Globo,
+ESPN/Disney+, Paramount+), Nations League (SporTV and ESPN), NBA (ESPN,
+Prime Video), NFL (ESPN, SporTV, Netflix, DAZN), La Liga and Ligue 1 (moved
+to CazéTV, but no source says every match), Bundesliga (OneFootball plus a
+dozen outlets).
+
+Sources are on each row of the two files.
