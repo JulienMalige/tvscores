@@ -74,6 +74,11 @@ enum Metrics {
     static let settingsFlag: CGFloat = 44
     /// Settings, after tvOS's own: the mark on the left, the list on the right.
     static let settingsMark: CGFloat = 520
+
+    // The launch loader: the app's mark, then a bar that fills as the launch does.
+    static let launchMark: CGFloat = 360
+    static let launchBarWidth: CGFloat = 420
+    static let launchBarHeight: CGFloat = 8
     static let settingsGap: CGFloat = 80
     static let settingsMargin: CGFloat = 120
     static let settingsTitleGap: CGFloat = 40

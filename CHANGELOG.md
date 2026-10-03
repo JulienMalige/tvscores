@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- The screen you see while the app opens shows the app's own mark in the
+  middle, gently pulsing, and a bar that fills as it connects and gets the
+  menu's pictures ready, in place of a spinner.
 - Changing the app's language in Settings applies at once: the menu, the
   game pages, the dates and the country names all switch, with no need to
   close and reopen the app. You are taken back to Home when it changes.

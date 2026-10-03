@@ -41,6 +41,11 @@ final class ScoreboardStore {
     /// before its pictures shows fallbacks and then swaps them — which reads
     /// as a glitch rather than as loading.
     private(set) var ready = false
+    /// How far the launch is, 0 to 1, for the loader's bar: asking, then the
+    /// board in, then the menu's icons as they arrive. It only moves forward
+    /// and stops mattering once `ready`.
+    private(set) var launchProgress = Self.asking
+    private static let asking = 0.05, boardIn = 0.35
     /// Moves when the menu's icons have arrived — once after launch, and
     /// again if a retry brings in one that a slow line lost. The sidebar
     /// rows are drawn from the image cache without state of their own, so
@@ -72,6 +77,7 @@ final class ScoreboardStore {
             if menuMoved { leagues = fresh.leagues }
             if boardMoved || menuMoved { Diagnostics.shared.note("refresh: board \(boardMoved ? "changed" : "same"), menu \(menuMoved ? "changed" : "same"), live \(fresh.live)") }
             error = nil
+            advance(to: Self.boardIn)
             if warmsImages { await warm(fresh) } else { ready = true }
         } catch {
             self.error = error.localizedDescription
@@ -101,12 +107,20 @@ final class ScoreboardStore {
         let icons = board.leagues.map(\.icon)
         if !ready {
             await withTaskGroup(of: Void.self) { group in
-                group.addTask { [prefetch] in _ = await prefetch(icons) }
+                group.addTask { [prefetch, weak self] in
+                    // In fours, as the prefetcher takes them, so the bar moves as they land.
+                    let chunks = stride(from: 0, to: icons.count, by: 4).map { Array(icons[$0..<min($0 + 4, icons.count)]) }
+                    for (i, chunk) in chunks.enumerated() {
+                        _ = await prefetch(chunk)
+                        await self?.iconsLanded(Double(i + 1) / Double(chunks.count))
+                    }
+                }
                 group.addTask { try? await Task.sleep(for: .seconds(4)) }
                 await group.next()
                 group.cancelAll()
             }
             ready = true
+            launchProgress = 1
         }
         let rest = board.imageURLs
         Task.detached(priority: .utility) { [prefetch] in _ = await prefetch(rest) }
@@ -119,6 +133,11 @@ final class ScoreboardStore {
             self?.fillingIcons = false
         }
     }
+
+    private func advance(to value: Double) { launchProgress = max(launchProgress, value) }
+
+    /// The icons are the rest of the way from the board's arrival to ready.
+    private func iconsLanded(_ fraction: Double) { advance(to: Self.boardIn + (1 - Self.boardIn) * fraction) }
 
     private var iconsHave = 0
     private var fillingIcons = false

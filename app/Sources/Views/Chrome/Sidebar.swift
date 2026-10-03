@@ -36,7 +36,7 @@ struct Sidebar: View {
 
     var body: some View {
         Group {
-            if store.ready { root } else { LaunchLoader(error: store.error) }
+            if store.ready { root } else { LaunchLoader(progress: store.launchProgress, error: store.error) }
         }
         .task { Diagnostics.shared.start(); store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }

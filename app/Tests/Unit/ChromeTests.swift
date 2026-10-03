@@ -127,4 +127,14 @@ struct ChromePictureTests {
         LanguageChoice.set(nil)
         #expect(LanguageChoice.bundle == Bundle.main, "the Apple TV's own when none is chosen")
     }
+
+    @Test("the launch bar only moves forward and is full when the app is ready")
+    @MainActor
+    func launchProgressAdvances() async {
+        let store = ScoreboardStore(source: .bundled(), warmImages: true, prefetch: { urls in urls.compactMap { $0 }.count })
+        #expect(store.launchProgress < 0.1, "a little before anything has arrived")
+        await store.refresh()
+        #expect(store.ready)
+        #expect(store.launchProgress == 1)
+    }
 }
