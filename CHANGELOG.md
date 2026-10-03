@@ -11,7 +11,8 @@ notes when a version ships.
   the ATP 500s (this week Tokyo and Beijing) are gone. The WTA's 500s stay.
 - Where to watch, for France: a game or race still to come shows its
   channels in small grey type under the time — "Canal+ · beIN Sports 1" —
-  and its page lists them all under Information, "À voir sur".
+  and its page shows them under the time in its header too, and lists
+  them all under Information, "À voir sur".
 
 ## 1.0 build 32 — 2 October 2026
 - Upcoming has a fine rule between one day and the next, under each day's

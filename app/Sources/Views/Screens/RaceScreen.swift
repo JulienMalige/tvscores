@@ -98,6 +98,7 @@ struct RaceHeaderSection: View {
                 } else {
                     StatusLabel(status: event.status, start: event.start)
                 }
+                if let channels = event.upcomingChannels { ChannelsLabel(names: channels, limit: 3) }
             }
         }
     }

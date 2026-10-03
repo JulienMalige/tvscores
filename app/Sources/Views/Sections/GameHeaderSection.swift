@@ -50,8 +50,14 @@ struct GameHeaderSection: View {
     }
 
     private var status: some View {
-        StatusLabel(status: event.status, start: event.start, setsShown: event.setScores != nil)
-            .frame(width: Metrics.gameCentre)
+        // Where it is on, under the time, as Apple Sports gives it: a page
+        // that opens on a table keeps its Information block below the
+        // screen, and the channel is what you came for (Julien, build 33).
+        VStack(spacing: 8) {
+            StatusLabel(status: event.status, start: event.start, setsShown: event.setScores != nil)
+            if let channels = event.upcomingChannels { ChannelsLabel(names: channels, limit: 3) }
+        }
+        .frame(width: Metrics.gameCentre)
     }
 
     private var empty: some View {

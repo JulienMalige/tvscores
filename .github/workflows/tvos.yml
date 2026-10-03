@@ -184,12 +184,17 @@ jobs:
           sleep 20
           xcrun simctl io "$UDID" screenshot shots/live-league-nfl-en.png
           # A game's page on live data: one finished, one to come.
-          for state in final:football final:nfl scheduled:football; do
+          for state in final:football final:nfl scheduled:football scheduled:nfl:tv; do
             xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
             SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresTab today -TVScoresGame "$state" -AppleLanguages "(en)"
             sleep 14
-            xcrun simctl io "$UDID" screenshot "shots/live-game-${state/:/-}-en.png"
+            xcrun simctl io "$UDID" screenshot "shots/live-game-${state//:/-}-en.png"
           done
+          # The next F1 weekend on live data, with its channels.
+          xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+          SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresTab upcoming -TVScoresRace f1:next -AppleLanguages "(en)"
+          sleep 14
+          xcrun simctl io "$UDID" screenshot shots/live-race-f1-next-en.png
           # Tennis on live data, for its tournament headings.
           xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
           SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresTab upcoming -TVScoresLeague wta -AppleLanguages "(en)"
