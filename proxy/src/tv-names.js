@@ -1,7 +1,8 @@
 /**
  * Names for where a game airs: the channels we read per country, how the
  * feeds spell them, and how team names are compared across languages.
- * Names only — rule 4: never a link, never a logo.
+ * Names only: no link and no logo is passed on (opening an official app
+ * is a roadmap item, docs/roadmap.md).
  */
 
 const range = (from, to, id, name) => Array.from({ length: to - from + 1 }, (_, i) => [id(from + i), name(from + i)]);

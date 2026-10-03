@@ -18,7 +18,7 @@ standings; opening a race gives the full classification.
 Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Brasileirão, Champions
 League, Europa League, Copa Libertadores, NFL, NBA, Formula 1, MotoGP and the
 ATP and WTA tours — the days under the title, every competition in the menu.
-No odds, no betting, no streaming links.
+No odds, no betting, no unofficial streams.
 
 ## How it works
 

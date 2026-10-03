@@ -22,7 +22,7 @@ CHANGELOG.md  what each TestFlight build changed, for whoever installs it.
 1. **The sports API key never enters `app/`.** The app talks only to the proxy. If you need data in the app, add an endpoint to the proxy.
 2. **Native SwiftUI for tvOS only.** No React Native, Flutter, or web views.
 3. **Licensed data only.** Do not add code that scrapes a website or calls an undocumented endpoint. If a provider is proposed, record its terms in `docs/data-providers.md` first.
-4. **No odds, betting, or streaming links** anywhere in the app.
+4. **No odds, no betting, and no links to unofficial streams** anywhere in the app. Opening a broadcaster's official app (the CANAL+ app for Canal+) is allowed (Julien, 2026-10-03); a pirate or unlicensed stream never is.
 5. **Crests come from the proxy** (`team.logo`, mirrored from TheSportsDB), decided by Julien on 2026-09-14 knowing the trademark risk; the monogram stays as the fallback. Never bundle logo files in the app.
 6. **Do not commit** `.xcodeproj` contents, `DerivedData`, `xcuserdata`, `.env`, or any secret. The `.gitignore` covers these; keep it that way.
 7. **Every change a tester could notice goes in `CHANGELOG.md`** under

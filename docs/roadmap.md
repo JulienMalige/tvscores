@@ -37,9 +37,9 @@ Noted 2026-10-03.
   Canal+ → the CANAL+ app on tvOS.
 - This needs a table from channel to app (bundle id or URL scheme) for each
   country, and each app may not accept being opened from outside.
-- **Conflicts with hard rule 4** ("no streaming links anywhere in the
-  app"). Julien would have to lift or reword that rule first; until then,
-  channels stay names only.
+- Allowed by hard rule 4 as reworded 2026-10-03: official broadcasters'
+  apps only, never an unofficial stream. Until this is built, channels
+  stay names.
 
 ## 4. My Teams (favourites)
 

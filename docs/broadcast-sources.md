@@ -2,7 +2,7 @@
 
 Goal: show the channel or streaming service carrying each event, US first,
 country selectable later, several broadcasters per event allowed.
-Hard rule 4 still applies: **names only, never a link**. Any provider field
+Hard rule 4 (reworded 2026-10-03) allows a broadcaster's official app but no unofficial stream; for now the proxy sends **names only, never a link**. Any provider field
 that carries a URL (channel website, deep link, logo URL) is dropped by the
 proxy. Showing a channel logo would be a trademark question like the crests
 (rule 5), so the MVP shows text only.
