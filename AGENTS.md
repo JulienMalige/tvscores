@@ -160,6 +160,9 @@ writes its own number is a bug, and rows all use `rowSurface(focused:)`.
 
 ## Open decisions (ask Julien, do not guess)
 
+- **Private beta, single user (Julien, 2026-10-03).** Every source stays on
+  its current tier while Julien is the only user; licensing is reviewed
+  again before the app reaches anyone else (docs/data-providers.md).
 - **Paid data tiers before any public release.** The motorsport source is free
   for non-commercial use only, the photo source runs on a public test key, and
   the badges under `proxy/assets` are other people's trademarks in a public

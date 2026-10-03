@@ -450,3 +450,16 @@ refreshed once a UTC day with its own back-off, countries one after another:
    row with its source (checked 2026-10-03; details in
    `docs/broadcast-sources.md`).
 
+
+## Private beta, sources as they are (Julien, 2026-10-03)
+
+Julien doubts that Orange Cat Blacktop or TheSportsDB hold real commercial
+rights to the data they sell (both say it is compiled from public or
+community sources), so paying for a "commercial" tier would not settle the
+question anyway. While the app is a private beta with Julien as its only
+user, the sources stay as they are: TheSportsDB on the $9 tier, Orange Cat
+Blacktop, livetennisapi and Jolpica on their free tiers, the community TV
+guides. Nothing is bought for a public release yet. Before the app goes to
+anyone else, the licensing of every source is reviewed again
+(docs/motorsport-sources.md, docs/tennis-stats-sources.md,
+docs/broadcast-sources.md hold what was found).
