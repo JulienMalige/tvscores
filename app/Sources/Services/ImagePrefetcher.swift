@@ -44,8 +44,19 @@ extension Scoreboard {
     /// Every image the board can show, league marks first: those head each
     /// section and are what the eye lands on while scrolling.
     var imageURLs: [URL?] {
-        let groups = Day.allCases.flatMap { self.groups(for: $0) }
-        var marks: [URL?] = leagues.flatMap { [$0.logo, $0.icon] }
+        let (marks, rest) = Self.pictures(of: Day.allCases.flatMap { self.groups(for: $0) })
+        return leagues.flatMap { [$0.logo, $0.icon] } + marks + rest
+    }
+
+    /// What the front page shows on opening: today's games. The loader waits
+    /// for these, crests and portraits, so the first screen is drawn whole.
+    var todayImageURLs: [URL?] {
+        let (marks, rest) = Self.pictures(of: groups(for: .today))
+        return marks + rest
+    }
+
+    private static func pictures(of groups: [LeagueGroup]) -> (marks: [URL?], rest: [URL?]) {
+        var marks: [URL?] = []
         var rest: [URL?] = []
         for group in groups {
             marks.append(group.league.logo)
@@ -63,7 +74,7 @@ extension Scoreboard {
                 }
             }
         }
-        return marks + rest
+        return (marks, rest)
     }
 }
 

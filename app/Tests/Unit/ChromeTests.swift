@@ -69,6 +69,15 @@ struct ChromePictureTests {
         #expect(urls.count > marks.count, "and the crests and portraits follow")
     }
 
+    @Test("the front page's own crests and portraits are the ones the loader waits for")
+    func todayIsWaitedFor() throws {
+        let board = try Self.board()
+        let today = Set(board.todayImageURLs.compactMap { $0 })
+        #expect(!today.isEmpty)
+        #expect(today.isSubset(of: Set(board.imageURLs.compactMap { $0 })), "nothing the rest of the board does not hold")
+        #expect(today.count < Set(board.imageURLs.compactMap { $0 }).count, "and not the other days' as well")
+    }
+
     @Test("a board whose marks never arrive still lets the app in")
     @MainActor
     func readyDoesNotWaitForever() async {

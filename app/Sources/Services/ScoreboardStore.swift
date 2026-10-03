@@ -97,25 +97,28 @@ final class ScoreboardStore {
 
     /// Decode the pictures before the screen wants them.
     ///
-    /// The menu's icons go first and are waited for: there are fifteen, they
-    /// are the smallest files, and a second of loader beats a menu full of
-    /// soccerballs. A slow line must not hold the app shut, so the wait has a
-    /// ceiling; whatever is still missing after it keeps loading behind the
-    /// screen, and `iconsVersion` moves when it lands so the menu redraws.
-    /// Everything else — heading marks, crests, portraits — carries on behind.
+    /// The menu's icons go first, then today's crests and portraits (Julien,
+    /// 2026-10-03), and both are waited for: there are fifteen icons, they are
+    /// the smallest files, and a second of loader beats a menu full of
+    /// soccerballs or a front page whose crests pop in. A slow line must not
+    /// hold the app shut, so the wait has a ceiling; whatever is still missing
+    /// after it keeps loading behind the screen, and `iconsVersion` moves when
+    /// the icons land so the menu redraws. Everything else — the other days'
+    /// crests and portraits — carries on behind.
     private func warm(_ board: Scoreboard) async {
         let icons = board.leagues.map(\.icon)
+        let waited = icons + board.todayImageURLs
         if !ready {
             await withTaskGroup(of: Void.self) { group in
                 group.addTask { [prefetch, weak self] in
                     // In fours, as the prefetcher takes them, so the bar moves as they land.
-                    let chunks = stride(from: 0, to: icons.count, by: 4).map { Array(icons[$0..<min($0 + 4, icons.count)]) }
+                    let chunks = stride(from: 0, to: waited.count, by: 4).map { Array(waited[$0..<min($0 + 4, waited.count)]) }
                     for (i, chunk) in chunks.enumerated() {
                         _ = await prefetch(chunk)
                         await self?.iconsLanded(Double(i + 1) / Double(chunks.count))
                     }
                 }
-                group.addTask { try? await Task.sleep(for: .seconds(4)) }
+                group.addTask { try? await Task.sleep(for: .seconds(6)) }
                 await group.next()
                 group.cancelAll()
             }
@@ -136,7 +139,7 @@ final class ScoreboardStore {
 
     private func advance(to value: Double) { launchProgress = max(launchProgress, value) }
 
-    /// The icons are the rest of the way from the board's arrival to ready.
+    /// The icons and today's pictures are the rest of the way from the board's arrival to ready.
     private func iconsLanded(_ fraction: Double) { advance(to: Self.boardIn + (1 - Self.boardIn) * fraction) }
 
     private var iconsHave = 0

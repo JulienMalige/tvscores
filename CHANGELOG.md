@@ -10,6 +10,9 @@ notes when a version ships.
 - The screen you see while the app opens shows the app's own mark in the
   middle, gently pulsing, and a bar that fills as it connects and gets the
   menu's pictures ready, in place of a spinner.
+- The crests and the drivers' and riders' portraits of today's games are
+  loaded before the front page opens, so it is drawn whole instead of
+  filling in as you look at it.
 - Changing the app's language in Settings applies at once: the menu, the
   game pages, the dates and the country names all switch, with no need to
   close and reopen the app. You are taken back to Home when it changes.
