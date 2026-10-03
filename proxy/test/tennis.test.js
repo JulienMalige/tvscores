@@ -64,12 +64,12 @@ const CATALOGUE = { 1238: "grand_slam", 1270: "itf", 2129: null, 3226: "atp_250"
 const big = (over = {}) =>
   bigEventFilter({ byId: CATALOGUE, categories: config.tennis.categories, includeQualifying: false, alsoBig: [1270], ...over });
 
-test("only the majors, the 1000s, the 500s and the finals reach the television", () => {
+test("only the majors, the 1000s, the WTA 500s and the finals reach the television", () => {
   const keep = big();
   assert.equal(keep({ tournament_id: 1238 }), true, "Australian Open");
   assert.equal(keep({ tournament_id: 7001 }), true, "a Masters 1000");
   assert.equal(keep({ tournament_id: 8002 }), true, "a WTA 1000");
-  assert.equal(keep({ tournament_id: 1652 }), true, "an ATP 500, Beijing");
+  assert.equal(keep({ tournament_id: 1652 }), false, "an ATP 500, Beijing (Julien, 2026-10-03)");
   assert.equal(keep({ tournament_id: 5005 }), true, "a WTA 500");
   assert.equal(keep({ tournament_id: 3226 }), false, "an ATP 250");
   assert.equal(keep({ tournament_id: 5006 }), false, "a WTA 250");
@@ -115,7 +115,7 @@ test("a tournament with a tier and no category still counts by its tier", () => 
   assert.equal(TIER_CATEGORY.atp_500, "atp_500", "a 500 is kept by its tier too");
   assert.equal(TIER_CATEGORY.wta_500, "wta_500");
   assert.equal(TIER_CATEGORY.atp_250, undefined, "a 250 stays out");
-  for (const tier of Object.keys(TIER_CATEGORY).filter((t) => t !== "tour_finals")) {
+  for (const tier of Object.keys(TIER_CATEGORY).filter((t) => t !== "tour_finals" && t !== "atp_500")) {
     assert.ok(config.tennis.categories.includes(TIER_CATEGORY[tier]), `${tier} stands for a category we show`);
   }
 });
@@ -124,7 +124,7 @@ test("upcoming asks for our tiers only, and rounds lose the tournament's name", 
   assert.deepEqual(tiersFor(["grand_slam", "masters_1000", "tour_finals", "wta_1000"]).sort(),
     ["atp_1000", "atp_finals", "grand_slam", "wta_1000", "wta_finals"]);
   assert.deepEqual(tiersFor(config.tennis.categories).sort(),
-    ["atp_1000", "atp_500", "atp_finals", "grand_slam", "wta_1000", "wta_500", "wta_finals"], "the 500s are asked for");
+    ["atp_1000", "atp_finals", "grand_slam", "wta_1000", "wta_500", "wta_finals"], "the WTA 500s are asked for, not the ATP's");
   assert.ok(!tiersFor(config.tennis.categories).includes("tour_finals"), "never our own name, which the feed refuses");
   assert.equal(roundOf("WTA Beijing - Round of 64"), "Round of 64");
   assert.equal(roundOf("WTA Beijing - 1/64-finals"), "Round of 128");

@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- Men's tennis is back to the Masters 1000s, the majors and the Finals:
+  the ATP 500s (this week Tokyo and Beijing) are gone. The WTA's 500s stay.
 - Where to watch, for France: a game or race still to come shows its
   channels in small grey type under the time — "Canal+ · beIN Sports 1" —
   and its page lists them all under Information, "À voir sur".

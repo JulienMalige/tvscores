@@ -151,14 +151,15 @@ export const config = {
   /**
    * Tennis plays somewhere every week of the year, most of it in front of
    * nobody. These are the events worth a television: the four majors, the
-   * 1000-level and 500-level fields (Julien, 2026-09-28: the 500s too) and
+   * 1000-level fields, the WTA's 500s (Julien, 2026-09-28: the 500s too;
+   * 2026-10-03: not the ATP's, "focus on ATP 1000") and
    * the season finals. The feed labels a tournament's
    * category only where its own catalogues agree on an exact-name join and
    * never guesses from the name, so an unlabelled tournament is left out
    * rather than assumed to be big.
    */
   tennis: {
-    categories: ["grand_slam", "masters_1000", "tour_finals", "wta_1000", "atp_500", "wta_500"],
+    categories: ["grand_slam", "masters_1000", "tour_finals", "wta_1000", "wta_500"],
     /** Names and dates by tour, town and week; see `calendarEntry`. */
     calendar: readCalendar(),
     /** Qualifying draws are the same tournament but not the part you watch. */
@@ -168,8 +169,8 @@ export const config = {
      * name match is what mislabelled them: Madrid and Rome come back as `itf`
      * (both cities host an ITF week of the same name) and the rest as `null`.
      * Each tournament has two ids, one per event type, and both are listed.
-     * Checked 2026-09-15. ATP Doha and ATP Beijing are 500s, kept by the
-     * category or tier the catalogue gives them now that 500s are shown.
+     * Checked 2026-09-15. ATP Doha and ATP Beijing are 500s, and the ATP's
+     * 500s are not shown (2026-10-03).
      */
     alsoBig: [
       1262, 1970, // Monte Carlo
