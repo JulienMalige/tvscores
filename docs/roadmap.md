@@ -40,3 +40,18 @@ Noted 2026-10-03.
 - **Conflicts with hard rule 4** ("no streaming links anywhere in the
   app"). Julien would have to lift or reword that rule first; until then,
   channels stay names only.
+
+## 4. My Teams (favourites)
+
+Noted 2026-10-03.
+
+- A "My Teams" entry in the menu, near Home, as in Apple Sports' sidebar.
+- The viewer picks the teams and players they follow, in any sport or
+  competition we carry.
+- My Teams shows only their games, laid out like Home: Yesterday, Today and
+  Upcoming, with the same rows and game pages.
+- Choosing the teams needs a picker: browse by competition, then tick
+  teams. Searching by name could come later.
+- Kept on the Apple TV, like the Settings choices. The proxy already
+  serves every game; it may need a list of each competition's teams for
+  the picker.
