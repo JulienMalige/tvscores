@@ -215,7 +215,7 @@ export class CalendarScheduler {
       if (now > t - 6 * 3600e3 && now < t + 6 * 3600e3) return true;
       return (e.sessions || []).some((s) => {
         const at = Date.parse(s.start);
-        return s.kind !== "race" && now >= at && now < at + 3 * 3600e3;
+        return ["qualifying", "sprint"].includes(s.kind) && now >= at && now < at + 3 * 3600e3;
       });
     });
     return backoff(near ? CALENDAR_LIVE : CALENDAR_IDLE, this.meta.failures);

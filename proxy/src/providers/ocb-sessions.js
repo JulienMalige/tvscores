@@ -11,8 +11,12 @@ import { classify, driverFields, lapSeconds, placed } from "./ocb-rows.js";
  * sprint shootout is left out: the grid that matters is the race's.
  */
 const KINDS = ["qualifying", "sprint"];
-/** An empty answer is tried again at the next round, this many times in all. */
-const TRIES = 3;
+/**
+ * An empty or failed answer is asked again at later rounds until the race
+ * starts — a feed can publish a grid hours after "completed" (review, build
+ * 35) — and at most this many times.
+ */
+const TRIES = 12;
 /** Past this, a classified weekend keeps what it has and asks for nothing new. */
 const AFTER_RACE_MS = 2 * 86400e3;
 
@@ -79,13 +83,20 @@ export async function sessionResults(e, { cached = [], fetch, budget = () => tru
     if (settled || !list.every((s) => s.status === "completed")) continue;
     const i = out.findIndex((x) => x.kind === kind);
     const had = out[i];
-    if (had && (had.results?.length || (had.tries || 0) >= TRIES)) continue;
+    const raceStarted = race && now >= Date.parse(race.startTime);
+    if (had && (had.results?.length || (had.tries || 0) >= TRIES || raceStarted)) continue;
     if (!budget(list.length)) continue;
     const answers = [];
-    for (const s of list) {
-      const body = await fetch(s.id);
-      calls += 1;
-      answers.push(Array.isArray(body) ? body : body?.data || []);
+    try {
+      for (const s of list) {
+        const body = await fetch(s.id);
+        calls += 1;
+        answers.push(Array.isArray(body) ? body : body?.data || []);
+      }
+    } catch {
+      // One session's error is not the calendar's: counted as an empty
+      // answer, tried again next round (review, build 35).
+      answers.length = 0;
     }
     const last = list.at(-1);
     const results = kind === "qualifying" ? gridRows(answers, nationalities) : classify(answers.at(-1), nationalities) || [];

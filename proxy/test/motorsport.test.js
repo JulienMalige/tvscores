@@ -166,13 +166,23 @@ test("a session still running, or a weekend long done, costs nothing", async () 
   assert.equal((await sessionResults(done, { fetch: f.fetch, now: later })).calls, 0, "no backfill of past weekends");
 });
 
-test("an empty answer is retried a few times, then left alone; no budget, no call", async () => {
+test("an empty answer is retried until the race starts, a failure too; no budget, no call", async () => {
   const e = sx.f1.event;
   const f = feed({});
   let cached;
   for (let i = 0; i < 5; i += 1) cached = (await sessionResults(e, { cached, fetch: f.fetch, now: AFTER })).sessionResults;
-  assert.equal(f.asked.length, 3);
-  assert.equal(cached[0].tries, 3);
+  assert.equal(f.asked.length, 5, "asked every round while the race is ahead");
+  assert.equal(cached[0].tries, 5);
+  const race = e.schedule.find((x) => x.type === "race");
+  const started = Date.parse(race.startTime) + 60e3;
+  if (started < Date.parse(race.startTime) + 2 * 86400e3) {
+    const before = f.asked.length;
+    await sessionResults(e, { cached, fetch: f.fetch, now: started });
+    assert.equal(f.asked.length, before, "not once the race is under way");
+  }
+  // A failing call is an empty answer, not a thrown calendar (review, build 35).
+  const broken = await sessionResults(e, { fetch: async () => { throw new Error("HTTP 500"); }, now: AFTER });
+  assert.equal(broken.sessionResults[0].tries, 1);
   const g = feed({ [idOf(e, "Qualifying")]: sx.f1.qualifying });
   assert.equal((await sessionResults(e, { fetch: g.fetch, budget: () => false, now: AFTER })).calls, 0);
 });

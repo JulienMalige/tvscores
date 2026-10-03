@@ -28,10 +28,15 @@ struct DaySection<Row: View>: View {
 extension LeagueGroup {
     /// Groups cut by the viewer's calendar day, earliest first, each day's
     /// competitions in the order the board gives them.
-    static func byDay(_ groups: [LeagueGroup], calendar: Calendar = .current) -> [(day: Date, groups: [LeagueGroup])] {
+    /// A race weekend goes under the day of its first session still to come,
+    /// since its row lists those sessions from there on: Saturday's
+    /// qualifying is not under Sunday's heading (review, build 35).
+    static func byDay(_ groups: [LeagueGroup], now: Date = .now, calendar: Calendar = .current) -> [(day: Date, groups: [LeagueGroup])] {
         var days: [Date: [LeagueGroup]] = [:]
         for group in groups {
-            let split = Dictionary(grouping: group.events) { calendar.startOfDay(for: $0.start) }
+            let split = Dictionary(grouping: group.events) { event in
+                calendar.startOfDay(for: event.sessions(on: .upcoming, now: now, calendar: calendar).map(\.start).min() ?? event.start)
+            }
             for (day, events) in split {
                 days[day, default: []].append(LeagueGroup(sport: group.sport, league: group.league, events: events))
             }
