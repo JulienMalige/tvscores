@@ -117,7 +117,7 @@ This is the mechanic to preserve; `proxy/src/scheduler.js` owns it and
 | Schedules (`daily`) | once per UTC day after `dailyRefreshHourUtc`, or after `idleRefreshMinutes` — but never while a game could be in progress | 9 calls per team sport, one per day of the window, plus one per competition with nothing in it (when it is next on) |
 | Scores (`live`) | only inside a live window, then every `liveIntervalSeconds` — 30 s for the sports on the paid key, 30 min for tennis | 1 call per sport |
 | Standings | every 6 hours, and within 10 min of a final whistle in that league | 1 per league (the season's results for the leagues the feed has no table for) |
-| Motorsport calendar | every 6 hours, or every 30 min within 6 h of a session | 1 + one per newly finished race |
+| Motorsport calendar | every 6 hours, or every 30 min within 6 h of a session and for 3 h after a qualifying or sprint starts | 1 + one per newly finished race, qualifying or sprint |
 | Portraits | once per athlete, kept a month | background, 25/min |
 | Crests, badges | mirrored once, served with a month-long header | none after the first |
 | TV channels (`broadcasts.js`) | once per UTC day per source, an hour after `dailyRefreshHourUtc` once the schedules are in; a failed source keeps its last answer and retries after 30 min, then hourly | 1 TheSportsDB call + 1 XMLTV download (~11 MB gzipped) |
