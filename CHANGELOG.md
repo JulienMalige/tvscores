@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- More games show their channels: the Nations League and NBA games that
+  share a time slot (L'Équipe, beIN Sports), tennis being played, and a
+  race weekend on its qualifying day.
 
 ## 1.0 build 33 — 3 October 2026
 - A gear at the top right of the menu opens Settings: the country whose

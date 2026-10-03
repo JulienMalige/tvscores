@@ -6,8 +6,9 @@ import { MIN } from "./clock.js";
  * magazines alongside the games, so a programme only counts when it starts
  * between 45 minutes before a kickoff (the build-up) and 15 minutes after it,
  * and then only when it names both teams, is a race weekend's session, or
- * names a competition that has exactly one game of ours at that moment.
- * When in doubt — two games at once — nothing is guessed.
+ * names a competition that has exactly one game of ours at that moment —
+ * or several, and its description names one first. When in doubt, nothing
+ * is guessed.
  */
 const BEFORE = 45 * MIN;
 // A listing that names both teams can open earlier: Ligue 1+ starts Lens /
@@ -26,6 +27,7 @@ const COMPETITIONS = [
   { label: /^football$/, phrase: /^ligue europa\b(?!.*conference)/, sport: "football", league: 4481 },
   { label: /^football$/, phrase: /^ligue des nations\b/, sport: "football", league: 4490 },
   { label: /^football$/, phrase: /^copa libertadores\b/, sport: "football", league: 4501 },
+  { label: /^football$/, phrase: /^match amical\b/, sport: "football", league: 4562 },
   { label: /^football$/, phrase: /^(championnat du bresil|brasileirao)\b/, sport: "football", league: 4351 },
   { label: /^football americain$/, phrase: /^nfl\b/, sport: "nfl", league: 4391 },
   { label: /^basket ?ball$/, phrase: /^(pre saison )?nba\b/, sport: "nba", league: 4387 },
@@ -103,5 +105,28 @@ export function matchProgramme(p, index) {
   const comp = COMPETITIONS.find((c) => c.label.test(label) && c.phrase.test(phrase));
   if (!comp) return [];
   const only = near.filter((x) => x.e.sport === comp.sport && String(x.e.league?.id) === String(comp.league));
-  return only.length === 1 ? [only[0].e.id] : [];
+  if (only.length === 1) return [only[0].e.id];
+  return namedIn(p.desc, only);
+}
+
+/**
+ * Several games of the competition at that hour, and a title naming none:
+ * the description usually opens on the game shown — "La Croatie accueille
+ * l'Angleterre…", then "on jouera également Islande/Bulgarie" (Julien,
+ * build 34: the Nations League and the NBA had no channel). The game whose
+ * two sides are both named soonest is the one; none named, no guess.
+ */
+function namedIn(desc, candidates) {
+  const words = english(desc || "").split(" ");
+  if (words.length < 2) return [];
+  // Where a side is first named in full, and where a game is: once both
+  // sides are. "…face à la Belgique, l'Italie… en Turquie… au Stade de
+  // France" is Italy v Turkey, not France v Belgium.
+  const at = (side) => (side.length && side.every((w) => words.includes(w)) ? Math.max(...side.map((w) => words.indexOf(w))) : -1);
+  const named = candidates
+    .map((x) => ({ x, home: at(x.home), away: at(x.away) }))
+    .filter((c) => c.home >= 0 && c.away >= 0)
+    .map((c) => ({ x: c.x, at: Math.max(c.home, c.away) }))
+    .sort((a, b) => a.at - b.at);
+  return named.length ? [named[0].x.e.id] : [];
 }

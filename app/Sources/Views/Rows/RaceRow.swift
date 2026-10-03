@@ -62,6 +62,8 @@ private struct RaceRowContent: View {
                     caption(session.name)
                     Text(session.start, format: .dateTime.weekday(.wide).hour().minute())
                         .font(.title2.weight(.semibold))
+                    // On a qualifying day too, not only the race's (build 34).
+                    if let channels = event.upcomingChannels { ChannelsLabel(names: channels) }
                 }
                 .frame(maxWidth: .infinity)
             }

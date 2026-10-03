@@ -79,6 +79,8 @@ export function programme({ attrs, body }) {
     start: xmltvTime(attrs.start),
     title: text(body, "title"),
     subTitle: text(body, "sub-title"),
+    // Read to tell simultaneous games apart, never passed on.
+    desc: text(body, "desc"),
     rerun: /<previously-shown\b/.test(body),
   };
 }

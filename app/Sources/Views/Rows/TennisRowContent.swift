@@ -41,9 +41,12 @@ struct TennisRowContent: View {
                 // Over with no games known (a result from before build 32):
                 // "Final" says it rather than nothing.
                 if event.status.state != .final || sets.isEmpty {
-                    StatusLabel(status: event.status, start: event.start, compact: true,
-                                setsShown: !sets.isEmpty, sport: event.sport)
-                        .fixedSize()
+                    VStack(spacing: 4) {
+                        StatusLabel(status: event.status, start: event.start, compact: true,
+                                    setsShown: !sets.isEmpty, sport: event.sport)
+                        if let channels = event.upcomingChannels { ChannelsLabel(names: channels) }
+                    }
+                    .fixedSize()
                 }
                 if !sets.isEmpty {
                     VStack(spacing: Metrics.tennisLineGap) {

@@ -167,3 +167,14 @@ test("a listing naming both teams may open an hour before kickoff; a guess by co
   assert.deepEqual(matchProgramme({ start: "2026-10-09T17:45:00Z", title: "Football : Ligue 1 McDonald's - Lens / Lyon", subTitle: "" }, index), [lens.id]);
   assert.deepEqual(matchProgramme({ start: "2026-10-09T17:45:00Z", title: "Football américain : NFL", subTitle: "" }, index), [], "an hour early is too early to guess");
 });
+
+test("several games at once: the description's first game named in full is the one", async () => {
+  // Julien, build 34: Nations League listings name only the competition.
+  const { eventIndex, matchProgramme } = await import("../src/tv-match.js");
+  const at = "2026-10-05T18:45:00Z";
+  const game = (id, home, away) => ({ id, sport: "football", kind: "match", league: { id: 4490 }, start: at, home: { name: home }, away: { name: away } });
+  const index = eventIndex([game("a", "France", "Belgium"), game("b", "Italy", "Turkey"), game("c", "Wales", "Denmark")]);
+  const listing = (desc) => ({ start: "2026-10-05T18:39:00Z", title: "Football : Ligue des Nations UEFA", subTitle: "", desc });
+  assert.deepEqual(matchProgramme(listing("Après avoir raté son entrée en lice à Rome face à la Belgique, l'Italie s'est rassurée en Turquie… avant le Stade de France."), index), ["b"]);
+  assert.deepEqual(matchProgramme(listing("La Croatie accueille l'Angleterre."), index), [], "no game of ours named: no guess");
+});
