@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// The colour a page is tinted with, as Apple Sports tints each competition's
-/// page with the competition's own colour and its Home with green. Screens
+/// page with the competition's own colour and its Home with the icon's blue. Screens
 /// set it; the panels on them read it, so a panel on the NBA's page is a
 /// deeper navy rather than a neutral grey. Nil where a page has no tint.
 extension EnvironmentValues {
