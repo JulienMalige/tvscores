@@ -141,12 +141,10 @@ jobs:
           xcrun simctl io "$UDID" screenshot shots/menu-en.png
           # Settings, from the gear at the top of the menu.
           xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
-          for style in rows tiles chips; do
-            xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
-            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab today -TVScoresSettings -TVScoresSettingsStyle "$style" -channelCountries "(FR,US)" -AppleLanguages "(fr)"
-            sleep 8
-            xcrun simctl io "$UDID" screenshot "shots/settings-$style-fr.png"
-          done
+          xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+          SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab today -TVScoresSettings -channelCountries "(FR,US)" -AppleLanguages "(fr)"
+          sleep 8
+          xcrun simctl io "$UDID" screenshot shots/settings-fr.png
           xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
           SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab today -TVScoresLeague f1 -TVScoresTable constructors -AppleLanguages "(en)"
           sleep 8

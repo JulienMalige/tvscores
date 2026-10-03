@@ -72,8 +72,10 @@ enum Metrics {
     /// A country's round flag before its channels, and in Settings' list.
     static let channelFlag: CGFloat = 28
     static let settingsFlag: CGFloat = 44
-    static let settingsTileFlag: CGFloat = 96
-    static let settingsTile: CGFloat = 300
+    /// Settings, after tvOS's own: the mark on the left, the list on the right.
+    static let settingsMark: CGFloat = 520
+    static let settingsGap: CGFloat = 80
+    static let settingsMargin: CGFloat = 120
     /// The same thing blown up for a podium, where it is the subject.
     static let markHero: CGFloat = 110
     /// A race weekend's flag over its caption on the front page, while
