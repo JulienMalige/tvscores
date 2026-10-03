@@ -36,6 +36,15 @@ struct SettingsScreen: View {
                 } footer: {
                     Text("settings.countryNote")
                 }
+                // Facts, not choices: rows the remote can stand on so the
+                // list scrolls, as tvOS's own information rows are.
+                Section("settings.sources") {
+                    fact("settings.scores", "TheSportsDB, Live Tennis API, Orange Cat, Jolpica")
+                    fact("settings.listings", "TheSportsDB, XML TV Fr, epgshare01")
+                }
+                Section("settings.about") {
+                    fact("settings.version", version)
+                }
             }
             .frame(maxWidth: .infinity)
         }
@@ -46,21 +55,26 @@ struct SettingsScreen: View {
         .accessibilityIdentifier("page.settings")
     }
 
-    /// The left column: the mark, the name and version, the sources.
+    /// The left column, as tvOS's settings pages open: the mark large, the
+    /// app's name, and what it is in a sentence. (TestFlight adds the
+    /// account's name there; tvOS tells no other app who is signed in.)
     private var about: some View {
         VStack(spacing: 28) {
             CourtMark()
                 .frame(width: Metrics.settingsMark, height: Metrics.settingsMark * 0.6)
             Text("app.title")
                 .font(.title3.weight(.bold))
-            VStack(spacing: 10) {
-                Text("settings.version") + Text(verbatim: " ") + Text(verbatim: version).foregroundStyle(.primary)
-                Text("settings.scores") + Text(verbatim: " TheSportsDB, Live Tennis API, Orange Cat, Jolpica").foregroundStyle(.primary)
-                Text("settings.listings") + Text(verbatim: " TheSportsDB, XML TV Fr, epgshare01").foregroundStyle(.primary)
-            }
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
+            Text("settings.blurb")
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: Metrics.settingsMark * 1.2)
+        }
+    }
+
+    private func fact(_ label: LocalizedStringKey, _ value: String) -> some View {
+        Button {} label: {
+            LabeledContent(label) { Text(verbatim: value) }
         }
     }
 }

@@ -1232,6 +1232,64 @@
         }
       }
     },
+    "settings.about": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À propos"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sobre"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acerca de"
+          }
+        }
+      }
+    },
+    "settings.blurb": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scores, schedules and where to watch, for the competitions worth a television."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scores, calendriers et où regarder, pour les compétitions qui valent un écran de télévision."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Placares, calendários e onde assistir, para as competições que merecem uma TV."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resultados, calendarios y dónde verlo, para las competiciones que merecen una tele."
+          }
+        }
+      }
+    },
     "settings.countryNote": {
       "extractionState": "manual",
       "localizations": {
@@ -1267,25 +1325,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "TV listings:"
+            "value": "TV listings"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Programmes TV :"
+            "value": "Programmes TV"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Programação de TV:"
+            "value": "Programação de TV"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Programación de TV:"
+            "value": "Programación de TV"
           }
         }
       }
@@ -1296,25 +1354,54 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Scores and schedules:"
+            "value": "Scores and schedules"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Scores et calendriers :"
+            "value": "Scores et calendriers"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Placares e calendários:"
+            "value": "Placares e calendários"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Resultados y calendarios:"
+            "value": "Resultados y calendarios"
+          }
+        }
+      }
+    },
+    "settings.sources": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sources"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sources"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fontes"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fuentes"
           }
         }
       }
@@ -1354,25 +1441,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Version:"
+            "value": "Version"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Version :"
+            "value": "Version"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Versão:"
+            "value": "Versão"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Versión:"
+            "value": "Versión"
           }
         }
       }
