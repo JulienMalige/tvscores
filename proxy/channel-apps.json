@@ -25,12 +25,17 @@
     "2026-10-04 (Brazil, with Julien)": [
       "Julien: the main ways to watch in Brazil are Globoplay, Vivo, Claro, SKY+ and the channel's own app",
       "Apple's store, Brazil: Premiere (468481865) has a tvOS app; Vivo's TV app is 'Vivo TV' (589412933, tvOS), not 'Vivo Play'; ge globo (361393520) has one too; Conmebol Libertadores, SportyNet, BandSports, Telecine and Oi Play have none"
+    ],
+    "2026-10-04 (France, with Julien)": [
+      "Julien: in France it is Canal+, Free, Molotov, maybe Bouygues and Orange",
+      "Apple's store, France: Free TV (1542614107) and b.tv par Bouygues Telecom (739824309) have a tvOS app; Orange and SFR have none for their TV service (RMC Sport, SFR's, has); nothing found for 'Wake Television'"
     ]
   },
   "toConfirm": [
     "Brazil, Vivo TV: which channels does the app carry (SporTV, ESPN, Premiere, TNT, Globo)? Added to all four from the web, not checked",
     "Brazil: for each of Globoplay, Vivo TV, Claro tv+ and SKY+, which of Globo, SporTV 1-3, Premiere, ESPN 1-4, TNT, Band Sports, Sportynet it really carries, and in which pack; whether the Premiere app opens a given game",
-    "France: the same for the operators' boxes (Orange, SFR, Free, Bouygues) if they have an Apple TV app that opens a channel"
+    "France, Free TV and b.tv: added to every French channel their boxes carry (Canal+, beIN, Ligue 1+, Eurosport, TNT channels), from general knowledge: which of them each really plays in the app, and does it need the pack?",
+    "France: Orange has no Apple TV app for its TV service in the store: is there another way Orange subscribers watch on an Apple TV? And what is 'Wake Television'?"
   ],
   "apps": {
     "beinconnect": {
@@ -339,53 +344,93 @@
       "tvos": [
         "BR"
       ]
+    },
+    "freetv": {
+      "name": "Free TV",
+      "kind": "provider",
+      "appStoreId": 1542614107,
+      "tvos": [
+        "FR"
+      ]
+    },
+    "btv": {
+      "name": "b.tv (Bouygues Telecom)",
+      "kind": "provider",
+      "appStoreId": 739824309,
+      "tvos": [
+        "FR"
+      ]
     }
   },
   "channels": {
     "FR": {
       "Canal+": [
         "canalplus",
-        "molotov"
+        "molotov",
+        "freetv",
+        "btv"
       ],
       "Canal+ Foot": [
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "Canal+ Sport": [
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "Canal+ Sport 360": [
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "Canal+ Premier League": [
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "beIN Sports": [
         "beinconnect",
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "beIN Sports 1": [
         "beinconnect",
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "beIN Sports 2": [
         "beinconnect",
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "beIN Sports 3": [
         "beinconnect",
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "beIN Sports Max 4": [
         "beinconnect",
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "beIN Sports Max 5": [
         "beinconnect",
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "beIN Sports Max 6": [
         "beinconnect",
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "DAZN": [
         "dazn"
@@ -400,37 +445,51 @@
         "primevideo",
         "molotov",
         "rmcsport",
-        "lequipe"
+        "lequipe",
+        "freetv",
+        "btv"
       ],
       "Eurosport": [
         "eurosport",
         "canalplus",
-        "primevideo"
+        "primevideo",
+        "freetv",
+        "btv"
       ],
       "TF1": [
         "tf1plus",
         "molotov",
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "France 2": [
         "francetv",
         "molotov",
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "France 3": [
         "francetv",
         "molotov",
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "M6": [
         "m6plus",
         "molotov",
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "L'Équipe": [
         "lequipe",
         "molotov",
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ],
       "RMC Sport": [
         "rmcsport"
@@ -440,7 +499,9 @@
       ],
       "beIN Sports Max": [
         "beinconnect",
-        "canalplus"
+        "canalplus",
+        "freetv",
+        "btv"
       ]
     },
     "US": {
