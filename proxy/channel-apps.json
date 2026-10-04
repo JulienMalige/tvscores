@@ -1,99 +1,596 @@
 {
-  "comment": "Hand-kept, not used yet (roadmap item 3, How to Watch). An event is on one or more channels (broadcasts.js); a channel is on one or more apps, listed here per country, most direct first. App Store ids from Apple's search API, 2026-10-03; null = to look up. Julien maintains this list: add an app to a channel's list, or a channel to the list, as you find them.",
+  "comment": "Hand-kept (roadmap item 3, How to Watch). An event is on one or more channels (broadcasts.js); a channel is on one or more apps, per country, listed here. Julien maintains this file: add an app to a channel's list, or a channel to a country, as you find them.",
+  "rules": [
+    "kind says what the app is to the channel: own (its own app), streamer (a streaming service that carries it), provider (a distributor, operator or bundle carrying many channels). A game's cards go own, then streamer, then provider; within a kind, the order here.",
+    "tvos lists the countries whose App Store has a tvOS version of the app (checked with Apple's lookup API, 2026-10-04). A card is shown only for an app with tvOS in the viewer's country: an iOS-only app cannot be opened from an Apple TV.",
+    "appStoreId is a number, or a map by country when the store's listing differs (Paramount+ in Brazil). builtIn apps (Apple TV) have none.",
+    "A channel is found by its exact name, then without a trailing number (Ligue 1+ 4 -> Ligue 1+, ESPN 3 -> ESPN), then without a trailing 'Max N' (beIN Sports Max 7 -> beIN Sports Max).",
+    "Never a link to a stream; only an official broadcaster's or distributor's app (AGENTS.md rule 4)."
+  ],
+  "checked": {
+    "2026-10-04": [
+      "tvOS availability of every appStoreId, Apple lookup API, FR/US/BR",
+      "Claro tv+ lineup: claro.com.br/blog/tv/assistir-futebol-ao-vivo (ESPN, SporTV, BandSports, GE TV in the plan; Premiere, Paramount+ add-ons; HBO Max and Prime Video on new plans)",
+      "Vivo Play: sports channels not in the app (tecnoblog.net); removed from every list"
+    ]
+  },
+  "toConfirm": [
+    "canalplus.com not reachable from the tools: Canal+ lists below are from memory and a summary (selectra.info): does the CANAL+ app carry Ligue 1+ (draft said yes, summary said not via myCanal) and beIN SPORTS?",
+    "'Fandango' on Bundesliga games in the US feed (with USA Network): a feed error, or a service we should map?",
+    "SKY+ lineup in Brazil: is ESPN/SporTV/Premiere in the app, and which pack?",
+    "Eurosport and beIN SPORTS CONNECT have no tvOS app in the French store: Canal+ and Prime Video then are the only cards in France",
+    "beIN SPORTS Max 4-10 in France: on the CANAL+ app too (added so those games have a card), or only on beIN's own app, which has no Apple TV version in France?"
+  ],
   "apps": {
-    "canalplus": { "name": "CANAL+", "appStoreId": 694580816 },
-    "beinconnect": { "name": "beIN SPORTS CONNECT", "appStoreId": 530061754 },
-    "dazn": { "name": "DAZN", "appStoreId": 1129523589 },
-    "ligue1plus": { "name": "Ligue 1+", "appStoreId": 6451418074 },
-    "eurosport": { "name": "Eurosport", "appStoreId": 324021126 },
-    "tf1plus": { "name": "TF1+", "appStoreId": 407248490 },
-    "m6plus": { "name": "M6+", "appStoreId": 369692259 },
-    "francetv": { "name": "france.tv", "appStoreId": 428835098 },
-    "molotov": { "name": "Molotov", "appStoreId": 1053134780 },
-    "lequipe": { "name": "L'Équipe", "appStoreId": 318133983 },
-    "rmcsport": { "name": "RMC Sport", "appStoreId": 1112438268 },
-    "primevideo": { "name": "Prime Video", "appStoreId": 545519333 },
-    "espn": { "name": "ESPN", "appStoreId": 317469184 },
-    "peacock": { "name": "Peacock", "appStoreId": 1508186374 },
-    "paramountplus": { "name": "Paramount+", "appStoreId": 530168168 },
-    "foxone": { "name": "FOX One", "appStoreId": 6746049430 },
-    "foxsports": { "name": "FOX Sports", "appStoreId": 294056623 },
-    "fubo": { "name": "Fubo", "appStoreId": 905401434 },
-    "youtubetv": { "name": "YouTube TV", "appStoreId": 1193350206 },
-    "sling": { "name": "Sling TV", "appStoreId": 945077360 },
-    "nbcsports": { "name": "NBC Sports", "appStoreId": 542511686 },
-    "telemundo": { "name": "Telemundo", "appStoreId": 680595680 },
-    "tennischannel": { "name": "Tennis Channel", "appStoreId": 651092377 },
-    "appletv": { "name": "Apple TV", "appStoreId": 1174078549 },
-    "hbomax": { "name": "HBO Max", "appStoreId": null },
-    "globoplay": { "name": "Globoplay", "appStoreId": 536321738 },
-    "disneyplus": { "name": "Disney+", "appStoreId": 1446075923 },
-    "vivoplay": { "name": "Vivo Play", "appStoreId": null },
-    "skyplus": { "name": "SKY+", "appStoreId": null },
-    "clarotvplus": { "name": "Claro tv+", "appStoreId": null },
-    "youtube": { "name": "YouTube", "appStoreId": 544007664 }
+    "beinconnect": {
+      "name": "beIN SPORTS CONNECT",
+      "kind": "own",
+      "appStoreId": 530061754,
+      "tvos": [
+        "US"
+      ]
+    },
+    "lequipe": {
+      "name": "L'Équipe",
+      "kind": "own",
+      "appStoreId": 318133983,
+      "tvos": [
+        "FR"
+      ]
+    },
+    "rmcsport": {
+      "name": "RMC Sport",
+      "kind": "own",
+      "appStoreId": 1112438268,
+      "tvos": [
+        "FR"
+      ]
+    },
+    "ligue1plus": {
+      "name": "Ligue 1+",
+      "kind": "own",
+      "appStoreId": 6451418074,
+      "tvos": [
+        "FR"
+      ]
+    },
+    "eurosport": {
+      "name": "Eurosport",
+      "kind": "own",
+      "appStoreId": 324021126,
+      "tvos": []
+    },
+    "dazn": {
+      "name": "DAZN",
+      "kind": "own",
+      "appStoreId": 1129523589,
+      "tvos": [
+        "FR"
+      ]
+    },
+    "tennischannel": {
+      "name": "Tennis Channel",
+      "kind": "own",
+      "appStoreId": 651092377,
+      "tvos": [
+        "US"
+      ]
+    },
+    "nba": {
+      "name": "NBA",
+      "kind": "own",
+      "appStoreId": 484672289,
+      "tvos": [
+        "US"
+      ]
+    },
+    "nfl": {
+      "name": "NFL",
+      "kind": "own",
+      "appStoreId": 389781154,
+      "tvos": [
+        "US"
+      ]
+    },
+    "foxsports": {
+      "name": "FOX Sports",
+      "kind": "own",
+      "appStoreId": 294056623,
+      "tvos": [
+        "US"
+      ]
+    },
+    "nbcsports": {
+      "name": "NBC Sports",
+      "kind": "own",
+      "appStoreId": 542511686,
+      "tvos": [
+        "US"
+      ]
+    },
+    "telemundo": {
+      "name": "Telemundo",
+      "kind": "own",
+      "appStoreId": 680595680,
+      "tvos": [
+        "US"
+      ]
+    },
+    "univision": {
+      "name": "Univision",
+      "kind": "own",
+      "appStoreId": 425226754,
+      "tvos": [
+        "US"
+      ]
+    },
+    "vix": {
+      "name": "ViX",
+      "kind": "own",
+      "appStoreId": 1531467766,
+      "tvos": [
+        "US"
+      ]
+    },
+    "espn": {
+      "name": "ESPN",
+      "kind": "own",
+      "appStoreId": 317469184,
+      "tvos": [
+        "US"
+      ]
+    },
+    "tf1plus": {
+      "name": "TF1+",
+      "kind": "own",
+      "appStoreId": 407248490,
+      "tvos": [
+        "FR"
+      ]
+    },
+    "m6plus": {
+      "name": "M6+",
+      "kind": "own",
+      "appStoreId": 369692259,
+      "tvos": [
+        "FR"
+      ]
+    },
+    "francetv": {
+      "name": "france.tv",
+      "kind": "own",
+      "appStoreId": 428835098,
+      "tvos": [
+        "FR"
+      ]
+    },
+    "globoplay": {
+      "name": "Globoplay",
+      "kind": "own",
+      "appStoreId": 536321738,
+      "tvos": [
+        "BR"
+      ]
+    },
+    "disneyplus": {
+      "name": "Disney+",
+      "kind": "streamer",
+      "appStoreId": 1446075923,
+      "tvos": [
+        "FR",
+        "BR"
+      ]
+    },
+    "primevideo": {
+      "name": "Prime Video",
+      "kind": "streamer",
+      "appStoreId": 545519333,
+      "tvos": [
+        "FR",
+        "US",
+        "BR"
+      ]
+    },
+    "peacock": {
+      "name": "Peacock",
+      "kind": "streamer",
+      "appStoreId": 1508186374,
+      "tvos": [
+        "US"
+      ]
+    },
+    "paramountplus": {
+      "name": "Paramount+",
+      "kind": "streamer",
+      "appStoreId": {
+        "US": 530168168,
+        "BR": 1340650234
+      },
+      "tvos": [
+        "US",
+        "BR"
+      ]
+    },
+    "foxone": {
+      "name": "FOX One",
+      "kind": "streamer",
+      "appStoreId": 6746049430,
+      "tvos": [
+        "US"
+      ]
+    },
+    "hbomax": {
+      "name": "HBO Max",
+      "kind": "streamer",
+      "appStoreId": 1666653815,
+      "tvos": [
+        "US",
+        "BR"
+      ]
+    },
+    "appletv": {
+      "name": "Apple TV",
+      "kind": "streamer",
+      "appStoreId": null,
+      "tvos": [
+        "US",
+        "FR",
+        "BR"
+      ],
+      "builtIn": true
+    },
+    "youtube": {
+      "name": "YouTube",
+      "kind": "streamer",
+      "appStoreId": 544007664,
+      "tvos": [
+        "BR",
+        "FR",
+        "US"
+      ]
+    },
+    "canalplus": {
+      "name": "CANAL+",
+      "kind": "provider",
+      "appStoreId": 694580816,
+      "tvos": [
+        "FR"
+      ]
+    },
+    "molotov": {
+      "name": "Molotov",
+      "kind": "provider",
+      "appStoreId": 1053134780,
+      "tvos": [
+        "FR"
+      ]
+    },
+    "fubo": {
+      "name": "Fubo",
+      "kind": "provider",
+      "appStoreId": 905401434,
+      "tvos": [
+        "US"
+      ]
+    },
+    "youtubetv": {
+      "name": "YouTube TV",
+      "kind": "provider",
+      "appStoreId": 1193350206,
+      "tvos": [
+        "US"
+      ]
+    },
+    "sling": {
+      "name": "Sling TV",
+      "kind": "provider",
+      "appStoreId": 945077360,
+      "tvos": [
+        "US"
+      ]
+    },
+    "clarotvplus": {
+      "name": "Claro tv+",
+      "kind": "provider",
+      "appStoreId": 862576254,
+      "tvos": [
+        "BR"
+      ]
+    },
+    "skyplus": {
+      "name": "SKY+",
+      "kind": "provider",
+      "appStoreId": 6467130144,
+      "tvos": [
+        "BR"
+      ]
+    }
   },
   "channels": {
     "FR": {
-      "Canal+": ["canalplus", "molotov"],
-      "Canal+ Foot": ["canalplus"],
-      "Canal+ Sport": ["canalplus"],
-      "Canal+ Sport 360": ["canalplus"],
-      "Canal+ Premier League": ["canalplus"],
-      "beIN Sports": ["beinconnect", "canalplus"],
-      "beIN Sports 1": ["beinconnect", "canalplus"],
-      "beIN Sports 2": ["beinconnect", "canalplus"],
-      "beIN Sports 3": ["beinconnect", "canalplus"],
-      "beIN Sports Max 4": ["beinconnect"],
-      "beIN Sports Max 5": ["beinconnect"],
-      "beIN Sports Max 6": ["beinconnect"],
-      "DAZN": ["dazn"],
-      "DAZN 1": ["dazn", "canalplus"],
-      "Ligue 1+": ["ligue1plus", "canalplus", "primevideo"],
-      "Eurosport": ["eurosport", "canalplus", "primevideo"],
-      "TF1": ["tf1plus", "molotov", "canalplus"],
-      "France 2": ["francetv", "molotov", "canalplus"],
-      "France 3": ["francetv", "molotov", "canalplus"],
-      "M6": ["m6plus", "molotov", "canalplus"],
-      "L'Équipe": ["lequipe", "molotov", "canalplus"],
-      "RMC Sport": ["rmcsport"]
+      "Canal+": [
+        "canalplus",
+        "molotov"
+      ],
+      "Canal+ Foot": [
+        "canalplus"
+      ],
+      "Canal+ Sport": [
+        "canalplus"
+      ],
+      "Canal+ Sport 360": [
+        "canalplus"
+      ],
+      "Canal+ Premier League": [
+        "canalplus"
+      ],
+      "beIN Sports": [
+        "beinconnect",
+        "canalplus"
+      ],
+      "beIN Sports 1": [
+        "beinconnect",
+        "canalplus"
+      ],
+      "beIN Sports 2": [
+        "beinconnect",
+        "canalplus"
+      ],
+      "beIN Sports 3": [
+        "beinconnect",
+        "canalplus"
+      ],
+      "beIN Sports Max 4": [
+        "beinconnect",
+        "canalplus"
+      ],
+      "beIN Sports Max 5": [
+        "beinconnect",
+        "canalplus"
+      ],
+      "beIN Sports Max 6": [
+        "beinconnect",
+        "canalplus"
+      ],
+      "DAZN": [
+        "dazn"
+      ],
+      "DAZN 1": [
+        "dazn",
+        "canalplus"
+      ],
+      "Ligue 1+": [
+        "ligue1plus",
+        "primevideo"
+      ],
+      "Eurosport": [
+        "eurosport",
+        "canalplus",
+        "primevideo"
+      ],
+      "TF1": [
+        "tf1plus",
+        "molotov",
+        "canalplus"
+      ],
+      "France 2": [
+        "francetv",
+        "molotov",
+        "canalplus"
+      ],
+      "France 3": [
+        "francetv",
+        "molotov",
+        "canalplus"
+      ],
+      "M6": [
+        "m6plus",
+        "molotov",
+        "canalplus"
+      ],
+      "L'Équipe": [
+        "lequipe",
+        "molotov",
+        "canalplus"
+      ],
+      "RMC Sport": [
+        "rmcsport"
+      ],
+      "Disney+": [
+        "disneyplus"
+      ],
+      "beIN Sports Max": [
+        "beinconnect",
+        "canalplus"
+      ]
     },
     "US": {
-      "ESPN": ["espn", "fubo", "youtubetv", "sling"],
-      "ESPN2": ["espn", "fubo", "youtubetv", "sling"],
-      "ESPN+": ["espn"],
-      "ESPN Deportes": ["espn", "fubo", "sling"],
-      "FOX": ["foxone", "foxsports", "fubo", "youtubetv"],
-      "FOX Sports": ["foxone", "foxsports", "fubo", "youtubetv"],
-      "FS1": ["foxone", "foxsports", "fubo", "youtubetv", "sling"],
-      "FS2": ["foxone", "foxsports", "fubo"],
-      "NBC": ["peacock", "nbcsports", "youtubetv", "fubo"],
-      "Peacock": ["peacock"],
-      "USA Network": ["nbcsports", "youtubetv", "fubo", "sling"],
-      "Telemundo": ["telemundo", "peacock", "youtubetv", "fubo"],
-      "Paramount+": ["paramountplus"],
-      "CBS": ["paramountplus", "youtubetv", "fubo"],
-      "TNT": ["hbomax", "youtubetv", "sling"],
-      "Prime Video": ["primevideo"],
-      "Apple TV": ["appletv"],
-      "Tennis Channel": ["tennischannel", "youtubetv", "fubo", "sling"],
-      "beIN Sports": ["beinconnect", "fubo", "sling"]
+      "ESPN": [
+        "espn",
+        "fubo",
+        "youtubetv",
+        "sling"
+      ],
+      "ESPN2": [
+        "espn",
+        "fubo",
+        "youtubetv",
+        "sling"
+      ],
+      "ESPN+": [
+        "espn"
+      ],
+      "ESPN Deportes": [
+        "espn",
+        "fubo",
+        "sling"
+      ],
+      "FOX": [
+        "foxone",
+        "foxsports",
+        "fubo",
+        "youtubetv"
+      ],
+      "FOX Sports": [
+        "foxone",
+        "foxsports",
+        "fubo",
+        "youtubetv"
+      ],
+      "FS1": [
+        "foxone",
+        "foxsports",
+        "fubo",
+        "youtubetv",
+        "sling"
+      ],
+      "FS2": [
+        "foxone",
+        "foxsports",
+        "fubo"
+      ],
+      "NBC": [
+        "peacock",
+        "nbcsports",
+        "youtubetv",
+        "fubo"
+      ],
+      "Peacock": [
+        "peacock"
+      ],
+      "USA Network": [
+        "nbcsports",
+        "youtubetv",
+        "fubo",
+        "sling"
+      ],
+      "Telemundo": [
+        "telemundo",
+        "peacock",
+        "youtubetv",
+        "fubo"
+      ],
+      "Paramount+": [
+        "paramountplus"
+      ],
+      "CBS": [
+        "paramountplus",
+        "youtubetv",
+        "fubo"
+      ],
+      "TNT": [
+        "hbomax",
+        "youtubetv",
+        "sling"
+      ],
+      "Prime Video": [
+        "primevideo"
+      ],
+      "Apple TV": [
+        "appletv"
+      ],
+      "Tennis Channel": [
+        "tennischannel",
+        "youtubetv",
+        "fubo",
+        "sling"
+      ],
+      "beIN Sports": [
+        "beinconnect",
+        "fubo",
+        "sling"
+      ],
+      "NBA TV": [
+        "nba"
+      ],
+      "NFL Network": [
+        "nfl",
+        "youtubetv",
+        "fubo"
+      ],
+      "Universo": [
+        "peacock",
+        "telemundo"
+      ],
+      "TUDN": [
+        "vix",
+        "univision"
+      ],
+      "Fox Soccer Plus": [
+        "foxsports",
+        "foxone",
+        "fubo"
+      ]
     },
     "BR": {
-      "Globo": ["globoplay"],
-      "SporTV": ["globoplay", "vivoplay", "skyplus", "clarotvplus"],
-      "SporTV 2": ["globoplay", "vivoplay", "skyplus", "clarotvplus"],
-      "SporTV 3": ["globoplay", "vivoplay", "skyplus", "clarotvplus"],
-      "Premiere": ["globoplay", "vivoplay", "skyplus", "clarotvplus"],
-      "ESPN": ["disneyplus", "vivoplay", "skyplus", "clarotvplus"],
-      "ESPN 2": ["disneyplus", "vivoplay", "skyplus", "clarotvplus"],
-      "ESPN 3": ["disneyplus", "vivoplay", "skyplus", "clarotvplus"],
-      "ESPN 4": ["disneyplus", "vivoplay", "skyplus", "clarotvplus"],
-      "Disney+": ["disneyplus"],
-      "HBO Max": ["hbomax"],
-      "TNT": ["hbomax", "vivoplay", "skyplus", "clarotvplus"],
-      "Prime Video": ["primevideo"],
-      "CazéTV": ["youtube"]
+      "Globo": [
+        "globoplay"
+      ],
+      "SporTV": [
+        "globoplay",
+        "clarotvplus",
+        "skyplus"
+      ],
+      "SporTV 2": [
+        "globoplay",
+        "clarotvplus",
+        "skyplus"
+      ],
+      "SporTV 3": [
+        "globoplay",
+        "clarotvplus",
+        "skyplus"
+      ],
+      "Premiere": [
+        "globoplay",
+        "clarotvplus",
+        "skyplus"
+      ],
+      "ESPN": [
+        "disneyplus",
+        "clarotvplus",
+        "skyplus"
+      ],
+      "ESPN 2": [
+        "disneyplus",
+        "clarotvplus",
+        "skyplus"
+      ],
+      "ESPN 3": [
+        "disneyplus",
+        "clarotvplus",
+        "skyplus"
+      ],
+      "ESPN 4": [
+        "disneyplus",
+        "clarotvplus",
+        "skyplus"
+      ],
+      "Disney+": [
+        "disneyplus"
+      ],
+      "HBO Max": [
+        "hbomax",
+        "clarotvplus"
+      ],
+      "TNT": [
+        "hbomax",
+        "clarotvplus",
+        "skyplus"
+      ],
+      "Prime Video": [
+        "primevideo"
+      ],
+      "CazéTV": [
+        "youtube"
+      ],
+      "Globoplay": [
+        "globoplay"
+      ],
+      "Paramount+": [
+        "paramountplus",
+        "clarotvplus"
+      ]
     }
   }
 }

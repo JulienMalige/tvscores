@@ -47,6 +47,11 @@ Noted 2026-10-03.
   icon on the left, "Open in CANAL+" and "CANAL+ app" in grey on the
   right, an arrow at the end. Selecting it opens the app; if it is not
   installed, its App Store page.
+- Mapping prepared 2026-10-04 (`proxy/channel-apps.json`, guarded by
+  `proxy/test/channel-apps.test.js`): each app has a `kind` (its own app, a
+  streaming service, or a provider that carries many channels), the countries
+  where Apple's store has a tvOS version of it, and an App Store id. Julien
+  keeps it; its `toConfirm` list holds what could not be checked from here.
 - What it takes:
   - two many-to-many links (Julien): a game is on several channels, and a
     channel is on several apps — beIN Sports on beIN CONNECT and CANAL+,
