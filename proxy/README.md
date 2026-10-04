@@ -53,6 +53,15 @@ XML TV Fr, and epgshare01's US2 and BR2 files (see
 `docs/data-providers.md`). Matches are kept in the store per country, so a
 failed download serves yesterday's answer.
 
+How to Watch: an event on channels also carries `watchOn: { "FR": ["canalplus", "orangetv"] }`,
+the apps that can show it by the country of the channel, in the order to draw
+them (its own app, then streaming services, then providers; at most four; only
+apps with a tvOS version in that country), and the board carries `apps`, naming
+each one it points at: `{ "canalplus": { name, kind, id } }`, where `id` is the
+App Store id, or one per country when the store's listing differs, and
+`builtIn` marks the Apple TV app. The table is `channel-apps.json`, kept by hand
+with its rules inside; `src/watch.js` reads it.
+
 `days.upcoming` stops `schedule.upcomingDays` local days out, seven by default.
 
 ## Two kinds of files, and which is which

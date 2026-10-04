@@ -194,6 +194,8 @@ export const config = {
    * single `broadcastCountry` this replaced still works on its own (src/index.js).
    */
   broadcastCountries: BROADCAST_COUNTRIES,
+  /** How to Watch: which apps carry which channel, per country. Hand-kept; see src/watch.js. */
+  channelApps: JSON.parse(readFileSync(new URL("../channel-apps.json", import.meta.url), "utf8")),
   broadcastRights: Object.fromEntries(BROADCAST_COUNTRIES.map((cc) => [cc, readRights(cc)])),
   /** Display order of sports on the scoreboard. */
   sportOrder: ["football", "f1", "motogp", "tennis", "nba", "nfl"],

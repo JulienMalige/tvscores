@@ -167,10 +167,21 @@ export function withBroadcasts(e, broadcastsFor) {
   return by.FR ? { ...e, broadcasts: by.FR, broadcastsBy: by } : { ...e, broadcastsBy: by };
 }
 
-export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, mirror, broadcastsFor, activeSports = [], upcomingDays = 7 } = {}) {
+/**
+ * `watchOn: { FR: ["canalplus", "molotov"] }`: the apps that can show the game, by the
+ * country of the channel that carries it, in the order to draw them. The board's
+ * `apps` says what each is. Absent when there is nothing to open.
+ */
+export function withWatch(e, watch) {
+  if (!watch || !e.broadcastsBy) return e;
+  const watchOn = watch.forEvent(e.broadcastsBy);
+  return Object.keys(watchOn).length ? { ...e, watchOn } : e;
+}
+
+export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, mirror, broadcastsFor, watch, activeSports = [], upcomingDays = 7 } = {}) {
   // An event with no readable start cannot be placed on a day; one of them must
   // not be the reason nobody gets a board.
-  events = events.filter((e) => Number.isFinite(Date.parse(e.start))).map((e) => withBroadcasts(withPhotos(e, photoFor, mirror), broadcastsFor));
+  events = events.filter((e) => Number.isFinite(Date.parse(e.start))).map((e) => withWatch(withBroadcasts(withPhotos(e, photoFor, mirror), broadcastsFor), watch));
   const today = localDate(new Date(now).toISOString(), tz);
   const yesterday = localDate(new Date(now - 86400e3).toISOString(), tz);
   // Upcoming is a window, not the whole calendar: a fixture list weeks out is
@@ -211,6 +222,8 @@ export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrd
     stale,
     live: events.filter((e) => e.status.state === STATE.live).length,
     leagues: everyLeague(sportOrder, leagues, publicBase, standings, grouped, meta, events, now),
+    // Only the apps some game here points at, so the board does not carry the whole table.
+    ...(watch ? { apps: watch.describe(new Set(events.flatMap((e) => Object.values(e.watchOn || {}).flat()))) } : {}),
     days: grouped,
   };
 }

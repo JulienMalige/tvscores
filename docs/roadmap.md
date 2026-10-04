@@ -47,6 +47,8 @@ Noted 2026-10-03.
   icon on the left, "Open in CANAL+" and "CANAL+ app" in grey on the
   right, an arrow at the end. Selecting it opens the app; if it is not
   installed, its App Store page.
+- Proxy done 2026-10-04: `watchOn` on each event and `apps` on the board
+  (`proxy/src/watch.js`); the app's "How to Watch" block is next.
 - Mapping prepared 2026-10-04 (`proxy/channel-apps.json`, guarded by
   `proxy/test/channel-apps.test.js`): each app has a `kind` (its own app, a
   streaming service, or a provider that carries many channels), the countries
