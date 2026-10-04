@@ -14,8 +14,10 @@ import { appendTrace, POSTS_PER_MIN } from "./trace.js";
 const IMAGE_CACHE = "public, max-age=31536000, immutable"; // a year: a crest changes at a rebrand, and ImageMirror.VERSION is the lever
 
 /** @param limits per-source daily caps ({ football: 100, f1: 200, photos: 1000, ... }), supplied by index.js from the actual quotas. */
-export function createApp({ store, config, startedAt = Date.now(), photos, images, details, broadcasts, activeSports = [], limits = {}, log = () => {} }) {
+export function createApp({ store, config, startedAt = Date.now(), photos, images, details, broadcasts, appIcons, activeSports = [], limits = {}, log = () => {} }) {
   const watch = createWatch(config.channelApps);
+  // An app's icon is its store listing's, mirrored (shrunk, cached) like a crest.
+  const appIcon = (key) => (mirror && appIcons?.get(key) ? mirror(appIcons.get(key)) : undefined);
   const broadcastsFor = broadcasts ? (e) => broadcasts.for(e) : undefined;
   const photoFor = photos ? (name) => photos.photoFor(name) : undefined;
   const mirror = images ? (url) => images.url(url) : undefined;
@@ -78,7 +80,7 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
 
     if (path === "/v1/scoreboard") {
       const prepared = remember(`board|${tz}`, () => {
-        const body = buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, mirror, broadcastsFor, watch, activeSports, upcomingDays: config.schedule.upcomingDays });
+        const body = buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, mirror, broadcastsFor, watch, appIcon, activeSports, upcomingDays: config.schedule.upcomingDays });
         // The tables' crests and portraits are registered with the mirror here
         // too, so the warmer has them before any television opens a table:
         // a crest first mirrored while a page waits for it is the one that

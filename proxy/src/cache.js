@@ -21,6 +21,7 @@ export class Store {
     this.events = new Map();
     this.standings = {}; // "sport:leagueId" -> { updatedAt, tables }
     this.photos = {}; // athlete name -> { url|null, at }
+    this.appIcons = {}; // How to Watch app key -> { url, at }: the store listing's icon, see app-icons.js
     this.broadcasts = {}; // per country: { FR: { tsdb: { idEvent: [names] }, xmltv: { eventId: [names] } } }, see broadcasts.js
     this.meta = {};
     this.dirty = false; // per sport: { lastDaily, lastLive, lastOk, lastError, calls: { day, used } }
@@ -35,6 +36,7 @@ export class Store {
       this.standings = raw.standings || {};
       this.photos = raw.photos || {};
       this.broadcasts = raw.broadcasts || {};
+      this.appIcons = raw.appIcons || {};
       this.meta = raw.meta || {};
       this.migrateBroadcasts();
       if (raw.schemaVersion !== SCHEMA_VERSION) {
@@ -82,7 +84,7 @@ export class Store {
     if (every && Date.now() - (this.savedAt || 0) < every) return;
     this.savedAt = Date.now();
     const tmp = this.file + ".tmp";
-    writeFileSync(tmp, JSON.stringify({ schemaVersion: SCHEMA_VERSION, events: [...this.events.values()], standings: this.standings, photos: this.photos, broadcasts: this.broadcasts, meta: this.meta }));
+    writeFileSync(tmp, JSON.stringify({ schemaVersion: SCHEMA_VERSION, events: [...this.events.values()], standings: this.standings, photos: this.photos, broadcasts: this.broadcasts, appIcons: this.appIcons, meta: this.meta }));
     renameSync(tmp, this.file);
     this.dirty = false;
   }

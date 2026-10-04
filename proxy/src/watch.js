@@ -42,11 +42,15 @@ export function createWatch(table) {
     return out;
   }
 
-  /** What the television needs to draw and open a card: name, kind, App Store id (a number, or one per country), built in. */
-  function describe(keys) {
+  /**
+   * What the television needs to draw and open a card: name, kind, App Store id (a number, or one
+   * per country), the schemes to try, built in, and the icon (`iconFor(key)`, a mirrored address).
+   */
+  function describe(keys, iconFor = () => undefined) {
     return Object.fromEntries([...keys].sort().map((key) => {
-      const { name, kind, appStoreId, builtIn } = table.apps[key];
-      return [key, { name, kind, id: appStoreId, ...(builtIn ? { builtIn: true } : {}) }];
+      const { name, kind, appStoreId, builtIn, schemes } = table.apps[key];
+      const icon = iconFor(key);
+      return [key, { name, kind, id: appStoreId, ...(builtIn ? { builtIn: true } : {}), ...(schemes?.length ? { schemes } : {}), ...(icon ? { icon } : {}) }];
     }));
   }
 

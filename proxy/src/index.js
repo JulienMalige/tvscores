@@ -13,6 +13,7 @@ import { PhotoResolver } from "./photos.js";
 import { ImageMirror } from "./images.js";
 import { EventDetails } from "./details.js";
 import { LiveBackup } from "./providers/live-backup.js";
+import { AppIcons } from "./app-icons.js";
 import { TvChannels } from "./broadcasts.js";
 
 const log = (msg) => console.log(`${new Date().toISOString()} ${msg}`);
@@ -80,7 +81,8 @@ const broadcasts = new TvChannels({
   cfg: config.schedule,
   log,
 });
-const app = createApp({ store, config, photos, images, details, broadcasts, activeSports: schedulers.map((s) => s.p.sport), limits, log });
+const appIcons = new AppIcons({ table: config.channelApps, store, log });
+const app = createApp({ store, config, photos, images, details, broadcasts, appIcons, activeSports: schedulers.map((s) => s.p.sport), limits, log });
 // A promise nobody caught is a bug to read about in the journal, not a reason for every television to lose us.
 process.on("unhandledRejection", (err) => log(`unhandled rejection: ${err?.stack || err}`));
 app.listen(config.port, config.host, () => {
@@ -88,6 +90,7 @@ app.listen(config.port, config.host, () => {
   for (const s of schedulers) s.start();
   setTimeout(() => photos.start(), 15000); // after the first fetches land
   setTimeout(() => images.startWarming(), 25000); // after the board has named its images
+  appIcons.start(); // after the schedules, like the TV channels; nothing is asked unless an icon is due
   setTimeout(() => broadcasts.start(), 60000); // after the schedules' first pass
   setInterval(() => images.prune(), 12 * 3600e3).unref?.();
 });
@@ -98,6 +101,7 @@ for (const sig of ["SIGINT", "SIGTERM"]) {
     photos.stop();
     images.stop();
     broadcasts.stop();
+    appIcons.stop();
     store.save();
     app.close(() => process.exit(0));
   });

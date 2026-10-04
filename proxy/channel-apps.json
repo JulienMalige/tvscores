@@ -7,7 +7,8 @@
     "A channel is found by its exact name, then without a trailing number (Ligue 1+ 4 -> Ligue 1+, ESPN 3 -> ESPN), then without a trailing 'Max N' (beIN Sports Max 7 -> beIN Sports Max).",
     "Never a link to a stream; only an official broadcaster's or distributor's app (AGENTS.md rule 4).",
     "The first version privileges the main, official app: an app is a card only when an official source says it plays that channel; what is only inferred is left out until someone has seen it on a real Apple TV (Julien, 2026-10-04). The page shows at most four cards, in the order own, streamer, provider.",
-    "A competition's own app (competitions) is a complement: it goes after the channels' apps, keeps the last of the four places, and is shown for every country listed, whether or not a channel of that country carries the game."
+    "A competition's own app (competitions) is a complement: it goes after the channels' apps, keeps the last of the four places, and is shown for every country listed, whether or not a channel of that country carries the game.",
+    "schemes lists URL schemes to try, in order, to open the app from the Apple TV (UIApplication.open); they are guesses until the app's Open apps test (Settings) says which work, and the App Store page is the fallback. An app with none is opened only by its store page."
   ],
   "checked": {
     "2026-10-04": [
@@ -97,6 +98,9 @@
       "appStoreId": 6451418074,
       "tvos": [
         "FR"
+      ],
+      "schemes": [
+        "ligue1plus://"
       ]
     },
     "eurosport": {
@@ -113,6 +117,9 @@
         "FR",
         "US",
         "BR"
+      ],
+      "schemes": [
+        "dazn://"
       ]
     },
     "tennischannel": {
@@ -131,6 +138,9 @@
         "US",
         "FR",
         "BR"
+      ],
+      "schemes": [
+        "nba://"
       ]
     },
     "nfl": {
@@ -139,6 +149,9 @@
       "appStoreId": 389781154,
       "tvos": [
         "US"
+      ],
+      "schemes": [
+        "nfl://"
       ]
     },
     "nbcsports": {
@@ -147,6 +160,9 @@
       "appStoreId": 542511686,
       "tvos": [
         "US"
+      ],
+      "schemes": [
+        "nbcsports://"
       ]
     },
     "telemundo": {
@@ -155,6 +171,9 @@
       "appStoreId": 680595680,
       "tvos": [
         "US"
+      ],
+      "schemes": [
+        "telemundo://"
       ]
     },
     "univision": {
@@ -179,6 +198,10 @@
       "appStoreId": 317469184,
       "tvos": [
         "US"
+      ],
+      "schemes": [
+        "espn://",
+        "sportscenter://"
       ]
     },
     "tf1plus": {
@@ -187,6 +210,9 @@
       "appStoreId": 407248490,
       "tvos": [
         "FR"
+      ],
+      "schemes": [
+        "tf1plus://"
       ]
     },
     "m6plus": {
@@ -195,6 +221,9 @@
       "appStoreId": 369692259,
       "tvos": [
         "FR"
+      ],
+      "schemes": [
+        "m6plus://"
       ]
     },
     "francetv": {
@@ -203,6 +232,9 @@
       "appStoreId": 428835098,
       "tvos": [
         "FR"
+      ],
+      "schemes": [
+        "francetv://"
       ]
     },
     "globoplay": {
@@ -211,6 +243,9 @@
       "appStoreId": 536321738,
       "tvos": [
         "BR"
+      ],
+      "schemes": [
+        "globoplay://"
       ]
     },
     "disneyplus": {
@@ -221,6 +256,9 @@
         "BR",
         "FR",
         "US"
+      ],
+      "schemes": [
+        "disneyplus://"
       ]
     },
     "primevideo": {
@@ -231,6 +269,10 @@
         "FR",
         "US",
         "BR"
+      ],
+      "schemes": [
+        "primevideo://",
+        "aiv://"
       ]
     },
     "peacock": {
@@ -239,6 +281,9 @@
       "appStoreId": 1508186374,
       "tvos": [
         "US"
+      ],
+      "schemes": [
+        "peacock://"
       ]
     },
     "paramountplus": {
@@ -251,6 +296,9 @@
       "tvos": [
         "US",
         "BR"
+      ],
+      "schemes": [
+        "paramountplus://"
       ]
     },
     "foxone": {
@@ -259,6 +307,9 @@
       "appStoreId": 6746049430,
       "tvos": [
         "US"
+      ],
+      "schemes": [
+        "foxone://"
       ]
     },
     "hbomax": {
@@ -269,6 +320,9 @@
         "BR",
         "FR",
         "US"
+      ],
+      "schemes": [
+        "hbomax://"
       ]
     },
     "appletv": {
@@ -280,7 +334,11 @@
         "FR",
         "BR"
       ],
-      "builtIn": true
+      "builtIn": true,
+      "schemes": [
+        "videos://",
+        "com.apple.TVWatchList://"
+      ]
     },
     "youtube": {
       "name": "YouTube",
@@ -290,6 +348,9 @@
         "BR",
         "FR",
         "US"
+      ],
+      "schemes": [
+        "youtube://"
       ]
     },
     "canalplus": {
@@ -298,6 +359,10 @@
       "appStoreId": 694580816,
       "tvos": [
         "FR"
+      ],
+      "schemes": [
+        "mycanal://",
+        "canalplus://"
       ]
     },
     "molotov": {
@@ -306,6 +371,9 @@
       "appStoreId": 1053134780,
       "tvos": [
         "FR"
+      ],
+      "schemes": [
+        "molotov://"
       ]
     },
     "fubo": {
@@ -314,6 +382,9 @@
       "appStoreId": 905401434,
       "tvos": [
         "US"
+      ],
+      "schemes": [
+        "fubotv://"
       ]
     },
     "youtubetv": {
@@ -322,6 +393,9 @@
       "appStoreId": 1193350206,
       "tvos": [
         "US"
+      ],
+      "schemes": [
+        "youtubetv://"
       ]
     },
     "sling": {
@@ -330,6 +404,9 @@
       "appStoreId": 945077360,
       "tvos": [
         "US"
+      ],
+      "schemes": [
+        "sling://"
       ]
     },
     "clarotvplus": {
@@ -338,6 +415,9 @@
       "appStoreId": 862576254,
       "tvos": [
         "BR"
+      ],
+      "schemes": [
+        "clarotvplus://"
       ]
     },
     "skyplus": {
@@ -350,7 +430,10 @@
       "aka": [
         "DIRECTV GO"
       ],
-      "note": "Brazil. The former DIRECTV GO app (Julien; Apple's store returns it for 'DIRECTV GO', first released 2023-11-28): live channels and on-demand, SKY satellite subscribers use the same app. Plans: SKY+ Light / Full, Canais e Streamings II, Futebol, Canais e Futebol (R$ 79,90-219,90). Premiere is opened by searching inside it (SKY+ FAQ)."
+      "note": "Brazil. The former DIRECTV GO app (Julien; Apple's store returns it for 'DIRECTV GO', first released 2023-11-28): live channels and on-demand, SKY satellite subscribers use the same app. Plans: SKY+ Light / Full, Canais e Streamings II, Futebol, Canais e Futebol (R$ 79,90-219,90). Premiere is opened by searching inside it (SKY+ FAQ).",
+      "schemes": [
+        "skyplus://"
+      ]
     },
     "fandango": {
       "name": "Fandango",
@@ -366,6 +449,9 @@
       "appStoreId": 468481865,
       "tvos": [
         "BR"
+      ],
+      "schemes": [
+        "premiere://"
       ]
     },
     "vivotv": {
@@ -375,7 +461,10 @@
       "tvos": [
         "BR"
       ],
-      "note": "Brazil. The former Vivo Play app, renamed Vivo TV on 2025-10-03 (Vivo's notice; same id 589412933). App-only plans (Inicial, Estendido): ESPN 1-4 (5-6 in Estendido), TNT, BandSports, open channels. SporTV only with the TV packages (Avançado, Completo); Globo only in 14 cities. No Premiere: Vivo sends Premiere subscribers to the Premiere and Globoplay apps."
+      "note": "Brazil. The former Vivo Play app, renamed Vivo TV on 2025-10-03 (Vivo's notice; same id 589412933). App-only plans (Inicial, Estendido): ESPN 1-4 (5-6 in Estendido), TNT, BandSports, open channels. SporTV only with the TV packages (Avançado, Completo); Globo only in 14 cities. No Premiere: Vivo sends Premiere subscribers to the Premiere and Globoplay apps.",
+      "schemes": [
+        "vivotv://"
+      ]
     },
     "freetv": {
       "name": "Free TV",
@@ -407,6 +496,9 @@
       "appStoreId": 1136238277,
       "tvos": [
         "US"
+      ],
+      "schemes": [
+        "directv://"
       ]
     },
     "spectrum": {
@@ -423,6 +515,9 @@
       "appStoreId": 376510438,
       "tvos": [
         "US"
+      ],
+      "schemes": [
+        "hulu://"
       ]
     },
     "usanetwork": {
@@ -471,6 +566,9 @@
       "appStoreId": 363590051,
       "tvos": [
         "US"
+      ],
+      "schemes": [
+        "nflx://"
       ]
     },
     "orangetv": {

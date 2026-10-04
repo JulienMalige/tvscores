@@ -178,7 +178,7 @@ function withWatch(e, watch) {
   return Object.keys(watchOn).length ? { ...e, watchOn } : e;
 }
 
-export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, mirror, broadcastsFor, watch, activeSports = [], upcomingDays = 7 } = {}) {
+export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, mirror, broadcastsFor, watch, appIcon, activeSports = [], upcomingDays = 7 } = {}) {
   // An event with no readable start cannot be placed on a day; one of them must
   // not be the reason nobody gets a board.
   events = events.filter((e) => Number.isFinite(Date.parse(e.start))).map((e) => withWatch(withBroadcasts(withPhotos(e, photoFor, mirror), broadcastsFor), watch));
@@ -223,7 +223,7 @@ export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrd
     live: events.filter((e) => e.status.state === STATE.live).length,
     leagues: everyLeague(sportOrder, leagues, publicBase, standings, grouped, meta, events, now),
     // Only the apps some game here points at, so the board does not carry the whole table.
-    ...(watch ? { apps: watch.describe(new Set(events.flatMap((e) => Object.values(e.watchOn || {}).flat()))) } : {}),
+    ...(watch ? { apps: watch.describe(new Set(events.flatMap((e) => Object.values(e.watchOn || {}).flat())), appIcon) } : {}),
     days: grouped,
   };
 }
