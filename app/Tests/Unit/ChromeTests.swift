@@ -132,7 +132,7 @@ struct ChromePictureTests {
         defer { LanguageChoice.set(before) }
         LanguageChoice.set("pt")
         #expect(LanguageChoice.locale.identifier == "pt")
-        #expect(String(localized: "status.final", bundle: LanguageChoice.bundle) != String(localized: "status.final", bundle: Bundle.main.path(forResource: "en", ofType: "lproj").flatMap(Bundle.init(path:)) ?? .main))
+        #expect(String(localized: "settings.none", bundle: LanguageChoice.bundle) == "Nenhum", "read in Portuguese, not the process's language")
         LanguageChoice.set(nil)
         #expect(LanguageChoice.bundle == Bundle.main, "the Apple TV's own when none is chosen")
     }
