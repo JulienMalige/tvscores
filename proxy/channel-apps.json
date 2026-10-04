@@ -41,6 +41,9 @@
       "US: the FOX Sports app stopped working on Apple TV on 2026-05-07 (its own store text; foxsports.com FAQ): FOX One replaces it. Fox Soccer Plus is not in FOX One. Fubo no longer has USA Network (Versant channels left in 2025); USA Network has its own app (661695783). NFL Network belongs to ESPN (in ESPN Unlimited). DIRECTV's lineup of 2026-07-29 carries NBA TV, TUDN, Universo, Univision, Fox Deportes, ESPN Deportes, Tennis Channel, FS2, not beIN or Fox Soccer Plus. The Bundesliga is Versant's (USA Network, free games on Fandango).",
       "FR: Orange has an Apple TV app, Orange TV (6504527377): beIN, Ligue 1+, Eurosport, TF1, France 2/3, M6, L'Équipe, not Canal+. Canal+ stopped carrying DAZN on 2025-07-31. b.tv (Bouygues) does not play the Canal+ channels (its channel PDF of 2026-09-01). Eurosport streams through HBO Max in France (HBO Max has an Apple TV app there). Disney+ carries the L'Équipe channel and the LaLiga games. beIN SPORTS CONNECT is played in the CANAL+ app. RMC Sport + Ligue 1+ is not confirmed this season (ligue1.com lists no RMC Sport as a partner). 'Wake Television' is probably Waka TV, an unlicensed IPTV: out under rule 4.",
       "BR: Vivo TV is the former Vivo Play. Claro tv+ carries Globo, ESPN 1-6, SporTV 1-3, TNT, BandSports, SportyNet, NSports, XSports, GE TV; HBO Max and Paramount+ are separate subscriptions that play in their own apps (so no Claro card). SKY+ names ESPN, SporTV, TNT and finds Premiere by search. Disney+ has the ESPN channels in Premium only. The ge app's tvOS build is from 2021: not used."
+    ],
+    "2026-10-04 (CazéTV, with Julien)": [
+      "CazéTV is a YouTube channel and, through a partnership with Amazon since 2024, also in Prime Video (simulcast of the whole 2026 World Cup, Libertadores and more); the Paulistão, the Copinha and the Brasileirão are YouTube-only (Meio&Mensagem, goal.com, gameoverdrive.com.br). YouTube first because everyone has it and it plays every game; a per-competition exception could drop the Prime Video card for the Brasileirão later."
     ]
   },
   "toConfirm": [
@@ -952,7 +955,8 @@
         "primevideo"
       ],
       "CazéTV": [
-        "youtube"
+        "youtube",
+        "primevideo"
       ],
       "Globoplay": [
         "globoplay"
