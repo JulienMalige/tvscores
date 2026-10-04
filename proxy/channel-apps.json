@@ -48,10 +48,18 @@
     ],
     "2026-10-04 (Julien: privilege the main official app, evolve later)": [
       "Left out for now, to add back when seen on a real TV: BR Premiere: Claro tv+ (an add-on; that it plays inside the tvOS app is unverified); FR Canal+: Free TV (inferred, not in Free's list); FR Canal+ Foot: Free TV (inferred, not in Free's list); FR Canal+ Sport: Free TV (inferred, not in Free's list); FR Canal+ Sport 360: Free TV (inferred, not in Free's list); US Universo: Telemundo app (unverified); US Tennis Channel: Fubo (unclear)"
+    ],
+    "2026-10-04 (open questions searched again)": [
+      "BR: Premiere plays inside Claro tv+: Claro's own page says clients with Premiere in their plan can watch the Brasileirão and the Copa do Brasil finals 'direto na Claro tv+', in the app, on TV and on the web, with Apple TV among the supported devices (claro.com.br/blog/tv/assistir-futebol-ao-vivo; dplnews.com) — Claro tv+ is back on Premiere",
+      "FR: Ligue 1+ 2026-27 is distributed by 'Orange, Bouygues Telecom, Free, SFR, DAZN, Prime Video, RMC Sport, Molotov et OneFootball, mais pas par Canal+' (ariase.com, summer 2026) — RMC Sport is back on Ligue 1+",
+      "FR: Freebox subscribers with a Canal+ offer use the myCANAL app on Apple TV with their Freebox login (universfreebox.com): the Canal+ channels are in the CANAL+ app, not in Free TV — the removal stands",
+      "FR: Orange TV carries beIN SPORTS 1-3, Ligue 1+ and Eurosport 1 (phonandroid.com, selectra.info); beIN plays on every TV connected to the Livebox. FR: the L'Équipe app on Apple TV has the live channel (since 2017; the 2019 build may be stale)",
+      "US: Fandango's Bundesliga is free, with no login, in the Fandango app on a connected TV (techradar.com, inquirer.com). Fubo has NFL Network, ESPN, FS1, FS2 and beIN (Pro), and lacks TNT, TBS and truTV; it restored NBC in September 2026 (cabletv.com, fantasynerds.com). The Telemundo app lists Universo among the networks it shows with a TV-provider login, a Peacock subscription does not count; whether Universo plays live there is not stated",
+      "Not found anywhere: whether SporTV and Globo play inside Vivo TV (Vivo's page says SporTV is in its closed lineup, available with a TV package; an older article says Vivo Play had no Apple TV app, the store now lists Vivo TV for tvOS); Globo live in SKY+; whether the NBC Sports app still plays USA Network"
     ]
   },
   "toConfirm": [
-    "Later, when someone has an Apple TV and the account: BR Premiere bought through Claro inside Claro tv+; BR SporTV and Globo in Vivo TV; Globo live in SKY+; FR Canal+ channels inside Free TV; FR the old L'Équipe app; FR 'RMC Sport + Ligue 1+'; FR Orange TV with beIN and Ligue 1+; US the NBC Sports app and USA Network; US Fandango's Bundesliga; US Fubo's Tennis Channel, NBA TV and NFL Network; US Telemundo and Universo. None of these blocks the first version."
+    "Still unknown after searching (for when someone has the account on a real Apple TV): BR whether SporTV and Globo play inside Vivo TV with a TV package; BR Globo live in SKY+; FR whether the 2019 L'Équipe tvOS build still plays the live channel; FR Orange TV on an Apple TV (beIN, Ligue 1+); US whether the NBC Sports app still plays USA Network; US whether Universo plays live in the Telemundo app; US Fubo's Tennis Channel and NBA TV. None blocks the first version."
   ],
   "apps": {
     "beinconnect": {
@@ -543,6 +551,7 @@
         "ligue1plus",
         "dazn",
         "primevideo",
+        "rmcsport",
         "molotov",
         "lequipe",
         "freetv",
@@ -905,7 +914,8 @@
       "Premiere": [
         "premiere",
         "globoplay",
-        "skyplus"
+        "skyplus",
+        "clarotvplus"
       ],
       "ESPN": [
         "disneyplus",
