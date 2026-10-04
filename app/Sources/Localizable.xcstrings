@@ -1261,6 +1261,64 @@
         }
       }
     },
+    "settings.apps": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps to show"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps à afficher"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps para mostrar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps para mostrar"
+          }
+        }
+      }
+    },
+    "settings.appsNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose the apps How to Watch offers. A hidden app is not offered on any game."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez les apps proposées dans Où regarder. Une app masquée n'est proposée sur aucun match."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolha os apps oferecidos em Onde assistir. Um app oculto não é oferecido em nenhum jogo."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige las apps que ofrece Dónde ver. Una app oculta no se ofrece en ningún partido."
+          }
+        }
+      }
+    },
     "settings.blurb": {
       "extractionState": "manual",
       "localizations": {

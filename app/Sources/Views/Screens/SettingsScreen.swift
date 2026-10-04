@@ -18,11 +18,10 @@ struct SettingsScreen: View {
     /// The apps How to Watch points at, for the "Open apps (test)" page.
     var apps: [String: WatchApp] = [:]
 
-    private enum Page { case top, competitions, countries, language, openApps }
-
-    @State private var page = Page.top
+    @State private var page = SettingsPage.top
     @State private var choice = ChannelChoice.shared
     @State private var leagueChoice = LeagueChoice.shared
+    @State private var appChoice = AppChoice.shared
     @State private var language = LanguageChoice.current
     /// The competition being moved with the remote, if any.
     @State private var lifted: String?
@@ -37,7 +36,7 @@ struct SettingsScreen: View {
 
     var body: some View {
         VStack(spacing: Metrics.settingsTitleGap) {
-            Text(title)
+            Text(page.title)
                 .font(.title3.weight(.bold))
             HStack(alignment: .top, spacing: Metrics.settingsGap) {
                 explanation
@@ -48,6 +47,7 @@ struct SettingsScreen: View {
                     case .competitions: competitionList
                     case .countries: countryList
                     case .language: languageList
+                    case .apps: AppsChoiceSection(apps: apps)
                     case .openApps: OpenAppsSection(apps: apps)
                     }
                 }
@@ -73,55 +73,28 @@ struct SettingsScreen: View {
             // `-TVScoresSettings countries` opens on that list (CI screenshots).
             let args = ProcessInfo.processInfo.arguments
             if let i = args.firstIndex(of: "-TVScoresSettings"), i + 1 < args.count {
-                page = ["countries": .countries, "competitions": .competitions, "language": .language, "openApps": .openApps][args[i + 1]] ?? .top
+                page = ["countries": .countries, "competitions": .competitions, "language": .language, "apps": .apps, "openApps": .openApps][args[i + 1]] ?? .top
             }
-        }
-    }
-
-    private var title: LocalizedStringKey {
-        switch page {
-        case .top: "settings.title"
-        case .competitions: "settings.competitions"
-        case .countries: "settings.watch"
-        case .language: "settings.language"
-        case .openApps: "settings.openApps"
         }
     }
 
     /// The left: what this page is for.
     private var explanation: some View {
         VStack(spacing: 40) {
-            switch page {
-            case .top:
+            if page == .top {
                 CourtMark()
                     .frame(width: Metrics.settingsMark, height: Metrics.settingsMark * 0.6)
-            case .competitions: symbol("trophy")
-            case .countries: symbol("tv")
-            case .language: symbol("globe")
-            case .openApps: symbol("arrow.up.forward.app")
+            } else if let symbol = page.symbol {
+                Image(systemName: symbol)
+                    .font(.system(size: Metrics.settingsMark * 0.45, weight: .light))
+                    .frame(height: Metrics.settingsMark * 0.6)
             }
-            Text(blurb)
+            Text(page.blurb(moving: lifted != nil))
                 .font(.callout.weight(.medium))
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: Metrics.settingsMark * 1.2)
         }
         .padding(.top, Metrics.settingsTitleGap)
-    }
-
-    private func symbol(_ name: String) -> some View {
-        Image(systemName: name)
-            .font(.system(size: Metrics.settingsMark * 0.45, weight: .light))
-            .frame(height: Metrics.settingsMark * 0.6)
-    }
-
-    private var blurb: LocalizedStringKey {
-        switch page {
-        case .top: "settings.blurb"
-        case .competitions: lifted == nil ? "settings.competitionsNote" : "settings.movingNote"
-        case .countries: "settings.countryNote"
-        case .language: "settings.languageNote"
-        case .openApps: "settings.openAppsNote"
-        }
     }
 
     private var chosenCountries: String {
@@ -139,6 +112,10 @@ struct SettingsScreen: View {
                 LabeledContent("settings.watch") { Text(verbatim: chosenCountries) }
             }
             .accessibilityIdentifier("settings.watch")
+            Button { page = .apps } label: {
+                LabeledContent("settings.apps") { Text(verbatim: appsShown) }
+            }
+            .accessibilityIdentifier("settings.apps")
             Button { page = .language } label: {
                 LabeledContent("settings.language") { Text(verbatim: language.map(LanguageChoice.name) ?? String(localized: "settings.languageSystem", bundle: LanguageChoice.bundle)) }
             }
@@ -173,6 +150,12 @@ struct SettingsScreen: View {
                 .accessibilityAddTraits(choice.isOn(country) ? .isSelected : [])
             }
         }
+    }
+
+    /// "34 of 49": the apps How to Watch offers.
+    private var appsShown: String {
+        let shown = apps.keys.filter { appChoice.isShown($0) }.count
+        return String(localized: "settings.shownCount \(shown) \(apps.count)", bundle: LanguageChoice.bundle)
     }
 
     private var shownCount: String {

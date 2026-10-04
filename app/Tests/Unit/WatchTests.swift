@@ -50,4 +50,30 @@ struct WatchTests {
         #expect(event.watchCards(apps, in: []).isEmpty, "no country chosen, no card")
         #expect(event.watchCards(nil, in: ["FR"]).isEmpty, "a board with no apps says nothing")
     }
+
+    @Test("an app turned off is offered on no game, and the choice is kept")
+    @MainActor
+    func hiddenAppsAreNotOffered() throws {
+        let apps = try ["a", "b", "c"].reduce(into: [String: WatchApp]()) {
+            $0[$1] = try Self.app(#"{"name":"\#($1)","kind":"own","id":1}"#)
+        }
+        let event = try Self.event(#"{"FR":["a","b","c"]}"#)
+        #expect(event.watchCards(apps, in: ["FR"], hiding: ["b"]).map(\.key) == ["a", "c"])
+        #expect(event.watchCards(apps, in: ["FR"], hiding: []).map(\.key) == ["a", "b", "c"], "nothing hidden by default")
+
+        let defaults = UserDefaults(suiteName: "tvscores.test.\(UUID().uuidString)")!
+        let choice = AppChoice(defaults: defaults)
+        #expect(choice.isShown("b"))
+        choice.toggle("b")
+        #expect(!choice.isShown("b"))
+        #expect(AppChoice(defaults: defaults).hidden == ["b"], "kept on this Apple TV")
+        choice.toggle("b")
+        #expect(AppChoice(defaults: defaults).hidden.isEmpty, "and turned back on")
+    }
+
+    @Test("the board names the countries an app has a tvOS version in")
+    func decodesCountries() throws {
+        let app = try Self.app(#"{"name":"A","kind":"own","id":1,"countries":["FR","BR"]}"#)
+        #expect(app.countries == ["FR", "BR"])
+    }
 }

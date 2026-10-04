@@ -12,6 +12,8 @@ struct WatchApp: Decodable, Equatable {
     let builtIn: Bool?
     /// URL schemes to try, in order, before the store page.
     let schemes: [String]?
+    /// The countries whose App Store has a tvOS version of it.
+    let countries: [String]?
     let icon: URL?
 
     /// The App Store id: one number, or one per country where the listing differs.
@@ -45,12 +47,13 @@ extension Event {
     /// The apps that can show this game, in the countries chosen in Settings, in the
     /// order the proxy gave them, each once.
     @MainActor
-    func watchCards(_ apps: [String: WatchApp]?, in chosen: [String]? = nil) -> [WatchCard] {
+    func watchCards(_ apps: [String: WatchApp]?, in chosen: [String]? = nil, hiding hidden: Set<String>? = nil) -> [WatchCard] {
         guard let apps, let watchOn else { return [] }
+        let off = hidden ?? AppChoice.shared.hidden
         var seen = Set<String>()
         return (chosen ?? ChannelChoice.shared.countries).flatMap { country in
             (watchOn[country] ?? []).compactMap { key -> WatchCard? in
-                guard let app = apps[key], seen.insert(key).inserted else { return nil }
+                guard !off.contains(key), let app = apps[key], seen.insert(key).inserted else { return nil }
                 return WatchCard(key: key, country: country, app: app)
             }
         }

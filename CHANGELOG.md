@@ -7,6 +7,11 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- Settings, Apps to show: turn off the apps you do not want How to Watch to offer,
+  Canal+ only if that is what you use, for example. A hidden app is not offered on any
+  game; turn it back on whenever you like. Kept on this Apple TV.
+- How to Watch opens Disney+ directly; the apps whose own link is not known yet open
+  their App Store page.
 
 ## 1.0 build 41 — 4 October 2026
 - How to Watch cards keep the Apple TV app's own layout: the app's wide icon on the
