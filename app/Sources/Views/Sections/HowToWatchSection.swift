@@ -56,7 +56,7 @@ private struct WatchTile: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: Metrics.watchCardWidth)
         // A faint rectangle at rest, so they read as cards before one is focused.
         .rowSurface(focused: isFocused, resting: 0.08)
     }
