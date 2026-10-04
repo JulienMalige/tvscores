@@ -48,11 +48,14 @@ export function createWatch(table) {
    */
   function describe(keys, iconFor = () => undefined) {
     return Object.fromEntries([...keys].sort().map((key) => {
-      const { name, kind, appStoreId, builtIn, schemes } = table.apps[key];
+      const { name, kind, appStoreId, builtIn, schemes, tvos } = table.apps[key];
       const icon = iconFor(key);
-      return [key, { name, kind, id: appStoreId, ...(builtIn ? { builtIn: true } : {}), ...(schemes?.length ? { schemes } : {}), ...(icon ? { icon } : {}) }];
+      return [key, { name, kind, id: appStoreId, countries: tvos, ...(builtIn ? { builtIn: true } : {}), ...(schemes?.length ? { schemes } : {}), ...(icon ? { icon } : {}) }];
     }));
   }
 
-  return { forEvent, describe };
+  /** Every key in the table: the board names them all, so Settings can list the apps to show or hide. */
+  const keys = () => Object.keys(table.apps);
+
+  return { forEvent, describe, keys };
 }

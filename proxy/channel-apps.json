@@ -61,6 +61,9 @@
     ],
     "2026-10-04 (NBA and NFL apps, with Julien)": [
       "NBA League Pass is on Apple TV in France (basket-mag.com: standard €149.99 a year, premium, team pass; all games) and the NBA app has a tvOS build in the US, France and Brazil; NFL: in the US the NFL app, outside it NFL Game Pass International through DAZN (every game, RedZone, NFL Network), and DAZN has a tvOS app in France, the US and Brazil"
+    ],
+    "2026-10-04 (Open apps test on Julien's Apple TV, build 40)": [
+      "disneyplus:// opened the Disney+ app (the scheme works); mycanal:// and canalplus:// were refused, so CANAL+ is opened by its App Store page, https://apps.apple.com/app/id694580816, which opened; vivotv:// was refused, the App Store page opened. The store link answers 'opened' on the Apple TV, so it is the fallback for every app whose scheme is refused or unknown. More apps to test: the rest of the test page."
     ]
   },
   "toConfirm": [
@@ -359,10 +362,6 @@
       "appStoreId": 694580816,
       "tvos": [
         "FR"
-      ],
-      "schemes": [
-        "mycanal://",
-        "canalplus://"
       ]
     },
     "molotov": {
@@ -461,10 +460,7 @@
       "tvos": [
         "BR"
       ],
-      "note": "Brazil. The former Vivo Play app, renamed Vivo TV on 2025-10-03 (Vivo's notice; same id 589412933). App-only plans (Inicial, Estendido): ESPN 1-4 (5-6 in Estendido), TNT, BandSports, open channels. SporTV only with the TV packages (Avançado, Completo); Globo only in 14 cities. No Premiere: Vivo sends Premiere subscribers to the Premiere and Globoplay apps.",
-      "schemes": [
-        "vivotv://"
-      ]
+      "note": "Brazil. The former Vivo Play app, renamed Vivo TV on 2025-10-03 (Vivo's notice; same id 589412933). App-only plans (Inicial, Estendido): ESPN 1-4 (5-6 in Estendido), TNT, BandSports, open channels. SporTV only with the TV packages (Avançado, Completo); Globo only in 14 cities. No Premiere: Vivo sends Premiere subscribers to the Premiere and Globoplay apps."
     },
     "freetv": {
       "name": "Free TV",

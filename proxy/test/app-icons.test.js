@@ -52,8 +52,8 @@ test("a listing that is not there, or an error, leaves the app without an icon a
 test("the board describes an app with its icon and the schemes to try, and omits what it lacks", () => {
   const watch = createWatch(table);
   const cards = watch.describe(new Set(["a", "b", "c"]), (key) => (key === "b" ? "https://proxy/v1/img/abc" : undefined));
-  assert.deepEqual(cards.a, { name: "A", kind: "own", id: 11 });
-  assert.deepEqual(cards.b, { name: "B", kind: "streamer", id: { US: 22, BR: 33 }, schemes: ["b://"], icon: "https://proxy/v1/img/abc" });
+  assert.deepEqual(cards.a, { name: "A", kind: "own", id: 11, countries: ["FR"] });
+  assert.deepEqual(cards.b, { name: "B", kind: "streamer", id: { US: 22, BR: 33 }, countries: ["US"], schemes: ["b://"], icon: "https://proxy/v1/img/abc" });
   assert.equal(cards.c.builtIn, true);
 });
 

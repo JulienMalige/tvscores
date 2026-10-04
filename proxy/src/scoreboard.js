@@ -222,8 +222,8 @@ export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrd
     stale,
     live: events.filter((e) => e.status.state === STATE.live).length,
     leagues: everyLeague(sportOrder, leagues, publicBase, standings, grouped, meta, events, now),
-    // Only the apps some game here points at, so the board does not carry the whole table.
-    ...(watch ? { apps: watch.describe(new Set(events.flatMap((e) => Object.values(e.watchOn || {}).flat())), appIcon) } : {}),
+    // Every app of the table (a few KB): the games point at some, and Settings lists them all.
+    ...(watch ? { apps: watch.describe(watch.keys(), appIcon) } : {}),
     days: grouped,
   };
 }

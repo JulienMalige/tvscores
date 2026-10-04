@@ -46,10 +46,11 @@ test("a country with nothing to open, or an unknown channel, says nothing", () =
   assert.deepEqual(watch.forEvent(undefined), {});
 });
 
-test("the board names only the apps its games point at, with the id the store needs", () => {
+test("the board names an app with the id the store needs and the countries it has a tvOS app in", () => {
   const cards = watch.describe(new Set(["split", "own"]));
   assert.deepEqual(Object.keys(cards), ["own", "split"]);
-  assert.deepEqual(cards.split, { name: "Split", kind: "streamer", id: { US: 11, BR: 22 } }, "an id per country when the store's listing differs");
+  assert.deepEqual(cards.split, { name: "Split", kind: "streamer", id: { US: 11, BR: 22 }, countries: ["US", "BR"] }, "an id per country when the store's listing differs");
+  assert.deepEqual(watch.keys().sort(), ["built", "more", "other", "own", "phone", "prov", "split", "stream"], "and every key of the table is there to be listed");
   assert.equal(watch.describe(new Set(["built"])).built.builtIn, true);
 });
 
@@ -62,7 +63,7 @@ test("an event on the board carries watchOn, and the board carries the apps", ()
   assert.ok(event.watchOn.BR.includes("disneyplus"), "ESPN in Brazil opens in Disney+");
   for (const keys of Object.values(event.watchOn)) assert.ok(keys.length <= MAX_CARDS);
   for (const key of Object.values(event.watchOn).flat()) assert.ok(board.apps[key], `${key} is described`);
-  assert.deepEqual(Object.keys(board.apps).sort(), [...new Set(Object.values(event.watchOn).flat())].sort(), "and nothing else is");
+  assert.deepEqual(Object.keys(board.apps).sort(), Object.keys(config.channelApps.apps).sort(), "the board names every app of the table, for Settings to list");
   const bare = buildScoreboard([game], { tz: "UTC", leagues: config.leagues, sportOrder: config.sportOrder });
   assert.equal(bare.apps, undefined, "a board built without the table has no apps");
 });
