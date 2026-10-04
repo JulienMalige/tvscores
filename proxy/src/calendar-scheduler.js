@@ -30,6 +30,8 @@ export class CalendarScheduler {
       if (e.sport !== this.p.sport) return false;
       const t = Date.parse(e.start);
       if (now > t - 6 * 3600e3 && now < t + 6 * 3600e3) return true;
+      // A race that is over and has no classification yet is looked at every half hour.
+      if (e.status?.state === "final" && !e.results?.length && now >= t && now < t + 3 * 86400e3) return true;
       return (e.sessions || []).some((s) => {
         const at = Date.parse(s.start);
         return ["qualifying", "sprint"].includes(s.kind) && now >= at && now < at + 3 * 3600e3;

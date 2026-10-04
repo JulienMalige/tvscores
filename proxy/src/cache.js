@@ -124,11 +124,21 @@ export class Store {
     this.dirty = true;
   }
 
-  /** True when the podium is cached (or a fetch already came back empty): never refetch every tick. */
-  hasResults(id) {
+  /**
+   * True when the podium is cached, or there is nothing to gain by asking now: never
+   * refetch every tick. A classification that came back empty is asked for again
+   * half an hour later, for three days after the race — the feed often has the
+   * flag before the results (the F1 race of 2026-10-04 had none for hours), and
+   * "asked already" must not mean "never again". After that it is let go.
+   */
+  hasResults(id, now = Date.now()) {
     const e = this.events.get(id);
     if (!e || e.status.state !== "final") return false;
-    if (e.resultsFetchedAt && !e.results?.length) return true; // empty classification, tried already
+    if (e.resultsFetchedAt && !e.results?.length) {
+      const since = now - Date.parse(e.resultsFetchedAt);
+      const sinceRace = now - Date.parse(e.start);
+      return since < 30 * 60e3 || sinceRace > 3 * 86400e3;
+    }
     // The podium is what needs full names (they drive the portrait lookup);
     // one nameless backmarker must not condemn the race to endless refetching.
     return Boolean(e.results?.length && e.results.slice(0, 3).every((r) => r.fullName));
