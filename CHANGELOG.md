@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- How to Watch cards keep the Apple TV app's own layout: the app's wide icon on the
+  left, "Open In" and its name beside it, the external-link mark at the right, three
+  or four cards to a line instead of tall tiles.
 
 ## 1.0 build 40 — 4 October 2026
 - A game to come or under way shows How to Watch, right under the score, as the

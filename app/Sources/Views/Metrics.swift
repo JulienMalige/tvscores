@@ -78,8 +78,10 @@ enum Metrics {
     // How to Watch: a card per app, its wide tvOS icon (5:3) on the left.
     static let watchIconHeight: CGFloat = 96
     static let watchCardGap: CGFloat = 14
-    /// The narrowest a card is drawn: as many fit a line as the page's width allows, four or five.
-    static let watchTileMin: CGFloat = 300
+    /// The narrowest a card is drawn: as many fit a line as the page's width allows, three or four.
+    static let watchTileMin: CGFloat = 400
+    /// A card's icon, when several share a line.
+    static let watchTileIconHeight: CGFloat = 64
 
     // The launch loader: the app's mark, then a bar that fills as the launch does.
     static let launchMark: CGFloat = 360
