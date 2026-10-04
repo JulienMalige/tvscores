@@ -127,7 +127,7 @@ export class Store {
   /**
    * True when the podium is cached, or there is nothing to gain by asking now: never
    * refetch every tick. A classification that came back empty is asked for again
-   * half an hour later, for three days after the race — the feed often has the
+   * half an hour later, for a day after the race (a delayed race, Julien: 24 hours is enough) — the feed often has the
    * flag before the results (the F1 race of 2026-10-04 had none for hours), and
    * "asked already" must not mean "never again". After that it is let go.
    */
@@ -137,7 +137,7 @@ export class Store {
     if (e.resultsFetchedAt && !e.results?.length) {
       const since = now - Date.parse(e.resultsFetchedAt);
       const sinceRace = now - Date.parse(e.start);
-      return since < 30 * 60e3 || sinceRace > 3 * 86400e3;
+      return since < 30 * 60e3 || sinceRace > 86400e3;
     }
     // The podium is what needs full names (they drive the portrait lookup);
     // one nameless backmarker must not condemn the race to endless refetching.

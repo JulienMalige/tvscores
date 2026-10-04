@@ -82,10 +82,9 @@ private struct RaceRowContent: View {
     @ViewBuilder
     private var compact: some View {
         VStack(spacing: 6) {
-            // The country's flag says which weekend it is, until a podium does.
-            if podiumRows.isEmpty {
-                FlagMark(flag: event.flag, size: Metrics.raceRowFlag)
-            }
+            // The country's flag says which weekend it is, and stays over the podium
+            // (Julien, 2026-10-04: "show the flag and the podium together").
+            FlagMark(flag: event.flag, size: Metrics.raceRowFlag)
             if let finished {
                 caption(finalCaption(finished))
                 if let channels = event.upcomingChannels { ChannelsLabel(channels: channels) }

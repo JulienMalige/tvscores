@@ -6,7 +6,9 @@
  * are those apps for the countries its channels are in, kept only when the app
  * has a tvOS version in that country (an iOS-only app cannot be opened from an
  * Apple TV), ordered by what the app is to the channel (its own, a streaming
- * service, a provider carrying many), at most four.
+ * service, a provider carrying many), at most four. A competition's own app,
+ * the one with every game (NBA League Pass, NFL Game Pass), comes last, for each
+ * country the table lists it in, and keeps the fourth place.
  */
 const KINDS = ["own", "streamer", "provider"];
 export const MAX_CARDS = 4;
@@ -25,14 +27,17 @@ export function createWatch(table) {
     return Boolean(app && (app.builtIn || app.tvos.includes(country)));
   };
 
-  /** { FR: ["canalplus", ...] } for a game's `broadcastsBy`: only countries with something to open. */
-  function forEvent(broadcastsBy) {
+  /** { FR: ["canalplus", ...] } for a game's `broadcastsBy` and its competition: only countries with something to open. */
+  function forEvent(broadcastsBy, competitionId) {
+    const complement = table.competitions?.[String(competitionId)]?.apps || {};
     const out = {};
-    for (const [country, names] of Object.entries(broadcastsBy || {})) {
+    for (const country of new Set([...Object.keys(broadcastsBy || {}), ...Object.keys(complement)])) {
       const seen = [];
-      for (const name of names) for (const key of channelApps(country, name) || []) if (!seen.includes(key) && opens(key, country)) seen.push(key);
+      for (const name of broadcastsBy?.[country] || []) for (const key of channelApps(country, name) || []) if (!seen.includes(key) && opens(key, country)) seen.push(key);
+      const own = (complement[country] || []).filter((key) => opens(key, country));
       const ordered = [...seen].sort((a, b) => KINDS.indexOf(table.apps[a].kind) - KINDS.indexOf(table.apps[b].kind)); // stable: the table's order within a kind
-      if (ordered.length) out[country] = ordered.slice(0, MAX_CARDS);
+      const cards = [...ordered.filter((k) => !own.includes(k)).slice(0, MAX_CARDS - own.length), ...own];
+      if (cards.length) out[country] = cards;
     }
     return out;
   }

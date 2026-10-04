@@ -66,3 +66,25 @@ test("an event on the board carries watchOn, and the board carries the apps", ()
   const bare = buildScoreboard([game], { tz: "UTC", leagues: config.leagues, sportOrder: config.sportOrder });
   assert.equal(bare.apps, undefined, "a board built without the table has no apps");
 });
+
+test("a competition's own app comes last, for every country the table lists, and keeps the fourth place", () => {
+  const withNba = createWatch({
+    ...table,
+    competitions: { 77: { name: "X", apps: { FR: ["own"], BR: ["stream"], US: ["split"] } } },
+  });
+  // Many (own, stream, prov, other, more): own is a channel app and a complement: it is not shown twice, and it stays last.
+  assert.deepEqual(withNba.forEvent({ FR: ["Many"] }, 77).FR, ["stream", "prov", "other", "own"], "three channel apps, then the competition's");
+  assert.deepEqual(withNba.forEvent({ FR: ["Chan"] }, 77).FR, ["stream", "prov", "own"]);
+  assert.deepEqual(withNba.forEvent({}, 77), { FR: ["own"], BR: ["stream"], US: ["split"] }, "with no channel at all, every country whose complement opens");
+});
+
+test("a game of a competition with no complement is as before, and the real table lists the NBA and the NFL", () => {
+  assert.deepEqual(watch.forEvent({ FR: ["Chan"] }, 999), { FR: ["own", "stream", "prov"] });
+  const real = createWatch(config.channelApps);
+  const nba = real.forEvent({ BR: ["ESPN 2"] }, 4387);
+  assert.equal(nba.BR.at(-1), "nba", "the NBA app after ESPN's, in Brazil");
+  assert.equal(nba.FR.at(-1), "nba");
+  assert.equal(nba.US.at(-1), "nba");
+  const nfl = real.forEvent({}, 4391);
+  assert.deepEqual(nfl, { US: ["nfl"], FR: ["dazn"], BR: ["dazn"] }, "the NFL app in the US, DAZN's Game Pass elsewhere");
+});

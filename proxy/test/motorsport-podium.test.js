@@ -3,14 +3,14 @@ import assert from "node:assert/strict";
 import { CalendarScheduler } from "../src/calendar-scheduler.js";
 import { tmpStore } from "./helpers/schedule.js";
 
-test("a classification that came back empty is asked for again half an hour later, for three days", () => {
+test("a classification that came back empty is asked for again half an hour later, for a day", () => {
   const store = tmpStore();
   const race = { id: "f1:late", sport: "f1", kind: "race", start: "2026-10-04T07:00:00Z", status: { state: "final" }, league: { id: "f1" }, results: [], resultsFetchedAt: "2026-10-04T10:36:00Z" };
   store.upsert([race]);
   assert.equal(store.hasResults("f1:late", Date.parse("2026-10-04T10:50:00Z")), true, "fourteen minutes after the empty answer: wait");
   assert.equal(store.hasResults("f1:late", Date.parse("2026-10-04T11:10:00Z")), false, "half an hour on: ask again");
-  assert.equal(store.hasResults("f1:late", Date.parse("2026-10-06T11:10:00Z")), false, "two days on: still asking");
-  assert.equal(store.hasResults("f1:late", Date.parse("2026-10-08T11:10:00Z")), true, "four days on: let go");
+  assert.equal(store.hasResults("f1:late", Date.parse("2026-10-05T04:00:00Z")), false, "twenty-one hours after the race: still asking");
+  assert.equal(store.hasResults("f1:late", Date.parse("2026-10-05T09:00:00Z")), true, "a day and two hours after it: let go");
 });
 
 test("the motorsport calendar looks every half hour at a race that is over and has no podium", () => {

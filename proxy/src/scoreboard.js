@@ -173,8 +173,8 @@ export function withBroadcasts(e, broadcastsFor) {
  * `apps` says what each is. Absent when there is nothing to open.
  */
 function withWatch(e, watch) {
-  if (!watch || !e.broadcastsBy) return e;
-  const watchOn = watch.forEvent(e.broadcastsBy);
+  if (!watch) return e;
+  const watchOn = watch.forEvent(e.broadcastsBy, e.league?.id);
   return Object.keys(watchOn).length ? { ...e, watchOn } : e;
 }
 

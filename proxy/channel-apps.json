@@ -6,7 +6,8 @@
     "appStoreId is a number, or a map by country when the store's listing differs (Paramount+ in Brazil). builtIn apps (Apple TV) have none.",
     "A channel is found by its exact name, then without a trailing number (Ligue 1+ 4 -> Ligue 1+, ESPN 3 -> ESPN), then without a trailing 'Max N' (beIN Sports Max 7 -> beIN Sports Max).",
     "Never a link to a stream; only an official broadcaster's or distributor's app (AGENTS.md rule 4).",
-    "The first version privileges the main, official app: an app is a card only when an official source says it plays that channel; what is only inferred is left out until someone has seen it on a real Apple TV (Julien, 2026-10-04). The page shows at most four cards, in the order own, streamer, provider."
+    "The first version privileges the main, official app: an app is a card only when an official source says it plays that channel; what is only inferred is left out until someone has seen it on a real Apple TV (Julien, 2026-10-04). The page shows at most four cards, in the order own, streamer, provider.",
+    "A competition's own app (competitions) is a complement: it goes after the channels' apps, keeps the last of the four places, and is shown for every country listed, whether or not a channel of that country carries the game."
   ],
   "checked": {
     "2026-10-04": [
@@ -56,6 +57,9 @@
       "FR: Orange TV carries beIN SPORTS 1-3, Ligue 1+ and Eurosport 1 (phonandroid.com, selectra.info); beIN plays on every TV connected to the Livebox. FR: the L'Équipe app on Apple TV has the live channel (since 2017; the 2019 build may be stale)",
       "US: Fandango's Bundesliga is free, with no login, in the Fandango app on a connected TV (techradar.com, inquirer.com). Fubo has NFL Network, ESPN, FS1, FS2 and beIN (Pro), and lacks TNT, TBS and truTV; it restored NBC in September 2026 (cabletv.com, fantasynerds.com). The Telemundo app lists Universo among the networks it shows with a TV-provider login, a Peacock subscription does not count; whether Universo plays live there is not stated",
       "Not found anywhere: whether SporTV and Globo play inside Vivo TV (Vivo's page says SporTV is in its closed lineup, available with a TV package; an older article says Vivo Play had no Apple TV app, the store now lists Vivo TV for tvOS); Globo live in SKY+; whether the NBC Sports app still plays USA Network"
+    ],
+    "2026-10-04 (NBA and NFL apps, with Julien)": [
+      "NBA League Pass is on Apple TV in France (basket-mag.com: standard €149.99 a year, premium, team pass; all games) and the NBA app has a tvOS build in the US, France and Brazil; NFL: in the US the NFL app, outside it NFL Game Pass International through DAZN (every game, RedZone, NFL Network), and DAZN has a tvOS app in France, the US and Brazil"
     ]
   },
   "toConfirm": [
@@ -106,7 +110,9 @@
       "kind": "own",
       "appStoreId": 1129523589,
       "tvos": [
-        "FR"
+        "FR",
+        "US",
+        "BR"
       ]
     },
     "tennischannel": {
@@ -122,7 +128,9 @@
       "kind": "own",
       "appStoreId": 484672289,
       "tvos": [
-        "US"
+        "US",
+        "FR",
+        "BR"
       ]
     },
     "nfl": {
@@ -990,6 +998,37 @@
         "hbomax",
         "clarotvplus"
       ]
+    }
+  },
+  "competitions": {
+    "comment": "A league's own all-games app, added after the channels' apps to every country listed (Julien, 2026-10-04: 'the NBA app and the NFL app have all the games, a good complement'). Keyed by the competition's TheSportsDB id. NBA League Pass is in the NBA app in France and Brazil too (basket-mag.com 2026-27: standard, premium and team pass on Apple TV); outside the US the NFL's all-games product, NFL Game Pass International, is sold through DAZN, not the NFL app (nfl.com/DAZN, 2026).",
+    "4387": {
+      "name": "NBA",
+      "apps": {
+        "US": [
+          "nba"
+        ],
+        "FR": [
+          "nba"
+        ],
+        "BR": [
+          "nba"
+        ]
+      }
+    },
+    "4391": {
+      "name": "NFL",
+      "apps": {
+        "US": [
+          "nfl"
+        ],
+        "FR": [
+          "dazn"
+        ],
+        "BR": [
+          "dazn"
+        ]
+      }
     }
   }
 }

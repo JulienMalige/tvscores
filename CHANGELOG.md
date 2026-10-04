@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- A race's row keeps its country's flag above the podium, where the podium
+  used to take its place.
 
 ## 1.0 build 37 — 4 October 2026
 - The screen you see while the app opens shows the app's own mark in the
