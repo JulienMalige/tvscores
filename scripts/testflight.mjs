@@ -49,7 +49,8 @@ export { setNote, waitForBuild };
 async function waitForBuild(version, minutes = 30) {
   const deadline = Date.now() + minutes * 60e3;
   while (Date.now() < deadline) {
-    const { data } = await asc(`/v1/apps/${APP_ID}/builds?limit=20`);
+    // Newest first: /apps/{id}/builds lists the oldest and takes no sort, so past twenty builds the one just uploaded was never in the page (build 38, 4 October 2026).
+    const { data } = await asc(`/v1/builds?filter[app]=${APP_ID}&sort=-uploadedDate&limit=20`);
     const build = data.find((b) => b.attributes.version === String(version));
     if (build?.attributes.processingState === "VALID") return build;
     if (build?.attributes.processingState === "FAILED") throw new Error(`build ${version} failed processing`);
