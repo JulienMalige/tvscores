@@ -21,7 +21,7 @@ struct Sidebar: View {
     /// and must not take the board and its pictures with them.
     let store: ScoreboardStore
 
-    init(store: ScoreboardStore = ScoreboardStore()) {
+    init(store: ScoreboardStore) {
         self.store = store
     }
     @State private var selection = MenuItem.home

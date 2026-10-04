@@ -131,5 +131,5 @@ struct HomeScreen: View {
 }
 
 #Preview {
-    Sidebar()
+    Sidebar(store: ScoreboardStore())
 }

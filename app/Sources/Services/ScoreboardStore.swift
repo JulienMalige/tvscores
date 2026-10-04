@@ -44,7 +44,7 @@ final class ScoreboardStore {
     /// How far the launch is, 0 to 1, for the loader's bar: asking, then the
     /// board in, then the menu's icons as they arrive. It only moves forward
     /// and stops mattering once `ready`.
-    private(set) var launchProgress = Self.asking
+    private(set) var launchProgress = ScoreboardStore.asking
     private static let asking = 0.05, boardIn = 0.35
     /// Moves when the menu's icons have arrived — once after launch, and
     /// again if a retry brings in one that a slow line lost. The sidebar
