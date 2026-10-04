@@ -5,7 +5,8 @@
     "tvos lists the countries whose App Store has a tvOS version of the app (checked with Apple's lookup API, 2026-10-04). A card is shown only for an app with tvOS in the viewer's country: an iOS-only app cannot be opened from an Apple TV.",
     "appStoreId is a number, or a map by country when the store's listing differs (Paramount+ in Brazil). builtIn apps (Apple TV) have none.",
     "A channel is found by its exact name, then without a trailing number (Ligue 1+ 4 -> Ligue 1+, ESPN 3 -> ESPN), then without a trailing 'Max N' (beIN Sports Max 7 -> beIN Sports Max).",
-    "Never a link to a stream; only an official broadcaster's or distributor's app (AGENTS.md rule 4)."
+    "Never a link to a stream; only an official broadcaster's or distributor's app (AGENTS.md rule 4).",
+    "The first version privileges the main, official app: an app is a card only when an official source says it plays that channel; what is only inferred is left out until someone has seen it on a real Apple TV (Julien, 2026-10-04). The page shows at most four cards, in the order own, streamer, provider."
   ],
   "checked": {
     "2026-10-04": [
@@ -44,15 +45,13 @@
     ],
     "2026-10-04 (CazéTV, with Julien)": [
       "CazéTV is a YouTube channel and, through a partnership with Amazon since 2024, also in Prime Video (simulcast of the whole 2026 World Cup, Libertadores and more); the Paulistão, the Copinha and the Brasileirão are YouTube-only (Meio&Mensagem, goal.com, gameoverdrive.com.br). YouTube first because everyone has it and it plays every game; a per-competition exception could drop the Prime Video card for the Brasileirão later."
+    ],
+    "2026-10-04 (Julien: privilege the main official app, evolve later)": [
+      "Left out for now, to add back when seen on a real TV: BR Premiere: Claro tv+ (an add-on; that it plays inside the tvOS app is unverified); FR Canal+: Free TV (inferred, not in Free's list); FR Canal+ Foot: Free TV (inferred, not in Free's list); FR Canal+ Sport: Free TV (inferred, not in Free's list); FR Canal+ Sport 360: Free TV (inferred, not in Free's list); US Universo: Telemundo app (unverified); US Tennis Channel: Fubo (unclear)"
     ]
   },
   "toConfirm": [
-    "BR, Premiere bought through Claro: does it play inside the Claro tv+ app on the Apple TV, or only in the Premiere app?",
-    "BR, Vivo TV: do SporTV and Globo play in the Vivo TV app with a TV package? Does Globo play live in SKY+ where you are?",
-    "BR: do you watch CazéTV only through YouTube? Which channel names does the feed print for ge tv, Record, BandSports, SBT and Space games (added from the research, never seen in the feed)?",
-    "FR, Free TV: when a Freebox subscriber has a CANAL+ offer, do the Canal+ channels play inside Free TV on Apple TV, or does it send you to CANAL+? (Free's list confirms beIN, Ligue 1+, Eurosport 1; Canal+ is inferred.)",
-    "FR: does the old L'Équipe tvOS app (2019) still open? Is 'RMC Sport + Ligue 1+' still sold? Can you test Orange TV on an Apple TV (beIN / Ligue 1+ there)? Which exact names does the feed print for LaLiga on Disney+ and for Eurosport 360 / HBO Max?",
-    "US (first version): does the NBC Sports app still play USA Network since the Versant spin-off (removed for now)? Does the Fandango app show the Bundesliga on the TV? Should Netflix, Golf Channel, NHL Network and NBCSN get cards? Are Fubo's Tennis Channel, NBA TV and NFL Network real? Does the Telemundo app stream Universo live?"
+    "Later, when someone has an Apple TV and the account: BR Premiere bought through Claro inside Claro tv+; BR SporTV and Globo in Vivo TV; Globo live in SKY+; FR Canal+ channels inside Free TV; FR the old L'Équipe app; FR 'RMC Sport + Ligue 1+'; FR Orange TV with beIN and Ligue 1+; US the NBC Sports app and USA Network; US Fandango's Bundesliga; US Fubo's Tennis Channel, NBA TV and NFL Network; US Telemundo and Universo. None of these blocks the first version."
   ],
   "apps": {
     "beinconnect": {
@@ -471,20 +470,16 @@
   "channels": {
     "FR": {
       "Canal+": [
-        "canalplus",
-        "freetv"
+        "canalplus"
       ],
       "Canal+ Foot": [
-        "canalplus",
-        "freetv"
+        "canalplus"
       ],
       "Canal+ Sport": [
-        "canalplus",
-        "freetv"
+        "canalplus"
       ],
       "Canal+ Sport 360": [
-        "canalplus",
-        "freetv"
+        "canalplus"
       ],
       "Canal+ Premier League": [
         "canalplus"
@@ -744,7 +739,6 @@
       "Tennis Channel": [
         "tennischannel",
         "youtubetv",
-        "fubo",
         "sling",
         "directv",
         "spectrum"
@@ -775,7 +769,6 @@
       ],
       "Universo": [
         "peacock",
-        "telemundo",
         "youtubetv",
         "directv",
         "fubo"
@@ -912,7 +905,6 @@
       "Premiere": [
         "premiere",
         "globoplay",
-        "clarotvplus",
         "skyplus"
       ],
       "ESPN": [
