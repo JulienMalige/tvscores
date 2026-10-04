@@ -29,13 +29,18 @@
     "2026-10-04 (France, with Julien)": [
       "Julien: in France it is Canal+, Free, Molotov, maybe Bouygues and Orange",
       "Apple's store, France: Free TV (1542614107) and b.tv par Bouygues Telecom (739824309) have a tvOS app; Orange and SFR have none for their TV service (RMC Sport, SFR's, has); nothing found for 'Wake Television'"
+    ],
+    "2026-10-04 (store charts, FR/US/BR)": [
+      "Top-free iPhone charts, Entertainment and Sports, 100 each per country, kept to apps with a tvOS version: they confirm the picks (FR: CANAL+ #25, Free TV #42, Molotov #53, b.tv #81; BR: Globoplay #12, Premiere #17 in Sports, Claro tv+ #56) and add, for the US, Watch TNT, DIRECTV, Spectrum TV and Hulu + Live TV",
+      "Not mapped on purpose: F1 TV (a service for the sport, not a channel in the feed; idea: a competition-level 'also on' card), OneFootball, MLB, NHL, CBS Sports, Pluto, Tubi, Netflix, Crunchyroll"
     ]
   },
   "toConfirm": [
     "Brazil, Vivo TV: which channels does the app carry (SporTV, ESPN, Premiere, TNT, Globo)? Added to all four from the web, not checked",
     "Brazil: for each of Globoplay, Vivo TV, Claro tv+ and SKY+, which of Globo, SporTV 1-3, Premiere, ESPN 1-4, TNT, Band Sports, Sportynet it really carries, and in which pack; whether the Premiere app opens a given game",
     "France, Free TV and b.tv: added to every French channel their boxes carry (Canal+, beIN, Ligue 1+, Eurosport, TNT channels), from general knowledge: which of them each really plays in the app, and does it need the pack?",
-    "France: Orange has no Apple TV app for its TV service in the store: is there another way Orange subscribers watch on an Apple TV? And what is 'Wake Television'?"
+    "France: Orange has no Apple TV app for its TV service in the store: is there another way Orange subscribers watch on an Apple TV? And what is 'Wake Television'?",
+    "US (first version, from general knowledge and the charts): DIRECTV, Spectrum TV and Hulu + Live TV added to the big cable channels (ESPN, FOX, FS1, NBC, USA Network, TNT, CBS, NFL Network); Watch TNT is TNT's own app"
   ],
   "apps": {
     "beinconnect": {
@@ -360,6 +365,38 @@
       "tvos": [
         "FR"
       ]
+    },
+    "watchtnt": {
+      "name": "Watch TNT",
+      "kind": "own",
+      "appStoreId": 460494135,
+      "tvos": [
+        "US"
+      ]
+    },
+    "directv": {
+      "name": "DIRECTV",
+      "kind": "provider",
+      "appStoreId": 1136238277,
+      "tvos": [
+        "US"
+      ]
+    },
+    "spectrum": {
+      "name": "Spectrum TV",
+      "kind": "provider",
+      "appStoreId": 420455839,
+      "tvos": [
+        "US"
+      ]
+    },
+    "hululive": {
+      "name": "Hulu + Live TV",
+      "kind": "provider",
+      "appStoreId": 376510438,
+      "tvos": [
+        "US"
+      ]
     }
   },
   "channels": {
@@ -509,13 +546,19 @@
         "espn",
         "fubo",
         "youtubetv",
-        "sling"
+        "sling",
+        "directv",
+        "spectrum",
+        "hululive"
       ],
       "ESPN2": [
         "espn",
         "fubo",
         "youtubetv",
-        "sling"
+        "sling",
+        "directv",
+        "spectrum",
+        "hululive"
       ],
       "ESPN+": [
         "espn"
@@ -529,7 +572,10 @@
         "foxone",
         "foxsports",
         "fubo",
-        "youtubetv"
+        "youtubetv",
+        "directv",
+        "spectrum",
+        "hululive"
       ],
       "FOX Sports": [
         "foxone",
@@ -542,7 +588,10 @@
         "foxsports",
         "fubo",
         "youtubetv",
-        "sling"
+        "sling",
+        "directv",
+        "spectrum",
+        "hululive"
       ],
       "FS2": [
         "foxone",
@@ -553,7 +602,10 @@
         "peacock",
         "nbcsports",
         "youtubetv",
-        "fubo"
+        "fubo",
+        "directv",
+        "spectrum",
+        "hululive"
       ],
       "Peacock": [
         "peacock"
@@ -562,7 +614,10 @@
         "nbcsports",
         "youtubetv",
         "fubo",
-        "sling"
+        "sling",
+        "directv",
+        "spectrum",
+        "hululive"
       ],
       "Telemundo": [
         "telemundo",
@@ -576,12 +631,19 @@
       "CBS": [
         "paramountplus",
         "youtubetv",
-        "fubo"
+        "fubo",
+        "directv",
+        "spectrum",
+        "hululive"
       ],
       "TNT": [
+        "watchtnt",
         "hbomax",
         "youtubetv",
-        "sling"
+        "sling",
+        "directv",
+        "spectrum",
+        "hululive"
       ],
       "Prime Video": [
         "primevideo"
@@ -606,7 +668,10 @@
       "NFL Network": [
         "nfl",
         "youtubetv",
-        "fubo"
+        "fubo",
+        "directv",
+        "spectrum",
+        "hululive"
       ],
       "Universo": [
         "peacock",
