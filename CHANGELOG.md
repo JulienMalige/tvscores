@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+
+## 1.0 build 40 — 4 October 2026
 - A game to come or under way shows How to Watch, right under the score, as the
   Apple TV app draws it: a wide card for each app that can show it, with the app's
   own wide icon, "Open In" and its name, and the external-link mark. The channel's own
