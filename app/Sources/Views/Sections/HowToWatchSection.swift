@@ -14,19 +14,30 @@ struct HowToWatchSection: View {
                 .font(.body.weight(.semibold))
                 .frame(maxWidth: .infinity)
                 .padding(.bottom, 6)
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: Metrics.watchTileMin), spacing: Metrics.watchCardGap, alignment: .top)],
-                      spacing: Metrics.watchCardGap) {
-                ForEach(cards) { card in
-                    Button {
-                        Task {
-                            let tried = await AppOpener.open(card.app, key: card.key, country: card.country)
-                            failed = tried.contains { $0.opened } ? nil : card.app.name
+            // Rows of even columns: the cards of a line share its height, whatever their names, and a
+            // last line with fewer keeps the same widths.
+            let perLine = Metrics.watchCardsPerLine
+            let lines = stride(from: 0, to: cards.count, by: perLine).map { Array(cards[$0..<min($0 + perLine, cards.count)]) }
+            Grid(horizontalSpacing: Metrics.watchCardGap, verticalSpacing: Metrics.watchCardGap) {
+                ForEach(Array(lines.enumerated()), id: \.offset) { _, line in
+                    GridRow {
+                        ForEach(line) { card in
+                            Button {
+                                Task {
+                                    let tried = await AppOpener.open(card.app, key: card.key, country: card.country)
+                                    failed = tried.contains { $0.opened } ? nil : card.app.name
+                                }
+                            } label: {
+                                WatchTile(card: card)
+                            }
+                            .buttonStyle(QuietButtonStyle())
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .accessibilityIdentifier("watch.\(card.key)")
                         }
-                    } label: {
-                        WatchTile(card: card)
+                        ForEach(0..<(perLine - line.count), id: \.self) { _ in
+                            Color.clear.frame(maxWidth: .infinity, maxHeight: 0)
+                        }
                     }
-                    .buttonStyle(QuietButtonStyle())
-                    .accessibilityIdentifier("watch.\(card.key)")
                 }
             }
             if let failed {
@@ -54,10 +65,12 @@ private struct WatchTile: View {
                 Text("watch.open \(card.app.name)").font(.callout.weight(.semibold)).lineLimit(2).fixedSize(horizontal: false, vertical: true)
                 Text("watch.appOf \(card.app.name)").font(.caption).foregroundStyle(.secondary).lineLimit(1)
             }
-            .frame(minHeight: Metrics.watchTileTextMin, alignment: .leading)
+
             Spacer(minLength: 4)
             Image(systemName: "arrow.up.forward.app").font(.callout).foregroundStyle(.secondary)
         }
+        // As wide and as tall as the cell the grid gives it, so the card's surface fills it.
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         // A faint rectangle at rest, so they read as cards before one is focused.
         .rowSurface(focused: isFocused, resting: 0.08, insetV: Metrics.watchTileInsetV, insetH: Metrics.watchTileInsetH)
     }
