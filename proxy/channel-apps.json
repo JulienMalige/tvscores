@@ -21,10 +21,16 @@
     "2026-10-04 (third search)": [
       "Fandango: the Bundesliga's US rights are Versant's from 2026-27 — 30+ games on USA Network, the other 275+ free on Fandango's ad-supported streaming (insidersport.com, heavy.com, sportcal.com)",
       "SKY+ (Brazil): packs carry ESPN, ESPN Brasil, SporTV 1-3, Premiere, BandSports, Fox Sports, with HBO Max, Prime, Paramount+ and Disney+ in the bigger ones; the SKY+ app plays live channels on a smart TV (minhaconexao.com.br, melhorplano.net, opovo.com.br)"
+    ],
+    "2026-10-04 (Brazil, with Julien)": [
+      "Julien: the main ways to watch in Brazil are Globoplay, Vivo, Claro, SKY+ and the channel's own app",
+      "Apple's store, Brazil: Premiere (468481865) has a tvOS app; Vivo's TV app is 'Vivo TV' (589412933, tvOS), not 'Vivo Play'; ge globo (361393520) has one too; Conmebol Libertadores, SportyNet, BandSports, Telecine and Oi Play have none"
     ]
   },
   "toConfirm": [
-    "Eurosport and beIN SPORTS CONNECT have no tvOS app in the French store, so there Canal+ (and Prime Video for Eurosport) are the cards: nothing to do unless the store listing changes"
+    "Brazil, Vivo TV: which channels does the app carry (SporTV, ESPN, Premiere, TNT, Globo)? Added to all four from the web, not checked",
+    "Brazil: for each of Globoplay, Vivo TV, Claro tv+ and SKY+, which of Globo, SporTV 1-3, Premiere, ESPN 1-4, TNT, Band Sports, Sportynet it really carries, and in which pack; whether the Premiere app opens a given game",
+    "France: the same for the operators' boxes (Orange, SFR, Free, Bouygues) if they have an Apple TV app that opens a channel"
   ],
   "apps": {
     "beinconnect": {
@@ -317,6 +323,22 @@
       "tvos": [
         "US"
       ]
+    },
+    "premiere": {
+      "name": "Premiere",
+      "kind": "own",
+      "appStoreId": 468481865,
+      "tvos": [
+        "BR"
+      ]
+    },
+    "vivotv": {
+      "name": "Vivo TV",
+      "kind": "provider",
+      "appStoreId": 589412933,
+      "tvos": [
+        "BR"
+      ]
     }
   },
   "channels": {
@@ -549,42 +571,51 @@
       "SporTV": [
         "globoplay",
         "clarotvplus",
-        "skyplus"
+        "skyplus",
+        "vivotv"
       ],
       "SporTV 2": [
         "globoplay",
         "clarotvplus",
-        "skyplus"
+        "skyplus",
+        "vivotv"
       ],
       "SporTV 3": [
         "globoplay",
         "clarotvplus",
-        "skyplus"
+        "skyplus",
+        "vivotv"
       ],
       "Premiere": [
+        "premiere",
         "globoplay",
         "clarotvplus",
-        "skyplus"
+        "skyplus",
+        "vivotv"
       ],
       "ESPN": [
         "disneyplus",
         "clarotvplus",
-        "skyplus"
+        "skyplus",
+        "vivotv"
       ],
       "ESPN 2": [
         "disneyplus",
         "clarotvplus",
-        "skyplus"
+        "skyplus",
+        "vivotv"
       ],
       "ESPN 3": [
         "disneyplus",
         "clarotvplus",
-        "skyplus"
+        "skyplus",
+        "vivotv"
       ],
       "ESPN 4": [
         "disneyplus",
         "clarotvplus",
-        "skyplus"
+        "skyplus",
+        "vivotv"
       ],
       "Disney+": [
         "disneyplus"
@@ -596,7 +627,8 @@
       "TNT": [
         "hbomax",
         "clarotvplus",
-        "skyplus"
+        "skyplus",
+        "vivotv"
       ],
       "Prime Video": [
         "primevideo"
