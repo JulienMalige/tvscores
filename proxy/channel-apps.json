@@ -12,14 +12,17 @@
       "tvOS availability of every appStoreId, Apple lookup API, FR/US/BR",
       "Claro tv+ lineup: claro.com.br/blog/tv/assistir-futebol-ao-vivo (ESPN, SporTV, BandSports, GE TV in the plan; Premiere, Paramount+ add-ons; HBO Max and Prime Video on new plans)",
       "Vivo Play: sports channels not in the app (tecnoblog.net); removed from every list"
+    ],
+    "2026-10-04 (second search, several sites: selectra.info, footmarseille.com, alloforfait.fr, echosdunet.net, clubic.com)": [
+      "Ligue 1+ 2026-27 is not on Canal+/myCANAL (no agreement with the LFP); it is on its own app, DAZN, Prime Video (Ligue 1 Pass), RMC Sport, Molotov, L'Équipe and the operators' boxes",
+      "The CANAL+ Sport pack carries CANAL+ Sport, CANAL+ Foot, beIN SPORTS 1-10 (so Max 4-10 are on the CANAL+ app), Eurosport 1, 2 and 360, Multisports 1, Golf+",
+      "myCANAL is on Apple TV (and Apple's lookup lists a tvOS CANAL+ app in France)"
     ]
   },
   "toConfirm": [
-    "canalplus.com not reachable from the tools: Canal+ lists below are from memory and a summary (selectra.info): does the CANAL+ app carry Ligue 1+ (draft said yes, summary said not via myCanal) and beIN SPORTS?",
     "'Fandango' on Bundesliga games in the US feed (with USA Network): a feed error, or a service we should map?",
     "SKY+ lineup in Brazil: is ESPN/SporTV/Premiere in the app, and which pack?",
-    "Eurosport and beIN SPORTS CONNECT have no tvOS app in the French store: Canal+ and Prime Video then are the only cards in France",
-    "beIN SPORTS Max 4-10 in France: on the CANAL+ app too (added so those games have a card), or only on beIN's own app, which has no Apple TV version in France?"
+    "Eurosport and beIN SPORTS CONNECT have no tvOS app in the French store, so there Canal+ (and Prime Video for Eurosport) are the cards: nothing to do unless the store listing changes"
   ],
   "apps": {
     "beinconnect": {
@@ -361,7 +364,11 @@
       ],
       "Ligue 1+": [
         "ligue1plus",
-        "primevideo"
+        "dazn",
+        "primevideo",
+        "molotov",
+        "rmcsport",
+        "lequipe"
       ],
       "Eurosport": [
         "eurosport",
