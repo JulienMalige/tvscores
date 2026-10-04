@@ -48,10 +48,13 @@ private struct WatchTile: View {
     var body: some View {
         HStack(spacing: Metrics.watchCardGap) {
             AppIconMark(app: card.app, height: Metrics.watchTileIconHeight)
+            // A long name takes a second line rather than being cut off (Julien: option A); the block
+            // keeps the room for it, so a row of cards is even.
             VStack(alignment: .leading, spacing: 2) {
-                Text("watch.open \(card.app.name)").font(.callout.weight(.semibold)).lineLimit(1).minimumScaleFactor(0.85)
+                Text("watch.open \(card.app.name)").font(.callout.weight(.semibold)).lineLimit(2).fixedSize(horizontal: false, vertical: true)
                 Text("watch.appOf \(card.app.name)").font(.caption).foregroundStyle(.secondary).lineLimit(1)
             }
+            .frame(minHeight: Metrics.watchTileTextMin, alignment: .leading)
             Spacer(minLength: 4)
             Image(systemName: "arrow.up.forward.app").font(.callout).foregroundStyle(.secondary)
         }

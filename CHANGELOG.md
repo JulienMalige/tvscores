@@ -10,6 +10,8 @@ notes when a version ships.
 - Settings, Apps to show: turn off the apps you do not want How to Watch to offer,
   Canal+ only if that is what you use, for example. A hidden app is not offered on any
   game; turn it back on whenever you like. Kept on this Apple TV.
+- A long app name on a How to Watch card ("Open In YouTube TV") takes a second line
+  instead of being cut off; the cards in a row stay the same height.
 - How to Watch opens Disney+ directly; the apps whose own link is not known yet open
   their App Store page.
 

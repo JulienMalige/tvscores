@@ -85,6 +85,9 @@ enum Metrics {
     static let watchTileIconHeight: CGFloat = 56
     static let watchTileInsetH: CGFloat = 14
     static let watchTileInsetV: CGFloat = 12
+    /// The text beside a card's icon keeps room for two lines of the name and the grey one under it,
+    /// so every card in a row is as tall as the one with a long name.
+    static let watchTileTextMin: CGFloat = 64
 
     // The launch loader: the app's mark, then a bar that fills as the launch does.
     static let launchMark: CGFloat = 360
