@@ -60,26 +60,31 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
 
   /**
    * The window, one date at a time. A date that fails costs that date and not
-   * the others: the answer is what came, marked `partial` so the scheduler
-   * asks again soon; only a window in which nothing came is an error.
+   * the others: the answer is what came, marked `partial` with the dates it
+   * `missing`, so the scheduler asks again soon for those alone; only a window
+   * in which nothing came is an error. A 429 stops the pass: asking the rest
+   * would be refused too, and counted. `dates` is such a second ask.
    */
-  async function daily() {
+  async function daily({ dates: only } = {}) {
     const out = [];
-    const dates = datesAround(win);
-    let failed = 0, lastError;
-    for (const date of dates) {
+    const dates = only?.length ? only : datesAround(win);
+    const missing = [];
+    let lastError;
+    for (let i = 0; i < dates.length; i++) {
       try {
-        out.push(...(await byDate(date)));
+        out.push(...(await byDate(dates[i])));
       } catch (err) {
-        failed += 1;
         lastError = err;
-        log(`sportsdb ${sport} ${date}: ${err.message}`);
+        missing.push(dates[i]);
+        log(`sportsdb ${sport} ${dates[i]}: ${err.message}`);
+        if (err.status === 429) { missing.push(...dates.slice(i + 1)); break; }
       }
     }
-    if (failed === dates.length) throw lastError;
-    log(`GET sportsdb ${sport} ${dates.length - failed} of ${dates.length} days -> ${out.length} matches`);
-    await nextFixtures(out);
-    out.partial = failed > 0;
+    if (missing.length === dates.length) throw lastError;
+    log(`GET sportsdb ${sport} ${dates.length - missing.length} of ${dates.length} days -> ${out.length} matches`);
+    if (!only?.length) await nextFixtures(out); // with the whole window, not with the odd date made up
+    out.partial = missing.length > 0;
+    out.missing = missing;
     return out;
   }
 
@@ -105,6 +110,7 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
         ({ body } = await call(`${V1}/${key}/eventsnextleague.php?id=${id}`));
       } catch (err) {
         log(`sportsdb ${sport} next ${id}: ${err.message}`); // what we knew of it stays
+        if (err.status === 429) break; // the rest would be refused too
         continue;
       }
       const soonest = (body?.events || []).filter((r) => wanted({ ...r, idLeague: id })).map((r) => ({ start: startOf(r), season: r.strSeason })).filter((r) => r.start).sort((a, b) => a.start.localeCompare(b.start))[0];
@@ -177,6 +183,7 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
         failed += 1;
         lastError = err;
         log(`sportsdb ${sport} table ${league.id}: ${err.message}`);
+        if (err.status === 429) break; // the rest would be refused too
       }
     }
     if (failed && !Object.keys(out).length) throw lastError;

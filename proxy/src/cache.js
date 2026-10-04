@@ -31,7 +31,7 @@ export class Store {
   load() {
     try {
       const raw = JSON.parse(readFileSync(this.file, "utf8"));
-      for (const e of raw.events || []) this.events.set(e.id, e);
+      for (const e of raw.events || []) if (Number.isFinite(Date.parse(e.start))) this.events.set(e.id, e);
       this.standings = raw.standings || {};
       this.photos = raw.photos || {};
       this.broadcasts = raw.broadcasts || {};
@@ -94,12 +94,14 @@ export class Store {
   upsert(events) {
     if (events.length) this.dirty = true;
     for (const e of events) {
+      if (!Number.isFinite(Date.parse(e.start))) continue; // it cannot be placed on a day, so it is not kept
       const old = this.events.get(e.id);
       const merged = { ...old, ...e };
       // A second look that names a team without its crest (the live feed does)
-      // must not take the crest the first look found.
+      // must not take the crest the first look found, but only for the same team:
+      // a knockout slot that turns out to be another club has not got the old one's.
       for (const side of ["home", "away"]) {
-        if (old?.[side] && e[side]) merged[side] = { ...old[side], ...Object.fromEntries(Object.entries(e[side]).filter(([, v]) => v !== undefined)) };
+        if (old?.[side] && e[side] && old[side].name === e[side].name) merged[side] = { ...old[side], ...Object.fromEntries(Object.entries(e[side]).filter(([, v]) => v !== undefined)) };
       }
       this.events.set(e.id, merged);
     }

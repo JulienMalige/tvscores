@@ -82,15 +82,21 @@ export class TeamSportScheduler {
    * Never while a game could be in progress: a new day waits for the window to
    * close as an idle one does (a full pass is nine calls, in the middle of a
    * 30-second poll, and it overwrites the live rows with the older feed's).
-   * The valve is a day and a half: a window that is never shut must not mean
-   * a board that is never refilled.
+   * Three valves, because a window can stay open for a day: it waits six hours
+   * past the refresh hour at most; a provider that is polled whatever we track
+   * (a tour's day runs from morning to night, and the daily pass is the only
+   * way tomorrow's matches appear) does not wait at all; and a day and a half
+   * without a pass is one whatever is on.
    */
   needsDaily(now = Date.now()) {
     const last = this.meta.lastDaily ? Date.parse(this.meta.lastDaily) : 0;
     if (!last || now - last > 36 * 3600e3) return true;
-    if (this.hasLiveWindow(now)) return false;
-    const dayChanged = Quota.utcDay(last) !== Quota.utcDay(now) && new Date(now).getUTCHours() >= this.cfg.dailyRefreshHourUtc;
-    const idle = now - last > this.cfg.idleRefreshMinutes * MIN;
+    const day = new Date(now);
+    const dueAt = Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate(), this.cfg.dailyRefreshHourUtc);
+    const dayChanged = Quota.utcDay(last) !== Quota.utcDay(now) && now >= dueAt;
+    const blocked = this.hasLiveWindow(now) && !this.p.alwaysLive && now - dueAt < 6 * 3600e3;
+    if (blocked) return false;
+    const idle = now - last > this.cfg.idleRefreshMinutes * MIN && !this.hasLiveWindow(now);
     // A pass that came back with a date or two missing is finished in half an hour.
     const unfinished = this.meta.retryDailyAfter && now >= Date.parse(this.meta.retryDailyAfter);
     return dayChanged || idle || Boolean(unfinished);
@@ -101,12 +107,18 @@ export class TeamSportScheduler {
     // not start the round with three calls left in the budget.
     const need = this.p.dailyCost ?? 1;
     if (this.quota.spendable(now) < need) return this.log(`${this.p.sport}: skip daily, quota ${this.quota.remaining(now)} left`);
-    const rows = await this.p.daily();
+    // A pass that came back short is finished with the dates it missed, not begun again.
+    const rows = await this.p.daily(this.meta.retryDates?.length ? { dates: this.meta.retryDates } : undefined);
     this.store.upsert(rows);
     this.meta.lastDaily = new Date(now).toISOString();
     this.meta.lastOk = this.meta.lastDaily;
-    if (rows.partial) this.meta.retryDailyAfter = new Date(now + 30 * MIN).toISOString();
-    else delete this.meta.retryDailyAfter;
+    if (rows.partial) {
+      this.meta.retryDailyAfter = new Date(now + 30 * MIN).toISOString();
+      this.meta.retryDates = rows.missing;
+    } else {
+      delete this.meta.retryDailyAfter;
+      delete this.meta.retryDates;
+    }
   }
 
   /**

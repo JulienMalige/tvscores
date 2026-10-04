@@ -40,14 +40,24 @@ test("a timezone is one canonical name or it is refused", async () => {
 test("the board is gzipped for a client that takes it, and one bad event does not stop it", async () => {
   const s = await serve();
   try {
-    s.store.upsert([{ id: "x:1", sport: "football", league: { id: 1, name: "L" }, start: "not a date", status: { state: "scheduled" }, home: { name: "A" }, away: { name: "B" } }]);
-    const res = await s.get("/v1/scoreboard?tz=UTC");
-    assert.equal(res.status, 200, "the unreadable date is left off, not fatal");
-    const plain = await fetch(`http://127.0.0.1:${s.port}/tvscores/v1/scoreboard?tz=UTC`, { headers: { "accept-encoding": "identity" } });
+    const game = (i, start) => ({ id: `football:tsdb:${i}`, sport: "football", kind: "match", league: { id: 4328, name: "Premier League", short: "PL" }, start, status: { state: "scheduled" }, home: { name: `Home ${i}`, short: "HOM" }, away: { name: `Away ${i}`, short: "AWY" }, score: { home: null, away: null } });
+    const today = new Date().toISOString();
+    s.store.upsert(Array.from({ length: 40 }, (_, i) => game(i, today)));
+    s.store.events.set("football:tsdb:bad", game("bad", "not a date")); // one that got past the store's own guard
+    const url = `http://127.0.0.1:${s.port}/tvscores/v1/scoreboard?tz=UTC`;
+    const plain = await fetch(url, { headers: { "accept-encoding": "identity" } });
+    assert.equal(plain.status, 200, "the unreadable date is left off, not fatal");
     assert.equal(plain.headers.get("content-encoding"), null);
-    const gz = await s.get("/v1/scoreboard?tz=UTC", { "accept-encoding": "gzip" });
-    assert.equal(gz.status, 200);
-    assert.ok(await gz.json(), "decoded by fetch");
+    const size = (await plain.text()).length;
+    assert.ok(size > 1024, `a board big enough to be worth compressing (${size} bytes)`);
+    const zipped = await fetch(url, { headers: { "accept-encoding": "gzip" } });
+    assert.equal(zipped.headers.get("content-encoding"), "gzip");
+    assert.match(zipped.headers.get("vary"), /accept-encoding/i);
+    assert.equal((await zipped.json()).days.today.length > 0, true, "and it is the same board");
+    const refused = await fetch(url, { headers: { "accept-encoding": "gzip;q=0" } });
+    assert.equal(refused.headers.get("content-encoding"), null, "gzip at q=0 is a refusal");
+    const fixtures = await fetch(`http://127.0.0.1:${s.port}/tvscores/v1/fixtures?date=${today.slice(0, 10)}&tz=UTC`);
+    assert.equal(fixtures.status, 200, "and the fixtures are not taken down by it either");
   } finally {
     await s.close();
   }
@@ -56,13 +66,17 @@ test("the board is gzipped for a client that takes it, and one bad event does no
 test("a 304 stands for a few minutes at most, so a television's clock cannot go stale", async () => {
   const s = await serve();
   const realNow = Date.now;
+  const bucket = 5 * 60e3;
+  const start = Math.floor(realNow() / bucket) * bucket + 60e3; // a minute into a window, whatever the wall clock says
   try {
+    Date.now = () => start;
     const first = await s.get("/v1/scoreboard?tz=UTC");
     const tag = first.headers.get("etag");
+    Date.now = () => start + 30e3;
     assert.equal((await s.get("/v1/scoreboard?tz=UTC", { "if-none-match": tag })).status, 304);
-    Date.now = () => realNow() + 6 * 60e3; // past the window, and past the memo
-    const later = await s.get("/v1/scoreboard?tz=UTC", { "if-none-match": tag });
-    assert.equal(later.status, 200, "after five minutes the body is sent again");
+    assert.equal((await s.get("/v1/scoreboard?tz=UTC", { "if-none-match": `W/${tag}, "other"` })).status, 304, "weakened, or one of a list, it is still ours");
+    Date.now = () => start + 6 * 60e3; // past the window, and past the memo
+    assert.equal((await s.get("/v1/scoreboard?tz=UTC", { "if-none-match": tag })).status, 200, "after five minutes the body is sent again");
   } finally {
     Date.now = realNow;
     await s.close();
@@ -101,5 +115,31 @@ test("a key in an upstream address is not in what the health page says", async (
     assert.ok(!health.includes(key), "scrubbed even if an error slipped through");
   } finally {
     await s.close();
+  }
+});
+
+test("the health page is never more than a few seconds old, and a trace directory frees its oldest idle file", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "tvscores-diag-"));
+  const store = new Store(dir);
+  const app = createApp({ store, config });
+  await new Promise((done) => app.listen(0, "127.0.0.1", done));
+  const { port } = app.address();
+  const post = (device) => fetch(`http://127.0.0.1:${port}/tvscores/v1/diag`, { method: "POST", body: JSON.stringify({ device, lines: ["x"] }) });
+  try {
+    for (let i = 1; i <= 64; i++) await post(`device${String(i).padStart(2, "0")}`);
+    assert.equal((await post("newcomer")).status, 429, "full, and everything in it is recent");
+    const { utimesSync } = await import("node:fs");
+    const old = new Date(Date.now() - 2 * 86400e3);
+    utimesSync(join(dir, "traces", "device01.log"), old, old);
+    assert.equal((await post("newcomer")).status, 200, "a device's trace untouched for two days makes room");
+    store.sportMeta("football").calls = { day: "x", used: 1 };
+    const one = await (await fetch(`http://127.0.0.1:${port}/tvscores/v1/health`)).json();
+    store.sportMeta("football").calls = { day: "x", used: 2 };
+    await new Promise((r) => setTimeout(r, 3100));
+    const two = await (await fetch(`http://127.0.0.1:${port}/tvscores/v1/health`)).json();
+    assert.equal(one.quota.football.used, 1);
+    assert.equal(two.quota.football.used, 2, "three seconds on, the count is current");
+  } finally {
+    await new Promise((done) => app.close(done));
   }
 });

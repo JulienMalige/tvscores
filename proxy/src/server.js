@@ -30,22 +30,31 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
     return teamBadges.has(path) ? `${config.publicBase}/v1/assets/teams/${path}.png` : undefined;
   };
   // Answers built from the store, kept a few seconds: the board changes at most
-  // every poll, not per request. Bounded, so no run of odd requests can grow it.
-  const memo = new Map(); // key -> { at, prepared }
-  const MEMO_MS = 15000;
-  const MEMO_MAX = 64;
-  const remember = (key, build) => {
-    const hit = memo.get(key);
-    if (hit && Date.now() - hit.at < MEMO_MS) return hit.prepared;
-    const prepared = build();
-    memo.delete(key);
-    memo.set(key, { at: Date.now(), prepared });
-    if (memo.size > MEMO_MAX) memo.delete(memo.keys().next().value);
-    return prepared;
+  // every poll, not per request. Bounded, and a hit counts as a use, so no run of
+  // odd requests can grow them or push the board out; the fixtures, which a
+  // client can ask for by any date, have a memo of their own.
+  const memoOf = (max, ttl) => {
+    const held = new Map(); // key -> { at, prepared }
+    return (key, build, ms = ttl) => {
+      const hit = held.get(key);
+      if (hit && Date.now() - hit.at < ms) {
+        held.delete(key);
+        held.set(key, hit);
+        return hit.prepared;
+      }
+      const prepared = build();
+      held.delete(key);
+      held.set(key, { at: Date.now(), prepared });
+      if (held.size > max) held.delete(held.keys().next().value);
+      return prepared;
+    };
   };
+  const remember = memoOf(64, 15000);
+  const rememberFixtures = memoOf(16, 15000);
   // Anything that is a key of ours or of a provider, to be scrubbed from what the health page says.
   const secrets = [config.theSportsDbKey, config.apiSportsKey, config.liveTennisKey, config.ocBlacktopKey].filter((k) => k && k.length > 6);
   const scrub = (value) => {
+    if (value == null) return value;
     let text = JSON.stringify(value ?? null);
     for (const secret of secrets) text = text.split(secret).join("…");
     return JSON.parse(text);
@@ -83,7 +92,7 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
     if (path === "/v1/fixtures") {
       const date = url.searchParams.get("date");
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date || "")) return send(res, 400, { error: "date=YYYY-MM-DD required" });
-      const prepared = remember(`fixtures|${tz}|${date}`, () => {
+      const prepared = rememberFixtures(`${tz}|${date}`, () => {
         const events = store.all().filter((e) => localDate(e.start, tz) === date).map((e) => withBroadcasts(e, broadcastsFor));
         return prepare({ date, tz, events });
       });
@@ -210,7 +219,7 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
             lastOk: m.lastOk, lastError: scrub(m.lastError),
           }];
         })),
-      }));
+      }), 3000);
       return send(res, 200, undefined, { "cache-control": "no-store" }, req, prepared);
     }
     send(res, 404, { error: "not found" });

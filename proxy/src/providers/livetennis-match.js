@@ -120,10 +120,15 @@ const WINNER = { 1: "home", 2: "away" };
 export function normaliseMatch(m, info, calendar = []) {
   const league = TOURS[m.tour];
   if (!league || m.is_doubles) return null;
-  // No time, or one that is not a time: the match cannot be placed on a day, and
-  // inventing "now" would move it on every poll and hold its live window open.
-  const when = Date.parse(m.scheduled_time || m.live_at);
-  if (!Number.isFinite(when)) return null;
+  // A time is a string or an epoch. None, or one that is not a time, cannot place an
+  // upcoming match on a day, and inventing "now" would move it on every poll; a match
+  // already in play is worth showing whatever its payload forgot, so it keeps the poll's.
+  const raw = m.scheduled_time ?? m.live_at;
+  let when = typeof raw === "number" ? raw : Date.parse(raw);
+  if (!Number.isFinite(when)) {
+    if (m.status !== "live") return null;
+    when = Date.now();
+  }
   const start = new Date(when).toISOString();
   const entry = info ? calendarEntry(calendar, { tour: m.tour, info, day: start.slice(0, 10) }) : undefined;
   let state = STATE.other;

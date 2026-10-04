@@ -27,9 +27,22 @@ export function prepare(body, { tagOf = body, window = 0, now = Date.now() } = {
  * when the caller takes it: the board is ~180 KB of repetitive text and a
  * television asks for it every minute while a game is on.
  */
+/** Whether an If-None-Match holds our tag: one tag or a list of them, weakened or not. */
+function holds(header, etag) {
+  if (!header) return false;
+  if (header.trim() === "*") return true;
+  return header.split(",").some((t) => t.trim().replace(/^W\//, "") === etag);
+}
+
+/** Whether the client takes gzip: named, and not at q=0. */
+function takesGzip(header) {
+  const m = /(?:^|,)\s*gzip\s*(?:;\s*q\s*=\s*([0-9.]+))?\s*(?:,|$)/i.exec(header || "");
+  return Boolean(m) && (m[1] === undefined || Number(m[1]) > 0);
+}
+
 export function send(res, status, body, extra = {}, req, prepared = prepare(body)) {
   const { etag } = prepared;
-  if (status === 200 && req?.headers["if-none-match"] === etag) {
+  if (status === 200 && holds(req?.headers["if-none-match"], etag)) {
     res.writeHead(304, { etag, "cache-control": SHORT_CACHE, "access-control-allow-origin": "*", ...extra });
     return res.end();
   }
@@ -41,7 +54,7 @@ export function send(res, status, body, extra = {}, req, prepared = prepare(body
     etag,
     ...extra,
   };
-  if (/\bgzip\b/.test(req?.headers["accept-encoding"] || "") && prepared.json.length > 1024) {
+  if (takesGzip(req?.headers["accept-encoding"]) && prepared.json.length > 1024) {
     prepared.gz ??= gzipSync(prepared.json);
     res.writeHead(status, { ...headers, "content-encoding": "gzip", "content-length": prepared.gz.length });
     return res.end(prepared.gz);

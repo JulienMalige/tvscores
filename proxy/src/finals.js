@@ -45,12 +45,16 @@ export async function confirmFinals(s, newIds, now) {
       }
     } catch (err) {
       s.log(`${s.p.sport}: confirm ${e.id} failed: ${err.message || err}`);
-      // A rate limit or a server error is not the match's doing: no try is used up,
-      // and no more are asked this round (three of those made the half-hour-old
-      // score of a finished match permanent, 2026-10-02).
-      if (err.status === 429 || err.status >= 500) { left.push(e); paused = true; }
-      else retry();
+      // A rate limit is not the match's doing: no try is used up and no more are asked
+      // this round (three of those made the half-hour-old score of a finished match
+      // permanent, 2026-10-02). It waits, though not for ever: a day, like any other.
+      // A server error on one id is that id's own failure, and counts as one.
+      if (err.status === 429) {
+        paused = true;
+        if (now - e.since < GIVE_UP_AFTER) left.push(e);
+        else s.log(`${s.p.sport}: gave up confirming ${e.id}`);
+      } else retry();
     }
   }
-  s.meta.toConfirm = left.length ? left : undefined;
+  s.meta.toConfirm = left.length ? left.slice(0, 200) : undefined; // a long outage must not grow it without end
 }

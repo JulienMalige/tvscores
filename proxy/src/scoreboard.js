@@ -17,6 +17,7 @@ function dayFormat(tz) {
 
 export function localDate(iso, tz) {
   const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return ""; // no day, and so never a day asked for
   const parts = dayFormat(tz).formatToParts(d);
   const get = (t) => parts.find((p) => p.type === t).value;
   return `${get("year")}-${get("month")}-${get("day")}`;

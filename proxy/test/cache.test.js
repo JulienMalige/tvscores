@@ -10,7 +10,7 @@ function oldStore(schemaVersion) {
   const dir = mkdtempSync(join(tmpdir(), "tvscores-"));
   writeFileSync(join(dir, "store.json"), JSON.stringify({
     schemaVersion,
-    events: [{ id: "football:12345", sport: "football", status: { state: "final" } }],
+    events: [{ id: "football:12345", sport: "football", start: "2026-09-15T20:00:00Z", status: { state: "final" } }],
     photos: { "Max Verstappen": { url: "https://example.test/mv.png", at: "2026-09-01" } },
     meta: { football: { lastDaily: "2026-09-15T10:00:00.000Z", calls: { day: "2026-09-15", used: 12 } } },
   }));

@@ -177,3 +177,76 @@ test("a photo lookup that is refused is still counted, and the day's line is kep
   assert.equal(photos.meta.calls.used, 1, "the refusal was a call");
   assert.equal(photos.quota.dailyQuota, DAILY_LINE);
 });
+
+test("a rate limit holds a match for a day at most, and a server error on one id counts as its failure", async () => {
+  const seen = match({ id: "tennis:9", sport: "tennis", status: { state: "live" } });
+  const limited = Object.assign(new Error("HTTP 429"), { status: 429 });
+  const broken = Object.assign(new Error("HTTP 500"), { status: 500 });
+  let failure = limited;
+  const provider = { sport: "tennis", finalizeOrphans: true, live: async () => [], byId: async () => { throw failure; } };
+  const s = scheduler(provider);
+  s.store.upsert([seen]);
+  await s.live(KICKOFF + 1800e3);
+  assert.equal(s.meta.toConfirm.length, 1, "held");
+  await s.live(KICKOFF + 25 * 3600e3);
+  assert.equal(s.meta.toConfirm, undefined, "and let go after a day of refusals");
+  const t = scheduler(provider);
+  failure = broken;
+  t.store.upsert([seen, match({ id: "tennis:10", sport: "tennis", status: { state: "live" } })]);
+  for (let round = 1; round <= 4; round++) await t.live(KICKOFF + round * 1800e3);
+  assert.equal(t.meta.toConfirm, undefined, "a dead id is let go after its three tries, and does not stop the others being asked");
+});
+
+test("a daily pass stops at a 429, and the second ask is for the dates it missed", async () => {
+  const dates = ["2026-10-01", "2026-10-02", "2026-10-03", "2026-10-04"];
+  const asked = [];
+  const refused = Object.assign(new Error("HTTP 429"), { status: 429 });
+  const rows = [match()];
+  rows.partial = true;
+  rows.missing = dates.slice(2);
+  const p = fake({});
+  p.daily = async (opts) => { asked.push(opts?.dates); return asked.length === 1 ? rows : [match()]; };
+  const s = scheduler(p);
+  const now = KICKOFF - 5 * 3600e3;
+  await s.daily(now);
+  assert.deepEqual(s.meta.retryDates, ["2026-10-03", "2026-10-04"]);
+  await s.daily(now + 31 * 60e3);
+  assert.deepEqual(asked, [undefined, ["2026-10-03", "2026-10-04"]], "the first asks for the window, the second only for what is missing");
+  assert.equal(s.meta.retryDates, undefined, "and a whole pass clears it");
+  assert.ok(refused.status);
+});
+
+test("a tour's day-change pass does not wait for a window that never shuts, and a team sport's waits six hours at most", () => {
+  const tour = scheduler({ ...fake({}), sport: "tennis", alwaysLive: true });
+  tour.store.upsert([lateGame()]);
+  tour.meta.lastDaily = new Date(KICKOFF - 3600e3).toISOString();
+  assert.equal(tour.needsDaily(NIGHT), true, "tomorrow's order of play is how new matches appear");
+  const team = scheduler(fake({}));
+  team.store.upsert([match({ start: "2026-09-16T04:00:00Z", status: { state: "live" } })]);
+  team.meta.lastDaily = new Date(KICKOFF - 3600e3).toISOString();
+  assert.equal(team.needsDaily(Date.parse("2026-09-16T05:00:00Z")), false, "an hour after the refresh hour, a game on: it waits");
+  assert.equal(team.needsDaily(Date.parse("2026-09-16T10:30:00Z")), true, "six hours on, a window still open: it goes ahead");
+});
+
+test("a live match whose payload has no time keeps the poll's, an upcoming one is left out, an epoch is a time", async () => {
+  const { normaliseMatch } = await import("../src/providers/livetennis-match.js");
+  const base = { id: 1, tour: "atp", players: { p1: { name: "A" }, p2: { name: "B" } } };
+  assert.ok(normaliseMatch({ ...base, status: "live" }, {}), "in play, so it is shown");
+  assert.equal(normaliseMatch({ ...base, status: "upcoming" }, {}), null);
+  const epoch = Date.parse("2026-10-03T10:00:00Z");
+  assert.equal(normaliseMatch({ ...base, status: "upcoming", scheduled_time: epoch }, {}).start, "2026-10-03T10:00:00.000Z");
+});
+
+test("a team slot that turns out to be another club does not keep the first club's crest", () => {
+  const store = tmpStore();
+  store.upsert([match({ home: { name: "Winner of A", short: "WIN", logo: "https://cdn/a.png" } })]);
+  store.upsert([match({ home: { name: "Elche", short: "ELC", logo: undefined } })]);
+  assert.equal(store.events.get("football:tsdb:1").home.logo, undefined);
+  assert.equal(store.events.get("football:tsdb:1").home.name, "Elche");
+});
+
+test("an event with no readable start is not kept, whoever hands it over", () => {
+  const store = tmpStore();
+  store.upsert([match({ id: "football:tsdb:7", start: "not a date" }), match()]);
+  assert.deepEqual([...store.events.keys()], ["football:tsdb:1"]);
+});
