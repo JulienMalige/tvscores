@@ -36,14 +36,20 @@
     ],
     "2026-10-04 (SKY+, with Julien)": [
       "SKY+ in Brazil is the old DIRECTV GO app: one app, id 6467130144, tvOS; a search of the news for 'DirecTV Go' (70+ channels, R$ 79.90, no mobile or broadband plan needed) describes the same product"
+    ],
+    "2026-10-04 (three research agents, one per country; Julien's own knowledge still to apply)": [
+      "US: the FOX Sports app stopped working on Apple TV on 2026-05-07 (its own store text; foxsports.com FAQ): FOX One replaces it. Fox Soccer Plus is not in FOX One. Fubo no longer has USA Network (Versant channels left in 2025); USA Network has its own app (661695783). NFL Network belongs to ESPN (in ESPN Unlimited). DIRECTV's lineup of 2026-07-29 carries NBA TV, TUDN, Universo, Univision, Fox Deportes, ESPN Deportes, Tennis Channel, FS2, not beIN or Fox Soccer Plus. The Bundesliga is Versant's (USA Network, free games on Fandango).",
+      "FR: Orange has an Apple TV app, Orange TV (6504527377): beIN, Ligue 1+, Eurosport, TF1, France 2/3, M6, L'Équipe, not Canal+. Canal+ stopped carrying DAZN on 2025-07-31. b.tv (Bouygues) does not play the Canal+ channels (its channel PDF of 2026-09-01). Eurosport streams through HBO Max in France (HBO Max has an Apple TV app there). Disney+ carries the L'Équipe channel and the LaLiga games. beIN SPORTS CONNECT is played in the CANAL+ app. RMC Sport + Ligue 1+ is not confirmed this season (ligue1.com lists no RMC Sport as a partner). 'Wake Television' is probably Waka TV, an unlicensed IPTV: out under rule 4.",
+      "BR: Vivo TV is the former Vivo Play. Claro tv+ carries Globo, ESPN 1-6, SporTV 1-3, TNT, BandSports, SportyNet, NSports, XSports, GE TV; HBO Max and Paramount+ are separate subscriptions that play in their own apps (so no Claro card). SKY+ names ESPN, SporTV, TNT and finds Premiere by search. Disney+ has the ESPN channels in Premium only. The ge app's tvOS build is from 2021: not used."
     ]
   },
   "toConfirm": [
-    "Brazil, Vivo TV: which channels does the app carry (SporTV, ESPN, Premiere, TNT, Globo)? Added to all four from the web, not checked",
-    "Brazil: for each of Globoplay, Vivo TV, Claro tv+ and SKY+, which of Globo, SporTV 1-3, Premiere, ESPN 1-4, TNT, Band Sports, Sportynet it really carries, and in which pack; whether the Premiere app opens a given game",
-    "France, Free TV and b.tv: added to every French channel their boxes carry (Canal+, beIN, Ligue 1+, Eurosport, TNT channels), from general knowledge: which of them each really plays in the app, and does it need the pack?",
-    "France: Orange has no Apple TV app for its TV service in the store: is there another way Orange subscribers watch on an Apple TV? And what is 'Wake Television'?",
-    "US (first version, from general knowledge and the charts): DIRECTV, Spectrum TV and Hulu + Live TV added to the big cable channels (ESPN, FOX, FS1, NBC, USA Network, TNT, CBS, NFL Network); Watch TNT is TNT's own app"
+    "BR, Premiere bought through Claro: does it play inside the Claro tv+ app on the Apple TV, or only in the Premiere app?",
+    "BR, Vivo TV: do SporTV and Globo play in the Vivo TV app with a TV package? Does Globo play live in SKY+ where you are?",
+    "BR: do you watch CazéTV only through YouTube? Which channel names does the feed print for ge tv, Record, BandSports, SBT and Space games (added from the research, never seen in the feed)?",
+    "FR, Free TV: when a Freebox subscriber has a CANAL+ offer, do the Canal+ channels play inside Free TV on Apple TV, or does it send you to CANAL+? (Free's list confirms beIN, Ligue 1+, Eurosport 1; Canal+ is inferred.)",
+    "FR: does the old L'Équipe tvOS app (2019) still open? Is 'RMC Sport + Ligue 1+' still sold? Can you test Orange TV on an Apple TV (beIN / Ligue 1+ there)? Which exact names does the feed print for LaLiga on Disney+ and for Eurosport 360 / HBO Max?",
+    "US (first version): does the NBC Sports app still play USA Network since the Versant spin-off (removed for now)? Does the Fandango app show the Bundesliga on the TV? Should Netflix, Golf Channel, NHL Network and NBCSN get cards? Are Fubo's Tennis Channel, NBA TV and NFL Network real? Does the Telemundo app stream Universo live?"
   ],
   "apps": {
     "beinconnect": {
@@ -60,7 +66,8 @@
       "appStoreId": 318133983,
       "tvos": [
         "FR"
-      ]
+      ],
+      "note": "Its tvOS build is 1.2 of 2019-02-19: it may not open the live channel or Ligue 1+. Unverified in practice."
     },
     "rmcsport": {
       "name": "RMC Sport",
@@ -112,14 +119,6 @@
       "name": "NFL",
       "kind": "own",
       "appStoreId": 389781154,
-      "tvos": [
-        "US"
-      ]
-    },
-    "foxsports": {
-      "name": "FOX Sports",
-      "kind": "own",
-      "appStoreId": 294056623,
       "tvos": [
         "US"
       ]
@@ -201,8 +200,9 @@
       "kind": "streamer",
       "appStoreId": 1446075923,
       "tvos": [
+        "BR",
         "FR",
-        "BR"
+        "US"
       ]
     },
     "primevideo": {
@@ -248,8 +248,9 @@
       "kind": "streamer",
       "appStoreId": 1666653815,
       "tvos": [
-        "US",
-        "BR"
+        "BR",
+        "FR",
+        "US"
       ]
     },
     "appletv": {
@@ -331,10 +332,10 @@
       "aka": [
         "DIRECTV GO"
       ],
-      "note": "Brazil. The former DIRECTV GO app (Julien; Apple's store returns it for 'DIRECTV GO', first released 2023-11-28): a streaming service of live channels and on-demand with no dish, packs such as SKY+ Futebol (Premiere, Sportynet) and Canais e Futebol (91 channels). Different from SKY's satellite service."
+      "note": "Brazil. The former DIRECTV GO app (Julien; Apple's store returns it for 'DIRECTV GO', first released 2023-11-28): live channels and on-demand, SKY satellite subscribers use the same app. Plans: SKY+ Light / Full, Canais e Streamings II, Futebol, Canais e Futebol (R$ 79,90-219,90). Premiere is opened by searching inside it (SKY+ FAQ)."
     },
     "fandango": {
-      "name": "Fandango at Home",
+      "name": "Fandango",
       "kind": "streamer",
       "appStoreId": 487285735,
       "tvos": [
@@ -355,7 +356,8 @@
       "appStoreId": 589412933,
       "tvos": [
         "BR"
-      ]
+      ],
+      "note": "Brazil. The former Vivo Play app, renamed Vivo TV on 2025-10-03 (Vivo's notice; same id 589412933). App-only plans (Inicial, Estendido): ESPN 1-4 (5-6 in Estendido), TNT, BandSports, open channels. SporTV only with the TV packages (Avançado, Completo); Globo only in 14 cities. No Premiere: Vivo sends Premiere subscribers to the Premiere and Globoplay apps."
     },
     "freetv": {
       "name": "Free TV",
@@ -404,136 +406,200 @@
       "tvos": [
         "US"
       ]
+    },
+    "usanetwork": {
+      "name": "USA Network",
+      "kind": "own",
+      "appStoreId": 661695783,
+      "tvos": [
+        "US"
+      ]
+    },
+    "cbssports": {
+      "name": "CBS Sports",
+      "kind": "own",
+      "appStoreId": 307184892,
+      "tvos": [
+        "US"
+      ]
+    },
+    "watchtbs": {
+      "name": "Watch TBS",
+      "kind": "own",
+      "appStoreId": 462780547,
+      "tvos": [
+        "US"
+      ]
+    },
+    "trutv": {
+      "name": "truTV",
+      "kind": "own",
+      "appStoreId": 396972659,
+      "tvos": [
+        "US"
+      ]
+    },
+    "golfchannel": {
+      "name": "Golf Channel",
+      "kind": "own",
+      "appStoreId": 466053027,
+      "tvos": [
+        "US"
+      ]
+    },
+    "netflix": {
+      "name": "Netflix",
+      "kind": "streamer",
+      "appStoreId": 363590051,
+      "tvos": [
+        "US"
+      ]
+    },
+    "orangetv": {
+      "name": "Orange TV",
+      "kind": "provider",
+      "appStoreId": 6504527377,
+      "tvos": [
+        "FR"
+      ],
+      "note": "Made only for Apple TV (launched 2024-07). Needs the Orange option for connected TVs (free with Livebox Up/Max). Orange's channel list marks beIN 1-10, Ligue 1+ 1-9, Eurosport 1/2/360, TF1, France 2/3, M6 and L'Équipe as watchable outside the box; Canal+ channels are not."
     }
   },
   "channels": {
     "FR": {
       "Canal+": [
         "canalplus",
-        "molotov",
-        "freetv",
-        "btv"
+        "freetv"
       ],
       "Canal+ Foot": [
         "canalplus",
-        "freetv",
-        "btv"
+        "freetv"
       ],
       "Canal+ Sport": [
         "canalplus",
-        "freetv",
-        "btv"
+        "freetv"
       ],
       "Canal+ Sport 360": [
         "canalplus",
-        "freetv",
-        "btv"
+        "freetv"
       ],
       "Canal+ Premier League": [
-        "canalplus",
-        "freetv",
-        "btv"
+        "canalplus"
       ],
       "beIN Sports": [
         "beinconnect",
         "canalplus",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv"
       ],
       "beIN Sports 1": [
         "beinconnect",
         "canalplus",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv"
       ],
       "beIN Sports 2": [
         "beinconnect",
         "canalplus",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv"
       ],
       "beIN Sports 3": [
         "beinconnect",
         "canalplus",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv"
       ],
       "beIN Sports Max 4": [
         "beinconnect",
         "canalplus",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv"
       ],
       "beIN Sports Max 5": [
         "beinconnect",
         "canalplus",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv"
       ],
       "beIN Sports Max 6": [
         "beinconnect",
         "canalplus",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv"
       ],
       "DAZN": [
         "dazn"
       ],
       "DAZN 1": [
-        "dazn",
-        "canalplus"
+        "dazn"
       ],
       "Ligue 1+": [
         "ligue1plus",
         "dazn",
         "primevideo",
         "molotov",
-        "rmcsport",
         "lequipe",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv"
       ],
       "Eurosport": [
+        "hbomax",
         "eurosport",
         "canalplus",
         "primevideo",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv"
       ],
       "TF1": [
         "tf1plus",
         "molotov",
         "canalplus",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv"
       ],
       "France 2": [
         "francetv",
         "molotov",
         "canalplus",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv"
       ],
       "France 3": [
         "francetv",
         "molotov",
         "canalplus",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv"
       ],
       "M6": [
         "m6plus",
         "molotov",
         "canalplus",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv"
       ],
       "L'Équipe": [
         "lequipe",
         "molotov",
         "canalplus",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv",
+        "disneyplus"
       ],
       "RMC Sport": [
         "rmcsport"
@@ -545,7 +611,13 @@
         "beinconnect",
         "canalplus",
         "freetv",
-        "btv"
+        "btv",
+        "orangetv"
+      ],
+      "Eurosport 360": [
+        "hbomax",
+        "canalplus",
+        "orangetv"
       ]
     },
     "US": {
@@ -568,16 +640,19 @@
         "hululive"
       ],
       "ESPN+": [
-        "espn"
+        "espn",
+        "disneyplus"
       ],
       "ESPN Deportes": [
         "espn",
         "fubo",
-        "sling"
+        "sling",
+        "directv",
+        "youtubetv",
+        "hululive"
       ],
       "FOX": [
         "foxone",
-        "foxsports",
         "fubo",
         "youtubetv",
         "directv",
@@ -586,13 +661,11 @@
       ],
       "FOX Sports": [
         "foxone",
-        "foxsports",
         "fubo",
         "youtubetv"
       ],
       "FS1": [
         "foxone",
-        "foxsports",
         "fubo",
         "youtubetv",
         "sling",
@@ -602,8 +675,12 @@
       ],
       "FS2": [
         "foxone",
-        "foxsports",
-        "fubo"
+        "fubo",
+        "youtubetv",
+        "sling",
+        "directv",
+        "spectrum",
+        "hululive"
       ],
       "NBC": [
         "peacock",
@@ -618,9 +695,8 @@
         "peacock"
       ],
       "USA Network": [
-        "nbcsports",
+        "usanetwork",
         "youtubetv",
-        "fubo",
         "sling",
         "directv",
         "spectrum",
@@ -630,12 +706,16 @@
         "telemundo",
         "peacock",
         "youtubetv",
-        "fubo"
+        "fubo",
+        "directv",
+        "spectrum",
+        "hululive"
       ],
       "Paramount+": [
         "paramountplus"
       ],
       "CBS": [
+        "cbssports",
         "paramountplus",
         "youtubetv",
         "fubo",
@@ -662,44 +742,151 @@
         "tennischannel",
         "youtubetv",
         "fubo",
-        "sling"
+        "sling",
+        "directv",
+        "spectrum"
       ],
       "beIN Sports": [
         "beinconnect",
         "fubo",
-        "sling"
+        "sling",
+        "youtubetv",
+        "spectrum"
       ],
       "NBA TV": [
-        "nba"
+        "nba",
+        "youtubetv",
+        "directv",
+        "sling",
+        "spectrum"
       ],
       "NFL Network": [
+        "espn",
         "nfl",
+        "youtubetv",
+        "fubo",
+        "directv",
+        "spectrum",
+        "hululive",
+        "sling"
+      ],
+      "Universo": [
+        "peacock",
+        "telemundo",
+        "youtubetv",
+        "directv",
+        "fubo"
+      ],
+      "TUDN": [
+        "vix",
+        "univision",
+        "youtubetv",
+        "directv"
+      ],
+      "Fox Soccer Plus": [
+        "fubo",
+        "youtubetv"
+      ],
+      "Fandango": [
+        "fandango"
+      ],
+      "ABC": [
+        "espn",
         "youtubetv",
         "fubo",
         "directv",
         "spectrum",
         "hululive"
       ],
-      "Universo": [
-        "peacock",
-        "telemundo"
-      ],
-      "TUDN": [
-        "vix",
-        "univision"
-      ],
-      "Fox Soccer Plus": [
-        "foxsports",
+      "Fox Deportes": [
         "foxone",
+        "fubo",
+        "directv",
+        "youtubetv",
+        "sling",
+        "hululive"
+      ],
+      "Peacock Premium": [
+        "peacock"
+      ],
+      "HBO Max": [
+        "hbomax"
+      ],
+      "CBS Sports Network": [
+        "cbssports",
+        "youtubetv",
+        "directv",
+        "spectrum",
+        "hululive"
+      ],
+      "CBS Sports Golazo": [
+        "cbssports",
+        "paramountplus"
+      ],
+      "TBS": [
+        "watchtbs",
+        "hbomax",
+        "youtubetv",
+        "sling",
+        "directv",
+        "spectrum",
+        "hululive"
+      ],
+      "truTV": [
+        "trutv",
+        "hbomax",
+        "youtubetv",
+        "sling",
+        "directv",
+        "spectrum",
+        "hululive"
+      ],
+      "Univision": [
+        "univision",
+        "vix",
+        "youtubetv",
+        "directv",
+        "hululive"
+      ],
+      "UniMás": [
+        "univision",
+        "youtubetv",
+        "directv"
+      ],
+      "beIN Sports en Español": [
+        "beinconnect",
+        "fubo",
+        "sling"
+      ],
+      "NBCSN": [
+        "nbcsports",
+        "peacock",
+        "youtubetv",
         "fubo"
       ],
-      "Fandango": [
-        "fandango"
+      "Netflix": [
+        "netflix"
+      ],
+      "Golf Channel": [
+        "golfchannel",
+        "youtubetv",
+        "sling",
+        "directv",
+        "spectrum",
+        "hululive"
+      ],
+      "NHL Network": [
+        "directv",
+        "sling",
+        "spectrum"
       ]
     },
     "BR": {
       "Globo": [
-        "globoplay"
+        "globoplay",
+        "clarotvplus",
+        "vivotv",
+        "skyplus"
       ],
       "SporTV": [
         "globoplay",
@@ -723,8 +910,7 @@
         "premiere",
         "globoplay",
         "clarotvplus",
-        "skyplus",
-        "vivotv"
+        "skyplus"
       ],
       "ESPN": [
         "disneyplus",
@@ -754,8 +940,7 @@
         "disneyplus"
       ],
       "HBO Max": [
-        "hbomax",
-        "clarotvplus"
+        "hbomax"
       ],
       "TNT": [
         "hbomax",
@@ -773,7 +958,30 @@
         "globoplay"
       ],
       "Paramount+": [
-        "paramountplus",
+        "paramountplus"
+      ],
+      "ge tv": [
+        "globoplay",
+        "youtube",
+        "clarotvplus"
+      ],
+      "Record": [
+        "clarotvplus",
+        "vivotv",
+        "skyplus"
+      ],
+      "BandSports": [
+        "clarotvplus",
+        "vivotv",
+        "skyplus"
+      ],
+      "SBT": [
+        "clarotvplus",
+        "vivotv",
+        "skyplus"
+      ],
+      "Space": [
+        "hbomax",
         "clarotvplus"
       ]
     }
