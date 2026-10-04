@@ -72,9 +72,15 @@ export class Store {
     }
   }
 
-  /** Writes only when something changed since the last save. */
-  save() {
+  /**
+   * Writes only when something changed since the last save. `every` spares the
+   * disk: the schedulers touch the meta each tick, and the whole file is
+   * rewritten, so they ask for a write at most that often (a stop writes at once).
+   */
+  save({ every = 0 } = {}) {
     if (!this.dirty) return;
+    if (every && Date.now() - (this.savedAt || 0) < every) return;
+    this.savedAt = Date.now();
     const tmp = this.file + ".tmp";
     writeFileSync(tmp, JSON.stringify({ schemaVersion: SCHEMA_VERSION, events: [...this.events.values()], standings: this.standings, photos: this.photos, broadcasts: this.broadcasts, meta: this.meta }));
     renameSync(tmp, this.file);
@@ -87,7 +93,16 @@ export class Store {
 
   upsert(events) {
     if (events.length) this.dirty = true;
-    for (const e of events) this.events.set(e.id, { ...this.events.get(e.id), ...e });
+    for (const e of events) {
+      const old = this.events.get(e.id);
+      const merged = { ...old, ...e };
+      // A second look that names a team without its crest (the live feed does)
+      // must not take the crest the first look found.
+      for (const side of ["home", "away"]) {
+        if (old?.[side] && e[side]) merged[side] = { ...old[side], ...Object.fromEntries(Object.entries(e[side]).filter(([, v]) => v !== undefined)) };
+      }
+      this.events.set(e.id, merged);
+    }
   }
 
   setPhoto(name, entry) {

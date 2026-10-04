@@ -196,3 +196,23 @@ test("the board hands session rows their portraits and keeps the retry count to 
   assert.equal(out.sessionResults[0].results[0].photo, "mirror:https://img/max.png");
   assert.equal(out.sessionResults[1].tries, undefined);
 });
+
+test("one round's classification failing does not stop the calendar, and is asked for again", async (t) => {
+  const { motorsportProvider } = await import("../src/providers/ocblacktop.js");
+  const round = (id, name) => ({
+    id, name, dateStart: "2026-09-01", location: { name: "X", country: { name: "Italy", twoCode: "IT" } },
+    schedule: [{ id: `s${id}`, type: "race", name: "Race", startTime: "2026-09-01T12:00:00Z", status: "completed" }],
+  });
+  t.mock.method(globalThis, "fetch", async (url) => {
+    if (url.includes("/events?limit")) return new Response(JSON.stringify({ data: [round("1", "ONE"), round("2", "TWO")] }));
+    if (url.includes("/events/1/")) return new Response("", { status: 500 });
+    return new Response(JSON.stringify({ data: [] }));
+  });
+  const logged = [];
+  const p = motorsportProvider({ sport: "formula1", league: { id: "f1", name: "Formula 1", short: "F1" }, key: "k", quota: { spendable: () => 50, record: () => {} }, log: (m) => logged.push(m) });
+  const season = await p.season({ year: 2026 });
+  assert.equal(season.length, 2, "both rounds are on the calendar");
+  assert.equal(season[0].resultsFetchedAt, undefined, "the failed one is not marked as asked, so it is asked again");
+  assert.ok(season[1].resultsFetchedAt, "the other one is");
+  assert.ok(logged.some((m) => m.includes("results failed")));
+});

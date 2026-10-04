@@ -14,6 +14,14 @@ const V2 = "https://www.thesportsdb.com/api/v2/json";
  */
 export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons = {}, next = {}, log = () => {} }) {
   const { feed, live: livePath } = SPORTS[sport];
+  /** A call counts against the day whether or not it answers: a refusal was still spent. */
+  const call = async (url, opts) => {
+    try {
+      return await getJson(url, opts);
+    } finally {
+      quota.record(undefined);
+    }
+  };
   const byId = new Map(leagues.map((l) => [String(l.id), l]));
   /** A fixture of ours: a competition we follow, and a game its filters keep. */
   const wanted = (r) => {
@@ -27,7 +35,15 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
     // Every fixture names its own season, so the table lookup never needs a
     // call of its own — nor a hardcoded year that goes stale each August.
     for (const r of keep) if (r.strSeason) seasons[String(r.idLeague)] = r.strSeason;
-    return keep.map((r) => normaliseEvent(r, byId.get(String(r.idLeague)), sport)).filter(Boolean);
+    // One row the feed got wrong (a placeholder with no team yet) is that row's loss.
+    return keep.map((r) => {
+      try {
+        return normaliseEvent(r, byId.get(String(r.idLeague)), sport);
+      } catch (err) {
+        log(`sportsdb ${sport}: skipped a row (${err.message})`);
+        return undefined;
+      }
+    }).filter(Boolean);
   };
 
   /**
@@ -38,16 +54,32 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
    */
   async function byDate(date) {
     if (!key) throw new Error("TheSportsDB key missing");
-    const { body } = await getJson(`${V1}/${key}/eventsday.php?d=${date}&s=${encodeURIComponent(feed)}`);
-    quota.record(undefined);
+    const { body } = await call(`${V1}/${key}/eventsday.php?d=${date}&s=${encodeURIComponent(feed)}`);
     return mine(body?.events || []);
   }
 
+  /**
+   * The window, one date at a time. A date that fails costs that date and not
+   * the others: the answer is what came, marked `partial` so the scheduler
+   * asks again soon; only a window in which nothing came is an error.
+   */
   async function daily() {
     const out = [];
-    for (const date of datesAround(win)) out.push(...(await byDate(date)));
-    log(`GET sportsdb ${sport} ${win.back + win.ahead + 1} days -> ${out.length} matches`);
+    const dates = datesAround(win);
+    let failed = 0, lastError;
+    for (const date of dates) {
+      try {
+        out.push(...(await byDate(date)));
+      } catch (err) {
+        failed += 1;
+        lastError = err;
+        log(`sportsdb ${sport} ${date}: ${err.message}`);
+      }
+    }
+    if (failed === dates.length) throw lastError;
+    log(`GET sportsdb ${sport} ${dates.length - failed} of ${dates.length} days -> ${out.length} matches`);
     await nextFixtures(out);
+    out.partial = failed > 0;
     return out;
   }
 
@@ -68,8 +100,13 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
         if (!(next[id] && Date.parse(next[id].start) > Date.now())) delete next[id];
         continue;
       }
-      const { body } = await getJson(`${V1}/${key}/eventsnextleague.php?id=${id}`);
-      quota.record(undefined);
+      let body;
+      try {
+        ({ body } = await call(`${V1}/${key}/eventsnextleague.php?id=${id}`));
+      } catch (err) {
+        log(`sportsdb ${sport} next ${id}: ${err.message}`); // what we knew of it stays
+        continue;
+      }
       const soonest = (body?.events || []).filter((r) => wanted({ ...r, idLeague: id })).map((r) => ({ start: startOf(r), season: r.strSeason })).filter((r) => r.start).sort((a, b) => a.start.localeCompare(b.start))[0];
       // A new season when its label is not the one the league's own games
       // last carried: the NBA's first game of 2026-2027 after 2025-2026,
@@ -87,8 +124,7 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
   /** V2 carries the minute and the running score; V1 only catches up at the whistle. */
   async function live() {
     if (!key) throw new Error("TheSportsDB key missing");
-    const { body } = await getJson(`${V2}/livescore/${livePath}`, { headers: { "X-API-KEY": key } });
-    quota.record(undefined);
+    const { body } = await call(`${V2}/livescore/${livePath}`, { headers: { "X-API-KEY": key } });
     const rows = mine(body?.livescore || []);
     log(`GET sportsdb livescore ${livePath} -> ${rows.length} of ours in play`);
     return rows;
@@ -100,8 +136,7 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
    * yet asks the league itself, once, and keeps the answer.
    */
   async function currentSeason(id) {
-    const { body } = await getJson(`${V1}/${key}/lookupleague.php?id=${id}`);
-    quota.record(undefined);
+    const { body } = await call(`${V1}/${key}/lookupleague.php?id=${id}`);
     const season = (body?.leagues || [])[0]?.strCurrentSeason;
     if (season) seasons[String(id)] = season;
     return season;
@@ -119,25 +154,32 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
   async function standings(only) {
     if (!key) throw new Error("TheSportsDB key missing");
     const out = {};
+    let failed = 0, lastError;
     for (const league of leagues) {
       if (only && !only.has(String(league.id))) continue;
-      const season = seasons[String(league.id)] || (await currentSeason(league.id));
-      if (!season) continue;
-      if (league.table) {
-        const { body } = await getJson(`${V1}/${key}/eventsseason.php?id=${league.id}&s=${encodeURIComponent(season)}`);
-        quota.record(undefined);
-        const built = tableFromResults(body?.events || [], { ...league.table, groups: DIVISIONS[league.table.groups], zones: league.zones });
-        if (built) out[league.id] = { updatedAt: new Date().toISOString(), ...built };
-        continue;
-      }
-      const { body } = await getJson(`${V1}/${key}/lookuptable.php?l=${league.id}&s=${encodeURIComponent(season)}`);
-      quota.record(undefined);
-      const rows = (body?.table || []).map(feedTableRow);
-      if (rows.length) {
-        const table = { id: "table", columns: POINTS_COLUMNS, rows, ...(league.zones ? zonesFor(league.zones, rows.length) : {}) };
-        out[league.id] = { updatedAt: new Date().toISOString(), tables: [table] };
+      try {
+        const season = seasons[String(league.id)] || (await currentSeason(league.id));
+        if (!season) continue;
+        if (league.table) {
+          const { body } = await call(`${V1}/${key}/eventsseason.php?id=${league.id}&s=${encodeURIComponent(season)}`);
+          const built = tableFromResults(body?.events || [], { ...league.table, groups: DIVISIONS[league.table.groups], zones: league.zones });
+          if (built) out[league.id] = { updatedAt: new Date().toISOString(), ...built };
+          continue;
+        }
+        const { body } = await call(`${V1}/${key}/lookuptable.php?l=${league.id}&s=${encodeURIComponent(season)}`);
+        const rows = (body?.table || []).map(feedTableRow);
+        if (rows.length) {
+          const table = { id: "table", columns: POINTS_COLUMNS, rows, ...(league.zones ? zonesFor(league.zones, rows.length) : {}) };
+          out[league.id] = { updatedAt: new Date().toISOString(), tables: [table] };
+        }
+      } catch (err) {
+        // One league's table failing leaves the others' tables, and its own as it was.
+        failed += 1;
+        lastError = err;
+        log(`sportsdb ${sport} table ${league.id}: ${err.message}`);
       }
     }
+    if (failed && !Object.keys(out).length) throw lastError;
     log(`GET sportsdb ${sport} tables -> ${Object.keys(out).length} of ${leagues.length}`);
     return out;
   }

@@ -3,15 +3,12 @@ import { confirmFinals } from "./finals.js";
 import { STATE } from "./model.js";
 import { MIN } from "./clock.js";
 import { refreshStandings } from "./standings.js";
+import { settle, fail } from "./persist.js";
 
 /** A kickoff this far past with nothing to show for it deserves a second look. */
 const OVERDUE = 15 * MIN;
 /** However badly upstream is doing, look again within the hour. */
 const MAX_BACKOFF = 60 * 60e3;
-/** A race weekend: worth asking about every half hour. */
-const CALENDAR_LIVE = 30 * MIN;
-/** Every other day of the fortnight: the calendar is not going to move. */
-const CALENDAR_IDLE = 6 * 60 * MIN;
 
 /**
  * The wait after `failures` consecutive errors: the normal interval doubled
@@ -81,11 +78,22 @@ export class TeamSportScheduler {
     return Boolean(this.p.alwaysLive) || this.hasLiveWindow(now);
   }
 
+  /**
+   * Never while a game could be in progress: a new day waits for the window to
+   * close as an idle one does (a full pass is nine calls, in the middle of a
+   * 30-second poll, and it overwrites the live rows with the older feed's).
+   * The valve is a day and a half: a window that is never shut must not mean
+   * a board that is never refilled.
+   */
   needsDaily(now = Date.now()) {
     const last = this.meta.lastDaily ? Date.parse(this.meta.lastDaily) : 0;
+    if (!last || now - last > 36 * 3600e3) return true;
+    if (this.hasLiveWindow(now)) return false;
     const dayChanged = Quota.utcDay(last) !== Quota.utcDay(now) && new Date(now).getUTCHours() >= this.cfg.dailyRefreshHourUtc;
     const idle = now - last > this.cfg.idleRefreshMinutes * MIN;
-    return !last || dayChanged || (idle && !this.hasLiveWindow(now));
+    // A pass that came back with a date or two missing is finished in half an hour.
+    const unfinished = this.meta.retryDailyAfter && now >= Date.parse(this.meta.retryDailyAfter);
+    return dayChanged || idle || Boolean(unfinished);
   }
 
   async daily(now = Date.now()) {
@@ -93,9 +101,12 @@ export class TeamSportScheduler {
     // not start the round with three calls left in the budget.
     const need = this.p.dailyCost ?? 1;
     if (this.quota.spendable(now) < need) return this.log(`${this.p.sport}: skip daily, quota ${this.quota.remaining(now)} left`);
-    this.store.upsert(await this.p.daily());
+    const rows = await this.p.daily();
+    this.store.upsert(rows);
     this.meta.lastDaily = new Date(now).toISOString();
     this.meta.lastOk = this.meta.lastDaily;
+    if (rows.partial) this.meta.retryDailyAfter = new Date(now + 30 * MIN).toISOString();
+    else delete this.meta.retryDailyAfter;
   }
 
   /**
@@ -139,7 +150,10 @@ export class TeamSportScheduler {
     );
     const orphan = needsLook.length > 0;
     const lastToday = this.meta.lastToday ? Date.parse(this.meta.lastToday) : 0;
-    if (orphan && now - lastToday > 20 * MIN && this.quota.spendable(now) > 0) {
+    // Twenty minutes on a hundred-a-day key; five where the budget is thousands,
+    // so a game that ended is not "live" on the board for a third of an hour.
+    const lookEvery = this.quota.dailyQuota >= 1000 ? 5 * MIN : 20 * MIN;
+    if (orphan && now - lastToday > lookEvery && this.quota.spendable(now) > 0) {
       // Refetch its own UTC date: a game that started before midnight is not in "today".
       const date = new Date(needsLook[0].start).toISOString().slice(0, 10);
       const back = await this.p.byDate(date);
@@ -167,83 +181,13 @@ export class TeamSportScheduler {
     try {
       if (this.needsDaily(now)) await this.daily(now);
       if (this.pollsLive(now)) await this.live(now);
-      await refreshStandings(this, now);
       this.meta.lastError = undefined;
       this.meta.failures = 0;
     } catch (err) {
-      this.meta.failures = (this.meta.failures || 0) + 1;
-      this.meta.lastError = { at: new Date(now).toISOString(), message: String(err.message || err) };
-      this.log(`${this.p.sport}: ${err.message} (failure ${this.meta.failures})`);
+      fail(this, err, now);
     }
-    this.store.prune(now);
-    this.store.touch(); // meta (quota counters, timestamps) changed
-    this.store.save();
-    this.timer = setTimeout(() => this.tick(), this.nextDelay(now));
-    this.timer.unref?.();
-  }
-
-  start() {
-    this.tick();
-  }
-
-  stop() {
-    clearTimeout(this.timer);
-  }
-}
-
-/** Calendar sports (F1, MotoGP): season list + results of finished races. */
-export class CalendarScheduler {
-  constructor({ provider, store, log, quota }) {
-    this.p = provider;
-    this.store = store;
-    this.log = log;
-    this.quota = quota;
-    this.meta = store.sportMeta(provider.sport);
-  }
-
-  /**
-   * F1 and MotoGP race roughly every other weekend, so polling a season
-   * calendar every half hour spends most of a month's free allowance on days
-   * when nothing happens. Half-hourly around the race, and for three hours
-   * after a qualifying or a sprint starts so its result is picked up within
-   * half an hour of the flag; six-hourly otherwise.
-   */
-  nextDelay(now = Date.now()) {
-    const near = this.store.all().some((e) => {
-      if (e.sport !== this.p.sport) return false;
-      const t = Date.parse(e.start);
-      if (now > t - 6 * 3600e3 && now < t + 6 * 3600e3) return true;
-      return (e.sessions || []).some((s) => {
-        const at = Date.parse(s.start);
-        return ["qualifying", "sprint"].includes(s.kind) && now >= at && now < at + 3 * 3600e3;
-      });
-    });
-    return backoff(near ? CALENDAR_LIVE : CALENDAR_IDLE, this.meta.failures);
-  }
-
-  async tick() {
-    const now = Date.now();
-    try {
-      const season = await this.p.season({
-        hasResults: (id) => this.store.hasResults(id),
-        cachedSessions: (id) => this.store.events.get(id)?.sessionResults,
-      });
-      // Keep cached podiums for rounds the provider did not re-fetch this time.
-      const merged = season.map((e) => (e.results ? e : { ...e, results: this.store.events.get(e.id)?.results }));
-      this.store.replaceSport(this.p.sport, merged);
-      await refreshStandings(this, now);
-      this.meta.lastOk = new Date(now).toISOString();
-      this.meta.lastError = undefined;
-      this.meta.failures = 0;
-    } catch (err) {
-      this.meta.failures = (this.meta.failures || 0) + 1;
-      this.meta.lastError = { at: new Date(now).toISOString(), message: String(err.message || err) };
-      this.log(`${this.p.sport}: ${err.message} (failure ${this.meta.failures})`);
-    }
-    this.store.touch();
-    this.store.save();
-    this.timer = setTimeout(() => this.tick(), this.nextDelay());
-    this.timer.unref?.();
+    await refreshStandings(this, now); // never throws: the tables' failures are theirs (standings.js)
+    settle(this, { now, prune: true, delay: () => this.nextDelay(now) });
   }
 
   start() {

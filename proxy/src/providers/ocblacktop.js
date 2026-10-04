@@ -131,10 +131,17 @@ export function motorsportProvider({ sport, league, key, quota, log = () => {}, 
         const base = normaliseEvent(e, { sport, league, nationalities: nats });
         if (!base) continue;
         if (base._completed && !hasResults(base.id) && quota.spendable() > 0) {
-          const rows = await get(`/events/${base._eventId}/sessions/${base._sessionId}/results`);
-          resultCalls += 1;
-          Object.assign(base, normaliseEvent(e, { sport, league, results: Array.isArray(rows) ? rows : rows.data, nationalities: nats }));
-          base.resultsFetchedAt = new Date().toISOString();
+          // One round's classification failing is that round's loss: the calendar
+          // and every other round still update, and this one is asked for again.
+          try {
+            const rows = await get(`/events/${base._eventId}/sessions/${base._sessionId}/results`);
+            Object.assign(base, normaliseEvent(e, { sport, league, results: Array.isArray(rows) ? rows : rows.data, nationalities: nats }));
+            base.resultsFetchedAt = new Date().toISOString();
+          } catch (err) {
+            log(`OCB ${sport} ${base.id}: results failed (${err.message})`);
+          } finally {
+            resultCalls += 1;
+          }
         }
         const sessions = await sessionResults(e, {
           cached: cachedSessions(base.id),

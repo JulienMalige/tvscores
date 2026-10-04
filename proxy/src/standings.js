@@ -19,6 +19,15 @@ const STANDINGS_RETRY = 30 * MIN;
  * the thing that makes an app feel dead, and it costs one call per league.
  */
 export async function refreshStandings(self, now) {
+  try {
+    await refresh(self, now);
+  } catch (err) {
+    // The tables have their own failures; whatever they throw, the scores go on.
+    self.log(`${self.p.sport}: standings: ${err.message}`);
+  }
+}
+
+async function refresh(self, now) {
   if (!self.p.standings) return;
   const last = self.meta.lastStandings ? Date.parse(self.meta.lastStandings) : 0;
   const dirty = self.dirtyLeagues?.size ? new Set(self.dirtyLeagues) : null;
@@ -27,7 +36,17 @@ export async function refreshStandings(self, now) {
   const due = now - last >= (self.meta.standingsEmpty ? STANDINGS_RETRY : STANDINGS_EVERY);
   if (!due && !(dirty && now - last >= STANDINGS_AFTER_GAME)) return;
   if (self.quota && self.quota.spendable(now) < 2) return;
-  const data = await self.p.standings(due ? undefined : dirty);
+  let data;
+  try {
+    data = await self.p.standings(due ? undefined : dirty);
+  } catch (err) {
+    // A table endpoint having a bad day is not the live feed having one: it
+    // gets the retry of an empty answer, and the scores keep their pace.
+    self.meta.lastStandings = new Date(now).toISOString();
+    self.meta.standingsEmpty = true;
+    self.store.touch();
+    return self.log(`${self.p.sport}: standings failed, retrying in half an hour (${err.message})`);
+  }
   self.dirtyLeagues?.clear();
   const nonEmpty = (d) => d && d.tables && d.tables.some((t) => t.rows && t.rows.length);
   if (data && data.tables) {

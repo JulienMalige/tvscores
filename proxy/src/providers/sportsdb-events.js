@@ -75,6 +75,7 @@ export function stateOf(row, now = Date.now()) {
 }
 
 export function normaliseEvent(row, league, sport = "football", now = Date.now()) {
+  if (!row?.strHomeTeam || !row?.strAwayTeam) return undefined; // a placeholder, not yet a fixture
   const start = startOf(row);
   if (!start) return null;
   const short = row.strStatus || "";

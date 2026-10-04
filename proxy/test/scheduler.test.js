@@ -4,45 +4,8 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Store } from "../src/cache.js";
-import { TeamSportScheduler, CalendarScheduler } from "../src/scheduler.js";
-
-const CFG = {
-  dailyRefreshHourUtc: 4,
-  idleRefreshMinutes: 180,
-  liveIntervalSeconds: 1800,
-  quotaReserve: 8,
-  dailyQuota: 100,
-  liveWindowHours: 4,
-};
-
-const KICKOFF = Date.parse("2026-09-15T20:00:00Z");
-const match = (over = {}) => ({
-  id: "football:tsdb:1",
-  sport: "football",
-  league: { id: 4335, name: "La Liga", short: "LIGA" },
-  kind: "match",
-  start: new Date(KICKOFF).toISOString(),
-  status: { state: "scheduled" },
-  home: { name: "Elche", short: "ELC" },
-  away: { name: "Oviedo", short: "OVI" },
-  score: { home: null, away: null },
-  ...over,
-});
-
-/** A provider that answers from what the test hands it, and counts its calls. */
-function fake({ daily = [], live = [], byDate = [] }) {
-  const calls = { daily: 0, live: 0, byDate: 0 };
-  return {
-    calls,
-    sport: "football",
-    daily: async () => (calls.daily++, daily),
-    live: async () => (calls.live++, live),
-    byDate: async (d) => (calls.byDate++, calls.lastDate = d, byDate),
-  };
-}
-
-const scheduler = (provider) =>
-  new TeamSportScheduler({ provider, store: new Store(mkdtempSync(join(tmpdir(), "tvscores-"))), cfg: CFG, log: () => {} });
+import { CalendarScheduler } from "../src/calendar-scheduler.js";
+import { CFG, KICKOFF, match, fake, scheduler } from "./helpers/schedule.js";
 
 test("nothing is polled until a kickoff is near", () => {
   const s = scheduler(fake({}));
