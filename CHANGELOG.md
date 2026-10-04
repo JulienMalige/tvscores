@@ -9,8 +9,6 @@ notes when a version ships.
 ## Unreleased
 - A finished game shows the channel it was on, under "Final", as an
   upcoming one shows where it is: on its row and at the top of its page.
-- A race's row keeps its country's flag above the podium, where the podium
-  used to take its place.
 
 ## 1.0 build 37 — 4 October 2026
 - The screen you see while the app opens shows the app's own mark in the
