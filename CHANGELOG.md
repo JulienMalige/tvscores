@@ -13,6 +13,9 @@ notes when a version ships.
   for the NFL outside the US). Select a card to open the app on the Apple TV; when
   nothing opens it says so. Which apps can be opened from outside is still being
   found out.
+- Coming back to the app from the background no longer leaves the menu's icons
+  (and other pictures) transparent: they are asked for again as soon as the app
+  is active.
 - Settings, About: Open apps (test) lists every app and tries its links from
   your Apple TV, so we learn which ones open.
 

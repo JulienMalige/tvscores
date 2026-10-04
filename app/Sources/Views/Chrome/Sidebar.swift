@@ -46,6 +46,10 @@ struct Sidebar: View {
         }
         .task { Diagnostics.shared.start(); store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
+        // The pictures the system emptied while the app was in the background come back.
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            Task { await store.rewarm() }
+        }
         .onChange(of: selection) { old, new in
             Diagnostics.shared.note("menu \(old) -> \(new)")
             chipShrunk = false

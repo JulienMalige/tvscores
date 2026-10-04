@@ -10,35 +10,35 @@ import Foundation
 actor ImagePrefetcher {
     static let shared = ImagePrefetcher()
 
-    private var done: Set<URL> = []
     /// How many pictures are in flight at once. The pictures are a few KB each,
     /// so a first launch is spent on requests, not bytes: eight at a time.
     static let parallel = 8
 
-    /// Returns how many of the pictures asked for are now in memory. Only a
-    /// picture that arrived is remembered as done: one that failed on a cold
-    /// line is asked for again next time, which is how the menu's icons fill
-    /// in after a slow start.
+    /// Returns how many of the pictures asked for are now in memory.
+    ///
+    /// What is in memory is read from the cache itself, not remembered here: the system
+    /// empties it while the app sits in the background, and a list of "done" kept apart
+    /// went on saying the menu's icons were in when they were gone, so they stayed
+    /// blank when the app came back (Julien, build 38). A picture that failed on a cold
+    /// line is asked for again next time, which is how the menu's icons fill in after a
+    /// slow start.
     @discardableResult
     func prefetch(_ urls: [URL?]) async -> Int {
-        let wanted = Array(Set(urls.compactMap { $0 })).filter { !done.contains($0) }
-        guard !wanted.isEmpty else { return urls.compactMap { $0 }.count }
+        let all = urls.compactMap { $0 }
+        let wanted = Array(Set(all)).filter { ImageCache.shared.image(for: $0) == nil }
+        guard !wanted.isEmpty else { return all.count }
         // A few at a time: an Apple TV on a slow line should not open sixty
         // connections at once, and the visible rows matter more than the tail.
         for chunk in stride(from: 0, to: wanted.count, by: Self.parallel).map({
             Array(wanted[$0..<min($0 + Self.parallel, wanted.count)])
         }) {
-            let arrived = await withTaskGroup(of: URL?.self, returning: [URL].self) { group in
+            await withTaskGroup(of: Void.self) { group in
                 for url in chunk {
-                    group.addTask { await ImageCache.shared.load(url) == nil ? nil : url }
+                    group.addTask { await ImageCache.shared.load(url) }
                 }
-                var out: [URL] = []
-                for await hit in group { if let hit { out.append(hit) } }
-                return out
             }
-            done.formUnion(arrived)
         }
-        return urls.compactMap { $0 }.filter { done.contains($0) }.count
+        return all.filter { ImageCache.shared.image(for: $0) != nil }.count
     }
 }
 

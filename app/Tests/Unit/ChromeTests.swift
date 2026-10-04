@@ -160,4 +160,21 @@ struct ChromePictureTests {
         await refresh.value
         #expect(fullWhileStillShown, "full first, then the screen goes: a bar that jumps to full as it is removed is never seen")
     }
+
+    @Test("back from the background, the menu's and today's pictures are asked for again and the menu looks again")
+    @MainActor
+    func rewarmAsksAgain() async {
+        final class Counter: @unchecked Sendable { var asked = 0 }
+        let counter = Counter()
+        let store = ScoreboardStore(source: .bundled(), warmImages: true, prefetch: { urls in
+            counter.asked += urls.compactMap { $0 }.count
+            return urls.compactMap { $0 }.count
+        })
+        await store.refresh()
+        let version = store.iconsVersion
+        counter.asked = 0
+        await store.rewarm()
+        #expect(counter.asked > 0, "the pictures are asked for again")
+        #expect(store.iconsVersion == version + 1, "and the menu is told to look")
+    }
 }

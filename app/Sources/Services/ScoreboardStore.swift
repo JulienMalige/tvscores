@@ -142,6 +142,17 @@ final class ScoreboardStore {
         }
     }
 
+    /// Back from the background. The system may have emptied the decoded pictures while
+    /// the app was away; they are asked for again, from the disk cache, for what the
+    /// menu and today's page draw, and every slot is told to look again (Julien,
+    /// build 38: the icons stayed transparent after coming back).
+    func rewarm() async {
+        guard ready, let board else { return }
+        _ = await prefetch(board.leagues.flatMap { [$0.icon, $0.logo] } + board.todayImageURLs)
+        iconsVersion += 1
+        ImageArrivals.shared.note()
+    }
+
     private func advance(to value: Double) { launchProgress = max(launchProgress, value) }
 
     /// The icons and today's pictures are the rest of the way from the board's arrival to ready.
@@ -189,66 +200,5 @@ final class ScoreboardStore {
     func stopAutoRefresh() {
         task?.cancel()
         task = nil
-    }
-
-    /// One game's page from the proxy, or nil: the bundled demo has none,
-    /// and a race, a tennis match or a failed request has none either.
-    func detail(for eventId: String) async -> GameDetail? {
-        guard case .remote(let base) = source,
-              var comps = URLComponents(url: base.appending(path: "v1/event"), resolvingAgainstBaseURL: false)
-        else { return nil }
-        comps.queryItems = [URLQueryItem(name: "id", value: eventId)]
-        guard let url = comps.url else { return nil }
-        var request = URLRequest(url: url)
-        request.timeoutInterval = 15
-        do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
-            return try ScoreboardDecoder.make().decode(GameDetail.self, from: data)
-        } catch {
-            return nil
-        }
-    }
-
-    /// Standings for one league, or nil when the proxy has none (free-plan sports).
-    func standings(for ref: LeagueRef) async -> Standings? {
-        do {
-            switch source {
-            case .bundled:
-                guard let url = Bundle.main.url(forResource: "sample-standings", withExtension: "json") else { return nil }
-                let bundle = try ScoreboardDecoder.make().decode(StandingsBundle.self, from: Data(contentsOf: url))
-                return bundle.standings["\(ref.sport):\(ref.leagueId)"]
-            case .remote(let base):
-                var req = URLRequest(url: base.appending(path: "v1/standings/\(ref.sport)/\(ref.leagueId)"))
-                req.timeoutInterval = 15
-                let (d, resp) = try await URLSession.shared.data(for: req)
-                guard let http = resp as? HTTPURLResponse, http.statusCode == 200 else { return nil }
-                return try ScoreboardDecoder.make().decode(Standings.self, from: d)
-            }
-        } catch {
-            return nil
-        }
-    }
-
-    private func load() async throws -> Scoreboard {
-        let data: Data
-        switch source {
-        case .bundled(let name):
-            guard let url = Bundle.main.url(forResource: name, withExtension: "json") else {
-                throw URLError(.fileDoesNotExist)
-            }
-            data = try Data(contentsOf: url)
-        case .remote(let base):
-            var comps = URLComponents(url: base.appending(path: "v1/scoreboard"), resolvingAgainstBaseURL: false)!
-            comps.queryItems = [URLQueryItem(name: "tz", value: TimeZone.current.identifier)]
-            var req = URLRequest(url: comps.url!)
-            req.timeoutInterval = 15
-            let (d, resp) = try await URLSession.shared.data(for: req)
-            guard let http = resp as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
-                throw URLError(.badServerResponse)
-            }
-            data = d
-        }
-        return try ScoreboardDecoder.make().decode(Scoreboard.self, from: data)
     }
 }
