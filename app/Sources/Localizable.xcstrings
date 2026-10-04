@@ -3515,60 +3515,31 @@
         }
       }
     },
-    "watch.appOf %@": {
+    "watch.openShort": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ app"
+            "value": "Open"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Appli %@"
+            "value": "Ouvrir"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "App %@"
+            "value": "Abrir"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "App de %@"
-          }
-        }
-      }
-    },
-    "watch.open %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open in %@"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ouvrir dans %@"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Abrir no %@"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Abrir en %@"
+            "value": "Abrir"
           }
         }
       }
