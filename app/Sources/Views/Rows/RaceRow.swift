@@ -87,11 +87,11 @@ private struct RaceRowContent: View {
             FlagMark(flag: event.flag, size: Metrics.raceRowFlag)
             if let finished {
                 caption(finalCaption(finished))
-                if let channels = event.upcomingChannels { ChannelsLabel(channels: channels) }
+                if let channels = event.channelList { ChannelsLabel(channels: channels) }
             } else if shown.isEmpty {
                 caption(String(localized: "session.race", bundle: LanguageChoice.bundle))
                 StatusLabel(status: event.status, start: event.start)
-                if let channels = event.upcomingChannels { ChannelsLabel(channels: channels) }
+                if let channels = event.channelList { ChannelsLabel(channels: channels) }
             } else {
                 ForEach(shown) { session in
                     VStack(spacing: 6) {
@@ -99,7 +99,7 @@ private struct RaceRowContent: View {
                         Text(session.start, format: .dateTime.weekday(.wide).hour().minute())
                             .font(.title2.weight(.semibold))
                         // On a qualifying day too, not only the race's (build 34).
-                        if let channels = event.upcomingChannels { ChannelsLabel(channels: channels) }
+                        if let channels = event.channelList { ChannelsLabel(channels: channels) }
                     }
                 }
             }
@@ -163,7 +163,7 @@ private struct RaceRowContent: View {
                 if pending.isEmpty && finished == nil {
                     StatusLabel(status: event.status, start: event.start)
                 }
-                if let channels = event.upcomingChannels {
+                if let channels = event.channelList {
                     ChannelsLabel(channels: channels)
                         .padding(.top, Metrics.headingGap)
                 }

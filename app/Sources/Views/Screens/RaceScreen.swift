@@ -39,7 +39,7 @@ struct RaceScreen: View {
                 if classified {
                     PodiumSection(results: results)
                     ResultSection(results: results)
-                    GameInfoSection(start: event.start, venue: event.circuit, place: event.country, broadcasts: event.upcomingChannels)
+                    GameInfoSection(start: event.start, venue: event.circuit, place: event.country, broadcasts: event.channelList)
                 } else if !loaded {
                     // As a game's page: one loader under the header, then
                     // the schedule, the table and the place at once.
@@ -63,7 +63,7 @@ struct RaceScreen: View {
                     if let ref = standingsRef {
                         StandingsSection(ref: ref, store: store, carded: true, preloaded: standings)
                     }
-                    GameInfoSection(start: event.start, venue: event.circuit, place: event.country, broadcasts: event.upcomingChannels)
+                    GameInfoSection(start: event.start, venue: event.circuit, place: event.country, broadcasts: event.channelList)
                 }
             }
             .eventPageInsets()
@@ -109,7 +109,7 @@ struct RaceHeaderSection: View {
                 } else {
                     StatusLabel(status: event.status, start: event.start)
                 }
-                if let channels = event.upcomingChannels { ChannelsLabel(channels: channels, limit: 3) }
+                if let channels = event.channelList { ChannelsLabel(channels: channels, limit: 3) }
                 if !frontRow.isEmpty { front }
             }
         }

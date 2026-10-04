@@ -127,7 +127,7 @@ struct GameHeaderSection: View {
         // screen, and the channel is what you came for (Julien, build 33).
         VStack(spacing: 8) {
             StatusLabel(status: event.status, start: event.start, setsShown: event.setScores != nil)
-            if let channels = event.upcomingChannels { ChannelsLabel(channels: channels, limit: 3) }
+            if let channels = event.channelList { ChannelsLabel(channels: channels, limit: 3) }
         }
         .frame(width: Metrics.gameCentre)
     }

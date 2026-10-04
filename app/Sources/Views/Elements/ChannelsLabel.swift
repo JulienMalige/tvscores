@@ -56,12 +56,11 @@ struct ChannelsLabel: View {
 }
 
 extension Event {
-    /// The channels to show beside a game still to be played or under way,
-    /// in the countries chosen in Settings; once it is over, where it was on
-    /// no longer helps.
+    /// The channels to show beside a game, in the countries chosen in Settings:
+    /// where it is on, and once it is over where it was (Julien, 2026-10-04:
+    /// "on a finished game, you could also show the channel").
     @MainActor
-    var upcomingChannels: [Channel]? {
-        guard status.state != .final else { return nil }
+    var channelList: [Channel]? {
         let chosen = ChannelChoice.shared.countries
         let byCountry = broadcastsBy ?? (broadcasts.map { ["FR": $0] } ?? [:])
         let several = chosen.count > 1

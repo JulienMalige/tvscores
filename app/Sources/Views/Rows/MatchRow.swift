@@ -58,7 +58,7 @@ private struct MatchRowContent: View {
                 .frame(width: Metrics.matchScore, alignment: .center)
             VStack(spacing: 4) {
                 StatusLabel(status: event.status, start: event.start, compact: true, sport: event.sport)
-                if let channels = event.upcomingChannels { ChannelsLabel(channels: channels) }
+                if let channels = event.channelList { ChannelsLabel(channels: channels) }
             }
             .frame(maxWidth: .infinity)
             middle(event.score?.away, record: event.records?.away, winner: winner == .away)

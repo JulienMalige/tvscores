@@ -3,7 +3,7 @@ import Observation
 
 /// Which countries' TV channels the viewer wants beside each game, chosen in
 /// Settings: none, one or several (Julien, build 36). Kept on this Apple TV.
-/// Views read it through `Event.upcomingChannels`, so a change in Settings
+/// Views read it through `Event.channelList`, so a change in Settings
 /// redraws every row that shows channels.
 @MainActor
 @Observable

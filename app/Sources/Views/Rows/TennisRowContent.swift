@@ -37,7 +37,7 @@ struct TennisRowContent: View {
                             .fixedSize()
                         // Held to a width, so a long line shrinks or ends in
                         // "+1" rather than squeezing the players' names.
-                        if let channels = event.upcomingChannels {
+                        if let channels = event.channelList {
                             ChannelsLabel(channels: channels)
                                 .frame(maxWidth: Metrics.tennisChannels)
                         }
