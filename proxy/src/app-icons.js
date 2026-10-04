@@ -6,8 +6,9 @@ const GAP = 3000; // Apple's lookup API is asked a few times a minute, not in a 
 /**
  * The icon of each app in the How to Watch table, from Apple's documented iTunes
  * Lookup API (the app's own store listing; nothing is bundled in the app, as with
- * the crests). One call per app, kept a week; the picture itself goes through the
- * image mirror like every other. A call is made only for an app with no icon yet or
+ * the crests): the tvOS app's own icon, the wide one the Apple TV draws (512 x 307),
+ * not the iPhone's square. One call per app, kept a week; the picture itself goes
+ * through the image mirror like every other. A call is made only for an app with no icon yet or
  * a stale one, so a proxy with all of them asks nothing.
  */
 export class AppIcons {
@@ -30,7 +31,8 @@ export class AppIcons {
   }
 
   due(now = this.now()) {
-    return Object.keys(this.table.apps).filter((key) => this.#target(this.table.apps[key]) && !(this.store.appIcons[key] && now - this.store.appIcons[key].at < WEEK));
+    // An icon kept from before the wide ones (no `tv`) is asked for again.
+    return Object.keys(this.table.apps).filter((key) => this.#target(this.table.apps[key]) && !(this.store.appIcons[key]?.tv && now - this.store.appIcons[key].at < WEEK));
   }
 
   /** Ask for what is missing or stale; returns how many were fetched. */
@@ -39,10 +41,11 @@ export class AppIcons {
     for (const key of this.due().slice(0, limit)) {
       const { id, country } = this.#target(this.table.apps[key]);
       try {
-        const { body } = await this.fetch(`https://itunes.apple.com/lookup?id=${id}&country=${country}`);
-        const url = body?.results?.[0]?.artworkUrl512 || body?.results?.[0]?.artworkUrl100;
+        const { body } = await this.fetch(`https://itunes.apple.com/lookup?id=${id}&country=${country}&entity=tvSoftware`);
+        const tv = (body?.results || []).find((r) => (r.supportedDevices || []).some((d) => /AppleTV/.test(d)));
+        const url = (tv || body?.results?.[0])?.artworkUrl512 || (tv || body?.results?.[0])?.artworkUrl100;
         if (url) {
-          this.store.appIcons[key] = { url, at: this.now() };
+          this.store.appIcons[key] = { url, at: this.now(), tv: Boolean(tv) };
           this.store.touch();
           done += 1;
         } else {

@@ -75,11 +75,9 @@ enum Metrics {
     /// Settings, after tvOS's own: the mark on the left, the list on the right.
     static let settingsMark: CGFloat = 520
 
-    // How to Watch: a card per app, its icon on the left.
-    static let watchIcon: CGFloat = 72
+    // How to Watch: a card per app, its wide tvOS icon (5:3) on the left.
+    static let watchIconHeight: CGFloat = 96
     static let watchCardGap: CGFloat = 14
-    /// A card stays small: two apps do not stretch to half the page each, and four fit a row.
-    static let watchCardWidth: CGFloat = 320
 
     // The launch loader: the app's mark, then a bar that fills as the launch does.
     static let launchMark: CGFloat = 360

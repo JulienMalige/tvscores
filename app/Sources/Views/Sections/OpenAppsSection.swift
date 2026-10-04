@@ -18,7 +18,7 @@ struct OpenAppsSection: View {
                         Task { tried[key] = await AppOpener.open(app, key: key, country: country) }
                     } label: {
                         HStack(spacing: Metrics.watchCardGap) {
-                            AppIconMark(app: app, size: Metrics.watchIcon * 0.7)
+                            AppIconMark(app: app, height: Metrics.watchIconHeight * 0.5)
                             Text(verbatim: app.name)
                             Spacer()
                             Text(verbatim: summary(tried[key]))

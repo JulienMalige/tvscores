@@ -11,7 +11,7 @@ const table = {
   },
   channels: {},
 };
-const listing = (url) => ({ body: { results: [{ artworkUrl512: url }] } });
+const listing = (url) => ({ body: { results: [{ artworkUrl512: url, supportedDevices: ["AppleTV"] }] } });
 
 function icons(fetch, now = () => 1_000_000) {
   const store = { appIcons: {}, touch() {} };
@@ -29,7 +29,7 @@ test("an icon is asked for once per app with a store id, in the country it has a
   } finally {
     globalThis.setTimeout = realSetTimeout;
   }
-  assert.deepEqual(asked, ["https://itunes.apple.com/lookup?id=11&country=fr", "https://itunes.apple.com/lookup?id=22&country=us"]);
+  assert.deepEqual(asked, ["https://itunes.apple.com/lookup?id=11&country=fr&entity=tvSoftware", "https://itunes.apple.com/lookup?id=22&country=us&entity=tvSoftware"]);
   assert.equal(i.get("a"), "https://img/1.jpg");
   assert.deepEqual(i.due(), [], "nothing is due for a week");
   assert.equal(i.due(1_000_000 + 8 * 86400e3).length, 2, "and then both are");
@@ -55,4 +55,20 @@ test("the board describes an app with its icon and the schemes to try, and omits
   assert.deepEqual(cards.a, { name: "A", kind: "own", id: 11 });
   assert.deepEqual(cards.b, { name: "B", kind: "streamer", id: { US: 22, BR: 33 }, schemes: ["b://"], icon: "https://proxy/v1/img/abc" });
   assert.equal(cards.c.builtIn, true);
+});
+
+test("the tvOS app's own wide icon is the one kept, and an icon kept from before it is asked for again", async () => {
+  const body = { results: [{ artworkUrl512: "https://img/iphone.jpg", supportedDevices: ["iPhone"] }, { artworkUrl512: "https://img/tv.jpg", supportedDevices: ["AppleTV"] }] };
+  const { icons: i, store } = icons(async () => ({ body }));
+  store.appIcons.a = { url: "https://img/old-square.jpg", at: 1_000_000 }; // before the wide icons: no `tv`
+  assert.ok(i.due().includes("a"), "stale: it was the iPhone's");
+  const realSetTimeout = globalThis.setTimeout;
+  globalThis.setTimeout = (fn) => realSetTimeout(fn, 0);
+  try {
+    await i.fill();
+  } finally {
+    globalThis.setTimeout = realSetTimeout;
+  }
+  assert.equal(i.get("a"), "https://img/tv.jpg");
+  assert.equal(store.appIcons.a.tv, true);
 });
