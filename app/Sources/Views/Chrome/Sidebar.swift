@@ -93,7 +93,7 @@ struct Sidebar: View {
                 GameScreen(eventId: event.id, fallback: event, store: store)
             }
         }
-        .fullScreenCover(isPresented: $settingsOpen) { SettingsScreen(leagues: store.leagues) }
+        .fullScreenCover(isPresented: $settingsOpen) { SettingsScreen(leagues: store.leagues, apps: store.board?.apps ?? [:]) }
         // A competition hidden in Settings while its page was up: back to
         // Home, as for one gone from the list (review, build 36).
         .onChange(of: LeagueChoice.shared.hidden) { _, hidden in

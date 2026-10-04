@@ -7,6 +7,14 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- A game to come or under way shows How to Watch: a card for each app that can
+  show it, with the app's icon: the channel's own app, a streaming service, or
+  your provider's — and the league's own app last, the NBA's or the NFL's (DAZN's
+  for the NFL outside the US). Select a card to open the app on the Apple TV; when
+  nothing opens it says so. Which apps can be opened from outside is still being
+  found out.
+- Settings, About: Open apps (test) lists every app and tries its links from
+  your Apple TV, so we learn which ones open.
 
 ## 1.0 build 38 — 4 October 2026
 - The opening screen's bar is seen to fill completely before the screen

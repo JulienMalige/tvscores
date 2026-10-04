@@ -9,6 +9,8 @@ struct Scoreboard: Decodable, Equatable {
     /// Every competition we follow, playing this week or not. The day buckets
     /// only carry what has fixtures, so this is what the menu is built from.
     let leagues: [LeagueSummary]
+    /// The apps the games' `watchOn` points at, by key (How to Watch).
+    let apps: [String: WatchApp]?
     let days: Days
 
     struct Days: Decodable, Equatable {
@@ -163,6 +165,8 @@ struct Event: Decodable, Identifiable, Equatable {
     /// The same by country, "FR", "US", "BR"; `broadcasts` is France's,
     /// kept for builds before 36.
     let broadcastsBy: [String: [String]]?
+    /// The apps that can show it, by country: keys into the board's `apps`.
+    let watchOn: [String: [String]]?
     // race
     let name: String?
     let circuit: String?

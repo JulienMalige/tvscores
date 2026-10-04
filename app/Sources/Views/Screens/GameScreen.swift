@@ -71,6 +71,9 @@ struct GameScreen: View {
                     if event.sport != "tennis" {
                         GameInfoSection(start: event.start, venue: detail?.venue, place: detail?.city, broadcasts: event.channelList)
                     }
+                    // Before the whistle and during the game: the apps that can show it.
+                    let cards = event.status.state == .final ? [] : event.watchCards(store.board?.apps)
+                    if !cards.isEmpty { HowToWatchSection(cards: cards) }
                 }
             }
             .eventPageInsets()

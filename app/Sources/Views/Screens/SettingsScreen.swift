@@ -15,8 +15,10 @@ import SwiftUI
 struct SettingsScreen: View {
     /// Every competition the proxy serves, shown or not.
     let leagues: [LeagueSummary]
+    /// The apps How to Watch points at, for the "Open apps (test)" page.
+    var apps: [String: WatchApp] = [:]
 
-    private enum Page { case top, competitions, countries, language }
+    private enum Page { case top, competitions, countries, language, openApps }
 
     @State private var page = Page.top
     @State private var choice = ChannelChoice.shared
@@ -46,6 +48,7 @@ struct SettingsScreen: View {
                     case .competitions: competitionList
                     case .countries: countryList
                     case .language: languageList
+                    case .openApps: OpenAppsSection(apps: apps)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .top)
@@ -70,7 +73,7 @@ struct SettingsScreen: View {
             // `-TVScoresSettings countries` opens on that list (CI screenshots).
             let args = ProcessInfo.processInfo.arguments
             if let i = args.firstIndex(of: "-TVScoresSettings"), i + 1 < args.count {
-                page = ["countries": .countries, "competitions": .competitions, "language": .language][args[i + 1]] ?? .top
+                page = ["countries": .countries, "competitions": .competitions, "language": .language, "openApps": .openApps][args[i + 1]] ?? .top
             }
         }
     }
@@ -81,6 +84,7 @@ struct SettingsScreen: View {
         case .competitions: "settings.competitions"
         case .countries: "settings.watch"
         case .language: "settings.language"
+        case .openApps: "settings.openApps"
         }
     }
 
@@ -94,6 +98,7 @@ struct SettingsScreen: View {
             case .competitions: symbol("trophy")
             case .countries: symbol("tv")
             case .language: symbol("globe")
+            case .openApps: symbol("arrow.up.forward.app")
             }
             Text(blurb)
                 .font(.callout.weight(.medium))
@@ -115,6 +120,7 @@ struct SettingsScreen: View {
         case .competitions: lifted == nil ? "settings.competitionsNote" : "settings.movingNote"
         case .countries: "settings.countryNote"
         case .language: "settings.languageNote"
+        case .openApps: "settings.openAppsNote"
         }
     }
 
@@ -143,6 +149,10 @@ struct SettingsScreen: View {
             }
             Section("settings.about") {
                 fact("settings.version", version)
+                Button { page = .openApps } label: {
+                    LabeledContent("settings.openApps") { Text(verbatim: "\(apps.count)") }
+                }
+                .accessibilityIdentifier("settings.openApps")
             }
         }
     }
