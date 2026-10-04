@@ -33,6 +33,9 @@
     "2026-10-04 (store charts, FR/US/BR)": [
       "Top-free iPhone charts, Entertainment and Sports, 100 each per country, kept to apps with a tvOS version: they confirm the picks (FR: CANAL+ #25, Free TV #42, Molotov #53, b.tv #81; BR: Globoplay #12, Premiere #17 in Sports, Claro tv+ #56) and add, for the US, Watch TNT, DIRECTV, Spectrum TV and Hulu + Live TV",
       "Not mapped on purpose: F1 TV (a service for the sport, not a channel in the feed; idea: a competition-level 'also on' card), OneFootball, MLB, NHL, CBS Sports, Pluto, Tubi, Netflix, Crunchyroll"
+    ],
+    "2026-10-04 (SKY+, with Julien)": [
+      "SKY+ in Brazil is the old DIRECTV GO app: one app, id 6467130144, tvOS; a search of the news for 'DirecTV Go' (70+ channels, R$ 79.90, no mobile or broadband plan needed) describes the same product"
     ]
   },
   "toConfirm": [
@@ -324,7 +327,11 @@
       "appStoreId": 6467130144,
       "tvos": [
         "BR"
-      ]
+      ],
+      "aka": [
+        "DIRECTV GO"
+      ],
+      "note": "Brazil. The former DIRECTV GO app (Julien; Apple's store returns it for 'DIRECTV GO', first released 2023-11-28): a streaming service of live channels and on-demand with no dish, packs such as SKY+ Futebol (Premiere, Sportynet) and Canais e Futebol (91 channels). Different from SKY's satellite service."
     },
     "fandango": {
       "name": "Fandango at Home",
