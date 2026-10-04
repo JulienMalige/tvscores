@@ -7,12 +7,13 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
-- A game to come or under way shows How to Watch: a card for each app that can
-  show it, with the app's icon: the channel's own app, a streaming service, or
-  your provider's — and the league's own app last, the NBA's or the NFL's (DAZN's
-  for the NFL outside the US). Select a card to open the app on the Apple TV; when
-  nothing opens it says so. Which apps can be opened from outside is still being
-  found out.
+- A game to come or under way shows How to Watch, right under the score, as the
+  Apple TV app draws it: a wide card for each app that can show it, with the app's
+  own wide icon, "Open In" and its name, and the external-link mark. The channel's own
+  app comes first, then a streaming service, then your provider's, and the league's own
+  app last (the NBA's, the NFL's, DAZN's for the NFL outside the US). Select a card to
+  open the app on the Apple TV; when nothing opens it says so. Which apps can be opened
+  from outside is still being found out.
 - Coming back to the app from the background no longer leaves the menu's icons
   (and other pictures) transparent: they are asked for again as soon as the app
   is active.
