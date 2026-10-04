@@ -13,3 +13,14 @@ final class GameScreenFlow: FlowCase {
         XCTAssertFalse(app.buttons["watch.canalplus"].exists, "no French app: the demo's country is the US")
     }
 }
+
+/// Settings, Apps to show: every app How to Watch can offer, to turn off.
+final class AppsSettingsFlow: FlowCase {
+    func testTheAppsToShowAreListedForTheCountryChosen() {
+        // The demo's country is the US: ESPN and Disney+ are US apps; CANAL+ is French.
+        let app = Flow.launch(extra: ["-TVScoresSettings", "apps"], ready: "Apps to show")
+        XCTAssertTrue(app.buttons["settings.app.espn"].waitForExistence(timeout: 10), "ESPN is listed under the United States")
+        XCTAssertTrue(app.buttons["settings.app.disneyplus"].exists)
+        XCTAssertFalse(app.buttons["settings.app.canalplus"].exists, "and a French app is not, with only the US chosen")
+    }
+}
