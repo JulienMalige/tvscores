@@ -45,10 +45,10 @@ extension Event {
     /// The apps that can show this game, in the countries chosen in Settings, in the
     /// order the proxy gave them, each once.
     @MainActor
-    func watchCards(_ apps: [String: WatchApp]?, in countries: [String] = ChannelChoice.shared.countries) -> [WatchCard] {
+    func watchCards(_ apps: [String: WatchApp]?, in chosen: [String]? = nil) -> [WatchCard] {
         guard let apps, let watchOn else { return [] }
         var seen = Set<String>()
-        return countries.flatMap { country in
+        return (chosen ?? ChannelChoice.shared.countries).flatMap { country in
             (watchOn[country] ?? []).compactMap { key -> WatchCard? in
                 guard let app = apps[key], seen.insert(key).inserted else { return nil }
                 return WatchCard(key: key, country: country, app: app)
