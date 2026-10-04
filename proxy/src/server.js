@@ -1,66 +1,19 @@
 import { createServer } from "node:http";
-import { createHash } from "node:crypto";
-import { readFileSync, statSync, readdirSync, mkdirSync, appendFileSync, writeFileSync } from "node:fs";
+import { readFileSync, statSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ASSETS = join(dirname(fileURLToPath(import.meta.url)), "..", "assets");
 import { buildScoreboard, localDate, withTablePhotos, withBroadcasts } from "./scoreboard.js";
 import { slug } from "./model.js";
-
-/**
- * Ten seconds, not thirty: a score in stoppage time is worth asking about
- * again, and asking costs a header exchange when nothing changed.
- */
-const SHORT_CACHE = "public, max-age=10";
+import { prepare, send, canonicalTz } from "./respond.js";
+import { appendTrace, POSTS_PER_MIN } from "./trace.js";
 
 /** Crests and portraits change once in a blue moon; let the TV keep them. */
 const IMAGE_CACHE = "public, max-age=31536000, immutable"; // a year: a crest changes at a rebrand, and ImageMirror.VERSION is the lever
 
-/**
- * JSON with an ETag, and a bodyless 304 when the caller already has it.
- *
- * The scoreboard is ~50 KB and a television asks for it every minute while a
- * game is on, but it only actually changes when a poll brings something new.
- * The tag is the body's own hash, so "changed" means changed.
- */
-function send(res, status, body, extra = {}, req) {
-  const json = JSON.stringify(body);
-  const etag = `"${createHash("sha1").update(json).digest("base64url")}"`;
-  if (status === 200 && req?.headers["if-none-match"] === etag) {
-    res.writeHead(304, { etag, "cache-control": SHORT_CACHE, "access-control-allow-origin": "*", ...extra });
-    return res.end();
-  }
-  res.writeHead(status, {
-    "content-type": "application/json; charset=utf-8",
-    "cache-control": "public, max-age=30",
-    "access-control-allow-origin": "*",
-    etag,
-    ...extra,
-  });
-  res.end(json);
-}
-
 /** @param limits per-source daily caps ({ football: 100, f1: 200, photos: 1000, ... }), supplied by index.js from the actual quotas. */
-const TRACE_CAP = 512 * 1024;
-
-/** Append trace lines to `<cacheDir>/traces/<device>.log`, halving it past the cap. */
-function appendTrace(cacheDir, device, lines) {
-  const dir = join(cacheDir, "traces");
-  mkdirSync(dir, { recursive: true });
-  const file = join(dir, `${device}.log`);
-  const stamp = new Date().toISOString();
-  const text = lines.slice(0, 500).map((l) => `${stamp} ${String(l).slice(0, 300)}\n`).join("");
-  appendFileSync(file, text);
-  try {
-    if (statSync(file).size > TRACE_CAP) {
-      const kept = readFileSync(file, "utf8");
-      writeFileSync(file, kept.slice(kept.length >> 1));
-    }
-  } catch { /* the file is a convenience; losing a line of it is fine */ }
-}
-
-export function createApp({ store, config, startedAt = Date.now(), photos, images, details, broadcasts, activeSports = [], limits = {} }) {
+export function createApp({ store, config, startedAt = Date.now(), photos, images, details, broadcasts, activeSports = [], limits = {}, log = () => {} }) {
   const broadcastsFor = broadcasts ? (e) => broadcasts.for(e) : undefined;
   const photoFor = photos ? (name) => photos.photoFor(name) : undefined;
   const mirror = images ? (url) => images.url(url) : undefined;
@@ -76,36 +29,65 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
     const path = `${sport}/${slug(name)}`;
     return teamBadges.has(path) ? `${config.publicBase}/v1/assets/teams/${path}.png` : undefined;
   };
-  const memo = new Map(); // tz -> { at, body }: the board changes at most every poll, not per request
+  // Answers built from the store, kept a few seconds: the board changes at most
+  // every poll, not per request. Bounded, so no run of odd requests can grow it.
+  const memo = new Map(); // key -> { at, prepared }
   const MEMO_MS = 15000;
-  return createServer((req, res) => {
-    const url = new URL(req.url, "http://localhost");
+  const MEMO_MAX = 64;
+  const remember = (key, build) => {
+    const hit = memo.get(key);
+    if (hit && Date.now() - hit.at < MEMO_MS) return hit.prepared;
+    const prepared = build();
+    memo.delete(key);
+    memo.set(key, { at: Date.now(), prepared });
+    if (memo.size > MEMO_MAX) memo.delete(memo.keys().next().value);
+    return prepared;
+  };
+  // Anything that is a key of ours or of a provider, to be scrubbed from what the health page says.
+  const secrets = [config.theSportsDbKey, config.apiSportsKey, config.liveTennisKey, config.ocBlacktopKey].filter((k) => k && k.length > 6);
+  const scrub = (value) => {
+    let text = JSON.stringify(value ?? null);
+    for (const secret of secrets) text = text.split(secret).join("…");
+    return JSON.parse(text);
+  };
+  let diagWindow = { at: 0, count: 0 };
+
+  const handle = (req, res) => {
+    let url;
+    try {
+      url = new URL(req.url, "http://localhost");
+    } catch {
+      return send(res, 400, { error: "bad url" });
+    }
     let path = url.pathname;
     if (config.pathPrefix && path.startsWith(config.pathPrefix)) path = path.slice(config.pathPrefix.length) || "/";
-    const tz = url.searchParams.get("tz") || "UTC";
-    try {
-      Intl.DateTimeFormat("en", { timeZone: tz });
-    } catch {
-      return send(res, 400, { error: `unknown tz ${tz}` });
-    }
+    const rawTz = url.searchParams.get("tz") || "UTC";
+    const tz = canonicalTz(rawTz);
+    if (!tz) return send(res, 400, { error: `unknown tz ${rawTz.slice(0, 64)}` });
 
     if (path === "/v1/scoreboard") {
-      const hit = memo.get(tz);
-      if (hit && Date.now() - hit.at < MEMO_MS) return send(res, 200, hit.body, {}, req);
-      const body = buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, mirror, broadcastsFor, activeSports, upcomingDays: config.schedule.upcomingDays });
-      // The tables' crests and portraits are registered with the mirror here
-      // too, so the warmer has them before any television opens a table:
-      // a crest first mirrored while a page waits for it is the one that
-      // arrives late and is remembered as missing.
-      if (mirror) for (const table of Object.entries(store.standings)) withTablePhotos(table[1], photoFor, mirror, badgeFor(table[0].split(":")[0]));
-      memo.set(tz, { at: Date.now(), body });
-      return send(res, 200, body, {}, req);
+      const prepared = remember(`board|${tz}`, () => {
+        const body = buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, mirror, broadcastsFor, activeSports, upcomingDays: config.schedule.upcomingDays });
+        // The tables' crests and portraits are registered with the mirror here
+        // too, so the warmer has them before any television opens a table:
+        // a crest first mirrored while a page waits for it is the one that
+        // arrives late and is remembered as missing.
+        if (mirror) for (const table of Object.entries(store.standings)) withTablePhotos(table[1], photoFor, mirror, badgeFor(table[0].split(":")[0]));
+        // The tag is the content: generatedAt moves with every rebuild and is not a
+        // change. A 304 stands for five minutes at most, so a television's idea of
+        // "now", which it reads off generatedAt, is never older than that.
+        return prepare(body, { tagOf: { ...body, generatedAt: undefined }, window: 5 * 60e3 });
+      });
+      return send(res, 200, undefined, {}, req, prepared);
     }
     if (path === "/v1/fixtures") {
       const date = url.searchParams.get("date");
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date || "")) return send(res, 400, { error: "date=YYYY-MM-DD required" });
-      const events = store.all().filter((e) => localDate(e.start, tz) === date).map((e) => withBroadcasts(e, broadcastsFor));
-      return send(res, 200, { date, tz, events }, {}, req);
+      const prepared = remember(`fixtures|${tz}|${date}`, () => {
+        const events = store.all().filter((e) => localDate(e.start, tz) === date).map((e) => withBroadcasts(e, broadcastsFor));
+        return prepare({ date, tz, events });
+      });
+      return send(res, 200, undefined, {}, req, prepared);
     }
     if (path === "/v1/standings") {
       return send(res, 200, { standings: Object.fromEntries(Object.entries(store.standings).map(([k, v]) => [k, withTablePhotos(v, photoFor, mirror, badgeFor(k.split(":")[0]))])) });
@@ -145,7 +127,8 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
     const team = path.match(/^\/v1\/assets\/teams\/([a-z0-9-]+)\/([a-z0-9-]+)\.png$/);
     if (team && teamBadges.has(`${team[1]}/${team[2]}`)) {
       const badge = readFileSync(join(ASSETS, "teams", team[1], `${team[2]}.png`));
-      res.writeHead(200, { "content-type": "image/png", "content-length": badge.length, "cache-control": IMAGE_CACHE, "access-control-allow-origin": "*" });
+      // A week, not for ever: these are files of ours at a fixed address, redrawn now and then.
+      res.writeHead(200, { "content-type": "image/png", "content-length": badge.length, "cache-control": "public, max-age=604800", "access-control-allow-origin": "*" });
       return res.end(badge);
     }
     // A country's flag, flat and square, for the app to clip into a circle.
@@ -181,27 +164,39 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
     // directory, capped so a chatty build cannot fill the disk. There is no
     // Mac to read a television's console; this is the console.
     if (path === "/v1/diag" && req.method === "POST") {
+      // Open to anyone who can reach us, so it is rationed: so many posts a
+      // minute across every device, so many devices, one body size.
+      const now = Date.now();
+      if (now - diagWindow.at > 60e3) diagWindow = { at: now, count: 0 };
+      if (++diagWindow.count > POSTS_PER_MIN) return send(res, 429, { error: "too many traces" });
       let raw = "";
       req.on("data", (chunk) => {
         raw += chunk;
         if (raw.length > 64 * 1024) req.destroy();
       });
+      req.on("error", () => {});
       req.on("end", () => {
-        let body;
         try {
-          body = JSON.parse(raw);
-        } catch {
-          return send(res, 400, { error: "json body required" });
+          let body;
+          try {
+            body = JSON.parse(raw);
+          } catch {
+            return send(res, 400, { error: "json body required" });
+          }
+          const device = String(body?.device ?? "");
+          if (!/^[a-z0-9]{4,16}$/.test(device) || !Array.isArray(body.lines)) return send(res, 400, { error: "device and lines required" });
+          if (!appendTrace(store.dir, device, body.lines)) return send(res, 429, { error: "no room for another device" });
+          send(res, 200, { ok: true });
+        } catch (err) {
+          log(`diag failed: ${err.message}`);
+          if (!res.headersSent) send(res, 500, { error: "trace not kept" });
         }
-        const device = String(body.device || "");
-        if (!/^[a-z0-9]{4,16}$/.test(device) || !Array.isArray(body.lines)) return send(res, 400, { error: "device and lines required" });
-        appendTrace(store.dir, device, body.lines);
-        send(res, 200, { ok: true });
       });
       return;
     }
     if (path === "/v1/health" || path === "/") {
-      return send(res, 200, {
+      // Walks every mirrored file and every photo, so not on every ask.
+      const prepared = remember("health", () => prepare({
         ok: true,
         uptimeSeconds: Math.round((Date.now() - startedAt) / 1000),
         events: store.events.size,
@@ -212,11 +207,23 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
           return [sport, {
             day: m.calls?.day, used: m.calls?.used ?? 0, limit,
             remaining: limit == null ? null : Math.max(0, limit - (m.calls?.used ?? 0)),
-            lastOk: m.lastOk, lastError: m.lastError,
+            lastOk: m.lastOk, lastError: scrub(m.lastError),
           }];
         })),
-      }, { "cache-control": "no-store" });
+      }));
+      return send(res, 200, undefined, { "cache-control": "no-store" }, req, prepared);
     }
     send(res, 404, { error: "not found" });
+  };
+
+  // Nothing a request can say may take the process down: whatever throws is a 500.
+  return createServer((req, res) => {
+    try {
+      handle(req, res);
+    } catch (err) {
+      log(`request failed: ${req.method} ${String(req.url).slice(0, 120)}: ${err.message}`);
+      if (!res.headersSent) send(res, 500, { error: "internal error" });
+      else res.end();
+    }
   });
 }

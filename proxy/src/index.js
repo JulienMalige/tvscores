@@ -79,7 +79,9 @@ const broadcasts = new TvChannels({
   cfg: config.schedule,
   log,
 });
-const app = createApp({ store, config, photos, images, details, broadcasts, activeSports: schedulers.map((s) => s.p.sport), limits });
+const app = createApp({ store, config, photos, images, details, broadcasts, activeSports: schedulers.map((s) => s.p.sport), limits, log });
+// A promise nobody caught is a bug to read about in the journal, not a reason for every television to lose us.
+process.on("unhandledRejection", (err) => log(`unhandled rejection: ${err?.stack || err}`));
 app.listen(config.port, config.host, () => {
   log(`tvscores proxy listening on http://${config.host}:${config.port} (prefix ${config.pathPrefix || "none"})`);
   for (const s of schedulers) s.start();

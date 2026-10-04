@@ -1,3 +1,4 @@
+import { redact } from "./http.js";
 import { Readable, pipeline } from "node:stream";
 import { createGunzip } from "node:zlib";
 
@@ -97,7 +98,7 @@ export async function fetchXmltv(url, { timeoutMs = 120000, fetch = globalThis.f
   const res = await fetch(url, { signal: ctrl.signal });
   if (!res.ok) {
     clearTimeout(timer);
-    throw new Error(`HTTP ${res.status} for ${url}`);
+    throw new Error(`HTTP ${res.status} for ${redact(url)}`);
   }
   const out = pipeline(Readable.fromWeb(res.body), createGunzip(), () => clearTimeout(timer));
   out.setEncoding("utf8");

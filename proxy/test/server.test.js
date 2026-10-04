@@ -1,25 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, statSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { Store } from "../src/cache.js";
-import { createApp } from "../src/server.js";
 import { config } from "../src/config.js";
-
-/** Starts the app on an ephemeral port and returns a fetch bound to it. */
-async function serve(extra = {}) {
-  const store = new Store(mkdtempSync(join(tmpdir(), "tvscores-")));
-  const app = createApp({ store, config, ...extra });
-  await new Promise((done) => app.listen(0, "127.0.0.1", done));
-  const { port } = app.address();
-  return {
-    store,
-    port,
-    get: (path, headers) => fetch(`http://127.0.0.1:${port}${config.pathPrefix}${path}`, { headers }),
-    close: () => new Promise((done) => app.close(done)),
-  };
-}
+import { serve } from "./helpers/serve.js";
 
 test("the scoreboard carries an ETag, and repeats it as a bodyless 304", async () => {
   const s = await serve();

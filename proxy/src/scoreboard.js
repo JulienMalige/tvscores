@@ -3,9 +3,21 @@ import { photoKey } from "./photos.js";
 import { recordsFor } from "./details.js";
 
 /** Local calendar date (YYYY-MM-DD) of an instant in a time zone. */
+// One formatter per zone: making one costs more than using it, and a board asks for every event.
+const dayFormats = new Map();
+function dayFormat(tz) {
+  let f = dayFormats.get(tz);
+  if (!f) {
+    if (dayFormats.size >= 64) dayFormats.clear();
+    f = new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" });
+    dayFormats.set(tz, f);
+  }
+  return f;
+}
+
 export function localDate(iso, tz) {
   const d = new Date(iso);
-  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(d);
+  const parts = dayFormat(tz).formatToParts(d);
   const get = (t) => parts.find((p) => p.type === t).value;
   return `${get("year")}-${get("month")}-${get("day")}`;
 }
@@ -155,7 +167,9 @@ export function withBroadcasts(e, broadcastsFor) {
 }
 
 export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, mirror, broadcastsFor, activeSports = [], upcomingDays = 7 } = {}) {
-  events = events.map((e) => withBroadcasts(withPhotos(e, photoFor, mirror), broadcastsFor));
+  // An event with no readable start cannot be placed on a day; one of them must
+  // not be the reason nobody gets a board.
+  events = events.filter((e) => Number.isFinite(Date.parse(e.start))).map((e) => withBroadcasts(withPhotos(e, photoFor, mirror), broadcastsFor));
   const today = localDate(new Date(now).toISOString(), tz);
   const yesterday = localDate(new Date(now - 86400e3).toISOString(), tz);
   // Upcoming is a window, not the whole calendar: a fixture list weeks out is
