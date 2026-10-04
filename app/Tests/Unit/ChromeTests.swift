@@ -146,4 +146,18 @@ struct ChromePictureTests {
         #expect(store.ready)
         #expect(store.launchProgress == 1)
     }
+
+    @Test("the bar is seen full before the loader goes")
+    @MainActor
+    func barFillsBeforeTheLoaderGoes() async {
+        let store = ScoreboardStore(source: .bundled(), warmImages: true, prefetch: { urls in urls.compactMap { $0 }.count })
+        let refresh = Task { await store.refresh() }
+        var fullWhileStillShown = false
+        while !store.ready {
+            if store.launchProgress >= 1 { fullWhileStillShown = true }
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        await refresh.value
+        #expect(fullWhileStillShown, "full first, then the screen goes: a bar that jumps to full as it is removed is never seen")
+    }
 }

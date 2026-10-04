@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- The opening screen's bar is seen to fill completely before the screen
+  goes, where it used to stop partway and vanish.
 - A finished game shows the channel it was on, under "Final", as an
   upcoming one shows where it is: on its row and at the top of its page.
 

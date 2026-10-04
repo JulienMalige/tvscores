@@ -123,8 +123,12 @@ final class ScoreboardStore {
                 await group.next()
                 group.cancelAll()
             }
-            ready = true
+            // The bar is seen to fill before the loader goes: the screen is removed the
+            // moment `ready` flips, so a bar set to full in the same breath is never
+            // seen full (Julien, build 37: it stopped partway and everything vanished).
             launchProgress = 1
+            try? await Task.sleep(for: .milliseconds(450))
+            ready = true
         }
         let rest = board.imageURLs
         Task.detached(priority: .utility) { [prefetch] in _ = await prefetch(rest) }
