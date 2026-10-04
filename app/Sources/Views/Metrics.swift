@@ -80,8 +80,11 @@ enum Metrics {
     static let watchCardGap: CGFloat = 14
     /// The narrowest a card is drawn: as many fit a line as the page's width allows, three or four.
     static let watchTileMin: CGFloat = 400
-    /// A card's icon, when several share a line.
-    static let watchTileIconHeight: CGFloat = 64
+    /// A card's icon, and the room around it, when several share a line: tight enough that "Open In
+    /// NBC Sports" is not cut off.
+    static let watchTileIconHeight: CGFloat = 56
+    static let watchTileInsetH: CGFloat = 14
+    static let watchTileInsetV: CGFloat = 12
 
     // The launch loader: the app's mark, then a bar that fills as the launch does.
     static let launchMark: CGFloat = 360
@@ -176,10 +179,10 @@ enum Metrics {
 extension View {
     /// The card a row sits on. tvOS says "this one" by lightening and lifting
     /// it, and every row in the app says it the same way and at the same size.
-    func rowSurface(focused: Bool, resting: Double = 0.04, insetV: CGFloat = Metrics.rowInsetV) -> some View {
+    func rowSurface(focused: Bool, resting: Double = 0.04, insetV: CGFloat = Metrics.rowInsetV, insetH: CGFloat = Metrics.rowInsetH) -> some View {
         self
             .padding(.vertical, insetV)
-            .padding(.horizontal, Metrics.rowInsetH)
+            .padding(.horizontal, insetH)
             .focusGlass(focused, in: RoundedRectangle(cornerRadius: Metrics.rowRadius, style: .continuous), resting: resting)
             .scaleEffect(focused ? 1.02 : 1)
             .animation(.easeOut(duration: 0.15), value: focused)

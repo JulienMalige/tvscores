@@ -49,13 +49,13 @@ private struct WatchTile: View {
         HStack(spacing: Metrics.watchCardGap) {
             AppIconMark(app: card.app, height: Metrics.watchTileIconHeight)
             VStack(alignment: .leading, spacing: 2) {
-                Text("watch.open \(card.app.name)").font(.callout.weight(.semibold)).lineLimit(1).minimumScaleFactor(0.7)
+                Text("watch.open \(card.app.name)").font(.callout.weight(.semibold)).lineLimit(1).minimumScaleFactor(0.85)
                 Text("watch.appOf \(card.app.name)").font(.caption).foregroundStyle(.secondary).lineLimit(1)
             }
             Spacer(minLength: 4)
             Image(systemName: "arrow.up.forward.app").font(.callout).foregroundStyle(.secondary)
         }
         // A faint rectangle at rest, so they read as cards before one is focused.
-        .rowSurface(focused: isFocused, resting: 0.08)
+        .rowSurface(focused: isFocused, resting: 0.08, insetV: Metrics.watchTileInsetV, insetH: Metrics.watchTileInsetH)
     }
 }
