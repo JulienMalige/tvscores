@@ -1,4 +1,5 @@
 import { getJson } from "./http.js";
+import { Quota } from "./quota.js";
 import { MIN } from "./clock.js";
 import { backoff } from "./scheduler.js";
 import { fold } from "./tv-names.js";
@@ -11,7 +12,7 @@ const V2 = "https://www.thesportsdb.com/api/v2/json";
 const MAX_NAMES = 4;
 /** The team sports whose daily pass should land before we match against it. */
 const TEAM_SPORTS = ["football", "nfl", "nba"];
-const day = (t) => new Date(t).toISOString().slice(0, 10);
+const day = Quota.utcDay; // the same UTC day the quotas roll over on
 
 /**
  * Where each game airs, in one country: TheSportsDB's TV rows first, then

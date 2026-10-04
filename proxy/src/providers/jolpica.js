@@ -1,4 +1,5 @@
 import { getJson } from "../http.js";
+import { Quota } from "../quota.js";
 import { STATE, flag } from "../model.js";
 
 const BASE = "https://api.jolpi.ca/ergast/f1";
@@ -49,7 +50,9 @@ export async function f1Nationalities(year = new Date().getUTCFullYear()) {
 }
 
 export function f1Provider(league, log = () => {}, meta) {
-  const count = () => { if (!meta) return; const day = new Date().toISOString().slice(0, 10); if (meta.calls.day !== day) meta.calls = { day, used: 0 }; meta.calls.used += 1; };
+  // No daily cap is known for Jolpica; the counter is for the health page.
+  const quota = meta ? new Quota(meta, { dailyQuota: Infinity, quotaReserve: 0 }) : { record() {} };
+  const count = () => quota.record(undefined);
   return {
     sport: "f1",
     /** Whole season calendar plus the latest classified race, 2 cheap calls. */

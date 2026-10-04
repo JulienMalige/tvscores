@@ -1,8 +1,10 @@
 import { getJson } from "./http.js";
+import { Quota } from "./quota.js";
 
 const BASE = "https://www.thesportsdb.com/api/v1/json";
 const TTL_OK = 30 * 86400e3;
 const TTL_MISS = 3 * 86400e3;
+export const DAILY_LINE = 1000;
 const SPORT_HINT = { f1: "Motorsport", motogp: "Motorsport", tennis: "Tennis", football: "Soccer", nfl: "American Football", nba: "Basketball" };
 
 /** "Marc Márquez" -> "marc marquez" for exact, accent-insensitive comparison. */
@@ -65,6 +67,9 @@ export class PhotoResolver {
     this.log = log;
     this.interval = Math.ceil(60000 / perMinute);
     this.meta = store.sportMeta("photos"); // daily call counter, shown in /v1/health
+    // A soft line, not the provider's (its cap is per minute): enough for a new sport's
+    // whole cast, not enough for a loop gone wrong to run all day.
+    this.quota = new Quota(this.meta, { dailyQuota: DAILY_LINE, quotaReserve: 0 });
   }
 
   cached(name) {
@@ -110,16 +115,18 @@ export class PhotoResolver {
   }
 
   async lookup(name, sport) {
-    const { body } = await getJson(`${BASE}/${this.key}/searchplayers.php?p=${encodeURIComponent(name)}`);
-    const day = new Date().toISOString().slice(0, 10);
-    if (this.meta.calls.day !== day) this.meta.calls = { day, used: 0 };
-    this.meta.calls.used += 1;
+    let body;
+    try {
+      ({ body } = await getJson(`${BASE}/${this.key}/searchplayers.php?p=${encodeURIComponent(name)}`));
+    } finally {
+      this.quota.record(undefined); // a refused call was still a call
+    }
     const pick = pickPlayer(body.player || [], name, sport);
     return pick ? pick.strCutout : null;
   }
 
   async tick() {
-    const todo = this.pending().slice(0, 15);
+    const todo = this.pending().slice(0, Math.min(15, this.quota.spendable()));
     for (const [name, sport] of todo) {
       try {
         const url = await this.lookup(name, sport);

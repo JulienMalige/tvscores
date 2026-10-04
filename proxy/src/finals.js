@@ -25,8 +25,9 @@ export async function confirmFinals(s, newIds, now) {
   }
   const left = [];
   let asked = 0;
+  let paused = false; // upstream is refusing us: the rest wait for the next round, untried
   for (const e of queue) {
-    if (asked >= CONFIRM_PER_ROUND || s.quota.spendable(now) <= 0) { left.push(e); continue; }
+    if (paused || asked >= CONFIRM_PER_ROUND || s.quota.spendable(now) <= 0) { left.push(e); continue; }
     asked++;
     const retry = () => {
       if (e.tries + 1 < MAX_TRIES && now - e.since < GIVE_UP_AFTER) left.push({ ...e, tries: e.tries + 1 });
@@ -44,7 +45,11 @@ export async function confirmFinals(s, newIds, now) {
       }
     } catch (err) {
       s.log(`${s.p.sport}: confirm ${e.id} failed: ${err.message || err}`);
-      retry();
+      // A rate limit or a server error is not the match's doing: no try is used up,
+      // and no more are asked this round (three of those made the half-hour-old
+      // score of a finished match permanent, 2026-10-02).
+      if (err.status === 429 || err.status >= 500) { left.push(e); paused = true; }
+      else retry();
     }
   }
   s.meta.toConfirm = left.length ? left : undefined;

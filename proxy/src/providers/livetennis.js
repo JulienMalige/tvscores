@@ -36,6 +36,14 @@ export function bigEventFilter({ byId, categories, includeQualifying, alsoBig = 
  */
 export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }) {
   const headers = { authorization: `Bearer ${key}` };
+  /** A call counts against the day whether or not it answers: a refusal was still spent. */
+  const call = async (url) => {
+    try {
+      return await getJson(url, { headers });
+    } finally {
+      quota.record(undefined);
+    }
+  };
   /**
    * `tournament_id` -> category, for the two tours we show. The endpoint has no
    * category filter, so the tours are paged once and kept: a few calls a month
@@ -48,9 +56,9 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
     const byId = {};
     const info = {};
     for (const tour of ["atp", "wta"]) {
-      for (let offset = 0; ; ) {
-        const { body } = await getJson(`${BASE}/tournaments?tour=${tour}&limit=200&offset=${offset}`, { headers });
-        quota.record(undefined);
+      // A feed that says "more" for ever must not make this a loop: twenty pages is 4,000 tournaments.
+      for (let offset = 0, pages = 0; pages++ < 20; ) {
+        const { body } = await call(`${BASE}/tournaments?tour=${tour}&limit=200&offset=${offset}`);
         for (const t of body?.data || []) {
           byId[String(t.id)] = t.category || TIER_CATEGORY[t.tier] || null;
           info[String(t.id)] = { name: t.name, city: t.city, country: t.country, tier: t.tier, surface: t.surface };
@@ -72,8 +80,7 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
     // 28 September. The live list is short enough to take whole, which
     // keeps a tournament pinned in `alsoBig` whatever its tier.
     const tiers = status === "upcoming" ? `&tier=${tiersFor(tennis.categories).join(",")}` : "";
-    const { body } = await getJson(`${BASE}/matches?status=${status}${tiers}&limit=200`, { headers });
-    quota.record(undefined);
+    const { body } = await call(`${BASE}/matches?status=${status}${tiers}&limit=200`);
     const data = [...(body.data || [])];
     // A pinned tournament the feed gives no tier (Shanghai, WTA Montreal)
     // falls outside that filter, so it is asked for by id — only in its week
@@ -82,21 +89,26 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
       const today = new Date().toISOString().slice(0, 10);
       const seen = new Set(data.map((m) => m.id));
       for (const id of untieredOn(tennis.alsoBig, info, tennis.calendar, today)) {
-        const extra = await getJson(`${BASE}/matches?status=upcoming&tournament_id=${id}&limit=200`, { headers });
-        quota.record(undefined);
+        const extra = await call(`${BASE}/matches?status=upcoming&tournament_id=${id}&limit=200`);
         for (const m of extra.body?.data || []) if (!seen.has(m.id)) { seen.add(m.id); data.push(m); }
       }
     }
     const big = bigEventFilter({ byId, ...tennis });
-    const rows = data.filter(big).map((m) => normaliseMatch(m, info[String(m.tournament_id)], tennis.calendar)).filter(Boolean);
+    const rows = data.filter(big).map((m) => {
+      try {
+        return normaliseMatch(m, info[String(m.tournament_id)], tennis.calendar);
+      } catch (err) {
+        log(`tennis: skipped match ${m?.id} (${err.message})`); // one odd row is that row's loss
+        return null;
+      }
+    }).filter(Boolean);
     log(`GET tennis ${status} -> ${data.length} matches, ${rows.length} in ${tennis.categories.join("/")}`);
     return rows;
   }
   /** Top 25 per tour built from the ranked player list (1 call; /rankings is a paid tier). */
   async function standings() {
     if (!key) throw new Error("Live Tennis API key missing");
-    const { body } = await getJson(`${BASE}/players?limit=200`, { headers });
-    quota.record(undefined);
+    const { body } = await call(`${BASE}/players?limit=200`);
     const byTour = { atp: [], wta: [] };
     for (const p of body?.data || []) {
       if (p.is_doubles_team || !p.ranking || !byTour[p.tour]) continue;
@@ -121,15 +133,12 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
     const { info } = await catalogue();
     let body;
     try {
-      ({ body } = await getJson(`${BASE}/matches/${String(id).replace(/^tennis:/, "")}`, { headers }));
+      ({ body } = await call(`${BASE}/matches/${String(id).replace(/^tennis:/, "")}`));
     } catch (err) {
       // A match the feed no longer knows will never answer: say so, and
       // the caller stops asking. Anything else may pass, so it throws.
       if (/HTTP 404/.test(err.message)) return null;
       throw err;
-    } finally {
-      // Counted whatever came back: a failed call is a call (review, build 32).
-      quota.record(undefined);
     }
     return body?.id ? normaliseMatch(body, info[String(body.tournament_id)], tennis.calendar) : null;
   }

@@ -2,10 +2,14 @@ import { createHash } from "node:crypto";
 import { mkdirSync, existsSync, readFileSync, writeFileSync, unlinkSync, renameSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { shrinkImage } from "./shrink.js";
+import { prune, stats } from "./image-housekeeping.js";
 
 const MAX_BYTES = 3 << 20;
 const EXT = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/gif": "gif" };
 const DAY = 86400e3;
+/** Five failures in a row park a picture; a few hours later it is given another chance. */
+const PARK_AFTER = 5;
+const PARK_FOR = 6 * 3600e3;
 /**
  * Bumped when what the mirror keeps changes shape. It is part of every key, so
  * a television that cached the old copies for a month asks for the new ones,
@@ -134,11 +138,12 @@ export class ImageMirror {
         writeFileSync(tmp, buf);
         renameSync(tmp, target);
         if (old && old !== target) { try { unlinkSync(old); } catch { /* gone */ } }
-        Object.assign(entry, { ...kept, bytes: buf.length, original: original.length, fetchedAt: Date.now(), fails: 0 });
+        Object.assign(entry, { ...kept, bytes: buf.length, original: original.length, fetchedAt: Date.now(), fails: 0, failedAt: undefined });
         this.dirty = true;
         return true;
       } catch (err) {
         entry.fails = (entry.fails || 0) + 1;
+        entry.failedAt = Date.now();
         entry.lastError = String(err.message || err);
         this.dirty = true;
         this.log(`image miss ${entry.url} (${entry.lastError})`);
@@ -160,13 +165,31 @@ export class ImageMirror {
     if (!entry) return null;
     entry.lastUsed = Date.now();
     this.dirty = true;
-    const path = this.file(key);
-    if (path && existsSync(path)) return { body: readFileSync(path), type: entry.type, etag: key };
+    const held = this.#read(key);
+    if (held) return { body: held, type: entry.type, etag: key };
+    // A picture that keeps failing is not waited for: the television is sent to the
+    // original at once rather than made to sit through the timeout every time.
+    if (this.#parked(entry)) return { redirect: entry.url };
     if (await this.fetchOne(key)) {
-      const fresh = this.file(key);
-      if (fresh && existsSync(fresh)) return { body: readFileSync(fresh), type: entry.type, etag: key };
+      const fresh = this.#read(key);
+      if (fresh) return { body: fresh, type: this.entries.get(key).type, etag: key };
     }
     return { redirect: entry.url };
+  }
+
+  /** The bytes on disk, or null: a file that went between the check and the read is a miss, not a 502. */
+  #read(key) {
+    const path = this.file(key);
+    if (!path) return null;
+    try {
+      return readFileSync(path);
+    } catch {
+      return null;
+    }
+  }
+
+  #parked(entry, now = Date.now()) {
+    return (entry.fails || 0) >= PARK_AFTER && now - (entry.failedAt || 0) < PARK_FOR;
   }
 
   /** Keys still to fetch, missing ones first, then copies due a refresh. */
@@ -177,7 +200,7 @@ export class ImageMirror {
       const path = this.file(key);
       // Back off on a URL that keeps failing, whether it is a first fetch or a
       // refresh, so a handful of dead links cannot eat every pass.
-      if ((entry.fails || 0) >= 5) continue;
+      if (this.#parked(entry, now)) continue;
       if (!path || !existsSync(path)) missing.push(key);
       else if (now - (entry.fetchedAt || 0) > this.refreshAfter) stale.push(key);
     }
@@ -212,35 +235,11 @@ export class ImageMirror {
     this.save();
   }
 
-  /** Drop images nothing has asked for in a long while. */
   prune(now = Date.now()) {
-    let dropped = 0;
-    for (const [key, entry] of [...this.entries]) {
-      if (now - (entry.lastUsed || 0) <= this.maxAge) continue;
-      const path = this.file(key);
-      if (path) { try { unlinkSync(path); } catch { /* already gone */ } }
-      this.entries.delete(key);
-      dropped++;
-    }
-    // Files with no manifest entry (a manifest lost or hand-edited) go too.
-    const known = new Set([...this.entries.keys()]);
-    for (const name of readdirSync(this.dir)) {
-      if (name === "index.json" || name.endsWith(".tmp")) continue;
-      if (!known.has(name.replace(/\.[a-z]+$/, ""))) {
-        try { unlinkSync(join(this.dir, name)); dropped++; } catch { /* already gone */ }
-      }
-    }
-    if (dropped) { this.dirty = true; this.save(); }
-    return dropped;
+    return prune(this, now);
   }
 
   stats() {
-    let stored = 0;
-    let bytes = 0;
-    for (const [key, entry] of this.entries) {
-      const path = this.file(key);
-      if (path && existsSync(path)) { stored++; bytes += entry.bytes || 0; }
-    }
-    return { known: this.entries.size, stored, pending: this.entries.size - stored, megabytes: Math.round((bytes / 1e6) * 10) / 10 };
+    return stats(this);
   }
 }

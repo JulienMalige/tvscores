@@ -206,3 +206,30 @@ test("a manifest from before the shrinking is dropped, files and all", () => {
   assert.equal(m.entries.size, 0);
   assert.deepEqual(readdirSync(dir), ["index.json"]);
 });
+
+test("a picture parked after five failures is retried hours later, and not waited for meanwhile", async () => {
+  const dead = "https://cdn.example/dead.png";
+  const m = mirror(fakeFetch(new Error("down")), { shrink: async () => null });
+  m.url(dead);
+  const key = ImageMirror.key(dead);
+  for (let i = 0; i < 5; i++) await m.fetchOne(key);
+  assert.deepEqual(m.pending(), [], "parked: not in the warmer's list");
+  const before = m.fetchImpl.calls.length;
+  const hit = await m.serve(key);
+  assert.equal(hit.redirect, dead, "a television is sent to the original at once");
+  assert.equal(m.fetchImpl.calls.length, before, "without waiting on another try");
+  const later = Date.now() + 7 * 3600e3;
+  assert.deepEqual(m.pending(later), [key], "and six hours on it gets another chance");
+});
+
+test("a file that vanishes between the check and the read is a miss, not an error", async () => {
+  const m = mirror(fakeFetch({}), { shrink: async () => null });
+  const src = "https://cdn.example/gone.png";
+  const key = ImageMirror.key(src);
+  m.url(src);
+  await m.fetchOne(key);
+  const { unlinkSync } = await import("node:fs");
+  unlinkSync(m.file(key));
+  const hit = await m.serve(key);
+  assert.ok(hit.body || hit.redirect, "refetched or redirected, never thrown");
+});

@@ -161,6 +161,14 @@ export class TeamSportScheduler {
       this.noteResults(back);
       this.meta.lastToday = new Date(now).toISOString();
     }
+    // A provider with no way to ask for a day (tennis on the free tier) cannot find out
+    // what became of a match that was listed, never went live and was dropped from the
+    // list: a walkover, a withdrawal. Twelve hours past its time, it is let go.
+    if (!this.p.byDate) {
+      for (const e of this.events()) {
+        if (e.status.state === STATE.scheduled && now - Date.parse(e.start) > 12 * 3600e3) this.store.events.delete(e.id);
+      }
+    }
     this.meta.lastLive = new Date(now).toISOString();
     this.meta.lastOk = this.meta.lastLive;
   }

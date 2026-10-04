@@ -15,7 +15,11 @@ export async function getJson(url, { headers = {}, timeoutMs = 15000 } = {}) {
     const res = await fetch(url, { headers: { accept: "application/json", ...headers }, signal: ctrl.signal });
     const remainingHeader = res.headers.get("x-ratelimit-requests-remaining");
     const remaining = remainingHeader == null ? NaN : Number(remainingHeader);
-    if (!res.ok) throw new Error(`HTTP ${res.status} for ${redact(url)}`);
+    if (!res.ok) {
+      const err = new Error(`HTTP ${res.status} for ${redact(url)}`);
+      err.status = res.status; // for callers that treat a refusal and a missing thing differently
+      throw err;
+    }
     // An empty 200 is how some providers say "nothing here" — a cup with no
     // league table, a season that has not started. That is an answer, not a
     // parse error, so it comes back as null rather than throwing.

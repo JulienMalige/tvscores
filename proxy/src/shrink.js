@@ -1,6 +1,13 @@
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
+/** Interpreters running at once: a table of forty cold crests is not forty of them. */
+const MAX_RUNNING = 4;
+let running = 0;
+const waiting = [];
+const slot = () => new Promise((go) => (running < MAX_RUNNING ? (running++, go()) : waiting.push(go)));
+const release = () => (waiting.length ? waiting.shift()() : running--);
+
 const SCRIPT = fileURLToPath(new URL("../scripts/shrink.py", import.meta.url));
 
 /**
@@ -10,7 +17,16 @@ const SCRIPT = fileURLToPath(new URL("../scripts/shrink.py", import.meta.url));
  * Python here. The mirror then serves the original, so a missing helper costs
  * bytes and nothing else.
  */
-export function shrinkImage(buffer, { timeoutMs = 10000, python = "python3" } = {}) {
+export async function shrinkImage(buffer, opts) {
+  await slot();
+  try {
+    return await run(buffer, opts);
+  } finally {
+    release();
+  }
+}
+
+function run(buffer, { timeoutMs = 10000, python = "python3" } = {}) {
   return new Promise((resolve) => {
     let child;
     try {

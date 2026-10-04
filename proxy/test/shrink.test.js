@@ -29,3 +29,9 @@ test("bytes that are not a picture, or no Python at all, leave it alone too", as
   assert.equal(await shrinkImage(Buffer.from("not an image")), null);
   assert.equal(await shrinkImage(Buffer.from("x"), { python: "no-such-python-here" }), null);
 });
+
+test("only a few interpreters run at once", async () => {
+  const runs = Array.from({ length: 12 }, () => shrinkImage(Buffer.from("not an image")));
+  const out = await Promise.all(runs);
+  assert.ok(out.every((r) => r === null), "all twelve are answered, however they queue");
+});

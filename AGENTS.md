@@ -140,7 +140,10 @@ Invariants worth keeping:
 - **A live game must be able to stop being live.** A provider's live feed
   lists only games in progress, so a finished match disappears from it; the
   scheduler refetches that match's own UTC date through `provider.byDate` to
-  learn the final score. A provider with a `live()` needs a `byDate()`.
+  learn the final score. A provider with a `live()` needs a `byDate()` —
+  tennis on the free tier cannot have one: it asks for the match by id
+  (`byId`), and a listed match that never went live is let go twelve hours
+  past its time.
 - **Failures back off**: each consecutive one doubles the wait to a one-hour
   ceiling, cleared by a single good answer.
 - **Answers carry an `ETag`** and honour `If-None-Match` with a bodyless 304.

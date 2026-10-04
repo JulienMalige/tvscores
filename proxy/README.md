@@ -81,9 +81,9 @@ Crests and portraits live on other people's CDNs and almost never change, so
 the proxy keeps its own copy (`src/images.js`) and the television fetches every
 picture from one host with a year-long cache header. A URL is registered the
 instant it appears in a response and the bytes are pulled in the background,
-six at a time; a request for something not yet mirrored is fetched on the spot,
+twelve at a time; a request for something not yet mirrored is fetched on the spot,
 and if that fails it is redirected to the original rather than left blank. A
-URL that fails five times is dropped from the queue. Portraits are taken in
+URL that fails five times is parked for six hours (a television asking meanwhile is sent to the original at once), then tried again. Portraits are taken in
 TheSportsDB's `/preview` size, a fifth of the bytes and still larger than any
 avatar the app draws. Anything unasked-for for 60 days is pruned.
 

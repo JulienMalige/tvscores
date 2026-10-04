@@ -124,3 +124,56 @@ test("the stamp that says a classification was asked for survives a calendar ref
   assert.equal(store.events.get("f1:1").resultsFetchedAt, "2026-09-02T00:00:00Z");
   assert.equal(store.hasResults("f1:1"), true, "so it is not asked for every other tick");
 });
+
+test("a rate limit does not use up a match's tries, and stops the round", async () => {
+  const seen = (i) => match({ id: `tennis:${i}`, sport: "tennis", status: { state: "live" } });
+  const asked = [];
+  const limited = Object.assign(new Error("HTTP 429"), { status: 429 });
+  const provider = { sport: "tennis", finalizeOrphans: true, live: async () => [], byId: async (id) => { asked.push(id); throw limited; } };
+  const s = scheduler(provider);
+  s.store.upsert([seen(1), seen(2), seen(3)]);
+  for (let round = 1; round <= 5; round++) await s.live(KICKOFF + round * 1800e3);
+  assert.equal(asked.length, 5, "one ask a round, not eight: the first refusal ends the round");
+  assert.equal(s.meta.toConfirm.length, 3, "and all three are still waiting");
+  assert.ok(s.meta.toConfirm.every((e) => e.tries === 0), "none of them has a try used");
+});
+
+test("a match with no readable time is left out, not given the time of the poll", async () => {
+  const { normaliseMatch } = await import("../src/providers/livetennis-match.js");
+  const row = { id: 1, tour: "atp", status: "upcoming", players: { p1: { name: "A" }, p2: { name: "B" } } };
+  assert.equal(normaliseMatch(row, {}), null, "no time at all");
+  assert.equal(normaliseMatch({ ...row, scheduled_time: "not a time" }, {}), null, "a time that is not one");
+  assert.ok(normaliseMatch({ ...row, scheduled_time: "2026-10-03T10:00:00Z" }, {}), "a good one");
+});
+
+test("a catalogue that always says there is more is read twenty pages and no further", async (t) => {
+  const { tennisProvider } = await import("../src/providers/livetennis.js");
+  let pages = 0;
+  t.mock.method(globalThis, "fetch", async (url) => {
+    if (url.includes("/tournaments")) { pages += 1; return new Response(JSON.stringify({ data: [{ id: pages, name: "T", tour: "atp" }], meta: { has_more: true } })); }
+    return new Response(JSON.stringify({ data: [] }));
+  });
+  const spent = [];
+  const p = tennisProvider({ key: "k", quota: { record: () => spent.push(1) }, meta: {}, tennis: { categories: [], alsoBig: [], calendar: [] }, log: () => {} });
+  await p.byId("tennis:1").catch(() => {});
+  assert.equal(pages, 40, "twenty pages for each of the two tours, and it ended");
+});
+
+test("a listed match that never went live is let go twelve hours past its time", async () => {
+  const gone = match({ id: "tennis:5", sport: "tennis" });
+  const s = scheduler({ sport: "tennis", live: async () => [], finalizeOrphans: true });
+  s.store.upsert([gone]);
+  await s.live(KICKOFF + 11 * 3600e3);
+  assert.equal(s.store.events.size, 1, "eleven hours: still there");
+  await s.live(KICKOFF + 13 * 3600e3);
+  assert.equal(s.store.events.size, 0, "thirteen: it was a walkover, and is gone");
+});
+
+test("a photo lookup that is refused is still counted, and the day's line is kept", async (t) => {
+  const { PhotoResolver, DAILY_LINE } = await import("../src/photos.js");
+  t.mock.method(globalThis, "fetch", async () => new Response("", { status: 429 }));
+  const photos = new PhotoResolver({ store: tmpStore(), key: "k", log: () => {} });
+  await assert.rejects(() => photos.lookup("Some Name", "f1"));
+  assert.equal(photos.meta.calls.used, 1, "the refusal was a call");
+  assert.equal(photos.quota.dailyQuota, DAILY_LINE);
+});

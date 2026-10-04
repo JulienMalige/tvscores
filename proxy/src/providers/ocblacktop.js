@@ -58,9 +58,12 @@ export function motorsportProvider({ sport, league, key, quota, log = () => {}, 
   const headers = { "x-api-key": key };
   async function get(path) {
     if (!key) throw new Error("Orange Cat Blacktop key missing");
-    const { body } = await getJson(`${BASE}/${sport}${path}`, { headers });
-    quota.record(undefined);
-    return body;
+    try {
+      const { body } = await getJson(`${BASE}/${sport}${path}`, { headers });
+      return body;
+    } finally {
+      quota.record(undefined); // a refused call was still a call
+    }
   }
   const teamTable = sport === "formula1" ? { path: "/standings/constructors", id: "constructors" } : { path: "/standings/teams", id: "teams" };
   return {
