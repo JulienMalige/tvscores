@@ -17,11 +17,13 @@
       "Ligue 1+ 2026-27 is not on Canal+/myCANAL (no agreement with the LFP); it is on its own app, DAZN, Prime Video (Ligue 1 Pass), RMC Sport, Molotov, L'Équipe and the operators' boxes",
       "The CANAL+ Sport pack carries CANAL+ Sport, CANAL+ Foot, beIN SPORTS 1-10 (so Max 4-10 are on the CANAL+ app), Eurosport 1, 2 and 360, Multisports 1, Golf+",
       "myCANAL is on Apple TV (and Apple's lookup lists a tvOS CANAL+ app in France)"
+    ],
+    "2026-10-04 (third search)": [
+      "Fandango: the Bundesliga's US rights are Versant's from 2026-27 — 30+ games on USA Network, the other 275+ free on Fandango's ad-supported streaming (insidersport.com, heavy.com, sportcal.com)",
+      "SKY+ (Brazil): packs carry ESPN, ESPN Brasil, SporTV 1-3, Premiere, BandSports, Fox Sports, with HBO Max, Prime, Paramount+ and Disney+ in the bigger ones; the SKY+ app plays live channels on a smart TV (minhaconexao.com.br, melhorplano.net, opovo.com.br)"
     ]
   },
   "toConfirm": [
-    "'Fandango' on Bundesliga games in the US feed (with USA Network): a feed error, or a service we should map?",
-    "SKY+ lineup in Brazil: is ESPN/SporTV/Premiere in the app, and which pack?",
     "Eurosport and beIN SPORTS CONNECT have no tvOS app in the French store, so there Canal+ (and Prime Video for Eurosport) are the cards: nothing to do unless the store listing changes"
   ],
   "apps": {
@@ -307,6 +309,14 @@
       "tvos": [
         "BR"
       ]
+    },
+    "fandango": {
+      "name": "Fandango at Home",
+      "kind": "streamer",
+      "appStoreId": 487285735,
+      "tvos": [
+        "US"
+      ]
     }
   },
   "channels": {
@@ -527,6 +537,9 @@
         "foxsports",
         "foxone",
         "fubo"
+      ],
+      "Fandango": [
+        "fandango"
       ]
     },
     "BR": {
