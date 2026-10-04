@@ -46,6 +46,10 @@ struct GameScreen: View {
         ScrollView {
             VStack(spacing: Metrics.gameGap) {
                 GameHeaderSection(event: event, competition: competition, records: detail?.records)
+                // Right under the score, before the whistle and during the game: where to
+                // watch is what the page is opened for (Julien, build 33).
+                let cards = event.status.state == .final ? [] : event.watchCards(store.board?.apps)
+                if !cards.isEmpty { HowToWatchSection(cards: cards) }
                 if !ready {
                     // One native loader under the score while the rest
                     // comes, then the rest at once: a skeleton for the
@@ -71,9 +75,6 @@ struct GameScreen: View {
                     if event.sport != "tennis" {
                         GameInfoSection(start: event.start, venue: detail?.venue, place: detail?.city, broadcasts: event.channelList)
                     }
-                    // Before the whistle and during the game: the apps that can show it.
-                    let cards = event.status.state == .final ? [] : event.watchCards(store.board?.apps)
-                    if !cards.isEmpty { HowToWatchSection(cards: cards) }
                 }
             }
             .eventPageInsets()
