@@ -172,7 +172,7 @@ export function withBroadcasts(e, broadcastsFor) {
  * country of the channel that carries it, in the order to draw them. The board's
  * `apps` says what each is. Absent when there is nothing to open.
  */
-export function withWatch(e, watch) {
+function withWatch(e, watch) {
   if (!watch || !e.broadcastsBy) return e;
   const watchOn = watch.forEvent(e.broadcastsBy);
   return Object.keys(watchOn).length ? { ...e, watchOn } : e;
