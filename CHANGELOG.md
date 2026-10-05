@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- How to Watch now shows on a finished game too, right under the score and before its
+  statistics, since the app has the replay.
 - A game that has no channel but can be watched in an app says so under its time
   ("NBA app"), where its row used to say nothing; a finished game too, since the app
   has the replay. A channel still comes first.
@@ -24,7 +26,7 @@ notes when a version ships.
   or four cards to a line instead of tall tiles.
 
 ## 1.0 build 40 — 4 October 2026
-- A game shows How to Watch, right under the score and before its statistics, as the
+- A game to come or under way shows How to Watch, right under the score, as the
   Apple TV app draws it: a wide card for each app that can show it, with the app's
   own wide icon, "Open In" and its name, and the external-link mark. The channel's own
   app comes first, then a streaming service, then your provider's, and the league's own
