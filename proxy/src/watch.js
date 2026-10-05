@@ -34,9 +34,11 @@ export function createWatch(table) {
     for (const country of new Set([...Object.keys(broadcastsBy || {}), ...Object.keys(complement)])) {
       const seen = [];
       for (const name of broadcastsBy?.[country] || []) for (const key of channelApps(country, name) || []) if (!seen.includes(key) && opens(key, country)) seen.push(key);
-      const own = (complement[country] || []).filter((key) => opens(key, country));
+      // The competition's own app is added after the channels' apps; if a channel already
+      // carries it (the Premiere channel is the Premiere app) it stays where its kind puts it.
+      const own = (complement[country] || []).filter((key) => opens(key, country) && !seen.includes(key));
       const ordered = [...seen].sort((a, b) => KINDS.indexOf(table.apps[a].kind) - KINDS.indexOf(table.apps[b].kind)); // stable: the table's order within a kind
-      const cards = [...ordered.filter((k) => !own.includes(k)).slice(0, MAX_CARDS - own.length), ...own];
+      const cards = [...ordered.slice(0, MAX_CARDS - own.length), ...own];
       if (cards.length) out[country] = cards;
     }
     return out;

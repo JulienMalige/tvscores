@@ -73,9 +73,11 @@ test("a competition's own app comes last, for every country the table lists, and
     ...table,
     competitions: { 77: { name: "X", apps: { FR: ["own"], BR: ["stream"], US: ["split"] } } },
   });
-  // Many (own, stream, prov, other, more): own is a channel app and a complement: it is not shown twice, and it stays last.
-  assert.deepEqual(withNba.forEvent({ FR: ["Many"] }, 77).FR, ["stream", "prov", "other", "own"], "three channel apps, then the competition's");
-  assert.deepEqual(withNba.forEvent({ FR: ["Chan"] }, 77).FR, ["stream", "prov", "own"]);
+  // The competition's app, when a channel already carries it, stays where its kind puts it, once.
+  assert.deepEqual(withNba.forEvent({ FR: ["Many"] }, 77).FR, ["own", "stream", "prov", "other"], "own is a channel's own app here: first, and not twice");
+  assert.deepEqual(withNba.forEvent({ FR: ["Chan Max"] }, 77).FR, ["other", "own"], "when no channel carries it, it is added last");
+  const apart = createWatch({ ...table, competitions: { 77: { name: "X", apps: { FR: ["phone"] } } } });
+  assert.deepEqual(apart.forEvent({ FR: ["Many"] }, 77).FR, ["own", "stream", "prov", "other"], "an app with no tvOS version in the country is not added")
   assert.deepEqual(withNba.forEvent({}, 77), { FR: ["own"], BR: ["stream"], US: ["split"] }, "with no channel at all, every country whose complement opens");
 });
 
