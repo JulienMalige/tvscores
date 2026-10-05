@@ -14,7 +14,7 @@ test("every app says what it is, where it has a tvOS version, and how to find it
     const id = app.appStoreId;
     const ok = app.builtIn ? id === null : Number.isInteger(id) || (id && Object.values(id).every(Number.isInteger) && Object.keys(id).every((c) => COUNTRIES.includes(c)));
     assert.ok(ok, `${key}: an App Store id (a number, or one per country), or built in`);
-    for (const scheme of app.schemes || []) assert.match(scheme, /^[a-z][a-z0-9.+-]*:\/\/$/i, `${key}: a scheme is "name://"`);
+    for (const scheme of app.schemes || []) assert.match(scheme, /^([a-z][a-z0-9.+-]*:\/\/|https:\/\/[a-z0-9.-]+\/\S*)$/i, `${key}: a scheme is "name://" or a web address the app claims`);
   }
 });
 
