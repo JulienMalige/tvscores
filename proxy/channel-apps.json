@@ -76,6 +76,9 @@
       "Canal+: https://www.canalplus.com/ opened the CANAL+ app (a universal link works on the Apple TV); Globoplay: globoplay:// opened the app; Vivo TV: https://www.vivoplay.com.br/ was refused (the App Store page opened).",
       "Next candidates from the apple-app-site-association files: Vivo TV (com.pdi.enjoy) also claims www.vivotv.com.br for / and /channels; SKY+ (br.com.skymais) claims www.skymais.com.br for /home/sports, /home/live, /home/main (not /).",
       "SKY+ plans include Prime Video, Disney+, HBO Max, Paramount+, Premiere, Sportynet+ and NFL Game Pass (Julien's screenshots): all in the table but Sportynet+, which has no Apple TV app (iOS only); NFL Game Pass is DAZN's outside the US."
+    ],
+    "2026-10-05 (streaming apps by competition in Brazil, with Julien)": [
+      "Julien, from SKY+'s plan page (Prime Video, Disney+, HBO Max, Paramount+, Premiere, Sportynet+, NFL Game Pass): the streaming apps that carry sport in Brazil are offered for the competitions they carry. Where a source ties a competition to one: Libertadores and Sul-Americana -> Paramount+ (claro.com.br: 'Paramount+ — Copa Libertadores da América e a Copa Sul-Americana'), Champions League -> HBO Max (claro.com.br: 'UEFA Champions League com exclusividade'), Premier League -> Disney+ (ESPN holds the rights in Brazil to 2028; its channels are in Disney+ Premium). Not mapped, only part of the games: Prime Video (the Brasileirão's exclusive game of each round, some NBA and Copa do Brasil games)."
     ]
   },
   "toConfirm": [
@@ -1174,6 +1177,30 @@
       "apps": {
         "BR": [
           "premiere"
+        ]
+      }
+    },
+    "4501": {
+      "name": "Copa Libertadores",
+      "apps": {
+        "BR": [
+          "paramountplus"
+        ]
+      }
+    },
+    "4480": {
+      "name": "UEFA Champions League",
+      "apps": {
+        "BR": [
+          "hbomax"
+        ]
+      }
+    },
+    "4328": {
+      "name": "Premier League",
+      "apps": {
+        "BR": [
+          "disneyplus"
         ]
       }
     }
