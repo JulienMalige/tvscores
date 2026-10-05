@@ -8,10 +8,8 @@ notes when a version ships.
 
 ## Unreleased
 - A game that has no channel but can be watched in an app says so under its time
-  ("NBA app"), where its row used to say nothing. A channel still comes first, and a
-  finished game shows nothing.
-
-## 1.0 build 42 — 5 October 2026
+  ("NBA app"), where its row used to say nothing; a finished game too, since the app
+  has the replay. A channel still comes first.
 - Settings, Apps to show: turn off the apps you do not want How to Watch to offer,
   Canal+ only if that is what you use, for example. A hidden app is not offered on any
   game; turn it back on whenever you like. Kept on this Apple TV.

@@ -77,7 +77,7 @@ struct WatchTests {
         #expect(app.countries == ["FR", "BR"])
     }
 
-    @Test("a row names the channels, or failing that the app, and nothing for a game that is over")
+    @Test("a row names the channels, or failing that the app, a finished game too: the replay")
     @MainActor
     func listingNamesChannelsThenTheApp() throws {
         let apps = try ["nba": Self.app(#"{"name":"NBA","kind":"own","id":1}"#)]
@@ -91,7 +91,7 @@ struct WatchTests {
         #expect(none.listing(apps, in: ["US"], hiding: ["nba"]) == nil, "an app turned off is not named")
         #expect(none.listing(apps, in: ["FR"], hiding: []) == nil, "nor one of a country not chosen")
         let over = try decode(json("final", ""))
-        #expect(over.listing(apps, in: ["US"], hiding: []) == nil, "a game that is over says nothing")
+        #expect(over.listing(apps, in: ["US"], hiding: [])?.count == 1, "a game that is over names the app: the replay is there")
         let withChannel = try decode(json("scheduled", #","broadcastsBy":{"US":["ESPN"]}"#))
         #expect(withChannel.listing(apps, in: ["US"], hiding: [])?.map(\.name) == ["ESPN"], "a channel wins over the app")
     }

@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { sportsDbSport } from "../src/providers/sportsdb.js";
+import { datesAround } from "../src/providers/sportsdb-events.js";
 
 const football = JSON.parse(readFileSync(new URL("./fixtures/sportsdb-football.json", import.meta.url))).events;
 const SERIE_A = { id: 4332, name: "Serie A", short: "SA" };
@@ -32,22 +33,19 @@ function provider(over = {}) {
 }
 
 test("a date that fails costs that date, not the week", async (t) => {
+  // Whatever the day: the third date of the window is the one that fails.
+  const failing = datesAround({ back: 1, ahead: 7 })[2];
   network(t, {
-    "d=2026-10-03": 500,
+    [`d=${failing}`]: 500,
     "eventsday.php": { events: football },
     "eventsnextleague.php": null,
   });
   const { p, logged } = provider();
-  const realNow = Date.now;
-  Date.now = () => Date.parse("2026-10-03T12:00:00Z"); // so the window holds the failing date
-  try {
-    const rows = await p.daily();
-    assert.ok(rows.length > 0, "the other days' fixtures came");
-    assert.equal(rows.partial, true, "marked unfinished, so the scheduler asks again soon");
-    assert.ok(logged.some((m) => m.includes("2026-10-03")), "and the date that failed is named");
-  } finally {
-    Date.now = realNow;
-  }
+  const rows = await p.daily();
+  assert.ok(rows.length > 0, "the other days' fixtures came");
+  assert.equal(rows.partial, true, "marked unfinished, so the scheduler asks again soon");
+  assert.deepEqual(rows.missing, [failing], "with the date that failed named");
+  assert.ok(logged.some((m) => m.includes(failing)), "and logged");
 });
 
 test("a week in which nothing came is an error", async (t) => {
