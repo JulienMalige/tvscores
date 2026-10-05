@@ -147,6 +147,7 @@ final class ScoreboardStore {
     /// menu and today's page draw, and every slot is told to look again (Julien,
     /// build 38: the icons stayed transparent after coming back).
     func rewarm() async {
+        ImageArrivals.shared.wake()
         guard ready, let board else { return }
         _ = await prefetch(board.leagues.flatMap { [$0.icon, $0.logo] } + board.todayImageURLs)
         iconsVersion += 1

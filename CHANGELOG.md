@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- The country flags beside the channels (and any other picture the menu's refresh did not
+  know) no longer stay empty when you come back to the app after leaving it: every picture
+  fetches itself again.
 - On a game's row, the app named when there is no channel ("NBA app") carries a mark when
   you follow several countries, like the channels: a globe when it is the same app in all of
   them, a flag when it belongs to one country.

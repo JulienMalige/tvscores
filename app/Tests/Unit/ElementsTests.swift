@@ -56,6 +56,16 @@ struct ElementsTests {
         #expect(!StatusLabel.finalCombined.isEmpty)
     }
 
+    // MARK: ImageArrivals
+
+    @Test("the app coming back to the front moves the wake count every picture slot is keyed on")
+    @MainActor
+    func wakeMovesTheCount() {
+        let before = ImageArrivals.shared.wakes
+        ImageArrivals.shared.wake()
+        #expect(ImageArrivals.shared.wakes == before + 1)
+    }
+
     // MARK: ImageCache
 
     @Test("a picture that fails is asked for three times, then remembered, then forgotten")

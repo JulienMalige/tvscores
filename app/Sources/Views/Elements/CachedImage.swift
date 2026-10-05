@@ -12,7 +12,13 @@ import UIKit
 final class ImageArrivals {
     static let shared = ImageArrivals()
     private(set) var count = 0
+    /// Moves when the app comes back to the front: the system empties the decoded pictures
+    /// while it is away, and a slot whose picture is gone fetches it again (Julien, build 43:
+    /// the flags beside the channels were empty, the rewarm only knew the menu's and today's).
+    private(set) var wakes = 0
     private var pending = false
+
+    func wake() { wakes += 1 }
 
     func note() {
         guard !pending else { return }
@@ -154,6 +160,12 @@ final class ImageCache {
     }
 }
 
+/// What a slot's loading task is keyed on: its picture, and the app's last return to the front.
+private struct Reload: Equatable {
+    let url: URL?
+    let wakes: Int
+}
+
 /// An image that shows its fallback only when there is nothing else coming.
 ///
 /// While a picture is on its way the space is simply left empty: the fallback
@@ -195,12 +207,14 @@ struct CachedImage<Placeholder: View>: View {
                 Color.clear
             }
         }
-        .task(id: url) {
+        .task(id: Reload(url: url, wakes: ImageArrivals.shared.wakes)) {
             // A picture already in memory was drawn on the first frame; only
             // one that is not there yet has anything to record. One that
             // fails is asked for again while the row is still on screen —
             // twice, a minute apart — rather than left blank for good.
             guard let url, ImageCache.shared.image(for: url) == nil else { return }
+            loaded = nil
+            settled = false
             for _ in 0..<3 {
                 loaded = await ImageCache.shared.load(url)
                 if Task.isCancelled { return } // torn down; nothing to record
