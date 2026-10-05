@@ -179,6 +179,13 @@ jobs:
           saturday league-f1-upcoming -TVScoresTab upcoming -TVScoresLeague f1
           saturday race-f1-grid -TVScoresTab today -TVScoresRace f1:grid
           saturday race-motogp-grid -TVScoresTab today -TVScoresRace motogp:grid
+          # The app named on a row, with the three countries followed: a
+          # globe when it is the same app in all of them, a flag when it
+          # belongs to one (Julien, 2026-10-05).
+          xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+          SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab upcoming -TVScoresLeague nfl -channelCountries "(US,FR,BR)" -AppleLanguages "(en)"
+          sleep 8
+          xcrun simctl io "$UDID" screenshot shots/app-marks-en.png
           # Tennis results as each set's games, "6-4 3-4" (build 32).
           xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
           SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresSample race -TVScoresTab today -TVScoresLeague wta -AppleLanguages "(en)"
