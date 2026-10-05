@@ -95,4 +95,19 @@ struct WatchTests {
         let withChannel = try decode(json("scheduled", #","broadcastsBy":{"US":["ESPN"]}"#))
         #expect(withChannel.listing(apps, in: ["US"], hiding: [])?.map(\.name) == ["ESPN"], "a channel wins over the app")
     }
+
+    @Test("the app on a row has a flag only with several countries: a globe when it is the same in all, a flag when it is one country's")
+    @MainActor
+    func appMarkFollowsTheCountries() throws {
+        let apps = try ["nba", "dazn"].reduce(into: [String: WatchApp]()) {
+            $0[$1] = try Self.app(#"{"name":"\#($1)","kind":"own","id":1}"#)
+        }
+        let json = #"{"id":"x","sport":"nfl","kind":"match","start":"2026-10-04T10:00:00Z","status":{"state":"scheduled"},"watchOn":{"US":["nba"],"FR":["nba","dazn"],"BR":["dazn"]}}"#
+        let event = try ScoreboardDecoder.make().decode(Event.self, from: Data(json.utf8))
+        #expect(event.listing(apps, in: ["US"], hiding: [])?.first?.country == nil, "one country: no mark, as the channels")
+        let both = event.listing(apps, in: ["US", "FR"], hiding: [])?.first
+        #expect(both?.worldwide == true && both?.country == nil, "the same app in both countries: a globe")
+        let tied = event.listing(apps, in: ["FR", "BR"], hiding: [])?.first
+        #expect(tied?.worldwide == false && tied?.country == "FR", "not in every country: the flag of the country it came from")
+    }
 }

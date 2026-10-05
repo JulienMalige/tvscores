@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- On a game's row, the app named when there is no channel ("NBA app") carries a mark when
+  you follow several countries, like the channels: a globe when it is the same app in all of
+  them, a flag when it belongs to one country.
 
 ## 1.0 build 43 — 5 October 2026
 - How to Watch now shows on a finished game too, right under the score and before its

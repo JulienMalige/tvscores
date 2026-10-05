@@ -68,6 +68,14 @@ extension Event {
     func listing(_ apps: [String: WatchApp]?, in chosen: [String]? = nil, hiding hidden: Set<String>? = nil) -> [Channel]? {
         if let channels = channelList { return channels }
         guard let card = watchCards(apps, in: chosen, hiding: hidden).first else { return nil }
-        return [Channel(country: nil, name: String(localized: "watch.appOf \(card.app.name)", bundle: LanguageChoice.bundle))]
+        let countries = chosen ?? ChannelChoice.shared.countries
+        // As the channels' own rule: a mark only when several countries are chosen. The app that
+        // is offered in every one of them is "worldwide" (a globe, the NBA's); one tied to a
+        // country (Premiere in Brazil, DAZN's NFL pass in France) carries that country's flag.
+        let several = countries.count > 1
+        let worldwide = several && countries.allSatisfy { watchOn?[$0]?.contains(card.key) ?? false }
+        return [Channel(country: several && !worldwide ? card.country : nil,
+                        name: String(localized: "watch.appOf \(card.app.name)", bundle: LanguageChoice.bundle),
+                        worldwide: worldwide)]
     }
 }

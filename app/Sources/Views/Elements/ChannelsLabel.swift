@@ -6,6 +6,8 @@ struct Channel: Hashable {
     /// "FR", "US", "BR"; nil when only one country is chosen.
     let country: String?
     let name: String
+    /// An app that is the same in every country chosen: a globe, not a flag.
+    var worldwide = false
 }
 
 /// Where a game is on — "Canal+ · beIN Sports 1" — in small grey type
@@ -25,7 +27,9 @@ struct ChannelsLabel: View {
         HStack(spacing: 10) {
             ForEach(Array(groups.enumerated()), id: \.offset) { _, group in
                 HStack(spacing: 8) {
-                    if let country = group.country {
+                    if group.worldwide {
+                        Image(systemName: "globe").font(.system(size: Metrics.channelFlag * 0.8))
+                    } else if let country = group.country {
                         FlagMark(flag: ChannelChoice.flag(country), size: Metrics.channelFlag)
                     }
                     Text(verbatim: group.names.joined(separator: " · "))
@@ -42,13 +46,13 @@ struct ChannelsLabel: View {
     }
 
     /// Neighbouring channels of one country, under one flag.
-    private var groups: [(country: String?, names: [String])] {
-        var out: [(country: String?, names: [String])] = []
+    private var groups: [(country: String?, worldwide: Bool, names: [String])] {
+        var out: [(country: String?, worldwide: Bool, names: [String])] = []
         for c in shown {
-            if let last = out.last, last.country == c.country {
+            if let last = out.last, last.country == c.country, last.worldwide == c.worldwide {
                 out[out.count - 1].names.append(c.name)
             } else {
-                out.append((c.country, [c.name]))
+                out.append((c.country, c.worldwide, [c.name]))
             }
         }
         return out
