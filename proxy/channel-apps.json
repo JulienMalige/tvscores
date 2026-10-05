@@ -64,6 +64,9 @@
     ],
     "2026-10-04 (Open apps test on Julien's Apple TV, build 40)": [
       "disneyplus:// opened the Disney+ app (the scheme works); mycanal:// and canalplus:// were refused, so CANAL+ is opened by its App Store page, https://apps.apple.com/app/id694580816, which opened; vivotv:// was refused, the App Store page opened. The store link answers 'opened' on the Apple TV, so it is the fallback for every app whose scheme is refused or unknown. More apps to test: the rest of the test page."
+    ],
+    "2026-10-05 (Brasileirão, with Julien)": [
+      "The Premiere app is the Brasileirão's own app in Brazil (Julien: 'Premiere for the Brazilian soccer too'), added as the league's complement after the channels' apps, as the NBA app is for the NBA; Premiere carries most of each round, the rest being on Globo, Record/CazéTV and Prime Video, which the channels' cards cover"
     ]
   },
   "toConfirm": [
@@ -1121,6 +1124,14 @@
         ],
         "BR": [
           "dazn"
+        ]
+      }
+    },
+    "4351": {
+      "name": "Brasileirão",
+      "apps": {
+        "BR": [
+          "premiere"
         ]
       }
     }

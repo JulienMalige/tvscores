@@ -88,4 +88,6 @@ test("a game of a competition with no complement is as before, and the real tabl
   assert.equal(nba.US.at(-1), "nba");
   const nfl = real.forEvent({}, 4391);
   assert.deepEqual(nfl, { US: ["nfl"], FR: ["dazn"], BR: ["dazn"] }, "the NFL app in the US, DAZN's Game Pass elsewhere");
+  assert.deepEqual(real.forEvent({}, 4351), { BR: ["premiere"] }, "the Brasileirão's own app is Premiere, in Brazil");
+  assert.equal(real.forEvent({ BR: ["SporTV"] }, 4351).BR.at(-1), "premiere", "after the channels' apps");
 });
