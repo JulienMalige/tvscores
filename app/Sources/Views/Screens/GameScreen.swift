@@ -46,9 +46,9 @@ struct GameScreen: View {
         ScrollView {
             VStack(spacing: Metrics.gameGap) {
                 GameHeaderSection(event: event, competition: competition, records: detail?.records)
-                // Right under the score, before the whistle and during the game: where to
-                // watch is what the page is opened for (Julien, build 33).
-                let cards = event.status.state == .final ? [] : event.watchCards(store.board?.apps)
+                // Right under the score, before the statistics: where to watch is what the page is
+                // opened for (Julien, build 33), and after the whistle the app has the replay.
+                let cards = event.watchCards(store.board?.apps)
                 if !cards.isEmpty { HowToWatchSection(cards: cards) }
                 if !ready {
                     // One native loader under the score while the rest

@@ -24,7 +24,7 @@ notes when a version ships.
   or four cards to a line instead of tall tiles.
 
 ## 1.0 build 40 — 4 October 2026
-- A game to come or under way shows How to Watch, right under the score, as the
+- A game shows How to Watch, right under the score and before its statistics, as the
   Apple TV app draws it: a wide card for each app that can show it, with the app's
   own wide icon, "Open In" and its name, and the external-link mark. The channel's own
   app comes first, then a streaming service, then your provider's, and the league's own
