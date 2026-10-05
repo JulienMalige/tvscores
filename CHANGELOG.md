@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+
+## 1.0 build 44 — 5 October 2026
 - The country flags beside the channels (and any other picture the menu's refresh did not
   know) no longer stay empty when you come back to the app after leaving it: every picture
   fetches itself again.
