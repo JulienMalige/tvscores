@@ -59,3 +59,16 @@ extension Event {
         }
     }
 }
+
+extension Event {
+    /// What a game's row says it is on: its channels in the countries chosen, and failing that the app
+    /// that can show it, "NBA app" (Julien, 2026-10-04: "if it's just the app and no channel, we can
+    /// show the app"). Only before the whistle and during the game; a finished one with no channel
+    /// says nothing, since where to watch no longer helps.
+    @MainActor
+    func listing(_ apps: [String: WatchApp]?, in chosen: [String]? = nil, hiding hidden: Set<String>? = nil) -> [Channel]? {
+        if let channels = channelList { return channels }
+        guard status.state != .final, let card = watchCards(apps, in: chosen, hiding: hidden).first else { return nil }
+        return [Channel(country: nil, name: String(localized: "watch.appOf \(card.app.name)", bundle: LanguageChoice.bundle))]
+    }
+}

@@ -75,6 +75,7 @@ struct Sidebar: View {
                 .environment(\.openGame) { game = $0 }
                 .environment(\.menuIsOpen) { expanded }
                 .environment(\.boardNow, store.board?.generatedAt)
+                .environment(\.watchApps, store.board?.apps)
                 .environment(\.pageScrolled) { scrolled in
                     if scrolled != chipShrunk { chipShrunk = scrolled }
                 }

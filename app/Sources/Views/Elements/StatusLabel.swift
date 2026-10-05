@@ -127,4 +127,6 @@ extension EnvironmentValues {
     @Entry var underDayHeading = false
     /// When the board on screen was made.
     @Entry var boardNow: Date? = nil
+    /// The board's apps, so a row can name the app that shows a game that has no channel.
+    @Entry var watchApps: [String: WatchApp]? = nil
 }

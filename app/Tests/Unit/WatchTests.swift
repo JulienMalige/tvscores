@@ -76,4 +76,23 @@ struct WatchTests {
         let app = try Self.app(#"{"name":"A","kind":"own","id":1,"countries":["FR","BR"]}"#)
         #expect(app.countries == ["FR", "BR"])
     }
+
+    @Test("a row names the channels, or failing that the app, and nothing for a game that is over")
+    @MainActor
+    func listingNamesChannelsThenTheApp() throws {
+        let apps = try ["nba": Self.app(#"{"name":"NBA","kind":"own","id":1}"#)]
+        let json = { (state: String, extra: String) in
+            #"{"id":"x","sport":"nba","kind":"match","start":"2026-10-04T10:00:00Z","status":{"state":"\#(state)"},"watchOn":{"US":["nba"]}\#(extra)}"#
+        }
+        let decode = { (j: String) in try ScoreboardDecoder.make().decode(Event.self, from: Data(j.utf8)) }
+        let none = try decode(json("scheduled", ""))
+        let names = none.listing(apps, in: ["US"], hiding: [])?.map(\.name)
+        #expect(names?.count == 1 && names?.first?.contains("NBA") == true, "no channel: the app, as \"NBA app\"")
+        #expect(none.listing(apps, in: ["US"], hiding: ["nba"]) == nil, "an app turned off is not named")
+        #expect(none.listing(apps, in: ["FR"], hiding: []) == nil, "nor one of a country not chosen")
+        let over = try decode(json("final", ""))
+        #expect(over.listing(apps, in: ["US"], hiding: []) == nil, "a game that is over says nothing")
+        let withChannel = try decode(json("scheduled", #","broadcastsBy":{"US":["ESPN"]}"#))
+        #expect(withChannel.listing(apps, in: ["US"], hiding: [])?.map(\.name) == ["ESPN"], "a channel wins over the app")
+    }
 }

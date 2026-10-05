@@ -31,6 +31,7 @@ struct MatchRow: View {
 private struct MatchRowContent: View {
     let event: Event
     @Environment(\.isFocused) private var isFocused
+    @Environment(\.watchApps) private var apps
 
     var body: some View {
         VStack(spacing: 6) {
@@ -58,7 +59,7 @@ private struct MatchRowContent: View {
                 .frame(width: Metrics.matchScore, alignment: .center)
             VStack(spacing: 4) {
                 StatusLabel(status: event.status, start: event.start, compact: true, sport: event.sport)
-                if let channels = event.channelList { ChannelsLabel(channels: channels) }
+                if let channels = event.listing(apps) { ChannelsLabel(channels: channels) }
             }
             .frame(maxWidth: .infinity)
             middle(event.score?.away, record: event.records?.away, winner: winner == .away)
