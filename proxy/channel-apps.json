@@ -71,6 +71,11 @@
     ],
     "2026-10-05 (web links the apps claim)": [
       "The apple-app-site-association files of each app's own site list the bundle ids whose apps claim its addresses: 19 of the table's apps claim theirs (CANAL+ on www.canalplus.com for every path but /pass, /articles and /event; Vivo TV, the bundle com.pdi.enjoy, on www.vivoplay.com.br for /, /channels, /tv-guide/*, ...). Added to each app's links; whether tvOS opens the app for them is for the Open apps test to say."
+    ],
+    "2026-10-05 (second Open apps test, build 43)": [
+      "Canal+: https://www.canalplus.com/ opened the CANAL+ app (a universal link works on the Apple TV); Globoplay: globoplay:// opened the app; Vivo TV: https://www.vivoplay.com.br/ was refused (the App Store page opened).",
+      "Next candidates from the apple-app-site-association files: Vivo TV (com.pdi.enjoy) also claims www.vivotv.com.br for / and /channels; SKY+ (br.com.skymais) claims www.skymais.com.br for /home/sports, /home/live, /home/main (not /).",
+      "SKY+ plans include Prime Video, Disney+, HBO Max, Paramount+, Premiere, Sportynet+ and NFL Game Pass (Julien's screenshots): all in the table but Sportynet+, which has no Apple TV app (iOS only); NFL Game Pass is DAZN's outside the US."
     ]
   },
   "toConfirm": [
@@ -457,7 +462,9 @@
       ],
       "note": "Brazil. The former DIRECTV GO app (Julien; Apple's store returns it for 'DIRECTV GO', first released 2023-11-28): live channels and on-demand, SKY satellite subscribers use the same app. Plans: SKY+ Light / Full, Canais e Streamings II, Futebol, Canais e Futebol (R$ 79,90-219,90). Premiere is opened by searching inside it (SKY+ FAQ).",
       "schemes": [
-        "skyplus://"
+        "https://www.skymais.com.br/home/sports",
+        "https://www.skymais.com.br/home/live",
+        "https://www.skymais.com.br/home/main"
       ]
     },
     "fandango": {
@@ -488,6 +495,8 @@
       ],
       "note": "Brazil. The former Vivo Play app, renamed Vivo TV on 2025-10-03 (Vivo's notice; same id 589412933). App-only plans (Inicial, Estendido): ESPN 1-4 (5-6 in Estendido), TNT, BandSports, open channels. SporTV only with the TV packages (Avançado, Completo); Globo only in 14 cities. No Premiere: Vivo sends Premiere subscribers to the Premiere and Globoplay apps.",
       "schemes": [
+        "https://www.vivotv.com.br/",
+        "https://www.vivotv.com.br/channels",
         "https://www.vivoplay.com.br/"
       ]
     },
