@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+
+## 1.0 build 42 — 5 October 2026
 - Settings, Apps to show: turn off the apps you do not want How to Watch to offer,
   Canal+ only if that is what you use, for example. A hidden app is not offered on any
   game; turn it back on whenever you like. Kept on this Apple TV.
