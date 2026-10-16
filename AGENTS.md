@@ -166,10 +166,10 @@ writes its own number is a bug, and rows all use `rowSurface(focused:)`.
 - **Private beta, single user (Julien, 2026-10-03).** Every source stays on
   its current tier while Julien is the only user; licensing is reviewed
   again before the app reaches anyone else (docs/data-providers.md).
-- **Paid data tiers before any public release.** The motorsport source is free
-  for non-commercial use only, the photo source runs on a public test key, and
-  the badges under `proxy/assets` are other people's trademarks in a public
-  repository. This is the real gate on shipping to the store.
+- **The store release** (`docs/store-release.md`): free, and the takedown risk
+  on crests and photos accepted (Julien, 2026-10-16). Still his to decide: the
+  proxy's public host, and the sources whose terms forbid public use (the
+  MotoGP feed's "prototyping only" tier, the unlicensed photos).
 - **A seven-day Upcoming for football** needs a source with date ranges; the
   free plan serves yesterday to tomorrow only. See `docs/data-providers.md`.
 - **Where the proxy lives** once people other than Julien install the app. Its
