@@ -38,9 +38,10 @@ Julien's decisions:
   place of the Tailscale tunnel; its address is baked into every build. The
   cost does not grow with users: the proxy polls on its own schedule.
 - **Sources whose terms forbid public use whatever the price:** the MotoGP
-  feed's free tier is "prototyping only", the player photos have no stated
-  licence, and tennis and the TV guides have unstated terms
-  (`docs/data-providers.md`). Each needs its paid plan, a replacement, or to be
+  feed's free tier is "prototyping only", and tennis and the TV guides have
+  unstated terms (`docs/data-providers.md`). The player photos come through
+  the paid TheSportsDB key; their pictures' own rights are crowd-uploaded and
+  fall under the takedown risk above. Each needs its paid plan, a replacement, or to be
   left out of the public build.
 
 A first step that needs none of the above: external TestFlight (a public link,

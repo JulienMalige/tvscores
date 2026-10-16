@@ -169,7 +169,7 @@ writes its own number is a bug, and rows all use `rowSurface(focused:)`.
 - **The store release** (`docs/store-release.md`): free, and the takedown risk
   on crests and photos accepted (Julien, 2026-10-16). Still his to decide: the
   proxy's public host, and the sources whose terms forbid public use (the
-  MotoGP feed's "prototyping only" tier, the unlicensed photos).
+  MotoGP feed's "prototyping only" tier; tennis and the TV guides, unstated).
 - **A seven-day Upcoming for football** needs a source with date ranges; the
   free plan serves yesterday to tomorrow only. See `docs/data-providers.md`.
 - **Where the proxy lives** once people other than Julien install the app. Its
