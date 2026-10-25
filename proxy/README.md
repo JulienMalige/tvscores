@@ -154,7 +154,11 @@ npm start                      # http://127.0.0.1:8787
 journalctl --user -u tvscores-proxy -f
 ```
 
-Public URL while on the VPS Funnel: `https://srv1822832.tailf78112.ts.net/tvscores/v1/scoreboard`.
+Public URL: `https://tvscores.julienmalige.com/v1/scoreboard` (a Cloudflare Tunnel to
+the VPS, since 2026-10-25). The Tailscale Funnel mount,
+`https://srv1822832.tailf78112.ts.net/tvscores/v1/scoreboard`, still serves the builds
+up to 44; `TVSCORES_PATH_PREFIX` strips its `/tvscores`, and a path without it is
+served as is. `TVSCORES_PUBLIC_BASE` sets the host written into image links.
 
 Cache lives in `~/.local/state/tvscores/` and survives restarts; on an upstream
 failure the last good data is served and `stale` turns true after 6 h without a

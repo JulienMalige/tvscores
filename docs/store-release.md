@@ -15,6 +15,14 @@ What stands between TestFlight and the public store, and what Julien decided.
   falls back to the monogram; the app keeps the fallback for exactly that.
   Free does not change Apple's review: guideline 5.2.1 still asks about rights,
   so a rejection on logos remains possible, separately from a takedown.
+- **The proxy's address is Julien's own domain** (2026-10-25):
+  `https://tvscores.julienmalige.com`, the bundle id read backwards, bought on
+  Cloudflare Registrar (`julienmalige.com`, $10.46 a year, auto-renew on, WHOIS
+  private). It reaches the VPS through a Cloudflare Tunnel: no port opened, and
+  the name points at Cloudflare, not at the machine. The address is what every build carries, so the
+  host behind it can change later without a new build. Image links follow the
+  proxy's `TVSCORES_PUBLIC_BASE`, on the server. The Tailscale Funnel address
+  stays up while builds up to 44 are installed.
 
 ## Still to do
 
@@ -32,11 +40,8 @@ Free, can be done now:
 - The store listing in fr-FR, en-US, pt-BR, es-ES: name, subtitle,
   description, keywords, screenshots (the CI screenshots at 1920x1080).
 
-Julien's decisions:
+Julien's decision:
 
-- **Proxy hosting.** A domain of his own and a host meant for the public, in
-  place of the Tailscale tunnel; its address is baked into every build. The
-  cost does not grow with users: the proxy polls on its own schedule.
 - **Sources whose terms forbid public use whatever the price:** the MotoGP
   feed's free tier is "prototyping only", and tennis and the TV guides have
   unstated terms (`docs/data-providers.md`). The player photos come through

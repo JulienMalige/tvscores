@@ -100,7 +100,11 @@ Julien watches from Brazil (America/Sao_Paulo): capture `Resources/sample-scoreb
 
 Built 2026-09-13 in `proxy/` (Node 22, no dependencies, see `proxy/README.md`).
 Runs on Julien's VPS as a systemd user service, public at
-`https://srv1822832.tailf78112.ts.net/tvscores/v1/scoreboard?tz=<IANA tz>`.
+`https://tvscores.julienmalige.com/v1/scoreboard?tz=<IANA tz>`: Julien's domain
+(2026-10-25), reaching the VPS through a Cloudflare Tunnel (`~/VPS.md`). Builds
+up to 44 carry the old Tailscale Funnel address,
+`https://srv1822832.tailf78112.ts.net/tvscores`, which stays up while they are
+installed: the same process answers both, with or without the `/tvscores` prefix.
 The app reads `/v1/scoreboard` and `/v1/standings/{sport}/{league}`, and loads
 images from `/v1/img/...` and `/v1/assets/...` which the scoreboard hands it.
 Rules: polling on a schedule, never per request; per-sport daily budget with a
@@ -167,14 +171,12 @@ writes its own number is a bug, and rows all use `rowSurface(focused:)`.
   its current tier while Julien is the only user; licensing is reviewed
   again before the app reaches anyone else (docs/data-providers.md).
 - **The store release** (`docs/store-release.md`): free, and the takedown risk
-  on crests and photos accepted (Julien, 2026-10-16). Still his to decide: the
-  proxy's public host, and the sources whose terms forbid public use (the
-  MotoGP feed's "prototyping only" tier; tennis and the TV guides, unstated).
+  on crests and photos accepted (Julien, 2026-10-16); the proxy's address is
+  his domain (2026-10-25). Still his to decide: the sources whose terms forbid
+  public use (the MotoGP feed's "prototyping only" tier; tennis and the TV
+  guides, unstated).
 - **A seven-day Upcoming for football** needs a source with date ranges; the
   free plan serves yesterday to tomorrow only. See `docs/data-providers.md`.
-- **Where the proxy lives** once people other than Julien install the app. Its
-  address is baked into every build, and the current tunnel is not meant for
-  an audience.
 - Leagues in the MVP: Premier League, Champions League, NFL, NBA, F1, MotoGP,
   ATP/WTA. Rugby is available on the same plan if Julien wants it.
 - **The menu is ours, not tvOS's sidebar** (Julien, 2026-09-28, keeping

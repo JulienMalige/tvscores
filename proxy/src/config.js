@@ -83,7 +83,7 @@ export const config = {
   /** Optional URL prefix the reverse proxy leaves on the path (Tailscale serve --set-path). */
   pathPrefix: env.TVSCORES_PATH_PREFIX || "/tvscores",
   /** Public base the app reaches us at; used for asset URLs in responses. */
-  publicBase: env.TVSCORES_PUBLIC_BASE || "https://srv1822832.tailf78112.ts.net/tvscores",
+  publicBase: env.TVSCORES_PUBLIC_BASE || "https://tvscores.julienmalige.com",
   /**
    * Which competitions to keep, per provider. `badge` names a trimmed PNG in
    * proxy/assets/leagues (built by scripts/build-badges.py) served by this proxy.

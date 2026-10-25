@@ -34,7 +34,7 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleLocalizations: [en, fr, pt, es]
-        TVScoresProxyURL: https://srv1822832.tailf78112.ts.net/tvscores
+        TVScoresProxyURL: https://tvscores.julienmalige.com
         UIUserInterfaceStyle: Automatic
         ITSAppUsesNonExemptEncryption: false
     settings:
