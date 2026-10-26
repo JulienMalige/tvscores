@@ -74,6 +74,7 @@ struct SettingsScreen: View {
             let args = ProcessInfo.processInfo.arguments
             if let i = args.firstIndex(of: "-TVScoresSettings"), i + 1 < args.count {
                 page = ["countries": .countries, "competitions": .competitions, "language": .language, "apps": .apps, "openApps": .openApps][args[i + 1]] ?? .top
+                if page == .openApps, !Edition.current.hasTesterTools { page = .top }
             }
         }
     }
@@ -126,10 +127,13 @@ struct SettingsScreen: View {
             }
             Section("settings.about") {
                 fact("settings.version", version)
-                Button { page = .openApps } label: {
-                    LabeledContent("settings.openApps") { Text(verbatim: "\(apps.count)") }
+                // A tester's page only: the store build has no row for it (`Edition`).
+                if Edition.current.hasTesterTools {
+                    Button { page = .openApps } label: {
+                        LabeledContent("settings.openApps") { Text(verbatim: "\(apps.count)") }
+                    }
+                    .accessibilityIdentifier("settings.openApps")
                 }
-                .accessibilityIdentifier("settings.openApps")
             }
         }
     }

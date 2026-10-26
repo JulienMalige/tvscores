@@ -15,7 +15,7 @@ import UIKit
 /// Nothing personal goes: no name, no address, an anonymous id made once
 /// per install. Without a proxy address — the simulator's test runs, the
 /// bundled demo — the lines are still kept and written to the system log,
-/// and never posted.
+/// and never posted. The store build never posts either (`Edition`).
 @MainActor
 final class Diagnostics {
     static let shared = Diagnostics()
@@ -29,11 +29,7 @@ final class Diagnostics {
     private let started = Date()
 
     private init() {
-        if case .remote(let base) = ScoreboardSource.resolve() {
-            endpoint = base.appending(path: "v1/diag")
-        } else {
-            endpoint = nil
-        }
+        endpoint = Self.endpoint(source: ScoreboardSource.resolve(), edition: .current)
         let defaults = UserDefaults.standard
         if let id = defaults.string(forKey: "diag.device") {
             device = id
@@ -42,6 +38,12 @@ final class Diagnostics {
             defaults.set(id, forKey: "diag.device")
             device = id
         }
+    }
+
+    /// Where the lines go: the proxy's, for a tester's build that has one.
+    static func endpoint(source: ScoreboardSource, edition: Edition) -> URL? {
+        guard edition.hasTesterTools, case .remote(let base) = source else { return nil }
+        return base.appending(path: "v1/diag")
     }
 
     /// Start writing. Idempotent.

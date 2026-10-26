@@ -66,6 +66,21 @@ just took it. Leaving it open sent the same note to two builds in a row before
 the job did this itself. So the only thing to do by hand before a release is
 write the entry.
 
+**The store build** is the one to submit to Apple for review:
+
+```sh
+gh workflow run testflight.yml --repo JulienMalige/tvscores -f store=true
+```
+
+It is an ordinary TestFlight build with `TVScoresEdition` = `store` in its
+Info.plist (`app/Sources/Services/Edition.swift`): Settings has no "Open apps
+(test)" row and the trace is never posted, so App Privacy has no diagnostics to
+declare. Every other build is a tester's and keeps both. The line is drawn at
+build time because nothing at run time tells a reviewer from a tester: App
+Review runs a build in StoreKit's sandbox, as TestFlight does. Install the store
+build from TestFlight and check Settings before submitting it. The job fails if
+the archived Info.plist does not carry the edition it was asked for.
+
 The build number is the workflow run number, so every run is unique. The
 marketing version comes from `MARKETING_VERSION` in `app/project.yml`; bump it
 there for a new version. Processing in App Store Connect takes a few minutes,

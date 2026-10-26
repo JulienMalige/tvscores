@@ -5,6 +5,25 @@ import Testing
 /// The chrome: what the menu is built from, and what it is fed.
 @Suite("Chrome")
 struct ChromeTests {
+    @Test("only a build marked for the store is the store's; anything else is a tester's")
+    func editionReadsInfoPlist() {
+        #expect(Edition(info: ["TVScoresEdition": "store"]) == .store)
+        #expect(Edition(info: ["TVScoresEdition": "tester"]) == .tester)
+        #expect(Edition(info: [:]) == .tester, "a build without the key, Xcode's own")
+        #expect(Edition(info: ["TVScoresEdition": "$(TVSCORES_EDITION)"]) == .tester, "a setting left unexpanded")
+        #expect(!Edition.store.hasTesterTools)
+        #expect(Edition.tester.hasTesterTools)
+    }
+
+    @Test("the trace goes to the proxy from a tester's build only")
+    @MainActor
+    func traceStaysHomeInTheStoreBuild() throws {
+        let base = try #require(URL(string: "https://tvscores.example"))
+        #expect(Diagnostics.endpoint(source: .remote(base), edition: .tester)?.absoluteString == "https://tvscores.example/v1/diag")
+        #expect(Diagnostics.endpoint(source: .remote(base), edition: .store) == nil, "the store build posts nothing")
+        #expect(Diagnostics.endpoint(source: .bundled(), edition: .tester) == nil, "nor does the demo")
+    }
+
     @Test("the league list survives a refresh that changed nothing but scores")
     @MainActor
     func leagueListIsStable() async {

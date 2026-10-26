@@ -24,3 +24,17 @@ final class AppsSettingsFlow: FlowCase {
         XCTAssertFalse(app.buttons["settings.app.canalplus"].exists, "and a French app is not, with only the US chosen")
     }
 }
+
+/// Settings, About: the "Open apps (test)" row is a tester's, absent from the store build.
+final class StoreEditionFlow: FlowCase {
+    func testATestersBuildOffersTheOpenAppsPage() {
+        let app = Flow.launch(extra: ["-TVScoresSettings", "top"], ready: "Settings")
+        XCTAssertTrue(app.buttons["settings.openApps"].waitForExistence(timeout: 10), "a tester can try every app's links")
+    }
+
+    func testTheStoreBuildHasNoOpenAppsPage() {
+        let app = Flow.launch(extra: ["-TVScoresSettings", "top", "-TVScoresStoreEdition"], ready: "Settings")
+        XCTAssertTrue(app.buttons["settings.language"].waitForExistence(timeout: 10), "the top list is up")
+        XCTAssertFalse(app.buttons["settings.openApps"].waitForExistence(timeout: 3), "the store build has no test page")
+    }
+}

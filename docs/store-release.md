@@ -29,17 +29,18 @@ What stands between TestFlight and the public store, and what Julien decided.
   the es-ES store the app may go blank on matchdays; the remedy, if it matters,
   is a fallback host or an address that is not shared.
 
+- **The store build** (2026-10-26): the build submitted to Apple is made with
+  the TestFlight workflow's `store: true` (`docs/release.md`). It has no
+  "Open apps (test)" row in Settings, which a reviewer reads as a debug page,
+  and never posts the diagnostic trace, so App Privacy has no diagnostics to
+  declare. Every other build keeps both. A run-time check could not do this:
+  App Review runs a build in StoreKit's sandbox, as TestFlight does, so it
+  would have shown the reviewer the tester's page.
+
 ## Still to do
 
 Free, can be done now:
 
-- Hide Settings > About > Open apps (test) from the store version: a reviewer
-  reads it as a debug page. TestFlight and the App Store ship the same Release
-  binary, so this needs a check at run time (TestFlight or the store), not a
-  build setting: the television runs TestFlight builds and needs the page.
-- The diagnostic trace (`POST /v1/diag`): off in the store version by the same
-  run-time check (it stays on TestFlight until the menu has been used on the
-  television, AGENTS.md), or declared in App Privacy as diagnostics.
 - A privacy policy page and a support page, each at a public URL.
 - The App Privacy form, the age rating and the content rights questionnaires.
 - The store listing in fr-FR, en-US, pt-BR, es-ES: name, subtitle,
