@@ -47,6 +47,13 @@ test("leaves our own URLs and empty values alone", () => {
   assert.equal(m.entries.size, 0);
 });
 
+test("a host that only starts like ours is someone else's", () => {
+  const m = mirror(fakeFetch({}));
+  const lookalike = `${BASE}.elsewhere.example/a.png`;
+  assert.match(m.url(lookalike), /\/v1\/img\/[0-9a-f]{40}$/, "mirrored, not passed through");
+  assert.equal(m.entries.size, 1);
+});
+
 test("fetches the bytes once, then serves them from disk", async () => {
   const f = fakeFetch({});
   const m = mirror(f);

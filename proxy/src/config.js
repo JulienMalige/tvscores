@@ -80,7 +80,11 @@ export const config = {
   ocBlacktopKey: readKey("TVSCORES_OCBLACKTOP_KEY", "ocblacktop.key"),
   /** TheSportsDB key for athlete cutouts and schedules; "3" is the public test key, capped so hard it is unusable for anything but a demo. */
   theSportsDbKey: readKey("TVSCORES_TSDB_KEY", "thesportsdb.key") || "3",
-  /** Optional URL prefix the reverse proxy leaves on the path (Tailscale serve --set-path). */
+  /**
+   * URL prefix stripped when a request still carries it. Neither front door
+   * sends one today (the Funnel strips its own /tvscores mount, the Cloudflare
+   * Tunnel adds none); kept for a reverse proxy that leaves its mount on.
+   */
   pathPrefix: env.TVSCORES_PATH_PREFIX || "/tvscores",
   /** Public base the app reaches us at; used for asset URLs in responses. */
   publicBase: env.TVSCORES_PUBLIC_BASE || "https://tvscores.julienmalige.com",

@@ -90,7 +90,7 @@ export class ImageMirror {
   /** Public URL for an upstream image, registering it for mirroring. */
   url(original) {
     if (!original) return undefined;
-    if (this.publicBase && original.startsWith(this.publicBase)) return original; // already ours
+    if (this.publicBase && original.startsWith(`${this.publicBase}/`)) return original; // already ours
     const key = ImageMirror.key(original);
     const entry = this.entries.get(key);
     if (entry) {

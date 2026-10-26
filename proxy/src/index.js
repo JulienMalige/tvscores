@@ -68,7 +68,7 @@ if (config.ocBlacktopKey) {
 const photos = new PhotoResolver({ store, key: config.theSportsDbKey, log });
 const images = new ImageMirror({ dir: join(config.cacheDir, "images"), publicBase: config.publicBase, log });
 const limits = Object.fromEntries(schedulers.filter((s) => s.quota).map((s) => [s.p.sport, s.quota.dailyQuota]));
-limits.photos = 1000; // TheSportsDB test key: ~30/min; a soft daily line for the health page
+limits.photos = 1000; // a soft daily line for the health page, well under the paid key's rate
 limits.footballBackup = 100; // API-Sports' free plan, for the Brasileirão's live numbers
 const backup = new LiveBackup({ key: config.apiSportsKey, meta: store.sportMeta("footballBackup"), log });
 const details = new EventDetails({ key: config.theSportsDbKey, store, log, backup });

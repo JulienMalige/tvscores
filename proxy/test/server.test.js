@@ -131,6 +131,19 @@ test("a country's flag is served flat and square, by its two-letter code only", 
   }
 });
 
+test("a path that still carries the /tvscores mount is served the same", async () => {
+  const s = await serve();
+  try {
+    const plain = await s.get("/v1/health");
+    const mounted = await fetch(`http://127.0.0.1:${s.port}${config.pathPrefix}/v1/health`);
+    assert.equal(plain.status, 200);
+    assert.equal(mounted.status, 200);
+    assert.equal((await s.get(`${config.pathPrefix}${config.pathPrefix}/v1/health`)).status, 404, "the mount is stripped once, not repeatedly");
+  } finally {
+    await s.close();
+  }
+});
+
 test("a television's trace is filed under its device, and junk is refused", async () => {
   const s = await serve();
   try {
