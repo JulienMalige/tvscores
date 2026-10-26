@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+
+## 1.0 build 45 — 26 October 2026
 - The app now reaches its server at an address of its own, tvscores.julienmalige.com, the
   one the App Store version will use. Nothing should look different: if scores, crests or
   photos stop loading, this is the change to blame.
