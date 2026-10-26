@@ -102,9 +102,9 @@ Built 2026-09-13 in `proxy/` (Node 22, no dependencies, see `proxy/README.md`).
 Runs on Julien's VPS as a systemd user service, public at
 `https://tvscores.julienmalige.com/v1/scoreboard?tz=<IANA tz>`: Julien's domain
 (2026-10-25), reaching the VPS through a Cloudflare Tunnel (`~/VPS.md`). Builds
-up to 44 carry the old Tailscale Funnel address,
-`https://srv1822832.tailf78112.ts.net/tvscores`, which stays up while they are
-installed: the same process answers both, with or without the `/tvscores` prefix.
+up to 44 used the Tailscale Funnel address,
+`https://srv1822832.tailf78112.ts.net/tvscores`, turned off on 2026-10-26 once
+build 45 worked on the television; they no longer reach the proxy.
 The app reads `/v1/scoreboard` and `/v1/standings/{sport}/{league}`, and loads
 images from `/v1/img/...` and `/v1/assets/...` which the scoreboard hands it.
 Rules: polling on a schedule, never per request; per-sport daily budget with a

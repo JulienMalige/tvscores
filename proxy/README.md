@@ -22,7 +22,8 @@ Node 22, no npm dependencies; the image mirror calls `python3` with Pillow to sh
 | `POST /v1/diag` | a television's trace — focus moves, menu selection, refreshes — appended to `traces/<device>.log` under the cache directory, capped at 512 KB per device. Anonymous device id, no personal data; the only way to watch a real Apple TV without a Mac |
 
 Responses carry `Cache-Control: public, max-age=30`. The server also accepts the
-`/tvscores` prefix so it can sit behind `tailscale funnel --set-path /tvscores`.
+`/tvscores` prefix (`TVSCORES_PATH_PREFIX`), for a reverse proxy that leaves its
+mount on the path.
 
 Event shape: see `src/model.js`. Team events have `home/away {name, nick, short}`,
 `score {home, away}`, `status {state, clock, detail}` with `state` one of
@@ -150,18 +151,15 @@ holds that logic and its tests.
 ```bash
 # keys: files under ~/.config/tvscores/ (thesportsdb.key, ocblacktop.key, livetennisapi.key)
 npm start                      # http://127.0.0.1:8787
-./deploy/install.sh            # systemd --user service + Tailscale Funnel mount (re-adds /tvscores)
+./deploy/install.sh            # systemd --user service
 journalctl --user -u tvscores-proxy -f
 ```
 
 Public URL: `https://tvscores.julienmalige.com/v1/scoreboard`, a Cloudflare Tunnel to
 the VPS since 2026-10-25; the tunnel lives outside this repository (`~/.cloudflared`,
-recorded in `~/VPS.md`). The Tailscale Funnel mount,
-`https://srv1822832.tailf78112.ts.net/tvscores/v1/scoreboard`, still serves the board to
-builds up to 44: Tailscale strips its `/tvscores` before the request arrives, so both
-doors send the same paths. Image links carry `TVSCORES_PUBLIC_BASE`, one host for every
-build, so build 44 loads its pictures through the tunnel too. When the Funnel is retired,
-take its line out of `deploy/install.sh`, or the next run reopens it.
+recorded in `~/VPS.md`); it sends paths without a prefix. Image links carry
+`TVSCORES_PUBLIC_BASE`. Builds up to 44 used the Tailscale Funnel mount
+`https://srv1822832.tailf78112.ts.net/tvscores`, turned off on 2026-10-26.
 
 Cloudflare caches the PNGs at fixed addresses (`/v1/assets/...`) at its edge for their
 max-age: flags a year, teams a week, leagues a day. After redrawing one, purge the zone's

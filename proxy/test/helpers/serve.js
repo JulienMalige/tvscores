@@ -14,8 +14,7 @@ export async function serve(extra = {}) {
   return {
     store,
     port,
-    // Paths as production sends them: Tailscale's Funnel strips its /tvscores
-    // mount and the Cloudflare Tunnel adds none.
+    // Paths as production sends them: the Cloudflare Tunnel adds no prefix.
     get: (path, headers) => fetch(`http://127.0.0.1:${port}${path}`, { headers }),
     close: () => new Promise((done) => app.close(done)),
   };

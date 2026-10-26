@@ -81,9 +81,9 @@ export const config = {
   /** TheSportsDB key for athlete cutouts and schedules; "3" is the public test key, capped so hard it is unusable for anything but a demo. */
   theSportsDbKey: readKey("TVSCORES_TSDB_KEY", "thesportsdb.key") || "3",
   /**
-   * URL prefix stripped when a request still carries it. Neither front door
-   * sends one today (the Funnel strips its own /tvscores mount, the Cloudflare
-   * Tunnel adds none); kept for a reverse proxy that leaves its mount on.
+   * URL prefix stripped when a request still carries it. The Cloudflare Tunnel
+   * sends none (nor did the retired Funnel mount, which stripped its own); kept
+   * for a reverse proxy that leaves its mount on.
    */
   pathPrefix: env.TVSCORES_PATH_PREFIX || "/tvscores",
   /** Public base the app reaches us at; used for asset URLs in responses. */

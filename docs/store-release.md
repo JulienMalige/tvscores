@@ -21,10 +21,9 @@ What stands between TestFlight and the public store, and what Julien decided.
   private). It reaches the VPS through a Cloudflare Tunnel: no port opened, and
   the name points at Cloudflare, not at the machine. The address is what every
   build carries, so the host behind it can change later without a new build.
-  Image links follow the proxy's `TVSCORES_PUBLIC_BASE`, one host for every
-  build: since 2026-10-25 build 44 loads its pictures through the tunnel too,
-  and only its board still uses the Tailscale Funnel, which stays up while it
-  is installed.
+  Image links follow the proxy's `TVSCORES_PUBLIC_BASE`, on the server. The
+  Tailscale Funnel address that builds up to 44 carry was turned off on
+  2026-10-26, once build 45 worked on the television.
   Known limit: Spanish ISPs block Cloudflare's shared addresses during LaLiga
   matches, under a court order in force for 2026-27 (Euronews, 2026-09-18). On
   the es-ES store the app may go blank on matchdays; the remedy, if it matters,
