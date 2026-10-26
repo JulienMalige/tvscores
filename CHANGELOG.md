@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- The app now reaches its server at an address of its own, tvscores.julienmalige.com, the
+  one the App Store version will use. Nothing should look different: if scores, crests or
+  photos stop loading, this is the change to blame.
 
 ## 1.0 build 44 — 5 October 2026
 - The country flags beside the channels (and any other picture the menu's refresh did not

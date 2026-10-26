@@ -173,8 +173,9 @@ writes its own number is a bug, and rows all use `rowSurface(focused:)`.
 - **The store release** (`docs/store-release.md`): free, and the takedown risk
   on crests and photos accepted (Julien, 2026-10-16); the proxy's address is
   his domain (2026-10-25). Still his to decide: the sources whose terms forbid
-  public use (the MotoGP feed's "prototyping only" tier; tennis and the TV
-  guides, unstated).
+  public use (Orange Cat Blacktop's "prototyping" tier, which carries F1 and
+  MotoGP; Jolpica's non-commercial F1 flags; tennis and the TV guides,
+  unstated), and the badges in the public repository.
 - **A seven-day Upcoming for football** needs a source with date ranges; the
   free plan serves yesterday to tomorrow only. See `docs/data-providers.md`.
 - Leagues in the MVP: Premier League, Champions League, NFL, NBA, F1, MotoGP,

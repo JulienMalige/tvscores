@@ -150,15 +150,22 @@ holds that logic and its tests.
 ```bash
 # keys: files under ~/.config/tvscores/ (thesportsdb.key, ocblacktop.key, livetennisapi.key)
 npm start                      # http://127.0.0.1:8787
-./deploy/install.sh            # systemd --user service + Tailscale Funnel mount
+./deploy/install.sh            # systemd --user service + Tailscale Funnel mount (re-adds /tvscores)
 journalctl --user -u tvscores-proxy -f
 ```
 
-Public URL: `https://tvscores.julienmalige.com/v1/scoreboard` (a Cloudflare Tunnel to
-the VPS, since 2026-10-25). The Tailscale Funnel mount,
-`https://srv1822832.tailf78112.ts.net/tvscores/v1/scoreboard`, still serves the builds
-up to 44; `TVSCORES_PATH_PREFIX` strips its `/tvscores`, and a path without it is
-served as is. `TVSCORES_PUBLIC_BASE` sets the host written into image links.
+Public URL: `https://tvscores.julienmalige.com/v1/scoreboard`, a Cloudflare Tunnel to
+the VPS since 2026-10-25; the tunnel lives outside this repository (`~/.cloudflared`,
+recorded in `~/VPS.md`). The Tailscale Funnel mount,
+`https://srv1822832.tailf78112.ts.net/tvscores/v1/scoreboard`, still serves the board to
+builds up to 44: Tailscale strips its `/tvscores` before the request arrives, so both
+doors send the same paths. Image links carry `TVSCORES_PUBLIC_BASE`, one host for every
+build, so build 44 loads its pictures through the tunnel too. When the Funnel is retired,
+take its line out of `deploy/install.sh`, or the next run reopens it.
+
+Cloudflare caches the PNGs at fixed addresses (`/v1/assets/...`) at its edge for their
+max-age: flags a year, teams a week, leagues a day. After redrawing one, purge the zone's
+cache in Cloudflare's dashboard, or fresh installs keep the old picture.
 
 Cache lives in `~/.local/state/tvscores/` and survives restarts; on an upstream
 failure the last good data is served and `stale` turns true after 6 h without a
@@ -168,8 +175,9 @@ do it only when the stored shape actually changed.
 
 ## Rights
 
-Everything under `assets/` is someone else's trademark, redistributed from a
-public repository. That is a deliberate, recorded risk for the MVP (see
-`docs/data-providers.md`); before the store release the badges either come from
-a paid tier that licenses them or the app falls back to the monograms it
-already draws.
+The badges under `assets/leagues` and `assets/teams` are someone else's
+trademarks, redistributed from a public repository; `assets/flags` is the
+flag-icons set (MIT). Julien accepted the takedown risk for the store release
+(2026-10-16, `docs/store-release.md`): if a rights holder objects, that badge
+gives way to the monogram the app already draws. What stays open is the files
+sitting in this public repository; that note weighs the ways out.
