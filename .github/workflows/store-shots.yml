@@ -87,8 +87,21 @@ jobs:
             shot 6-menu -TVScoresTab today -TVScoresMenuOpen
           done
           ls -R store
+          # Not for the store: the Formula 1 drivers' table on live data, to
+          # see the flags the proxy gives it.
+          mkdir -p checks
+          xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+          SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores \
+            -TVScoresTab today -TVScoresLeague f1 -TVScoresTable drivers -AppleLanguages "(en)" -AppleLocale en_US > /dev/null
+          sleep 18
+          xcrun simctl io "$UDID" screenshot checks/f1-drivers-en.png > /dev/null
 
       - uses: actions/upload-artifact@v4
         with:
           name: store-shots
           path: app/store
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: checks
+          path: app/checks
