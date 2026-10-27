@@ -9,6 +9,8 @@ notes when a version ships.
 ## Unreleased
 - Settings: Open apps moves from About to a Debug section of its own at the bottom, which
   only TestFlight builds have; the App Store version will not show it.
+- The international friendlies are named in your language: Matchs amicaux, Amistosos, rather
+  than Friendlies, in the menu, in Settings and above their games.
 
 ## 1.0 build 45 — 26 October 2026
 - The app now reaches its server at an address of its own, tvscores.julienmalige.com, the

@@ -146,12 +146,20 @@ struct ChromePictureTests {
     }
 
     @Test("a language chosen in Settings is the one every string is read in, at once")
-    func chosenLanguageIsLive() {
+    func chosenLanguageIsLive() throws {
         let before = LanguageChoice.current
         defer { LanguageChoice.set(before) }
+        let url = try #require(Bundle.main.url(forResource: "sample-scoreboard", withExtension: "json"))
+        let board = try ScoreboardDecoder.make().decode(Scoreboard.self, from: Data(contentsOf: url))
+        let friendlies = try #require(board.leagues.first { $0.id.raw == "4562" })
         LanguageChoice.set("pt")
         #expect(LanguageChoice.locale.identifier == "pt")
         #expect(String(localized: "settings.none", bundle: LanguageChoice.bundle) == "Nenhum", "read in Portuguese, not the process's language")
+        // One test, not two: tests run side by side, and the choice is the app's.
+        LanguageChoice.set("fr")
+        #expect(friendlies.menu == "Matchs amicaux", "a competition named in plain words, from the board already read")
+        #expect(LeagueRef(friendlies).name == "Matchs amicaux internationaux", "and on its page")
+        #expect(board.leagues.first { $0.id.raw == "4328" }?.menu == "Premier League", "while a brand keeps its own name")
         LanguageChoice.set(nil)
         #expect(LanguageChoice.bundle == Bundle.main, "the Apple TV's own when none is chosen")
     }
