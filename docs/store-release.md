@@ -54,28 +54,34 @@ What stands between TestFlight and the public store, and what Julien decided.
   visitor, the tunnel's log names Cloudflare's edge rather than the viewer,
   and the trace is a tester's only. App Privacy is answered to match it.
 
+- **Sold everywhere but China mainland** (Julien, 2026-10-27), which wants a
+  government ICP filing number: 174 of Apple's 175 territories, and any it
+  adds later (`availableInNewTerritories`).
+
 ## Still to do
 
 Free, can be done now:
 
-- App Privacy: "Data Not Collected", as the policy says. The API offers no
-  way to it, so Julien answers it on the App Store Connect website.
-- The age rating: every answer None or No (no ads, gambling, web view, user
-  content or chat), which should come out 4+. Prepared on 2026-10-27, entered
-  once Julien agrees.
-- The countries the app is sold in: App Store Connect has none chosen yet.
-- App Review's contact: the name, phone number and email Apple's reviewers
-  may call.
+- App Review's contact: Julien Malige, `support@julienmalige.com`, no sign-in
+  to give. Apple refuses it without a phone number written with `+` and the
+  country code, which only Julien can give.
+- The EU's trader status (Digital Services Act), Julien's to declare on the
+  website: Business → Compliance → Digital Services Act. Until then the 27 EU
+  countries, France, Spain and Portugal among them, read
+  `TRADER_STATUS_NOT_PROVIDED` and the app cannot be sold there.
 - The content rights question (whether the app has the rights to the
   third-party content it shows) waits on the sources below.
 
-Done: the store page is in App Store Connect since 2026-10-27, its words in
-fr-FR, en-US, pt-BR and es-ES, the category, the copyright and the free price
-(`docs/store-listing.md`, sent by its push), and a first set of screenshots
-from live data (`store-shots.yml`), to be replaced by a busier day's, a Sunday
-afternoon. Live data sidesteps the demo samples' dead pictures (keys from
-before the mirror's `VERSION` 2, 404 on both hosts, since about 2026-10-03);
-those still want rekeying for the CI's own demo screenshots.
+Done, all on 2026-10-27: the store page, its words in fr-FR, en-US, pt-BR and
+es-ES, the category, the copyright and the free price (`docs/store-listing.md`,
+sent by its push), and a first set of screenshots from live data
+(`store-shots.yml`), to be replaced by a busier day's, a Sunday afternoon. Live
+data sidesteps the demo samples' dead pictures (keys from before the mirror's
+`VERSION` 2, 404 on both hosts, since about 2026-10-03); those still want
+rekeying for the CI's own demo screenshots. App Privacy says "Data Not
+Collected", as the policy does (Julien, on the website: the API has no way to
+it). The age rating is 4+, and Brazil's own L, from every answer None or No:
+no ads, gambling, web view, user content or chat.
 
 Julien's decisions:
 
