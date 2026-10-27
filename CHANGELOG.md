@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+
+## 1.0 build 46 — 27 October 2026
 - Settings: Open apps moves from About to a Debug section of its own at the bottom, which
   only TestFlight builds have; the App Store version will not show it.
 - The international friendlies are named in your language: Matchs amicaux, Amistosos, rather
