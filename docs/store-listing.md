@@ -40,8 +40,12 @@ with `<lang>` = `en`, `fr`, `pt`, `es`.
 Screenshots: `.github/workflows/store-shots.yml`, six per language at
 3840x2160, on live data with that storefront's language, clock and channels
 (Spain uses the US list, which carries the Spanish-language channels). Run
-it when the board is busy; the pictures show whatever is on. The push sends
-the words only: the pictures are still to be uploaded.
+it when the board is busy; the pictures show whatever is on. Look at them,
+then `gh run download <run id> -n store-shots -D <folder>` and
+`node scripts/store-shots.mjs <folder>` replace each language's set in App
+Store Connect and wait until Apple has accepted every picture, which took
+several minutes on 2026-10-27. The set uploaded that day (run 40505250408, a
+Tuesday midday) stands in until a busier day's.
 
 ## en-US
 

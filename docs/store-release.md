@@ -58,16 +58,24 @@ What stands between TestFlight and the public store, and what Julien decided.
 
 Free, can be done now:
 
-- The App Privacy form, the age rating and the content rights questionnaires.
-- The screenshots. The listing's words in fr-FR, en-US, pt-BR and es-ES, the
-  category, the copyright and the free price are in App Store Connect since
-  2026-10-27 (`docs/store-listing.md`, sent by its push). The pictures come
-  from live data (`store-shots.yml`): taken when the board is busy, a Sunday
-  afternoon, then uploaded. Live data sidesteps the demo samples' dead
-  pictures (keys from before the mirror's `VERSION` 2, 404 on both hosts,
-  since about 2026-10-03); those still want rekeying for the CI's own demo
-  screenshots.
+- App Privacy: "Data Not Collected", as the policy says. The API offers no
+  way to it, so Julien answers it on the App Store Connect website.
+- The age rating: every answer None or No (no ads, gambling, web view, user
+  content or chat), which should come out 4+. Prepared on 2026-10-27, entered
+  once Julien agrees.
 - The countries the app is sold in: App Store Connect has none chosen yet.
+- App Review's contact: the name, phone number and email Apple's reviewers
+  may call.
+- The content rights question (whether the app has the rights to the
+  third-party content it shows) waits on the sources below.
+
+Done: the store page is in App Store Connect since 2026-10-27, its words in
+fr-FR, en-US, pt-BR and es-ES, the category, the copyright and the free price
+(`docs/store-listing.md`, sent by its push), and a first set of screenshots
+from live data (`store-shots.yml`), to be replaced by a busier day's, a Sunday
+afternoon. Live data sidesteps the demo samples' dead pictures (keys from
+before the mirror's `VERSION` 2, 404 on both hosts, since about 2026-10-03);
+those still want rekeying for the CI's own demo screenshots.
 
 Julien's decisions:
 

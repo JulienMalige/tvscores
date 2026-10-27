@@ -12,7 +12,7 @@ import { asc } from './asc.mjs'
 
 const FILE = join(dirname(fileURLToPath(import.meta.url)), '..', 'docs', 'store-listing.md')
 const BUNDLE_ID = 'com.julienmalige.tvscores'
-const LOCALES = ['en-US', 'fr-FR', 'pt-BR', 'es-ES']
+export const LOCALES = ['en-US', 'fr-FR', 'pt-BR', 'es-ES']
 // App Store Connect's limits, in characters.
 const LIMITS = { Subtitle: 30, 'Promotional text': 170, Keywords: 100, Description: 4000 }
 // The lines every locale shares ("- Name: TV Scores"). <lang> in a value is
@@ -80,15 +80,22 @@ export function problems (listing) {
   return found
 }
 
-/** Sends the listing to the tvOS version being prepared: each field that
- *  differs, each locale App Store Connect lacks, the category, the copyright
- *  and the free price. `call` is the API (a stand-in in the tests). */
-export async function push (listing, { call = asc, dryRun = false, log = console.log } = {}) {
-  const send = (path, method, data, included) => dryRun ? null : call(path, { method, body: JSON.stringify({ data, included }) })
+/** The app, its information and its tvOS version, as long as App Store
+ *  Connect still lets them change. `call` is the API (a stand-in in the tests). */
+export async function openVersion (call = asc) {
   const app = (await call(`/v1/apps?filter[bundleId]=${BUNDLE_ID}`)).data.find((a) => a.attributes.bundleId === BUNDLE_ID)
   const info = (await call(`/v1/apps/${app.id}/appInfos?include=primaryCategory`)).data.find((i) => EDITABLE.includes(i.attributes.state))
   const version = (await call(`/v1/apps/${app.id}/appStoreVersions?filter[platform]=TV_OS`)).data.find((v) => EDITABLE.includes(v.attributes.appVersionState))
   if (!info || !version) throw new Error('no tvOS version open for changes: add the next version in App Store Connect first')
+  return { app, info, version }
+}
+
+/** Sends the listing to the tvOS version being prepared: each field that
+ *  differs, each locale App Store Connect lacks, the category, the copyright
+ *  and the free price. */
+export async function push (listing, { call = asc, dryRun = false, log = console.log } = {}) {
+  const send = (path, method, data, included) => dryRun ? null : call(path, { method, body: JSON.stringify({ data, included }) })
+  const { app, info, version } = await openVersion(call)
 
   for (const [type, owner, parent, names] of [
     ['appInfoLocalizations', 'appInfo', info, INFO_FIELDS],

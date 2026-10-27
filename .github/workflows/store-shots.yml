@@ -4,6 +4,7 @@ name: Store screenshots
 # each store language, on live data, with that storefront's clock and
 # channels. Run it by hand when the board is busy, a weekend afternoon in
 # Europe, rather than on every push: the screens show whatever is on.
+# scripts/store-shots.mjs then sends the artifact to App Store Connect.
 on:
   workflow_dispatch:
 
