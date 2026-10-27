@@ -13,7 +13,7 @@ app/          tvOS app (SwiftUI). Xcode project generated from app/project.yml w
 proxy/        caching proxy that runs on Julien's VPS. Owns every provider key.
 site/         the app's website (home, privacy, support) in the four languages; the proxy serves it outside /v1/.
 docs/         decisions, provider terms, release notes, the roadmap (docs/roadmap.md). One markdown file per topic.
-scripts/      repository tooling: the audit, the brand assets (drawn as geometry), the site's screenshots, the App Store Connect client.
+scripts/      repository tooling: the audit, the brand assets (drawn as geometry), the site's screenshots, the App Store Connect client and the store listing's push.
 CHANGELOG.md  what each TestFlight build changed, for whoever installs it.
 .claude/      the source-hygiene skill. Personal settings there are gitignored.
 ```

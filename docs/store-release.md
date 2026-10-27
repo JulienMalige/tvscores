@@ -59,12 +59,15 @@ What stands between TestFlight and the public store, and what Julien decided.
 Free, can be done now:
 
 - The App Privacy form, the age rating and the content rights questionnaires.
-- The store listing in fr-FR, en-US, pt-BR, es-ES: drafted in
-  `docs/store-listing.md` (2026-10-27), waiting for Julien's word, then to be
-  entered in App Store Connect. Its screenshots come from live data
-  (`store-shots.yml`), which sidesteps the demo samples' dead pictures (keys
-  from before the mirror's `VERSION` 2, 404 on both hosts, since about
-  2026-10-03); those still want rekeying for the CI's own demo screenshots.
+- The screenshots. The listing's words in fr-FR, en-US, pt-BR and es-ES, the
+  category, the copyright and the free price are in App Store Connect since
+  2026-10-27 (`docs/store-listing.md`, sent by its push). The pictures come
+  from live data (`store-shots.yml`): taken when the board is busy, a Sunday
+  afternoon, then uploaded. Live data sidesteps the demo samples' dead
+  pictures (keys from before the mirror's `VERSION` 2, 404 on both hosts,
+  since about 2026-10-03); those still want rekeying for the CI's own demo
+  screenshots.
+- The countries the app is sold in: App Store Connect has none chosen yet.
 
 Julien's decisions:
 

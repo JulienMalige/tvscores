@@ -1,9 +1,14 @@
 # The App Store listing
 
 The words and pictures of the store page, in its four languages (AGENTS.md:
-fr-FR, en-US, pt-BR, es-ES). Draft of 2026-10-27, for Julien to approve; they
-then go to App Store Connect, where the app's primary language is en-US.
-`node scripts/store-listing.mjs` checks every field against Apple's limits.
+fr-FR, en-US, pt-BR, es-ES). Written on 2026-10-27 and entered in App Store
+Connect the same day at Julien's word ("Yes please"); the app's primary
+language there is en-US. This file is the source: change the words here, then
+`node scripts/store-listing.mjs` checks every field against Apple's limits and
+`node scripts/store-listing.mjs push` sends whatever differs to the tvOS
+version being prepared (`--dry-run` lists it first). Apple once answered a
+change with a 500 and took it on the next try (2026-10-27): run the push
+again, it sends only what is left.
 
 What the words follow:
 
@@ -35,7 +40,8 @@ with `<lang>` = `en`, `fr`, `pt`, `es`.
 Screenshots: `.github/workflows/store-shots.yml`, six per language at
 3840x2160, on live data with that storefront's language, clock and channels
 (Spain uses the US list, which carries the Spanish-language channels). Run
-it when the board is busy; the pictures show whatever is on.
+it when the board is busy; the pictures show whatever is on. The push sends
+the words only: the pictures are still to be uploaded.
 
 ## en-US
 
