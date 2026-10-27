@@ -47,7 +47,7 @@ const NATIONALITY_ISO = {
   Canadian: "CA", French: "FR", German: "DE", Finnish: "FI", Danish: "DK", Thai: "TH", Japanese: "JP", Chinese: "CN",
   American: "US", Brazilian: "BR", Argentine: "AR", "New Zealander": "NZ", Swiss: "CH", Belgian: "BE", Austrian: "AT",
   Russian: "RU", Polish: "PL", Swedish: "SE", Irish: "IE", Colombian: "CO", Indonesian: "ID", Venezuelan: "VE",
-  Italy: "IT", "The Netherlands": "NL", Netherlands: "NL", "United Kingdom": "GB", England: "GB", Scotland: "GB",
+  Italy: "IT", "The Netherlands": "NL", Netherlands: "NL", Holland: "NL", USA: "US", "United Kingdom": "GB", England: "GB", Scotland: "GB",
   Wales: "GB", Spain: "ES", Monaco: "MC", Australia: "AU", Mexico: "MX", Canada: "CA", France: "FR", Germany: "DE",
   Finland: "FI", Denmark: "DK", Thailand: "TH", Japan: "JP", China: "CN", "United States": "US", Brazil: "BR",
   Argentina: "AR", "New Zealand": "NZ", Switzerland: "CH", Belgium: "BE", Austria: "AT", Russia: "RU", Poland: "PL",

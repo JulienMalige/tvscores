@@ -216,3 +216,14 @@ test("one round's classification failing does not stop the calendar, and is aske
   assert.ok(season[1].resultsFetchedAt, "the other one is");
   assert.ok(logged.some((m) => m.includes("results failed")));
 });
+
+test("the drivers' table carries their flags too, whatever the spelling", async (t) => {
+  const { motorsportProvider } = await import("../src/providers/ocblacktop.js");
+  t.mock.method(globalThis, "fetch", async (url) => {
+    const drivers = [{ position: 1, firstName: "Nico", lastName: "Hülkenberg", points: "12", teams: [{ shortName: "Audi" }] }];
+    return new Response(JSON.stringify({ data: url.endsWith("/standings/drivers") ? drivers : [] }));
+  });
+  const p = motorsportProvider({ sport: "formula1", league: F1, key: "k", quota: { spendable: () => 50, record: () => {} }, nationalities: async () => ({ hulkenberg: "Germany" }) });
+  const { tables } = await p.standings();
+  assert.equal(tables[0].rows[0].flag, "🇩🇪");
+});

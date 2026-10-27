@@ -1,5 +1,6 @@
 import { getJson } from "../http.js";
 import { STATE, flag, flagIso2, shortName } from "../model.js";
+import { surname } from "../photos.js";
 import { classify } from "./ocb-rows.js";
 import { sessionResults } from "./ocb-sessions.js";
 
@@ -97,7 +98,7 @@ export function motorsportProvider({ sport, league, key, quota, log = () => {}, 
               value: Math.round(Number(d.points)),
               code: d.code || undefined,
               color: d.teams?.[0]?.color || undefined,
-              flag: flag(nats[d.lastName]),
+              flag: flag(nats[surname(d.lastName)]),
             })),
           },
           {
