@@ -15,7 +15,7 @@ on:
         required: false
         type: string
       store:
-        description: Store build, the one to submit to Apple (no "Open apps (test)" page, no trace)
+        description: Store build, the one to submit to Apple (no Debug section in Settings, no trace)
         required: false
         type: boolean
         default: false

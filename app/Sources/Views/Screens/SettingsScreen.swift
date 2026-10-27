@@ -7,7 +7,7 @@ import SwiftUI
 /// next list in on the right while the left explains it, and Back returns.
 ///
 /// - the top: Competitions, Where to watch, Language (each with its value),
-///   Sources, Version;
+///   Sources, Version, and in a tester's build Debug, with Open apps;
 /// - Competitions: every competition by family, ticked to show it, with a
 ///   handle to move it up or down (build 36);
 /// - Where to watch: a checklist of countries — none, one or several;
@@ -15,7 +15,7 @@ import SwiftUI
 struct SettingsScreen: View {
     /// Every competition the proxy serves, shown or not.
     let leagues: [LeagueSummary]
-    /// The apps How to Watch points at, for the "Open apps (test)" page.
+    /// The apps How to Watch points at, for the Apps page and Debug's Open apps.
     var apps: [String: WatchApp] = [:]
 
     @State private var page = SettingsPage.top
@@ -127,12 +127,17 @@ struct SettingsScreen: View {
             }
             Section("settings.about") {
                 fact("settings.version", version)
-                // A tester's page only: the store build has no row for it (`Edition`).
-                if Edition.current.hasTesterTools {
+            }
+            // A tester's tools: the store build has no Debug section (`Edition`).
+            if Edition.current.hasTesterTools {
+                Section {
                     Button { page = .openApps } label: {
                         LabeledContent("settings.openApps") { Text(verbatim: "\(apps.count)") }
                     }
                     .accessibilityIdentifier("settings.openApps")
+                } header: {
+                    Text("settings.debug")
+                        .accessibilityIdentifier("settings.debug")
                 }
             }
         }

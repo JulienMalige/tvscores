@@ -1435,6 +1435,35 @@
         }
       }
     },
+    "settings.debug": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Debug"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Débogage"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Depuração"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Depuración"
+          }
+        }
+      }
+    },
     "settings.language": {
       "extractionState": "manual",
       "localizations": {
@@ -1644,25 +1673,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open apps (test)"
+            "value": "Open apps"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ouvrir les apps (test)"
+            "value": "Ouvrir les apps"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Abrir apps (teste)"
+            "value": "Abrir apps"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Abrir apps (prueba)"
+            "value": "Abrir apps"
           }
         }
       }

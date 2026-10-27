@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Settings, "Open apps (test)": every app How to Watch can point at, to try its links
+/// Settings, Debug, "Open apps": every app How to Watch can point at, to try its links
 /// from this Apple TV. tvOS documents no way to open another app, so what opens is
 /// found out here, and every try goes to the trace (`AppOpener`), where it is read to
 /// improve the table. Selecting an app tries its links in turn and shows what it tried.

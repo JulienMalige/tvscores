@@ -149,7 +149,7 @@ jobs:
             sleep 12
             xcrun simctl io "$UDID" screenshot "shots/settings-$page-fr.png"
           done
-          # The store build's Settings: no "Open apps (test)" row under About.
+          # The store build's Settings: no Debug section at the bottom.
           xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
           SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab today -TVScoresSettings top -TVScoresStoreEdition -channelCountries "(FR,US)" -AppleLanguages "(fr)"
           sleep 12

@@ -25,16 +25,18 @@ final class AppsSettingsFlow: FlowCase {
     }
 }
 
-/// Settings, About: the "Open apps (test)" row is a tester's, absent from the store build.
+/// Settings, Debug: a tester's section, with Open apps; the store build has none.
 final class StoreEditionFlow: FlowCase {
-    func testATestersBuildOffersTheOpenAppsPage() {
+    func testATestersBuildHasTheDebugSection() {
         let app = Flow.launch(extra: ["-TVScoresSettings", "top"], ready: "Settings")
-        XCTAssertTrue(app.buttons["settings.openApps"].waitForExistence(timeout: 10), "a tester can try every app's links")
+        XCTAssertTrue(app.staticTexts["settings.debug"].waitForExistence(timeout: 10), "a tester's Settings ends with Debug")
+        XCTAssertTrue(app.buttons["settings.openApps"].exists, "where a tester can try every app's links")
     }
 
-    func testTheStoreBuildHasNoOpenAppsPage() {
+    func testTheStoreBuildHasNoDebugSection() {
         let app = Flow.launch(extra: ["-TVScoresSettings", "top", "-TVScoresStoreEdition"], ready: "Settings")
         XCTAssertTrue(app.buttons["settings.language"].waitForExistence(timeout: 10), "the top list is up")
-        XCTAssertFalse(app.buttons["settings.openApps"].waitForExistence(timeout: 3), "the store build has no test page")
+        XCTAssertFalse(app.buttons["settings.openApps"].waitForExistence(timeout: 3), "the store build has no Open apps")
+        XCTAssertFalse(app.staticTexts["settings.debug"].exists, "nor a Debug section")
     }
 }

@@ -73,8 +73,8 @@ gh workflow run testflight.yml --repo JulienMalige/tvscores -f store=true
 ```
 
 It is an ordinary TestFlight build with `TVScoresEdition` = `store` in its
-Info.plist (`app/Sources/Services/Edition.swift`): Settings has no "Open apps
-(test)" row and the trace is never posted, so App Privacy has no diagnostics to
+Info.plist (`app/Sources/Services/Edition.swift`): Settings has no Debug section
+(Open apps) and the trace is never posted, so App Privacy has no diagnostics to
 declare. Every other build is a tester's and keeps both. The line is drawn at
 build time because nothing at run time tells a reviewer from a tester: App
 Review runs a build in StoreKit's sandbox, as TestFlight does. Install the store

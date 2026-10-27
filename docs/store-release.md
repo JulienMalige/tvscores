@@ -30,12 +30,15 @@ What stands between TestFlight and the public store, and what Julien decided.
   is a fallback host or an address that is not shared.
 
 - **The store build** (2026-10-26): the build submitted to Apple is made with
-  the TestFlight workflow's `store: true` (`docs/release.md`). It has no
-  "Open apps (test)" row in Settings, which a reviewer reads as a debug page,
-  and never posts the diagnostic trace, so App Privacy has no diagnostics to
-  declare. Every other build keeps both. A run-time check could not do this:
-  App Review runs a build in StoreKit's sandbox, as TestFlight does, so it
-  would have shown the reviewer the tester's page.
+  the TestFlight workflow's `store: true` (`docs/release.md`). It has no Debug
+  section in Settings (Open apps), which a reviewer could take for an
+  unfinished app, and never posts the diagnostic trace, so App Privacy has no
+  diagnostics to declare. Every other build keeps both. A run-time check could
+  not do this: App Review runs a build in StoreKit's sandbox, as TestFlight
+  does, so it would have shown the reviewer the tester's page. Tools for
+  testers go in that Debug section (Julien, 2026-10-27, keeping Open apps on
+  TestFlight: "Like a debug. We can add a debug section with this kind of
+  thing").
 
 ## Still to do
 
