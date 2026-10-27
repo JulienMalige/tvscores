@@ -56,15 +56,16 @@ jobs:
           APP=$(find build/Build/Products -name 'TVScores.app' -maxdepth 2 | head -1)
           xcrun simctl install "$UDID" "$APP"
           # A storefront: its language, its clock, its country's channels, the
-          # sport of its "where to watch" game and the competition it opens.
-          # Spain has no channel list of its own; the US one carries the
-          # Spanish-language channels.
+          # game to show where to watch, the finished game, and the competition
+          # it opens. Games are named best first (Sidebar.openRequestedGame):
+          # what is on decides which one opens. Spain has no channel list of
+          # its own; the US one carries the Spanish-language channels.
           for spec in \
-            "fr-FR fr fr_FR Europe/Paris FR football 4334" \
-            "en-US en en_US America/New_York US nfl nfl" \
-            "pt-BR pt-BR pt_BR America/Sao_Paulo BR football 4351" \
-            "es-ES es es_ES Europe/Madrid US football 4335"; do
-            read -r store lang locale zone countries watch league <<< "$spec"
+            "fr-FR fr fr_FR Europe/Paris FR scheduled:football:4334:tv|scheduled:football:tv final:football:4334|final:football:4328|final:football 4334" \
+            "en-US en en_US America/New_York US scheduled:nfl:tv|live:nfl:tv|scheduled:football:tv final:football:4328|final:football nfl" \
+            "pt-BR pt-BR pt_BR America/Sao_Paulo BR scheduled:football:4351:tv|scheduled:football:tv final:football:4351|final:football 4351" \
+            "es-ES es es_ES Europe/Madrid US scheduled:football:4335:tv|scheduled:football:tv final:football:4335|final:football 4335"; do
+            read -r store lang locale zone countries watch final league <<< "$spec"
             mkdir -p "store/$store"
             shot() { # $1 file name, then the app's arguments
               local name=$1
@@ -76,10 +77,12 @@ jobs:
               xcrun simctl io "$UDID" screenshot "store/$store/$name.png" > /dev/null
             }
             shot 1-today -TVScoresTab today
-            shot 2-watch -TVScoresTab today -TVScoresGame "scheduled:$watch:tv"
-            shot 3-game -TVScoresTab today -TVScoresGame final:football
-            shot 4-race -TVScoresTab today -TVScoresRace f1
-            shot 5-league -TVScoresTab today -TVScoresLeague "$league"
+            shot 2-watch -TVScoresTab today -TVScoresGame "$watch"
+            shot 3-game -TVScoresTab today -TVScoresGame "$final"
+            # The weekend with a result if the board still holds it, else the next.
+            shot 4-race -TVScoresTab today -TVScoresRace "f1|f1:next"
+            # Its games to come above its table, rather than an empty today.
+            shot 5-league -TVScoresTab upcoming -TVScoresLeague "$league"
             shot 6-menu -TVScoresTab today -TVScoresMenuOpen
           done
           ls -R store

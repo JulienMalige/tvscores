@@ -235,4 +235,20 @@ struct ModelTests {
         let bare = try ScoreboardDecoder.make().decode(GameDetail.self, from: Data(#"{"stats":[],"timeline":[]}"#.utf8))
         #expect(bare.periods == nil && bare.venue == nil)
     }
+
+    @Test("a launch argument's choices are tried in turn, by state, sport and competition")
+    @MainActor
+    func launchRequestPicksTheFirstChoiceOnTheBoard() throws {
+        let board = try ScoreboardDecoder.make().decode(Scoreboard.self, from: Self.sample("sample-scoreboard"))
+        let nfl = try #require(LaunchRequest.game("live:cricket|scheduled:nfl:4391", in: board), "no cricket: the NFL game")
+        #expect(nfl.sport == "nfl")
+        #expect(LaunchRequest.game("scheduled:nfl:4328", in: board) == nil, "the NFL's games are not the Premier League's")
+        #expect(LaunchRequest.game("final:cricket", in: board) == nil)
+
+        let races = try ScoreboardDecoder.make().decode(Scoreboard.self, from: Self.sample("sample-race"))
+        let raced = try #require(LaunchRequest.race("nascar|f1", in: races), "no NASCAR: the Formula 1 weekend")
+        #expect(raced.sport == "f1" && !(raced.results ?? []).isEmpty, "the one with a result")
+        #expect(LaunchRequest.race("f1:next", in: races)?.status.state == .scheduled)
+        #expect(LaunchRequest.race("nascar", in: races) == nil)
+    }
 }

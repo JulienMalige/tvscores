@@ -4,6 +4,12 @@ import XCTest
 /// reachable by remote.
 final class RaceScreenFlow: FlowCase {
 
+    func testASeriesWithNoWeekendGivesWayToTheNextChoice() {
+        // No NASCAR in the sample: the Formula 1 weekend with a result opens instead.
+        let app = Flow.launch(tab: "yesterday", extra: ["-TVScoresSample", "race", "-TVScoresRace", "nascar|f1"], ready: "Race Result")
+        XCTAssertTrue(app.staticTexts.matching(identifier: "result.1").firstMatch.waitForExistence(timeout: 12), "the race page is open")
+    }
+
     func testClassificationListsFinishersInOrderAndIsScrollable() {
         // A week with a classified Grand Prix in it, whatever this week holds.
         let app = Flow.launch(tab: "yesterday", extra: ["-TVScoresSample", "race", "-TVScoresRace", "f1"], ready: "Race Result")

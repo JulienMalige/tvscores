@@ -206,16 +206,11 @@ struct Sidebar: View {
         selection = .league(Self.key(hit))
     }
 
-    /// `-TVScoresGame final` opens the first game in that state (CI screenshots).
+    /// `-TVScoresGame final` opens the first game in that state (CI
+    /// screenshots); `LaunchRequest` reads the rest of what it can say.
     private func openRequestedGame() {
-        // "final" or "final:football" — a state, and the sport to take it
-        // from; "scheduled:nfl:tv", one that has channels.
         guard let wanted = Self.argument("-TVScoresGame"), let board = store.board else { return }
-        let parts = wanted.split(separator: ":").map(String.init)
-        game = Day.allCases.flatMap { board.groups(for: $0) }.flatMap(\.events)
-            .first { $0.kind == .match && $0.status.state.rawValue == parts.first
-                && (parts.count < 2 || $0.sport == parts[1])
-                && (parts.count < 3 || parts[2] != "tv" || $0.channelList != nil) }
+        game = LaunchRequest.game(wanted, in: board)
     }
 
     static func key(_ league: LeagueSummary) -> String { "\(league.sport):\(league.id.raw)" }

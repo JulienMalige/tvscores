@@ -12,6 +12,13 @@ final class GameScreenFlow: FlowCase {
         XCTAssertTrue(app.buttons["watch.nfl"].exists, "and the NFL's own app, last")
         XCTAssertFalse(app.buttons["watch.canalplus"].exists, "no French app: the demo's country is the US")
     }
+
+    func testAChoiceThatFindsNothingGivesWayToTheNext() {
+        // The store's screenshots name several games, best first: no cricket
+        // is on, so the NFL game with channels opens, found by its competition.
+        let app = Flow.launch(extra: ["-TVScoresGame", "live:cricket|scheduled:nfl:4391:tv"], ready: "How to Watch")
+        XCTAssertTrue(app.buttons["watch.espn"].waitForExistence(timeout: 10), "the second choice's game is open")
+    }
 }
 
 /// Settings, Apps to show: every app How to Watch can offer, to turn off.
