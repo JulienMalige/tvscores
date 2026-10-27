@@ -1,0 +1,90 @@
+name: Store screenshots
+
+# The App Store's pictures (docs/store-listing.md): the same six screens in
+# each store language, on live data, with that storefront's clock and
+# channels. Run it by hand when the board is busy, a weekend afternoon in
+# Europe, rather than on every push: the screens show whatever is on.
+on:
+  workflow_dispatch:
+
+jobs:
+  shots:
+    name: Store screenshots on live data
+    runs-on: macos-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure a tvOS simulator runtime exists
+        run: |
+          if ! xcrun simctl list runtimes | grep -q tvOS; then
+            sudo xcodebuild -downloadPlatform tvOS
+          fi
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      # As the store build: no Debug section, and no trace sent from the runner.
+      - name: Build for tvOS simulator
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project TVScores.xcodeproj \
+            -scheme TVScores \
+            -destination 'generic/platform=tvOS Simulator' \
+            -derivedDataPath build \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            TVSCORES_EDITION=store \
+            build 2>&1 | tee build.log | grep -E "error:|BUILD" || true
+          grep -q "BUILD SUCCEEDED" build.log
+
+      - name: Take the screenshots
+        run: |
+          set -euo pipefail
+          UDID=$(xcrun simctl list devices available -j \
+            | jq -r '.devices | to_entries[] | select(.key | test("tvOS")) | .value[] | select(.name | test("^Apple TV( 4K)?")) | .udid' \
+            | head -1)
+          xcrun simctl boot "$UDID" 2>/dev/null || true
+          xcrun simctl bootstatus "$UDID" -b
+          APP=$(find build/Build/Products -name 'TVScores.app' -maxdepth 2 | head -1)
+          xcrun simctl install "$UDID" "$APP"
+          # A storefront: its language, its clock, its country's channels, the
+          # sport of its "where to watch" game and the competition it opens.
+          # Spain has no channel list of its own; the US one carries the
+          # Spanish-language channels.
+          for spec in \
+            "fr-FR fr fr_FR Europe/Paris FR football 4334" \
+            "en-US en en_US America/New_York US nfl nfl" \
+            "pt-BR pt-BR pt_BR America/Sao_Paulo BR football 4351" \
+            "es-ES es es_ES Europe/Madrid US football 4335"; do
+            read -r store lang locale zone countries watch league <<< "$spec"
+            mkdir -p "store/$store"
+            shot() { # $1 file name, then the app's arguments
+              local name=$1
+              shift
+              xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+              SIMCTL_CHILD_TZ="$zone" xcrun simctl launch "$UDID" com.julienmalige.tvscores "$@" \
+                -AppleLanguages "($lang)" -AppleLocale "$locale" -channelCountries "($countries)" > /dev/null
+              sleep 18
+              xcrun simctl io "$UDID" screenshot "store/$store/$name.png" > /dev/null
+            }
+            shot 1-today -TVScoresTab today
+            shot 2-watch -TVScoresTab today -TVScoresGame "scheduled:$watch:tv"
+            shot 3-game -TVScoresTab today -TVScoresGame final:football
+            shot 4-race -TVScoresTab today -TVScoresRace f1
+            shot 5-league -TVScoresTab today -TVScoresLeague "$league"
+            shot 6-menu -TVScoresTab today -TVScoresMenuOpen
+          done
+          ls -R store
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: store-shots
+          path: app/store
