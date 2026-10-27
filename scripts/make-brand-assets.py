@@ -10,6 +10,9 @@ icon on the Apple TV then floats the lines above the court.
 Apple's rules this follows: one centred subject, a safe margin of 10-15% per
 layer because the layers shift, and a fully opaque bottom layer.
 
+The website's marks (site/img) are the same court: a vector for the page and
+the browser tab, a PNG for a phone's home screen.
+
     python3 scripts/make-brand-assets.py
 """
 from __future__ import annotations
@@ -23,6 +26,7 @@ from PIL import Image, ImageDraw
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CATALOG = ROOT / "app" / "Resources" / "Assets.xcassets"
 BRAND = CATALOG / "App Icon & Top Shelf Image.brandassets"
+SITE_IMG = ROOT / "site" / "img"
 
 # Lit from the top left and falling to a deeper blue at the bottom right,
 # as in the chosen render.
@@ -81,11 +85,11 @@ def middle_layer(size):
     return drawn(size, paint)
 
 
-def front_layer(size):
+def front_layer(size, line=LINE):
     """The white lines."""
     def paint(d, box):
         x, y, cw, ch = box
-        t = cw * LINE
+        t = cw * line
         white = (255, 255, 255, 255)
         half = t / 2
         d.rounded_rectangle((x - half, y - half, x + cw + half, y + ch + half),
@@ -140,11 +144,37 @@ def imageset(path, size_1x, scales, render):
     write_json(path / "Contents.json", {"images": images})
 
 
-def top_shelf(size):
+def top_shelf(size, line=LINE):
     img = back_layer(size)
     img.alpha_composite(middle_layer(size))
-    img.alpha_composite(front_layer(size))
+    img.alpha_composite(front_layer(size, line))
     return img.convert("RGB")
+
+
+def site_marks():
+    """The court for the website. Drawn small, as in a page's header or a
+    browser tab, the brand's line greys out, so the vector and the tab's PNG
+    carry a heavier one; the home-screen PNG is large enough for the brand's."""
+    s = 64
+    x, y, cw, ch = court_box((s, s))
+    t = cw * LINE * 1.8
+    rgb = lambda c: "#%02x%02x%02x" % c
+    f = lambda v: f"{v:.2f}".rstrip("0").rstrip(".")
+    lines = [f"M{f(x)} {f(y + ch * k)}H{f(x + cw)}" for k in SIDES]
+    lines += [f"M{f(x + cw * k)} {f(y + ch * SIDES[0])}V{f(y + ch * SIDES[1])}" for k in SERVICE]
+    lines += [f"M{f(x + cw * SERVICE[0])} {f(y + ch / 2)}H{f(x + cw * SERVICE[1])}", f"M{f(x + cw / 2)} {f(y)}V{f(y + ch)}"]
+    ends = "".join(f'<rect x="{f(x + cw * a)}" y="{f(y + ch * SIDES[0])}" width="{f(cw * (b - a))}" height="{f(ch * (SIDES[1] - SIDES[0]))}"/>'
+                   for a, b in ((0, SERVICE[0]), (SERVICE[1], 1)))
+    svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {s} {s}">'
+           f'<defs><linearGradient id="g" x2=".7" y2="1"><stop stop-color="{rgb(BLUE_LIGHT)}"/><stop offset="1" stop-color="{rgb(BLUE_DEEP)}"/></linearGradient></defs>'
+           f'<rect width="{s}" height="{s}" rx="{f(s * 0.22)}" fill="url(#g)"/>'
+           f'<g fill="#fff" fill-opacity=".08"><rect x="{f(x)}" y="{f(y)}" width="{f(cw)}" height="{f(ch)}" rx="{f(cw * CORNER)}"/>{ends}</g>'
+           f'<g fill="none" stroke="#fff" stroke-width="{f(t)}"><rect x="{f(x)}" y="{f(y)}" width="{f(cw)}" height="{f(ch)}" rx="{f(cw * CORNER)}"/>'
+           f'<path d="{"".join(lines)}"/></g></svg>\n')
+    SITE_IMG.mkdir(parents=True, exist_ok=True)
+    (SITE_IMG / "icon.svg").write_text(svg)
+    write_png(top_shelf((180, 180)), SITE_IMG / "icon-180.png")
+    write_png(top_shelf((32, 32), LINE * 2.6), SITE_IMG / "favicon-32.png")
 
 
 def main():
@@ -165,7 +195,8 @@ def main():
     imagestack(BRAND / "App Icon.imagestack", (400, 240), [1, 2])
     imageset(BRAND / "Top Shelf Image.imageset", (1920, 720), [1, 2], top_shelf)
     imageset(BRAND / "Top Shelf Image Wide.imageset", (2320, 720), [1, 2], top_shelf)
-    print("wrote", BRAND)
+    site_marks()
+    print("wrote", BRAND, "and", SITE_IMG)
 
 
 if __name__ == "__main__":

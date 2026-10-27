@@ -28,14 +28,14 @@ export function prepare(body, { tagOf = body, window = 0, now = Date.now() } = {
  * television asks for it every minute while a game is on.
  */
 /** Whether an If-None-Match holds our tag: one tag or a list of them, weakened or not. */
-function holds(header, etag) {
+export function holds(header, etag) {
   if (!header) return false;
   if (header.trim() === "*") return true;
   return header.split(",").some((t) => t.trim().replace(/^W\//, "") === etag);
 }
 
 /** Whether the client takes gzip: named, and not at q=0. */
-function takesGzip(header) {
+export function takesGzip(header) {
   const m = /(?:^|,)\s*gzip\s*(?:;\s*q\s*=\s*([0-9.]+))?\s*(?:,|$)/i.exec(header || "");
   return Boolean(m) && (m[1] === undefined || Number(m[1]) > 0);
 }

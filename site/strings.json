@@ -1,0 +1,110 @@
+{
+  "en": {
+    "name": "English",
+    "nav": {
+      "index": "Home",
+      "privacy": "Privacy",
+      "support": "Support"
+    },
+    "navLabel": "Pages",
+    "langLabel": "Language",
+    "titles": {
+      "index": "TV Scores: scores and where to watch, on Apple TV",
+      "privacy": "Privacy policy · TV Scores",
+      "support": "Support · TV Scores",
+      "notFound": "Page not found · TV Scores"
+    },
+    "descriptions": {
+      "index": "Scores, schedules and where to watch, for the competitions worth a television. For Apple TV.",
+      "privacy": "TV Scores collects no personal data: what leaves your Apple TV, and where it goes.",
+      "support": "Questions about TV Scores, and how to reach its maker.",
+      "notFound": "This page doesn't exist."
+    },
+    "notFound": {
+      "text": "This page doesn't exist.",
+      "back": "Back to the home page"
+    },
+    "footer": "TV Scores is not affiliated with the leagues, teams, players or broadcasters it shows. Apple TV and App Store are trademarks of Apple Inc."
+  },
+  "fr": {
+    "name": "Français",
+    "nav": {
+      "index": "Accueil",
+      "privacy": "Confidentialité",
+      "support": "Assistance"
+    },
+    "navLabel": "Pages",
+    "langLabel": "Langue",
+    "titles": {
+      "index": "TV Scores : scores et où regarder, sur Apple TV",
+      "privacy": "Politique de confidentialité · TV Scores",
+      "support": "Assistance · TV Scores",
+      "notFound": "Page introuvable · TV Scores"
+    },
+    "descriptions": {
+      "index": "Scores, calendriers et où regarder, pour les compétitions qui valent un écran de télévision. Pour l'Apple TV.",
+      "privacy": "TV Scores ne collecte aucune donnée personnelle : ce qui quitte votre Apple TV, et où cela va.",
+      "support": "Questions sur TV Scores, et comment joindre son auteur.",
+      "notFound": "Cette page n'existe pas."
+    },
+    "notFound": {
+      "text": "Cette page n'existe pas.",
+      "back": "Retour à l'accueil"
+    },
+    "footer": "TV Scores n'a aucun lien avec les ligues, équipes, joueurs ou diffuseurs qu'elle affiche. Apple TV et App Store sont des marques d'Apple Inc."
+  },
+  "pt": {
+    "name": "Português",
+    "nav": {
+      "index": "Início",
+      "privacy": "Privacidade",
+      "support": "Suporte"
+    },
+    "navLabel": "Páginas",
+    "langLabel": "Idioma",
+    "titles": {
+      "index": "TV Scores: placares e onde assistir, na Apple TV",
+      "privacy": "Política de privacidade · TV Scores",
+      "support": "Suporte · TV Scores",
+      "notFound": "Página não encontrada · TV Scores"
+    },
+    "descriptions": {
+      "index": "Placares, calendários e onde assistir, para as competições que merecem uma TV. Para Apple TV.",
+      "privacy": "O TV Scores não coleta dados pessoais: o que sai da sua Apple TV, e para onde vai.",
+      "support": "Dúvidas sobre o TV Scores, e como falar com quem o fez.",
+      "notFound": "Esta página não existe."
+    },
+    "notFound": {
+      "text": "Esta página não existe.",
+      "back": "Voltar ao início"
+    },
+    "footer": "O TV Scores não tem ligação com as ligas, equipes, jogadores ou emissoras que mostra. Apple TV e App Store são marcas da Apple Inc."
+  },
+  "es": {
+    "name": "Español",
+    "nav": {
+      "index": "Inicio",
+      "privacy": "Privacidad",
+      "support": "Soporte"
+    },
+    "navLabel": "Páginas",
+    "langLabel": "Idioma",
+    "titles": {
+      "index": "TV Scores: resultados y dónde verlo, en Apple TV",
+      "privacy": "Política de privacidad · TV Scores",
+      "support": "Soporte · TV Scores",
+      "notFound": "Página no encontrada · TV Scores"
+    },
+    "descriptions": {
+      "index": "Resultados, calendarios y dónde verlo, para las competiciones que merecen una tele. Para Apple TV.",
+      "privacy": "TV Scores no recoge datos personales: qué sale de tu Apple TV, y adónde va.",
+      "support": "Preguntas sobre TV Scores, y cómo contactar con su autor.",
+      "notFound": "Esta página no existe."
+    },
+    "notFound": {
+      "text": "Esta página no existe.",
+      "back": "Volver al inicio"
+    },
+    "footer": "TV Scores no tiene relación con las ligas, equipos, jugadores ni cadenas que muestra. Apple TV y App Store son marcas de Apple Inc."
+  }
+}

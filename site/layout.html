@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+<meta name="theme-color" content="#0c4ab8">
+<link rel="canonical" href="{{url}}">
+{{alternates}}
+<link rel="icon" href="/img/icon.svg" type="image/svg+xml">
+<link rel="icon" href="/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/img/icon-180.png">
+<link rel="stylesheet" href="/style.css">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="TV Scores">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:url" content="{{url}}">
+<meta property="og:image" content="{{base}}/img/shot-today.jpg">
+<meta property="og:locale" content="{{locale}}">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/{{lang}}/"><img src="/img/icon.svg" alt="" width="36" height="36"><span>TV Scores</span></a>
+  <nav class="nav" aria-label="{{navLabel}}">{{nav}}</nav>
+  <nav class="langs" aria-label="{{langLabel}}">{{langs}}</nav>
+</header>
+<main class="page-{{page}}">
+{{content}}
+</main>
+<footer class="bottom">
+  <nav aria-label="{{navLabel}}">{{footerNav}}</nav>
+  <p>{{footer}}</p>
+  <p>© 2026 Julien Malige</p>
+</footer>
+</body>
+</html>

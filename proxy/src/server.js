@@ -4,11 +4,13 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ASSETS = join(dirname(fileURLToPath(import.meta.url)), "..", "assets");
+const SITE = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "site");
 import { buildScoreboard, localDate, withTablePhotos, withBroadcasts } from "./scoreboard.js";
 import { slug } from "./model.js";
 import { createWatch } from "./watch.js";
 import { prepare, send, canonicalTz } from "./respond.js";
 import { appendTrace, POSTS_PER_MIN } from "./trace.js";
+import { createSite } from "./site.js";
 
 /** Crests and portraits change once in a blue moon; let the TV keep them. */
 const IMAGE_CACHE = "public, max-age=31536000, immutable"; // a year: a crest changes at a rebrand, and ImageMirror.VERSION is the lever
@@ -64,6 +66,13 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
     return JSON.parse(text);
   };
   let diagWindow = { at: 0, count: 0 };
+  // The website: a broken one costs its pages, never the data the televisions read.
+  let site;
+  try {
+    site = createSite(SITE, { publicBase: config.publicBase });
+  } catch (err) {
+    log(`site not loaded: ${err.message}`);
+  }
 
   const handle = (req, res) => {
     let url;
@@ -207,7 +216,7 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
       });
       return;
     }
-    if (path === "/v1/health" || path === "/") {
+    if (path === "/v1/health") {
       // Walks every mirrored file and every photo, so not on every ask.
       const prepared = remember("health", () => prepare({
         ok: true,
@@ -226,6 +235,7 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
       }), 3000);
       return send(res, 200, undefined, { "cache-control": "no-store" }, req, prepared);
     }
+    if (site && !path.startsWith("/v1/") && site.serve(req, res, path)) return;
     send(res, 404, { error: "not found" });
   };
 

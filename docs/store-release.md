@@ -40,11 +40,26 @@ What stands between TestFlight and the public store, and what Julien decided.
   TestFlight: "Like a debug. We can add a debug section with this kind of
   thing").
 
+- **The website** (2026-10-27, Julien: "we need to build a website"): the
+  pages Apple asks for live at the proxy's own address, served by the proxy
+  from `site/` (`proxy/src/site.js`): a home page, the privacy policy and the
+  support page, in the four store languages. The addresses to give App Store
+  Connect, per locale: `https://tvscores.julienmalige.com/<lang>/privacy` and
+  `/<lang>/support`, with `en` for en-US, `fr` for fr-FR, `pt` for pt-BR and
+  `es` for es-ES (the bare `/privacy` and `/support` pick the browser's
+  language). The contact is `support@julienmalige.com`, forwarded to Julien's
+  Gmail by Cloudflare Email Routing, so his own address stays off the page.
+  The policy says the store build collects nothing: the proxy logs no
+  visitor, the tunnel's log names Cloudflare's edge rather than the viewer,
+  and the trace is a tester's only. App Privacy is answered to match it.
+
 ## Still to do
 
 Free, can be done now:
 
-- A privacy policy page and a support page, each at a public URL.
+- Email Routing for `support@julienmalige.com`, which the website already
+  names: Julien turns it on in Cloudflare's dashboard (a verification link
+  comes to his Gmail).
 - The App Privacy form, the age rating and the content rights questionnaires.
 - The store listing in fr-FR, en-US, pt-BR, es-ES: name, subtitle,
   description, keywords, screenshots (the CI screenshots, 3840x2160). The demo

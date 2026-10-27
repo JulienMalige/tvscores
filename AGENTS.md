@@ -11,8 +11,9 @@ else.
 ```
 app/          tvOS app (SwiftUI). Xcode project generated from app/project.yml with XcodeGen.
 proxy/        caching proxy that runs on Julien's VPS. Owns every provider key.
+site/         the app's website (home, privacy, support) in the four languages; the proxy serves it outside /v1/.
 docs/         decisions, provider terms, release notes, the roadmap (docs/roadmap.md). One markdown file per topic.
-scripts/      repository tooling: the audit, the brand assets (drawn as geometry), the App Store Connect client.
+scripts/      repository tooling: the audit, the brand assets (drawn as geometry), the site's screenshots, the App Store Connect client.
 CHANGELOG.md  what each TestFlight build changed, for whoever installs it.
 .claude/      the source-hygiene skill. Personal settings there are gitignored.
 ```
@@ -83,6 +84,9 @@ Julien watches from Brazil (America/Sao_Paulo): capture `Resources/sample-scoreb
 - Swift, SwiftUI, Swift Concurrency (`async/await`). No Combine unless a framework forces it.
 - Minimum tvOS 18.0 (`app/project.yml`). Raise it only for a feature worth losing a TV over.
 - **Four languages from day one: French, English, Portuguese, Spanish.** Development language is English. Every user-facing string goes through a String Catalog (`Localizable.xcstrings`) with all four translations filled in before a feature is called done; no hard-coded strings in views. Store listing (name, subtitle, keywords, screenshots) is localised for the same four. Default store locales: fr-FR, en-US, pt-BR, es-ES; add pt-PT and es-MX as copies later if wanted.
+- **The privacy policy says what leaves the Apple TV** (`site/<lang>/privacy.html`, and
+  App Privacy in App Store Connect). A change to what the app sends, or to what the proxy
+  keeps, rewrites it in all four languages in the same commit.
 - Dates, times and team names are locale-aware: kickoff times in the viewer's time zone, day names via `Date.FormatStyle`, never hand-formatted.
 - Product name **TV Scores**, bundle id `com.julienmalige.tvscores`, Xcode scheme and target `TVScores`.
 - One feature per commit, with a message that says what changed for the user.
