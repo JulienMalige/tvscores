@@ -68,21 +68,37 @@ What stands between TestFlight and the public store, and what Julien decided.
   on the proxy, with no app update. The player photos come through the paid
   TheSportsDB key, their own rights under the takedown risk above.
 
-## Still to do
+## Submitted
 
-Free, can be done now:
+Version 1.0, with build 46 (the store build), went to App Review on
+2026-10-27 at 20:57 São Paulo time, once Julien had checked that build on the
+television (`WAITING_FOR_REVIEW`, review submission
+`b38ff0b5-ea0a-45db-b040-4257555d91f3`). With it:
 
-- The EU's trader status (Digital Services Act), Julien's to declare on the
-  website: Business → Compliance → Digital Services Act. Until then the 27 EU
-  countries, France, Spain and Portugal among them, read
-  `TRADER_STATUS_NOT_PROVIDED` and the app cannot be sold there.
-- The content rights question, at submission: yes, the app shows third-party
-  content, answered on the sources decision above.
+- **Content rights**: the app shows third-party content
+  (`USES_THIRD_PARTY_CONTENT`), on the sources decision above.
+- **A note for the reviewer**: no sign-in; the screens show the day's games,
+  from our own server, which caches licensed sports data; the menu opens with
+  Back, or a press left from the left edge.
+- **The privacy policy as text**, in each language: an Apple TV app must carry
+  the policy itself, since the television opens no link, and Apple turned the
+  submission away without it. `scripts/store-listing.mjs push` makes it from
+  `site/<lang>/privacy.html`, so the website stays the only copy.
+- **Release by hand**: once approved, the version waits ("Pending Developer
+  Release") for Julien's go; the release is then one call,
+  `POST /v1/appStoreVersionReleaseRequests`, or a button on the website.
 
-Done, all on 2026-10-27: the store page, its words in fr-FR, en-US, pt-BR and
+What can come back: Apple's reasons for a rejection arrive in App Store
+Connect (App Review) and by email to the account holder. A version under
+review can still be withdrawn, and changed, then sent again.
+
+## Done before the submission
+
+All on 2026-10-27: the store page, its words in fr-FR, en-US, pt-BR and
 es-ES, the category, the copyright and the free price (`docs/store-listing.md`,
-sent by its push), and a first set of screenshots from live data
-(`store-shots.yml`), to be replaced by a busier day's, a Sunday afternoon. Live
+sent by its push), and the screenshots, from that morning's live data
+(`store-shots.yml`); a busier day's, a Sunday afternoon, can go with the next
+version, since they are locked once submitted. Live
 data sidesteps the demo samples' dead pictures (keys from before the mirror's
 `VERSION` 2, 404 on both hosts, since about 2026-10-03); those still want
 rekeying for the CI's own demo screenshots. App Privacy says "Data Not
@@ -91,6 +107,9 @@ it). The age rating is 4+, and Brazil's own L, from every answer None or No:
 no ads, gambling, web view, user content or chat. App Review's contact is
 Julien, `support@julienmalige.com` and his mobile, with no sign-in to give;
 Apple refuses a contact without a phone, written with `+` and the country code.
+Julien declared himself a non-trader under the EU's Digital Services Act
+(Business → Compliance), and the 27 EU countries, which read
+`TRADER_STATUS_NOT_PROVIDED` until then, opened within a minute.
 
 Julien's decisions:
 
