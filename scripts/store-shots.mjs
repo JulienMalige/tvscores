@@ -51,6 +51,8 @@ export async function upload (folder, { call = asc, put = fetch, dryRun = false,
       attributes: { screenshotDisplayType: DISPLAY },
       relationships: { appStoreVersionLocalization: { data: { type: 'appStoreVersionLocalizations', id: localization.id } } }
     }))).data
+    // The old ones go first: a set holds ten at most. A run that fails
+    // halfway leaves the set short until it is run again.
     for (const old of present) await call(`/v1/appScreenshots/${old.id}`, { method: 'DELETE' })
     for (const shot of shots) {
       // A place is reserved, the parts go where Apple says, then the checksum closes it.

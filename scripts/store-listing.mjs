@@ -84,6 +84,7 @@ export function problems (listing) {
  *  Connect still lets them change. `call` is the API (a stand-in in the tests). */
 export async function openVersion (call = asc) {
   const app = (await call(`/v1/apps?filter[bundleId]=${BUNDLE_ID}`)).data.find((a) => a.attributes.bundleId === BUNDLE_ID)
+  if (!app) throw new Error(`no app with the bundle id ${BUNDLE_ID} in App Store Connect`)
   const info = (await call(`/v1/apps/${app.id}/appInfos?include=primaryCategory`)).data.find((i) => EDITABLE.includes(i.attributes.state))
   const version = (await call(`/v1/apps/${app.id}/appStoreVersions?filter[platform]=TV_OS`)).data.find((v) => EDITABLE.includes(v.attributes.appVersionState))
   if (!info || !version) throw new Error('no tvOS version open for changes: add the next version in App Store Connect first')
@@ -134,6 +135,7 @@ export async function push (listing, { call = asc, dryRun = false, log = console
     log('price: free')
     const { data: points } = await call(`/v1/apps/${app.id}/appPricePoints?filter[territory]=USA&limit=10`)
     const free = points.find((p) => Number(p.attributes.customerPrice) === 0)
+    if (!free) throw new Error('App Store Connect offers no free price point for the USA')
     // `${free}` names the price created along with the schedule, as Apple's own example does.
     await send('/v1/appPriceSchedules', 'POST', {
       type: 'appPriceSchedules',
