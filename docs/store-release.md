@@ -62,9 +62,6 @@ What stands between TestFlight and the public store, and what Julien decided.
 
 Free, can be done now:
 
-- App Review's contact: Julien Malige, `support@julienmalige.com`, no sign-in
-  to give. Apple refuses it without a phone number written with `+` and the
-  country code, which only Julien can give.
 - The EU's trader status (Digital Services Act), Julien's to declare on the
   website: Business → Compliance → Digital Services Act. Until then the 27 EU
   countries, France, Spain and Portugal among them, read
@@ -81,7 +78,9 @@ data sidesteps the demo samples' dead pictures (keys from before the mirror's
 rekeying for the CI's own demo screenshots. App Privacy says "Data Not
 Collected", as the policy does (Julien, on the website: the API has no way to
 it). The age rating is 4+, and Brazil's own L, from every answer None or No:
-no ads, gambling, web view, user content or chat.
+no ads, gambling, web view, user content or chat. App Review's contact is
+Julien, `support@julienmalige.com` and his mobile, with no sign-in to give;
+Apple refuses a contact without a phone, written with `+` and the country code.
 
 Julien's decisions:
 
