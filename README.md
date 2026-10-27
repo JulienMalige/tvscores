@@ -41,8 +41,7 @@ GitHub Actions macOS runners, which is the only place Xcode exists.
   2026-09-13: no App Store app uses the exact name, though "Scores TV" and
   "ScoreTV" exist, so the subtitle has to differentiate.
 - Launch languages French, English, Portuguese, Spanish, app and listing both.
-- Subtitles: "Matchs du jour et résultats", "Today's games, live", "Jogos de
-  hoje, ao vivo", "Partidos de hoy, en directo".
+- The store page's words and screenshots: [docs/store-listing.md](docs/store-listing.md).
 
 ## Status
 

@@ -59,11 +59,12 @@ What stands between TestFlight and the public store, and what Julien decided.
 Free, can be done now:
 
 - The App Privacy form, the age rating and the content rights questionnaires.
-- The store listing in fr-FR, en-US, pt-BR, es-ES: name, subtitle,
-  description, keywords, screenshots (the CI screenshots, 3840x2160). The demo
-  samples' pictures have been dead links since about 2026-10-03 (keys from
-  before the mirror's `VERSION` 2, 404 on both hosts): rekey or recapture them
-  before taking store screenshots in demo mode.
+- The store listing in fr-FR, en-US, pt-BR, es-ES: drafted in
+  `docs/store-listing.md` (2026-10-27), waiting for Julien's word, then to be
+  entered in App Store Connect. Its screenshots come from live data
+  (`store-shots.yml`), which sidesteps the demo samples' dead pictures (keys
+  from before the mirror's `VERSION` 2, 404 on both hosts, since about
+  2026-10-03); those still want rekeying for the CI's own demo screenshots.
 
 Julien's decisions:
 
