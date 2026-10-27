@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
-import { parse, problems, push } from '../store-listing.mjs'
+import { load, parse, privacyText, problems, push } from '../store-listing.mjs'
 
 const DOC = readFileSync(new URL('../../docs/store-listing.md', import.meta.url), 'utf8')
 const quiet = () => {}
@@ -26,8 +26,27 @@ function store ({ info = [], version = [], category = null, copyright = null, pr
   return { call, sent }
 }
 
-test('the listing in docs/ may go to the store', () => {
-  assert.deepEqual(problems(parse(DOC)), [])
+test('the listing in docs/, with the privacy pages of site/, may go to the store', () => {
+  assert.deepEqual(problems(load()), [])
+})
+
+test('Apple TV gets the privacy page as text: each heading over its paragraph, links spelt out', () => {
+  const html = '<article><h1>Privacy</h1>\n  <p class="updated">Updated</p>\n  <h2>Who</h2>\n  <p>Cloudflare &amp; co, under <a href="https://x.example/p">its policy</a>.\n Ask <a href="mailto:a@b.example">a@b.example</a>.</p></article>'
+  assert.equal(privacyText(html), 'Privacy\nUpdated\n\nWho\nCloudflare & co, under its policy (https://x.example/p). Ask a@b.example.')
+})
+
+test('each locale sends its own page, and French keeps its non-breaking spaces', () => {
+  const listing = load()
+  const fr = listing['fr-FR']['Privacy policy text']
+  assert.ok(fr.startsWith('Politique de confidentialité\n'))
+  assert.ok(fr.includes('\u00a0: support@julienmalige.com'))
+  for (const locale of ['en-US', 'pt-BR', 'es-ES']) assert.ok(!/[<>]/.test(listing[locale]['Privacy policy text']), locale)
+})
+
+test('a locale without its privacy text is held back', () => {
+  const listing = load()
+  delete listing['es-ES']['Privacy policy text']
+  assert.deepEqual(problems(listing), ['es-ES: no Privacy policy text, made from site/es/privacy.html'])
 })
 
 test('the lines every locale shares are read without their backticks', () => {
@@ -42,7 +61,7 @@ test('a price other than free is refused: push only knows free', () => {
 
 test('a locale the store lacks is added to the version being prepared, with its own pages', async () => {
   const { call, sent } = store()
-  await push(parse(DOC), { call, log: quiet })
+  await push(load(), { call, log: quiet })
   const fr = sent.find((s) => s.path === '/v1/appInfoLocalizations' && s.data.attributes.locale === 'fr-FR')
   assert.equal(fr.method, 'POST')
   assert.equal(fr.data.attributes.privacyPolicyUrl, 'https://tvscores.julienmalige.com/fr/privacy')
@@ -50,8 +69,8 @@ test('a locale the store lacks is added to the version being prepared, with its 
 })
 
 test('only the fields that differ are sent', async () => {
-  const listing = parse(DOC)
-  const { call, sent } = store({ info: [{ id: 'en', attributes: { locale: 'en-US', name: 'TV Scores', subtitle: listing['en-US'].Subtitle, privacyPolicyUrl: null } }] })
+  const listing = load()
+  const { call, sent } = store({ info: [{ id: 'en', attributes: { locale: 'en-US', name: 'TV Scores', subtitle: listing['en-US'].Subtitle, privacyPolicyUrl: null, privacyPolicyText: listing['en-US']['Privacy policy text'] } }] })
   await push(listing, { call, log: quiet })
   const en = sent.find((s) => s.path === '/v1/appInfoLocalizations/en')
   assert.equal(en.method, 'PATCH')
@@ -60,27 +79,27 @@ test('only the fields that differ are sent', async () => {
 
 test('the category, the copyright and the free price are set once', async () => {
   const fresh = store()
-  await push(parse(DOC), { call: fresh.call, log: quiet })
+  await push(load(), { call: fresh.call, log: quiet })
   assert.equal(fresh.sent.find((s) => s.path === '/v1/appInfos/info').data.relationships.primaryCategory.data.id, 'SPORTS')
   assert.equal(fresh.sent.find((s) => s.path === '/v1/appStoreVersions/v1').data.attributes.copyright, '2026 Julien Malige')
   assert.equal(fresh.sent.find((s) => s.path === '/v1/appPriceSchedules').included[0].relationships.appPricePoint.data.id, 'usa-free')
 
   const done = store({ category: 'SPORTS', copyright: '2026 Julien Malige', priced: true })
-  await push(parse(DOC), { call: done.call, log: quiet })
+  await push(load(), { call: done.call, log: quiet })
   assert.deepEqual(done.sent.filter((s) => !s.path.includes('Localizations')), [])
 })
 
 test('a dry run says what it would send and sends nothing', async () => {
   const { call, sent } = store()
   const said = []
-  await push(parse(DOC), { call, dryRun: true, log: (line) => said.push(line) })
+  await push(load(), { call, dryRun: true, log: (line) => said.push(line) })
   assert.deepEqual(sent, [])
-  assert.ok(said.includes('fr-FR: adds name, subtitle, privacyPolicyUrl'))
+  assert.ok(said.includes('fr-FR: adds name, subtitle, privacyPolicyUrl, privacyPolicyText'))
   assert.ok(said.includes('price: free'))
 })
 
 test('a version already sent to review is not touched', async () => {
   const { call, sent } = store({ state: 'WAITING_FOR_REVIEW' })
-  await assert.rejects(push(parse(DOC), { call, log: quiet }), /no tvOS version open for changes/)
+  await assert.rejects(push(load(), { call, log: quiet }), /no tvOS version open for changes/)
   assert.deepEqual(sent, [])
 })

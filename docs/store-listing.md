@@ -37,6 +37,11 @@ The same in every language:
 
 with `<lang>` = `en`, `fr`, `pt`, `es`.
 
+The privacy policy goes to the store a second time, as text: an Apple TV app
+must carry the policy itself, since the television opens no link, so `push`
+sends each locale's `site/<lang>/privacy.html` as plain text (Privacy Policy
+Text in App Store Connect). The website stays the only copy to write.
+
 Screenshots: `.github/workflows/store-shots.yml`, six per language at
 3840x2160, on live data with that storefront's language, clock and channels
 (Spain uses the US list, which carries the Spanish-language channels). Run

@@ -86,7 +86,9 @@ Julien watches from Brazil (America/Sao_Paulo): capture `Resources/sample-scoreb
 - **Four languages from day one: French, English, Portuguese, Spanish.** Development language is English. Every user-facing string goes through a String Catalog (`Localizable.xcstrings`) with all four translations filled in before a feature is called done; no hard-coded strings in views. Store listing (name, subtitle, keywords, screenshots) is localised for the same four. Default store locales: fr-FR, en-US, pt-BR, es-ES; add pt-PT and es-MX as copies later if wanted.
 - **The privacy policy says what leaves the Apple TV** (`site/<lang>/privacy.html`, and
   App Privacy in App Store Connect). A change to what the app sends, or to what the proxy
-  keeps, rewrites it in all four languages in the same commit.
+  keeps, rewrites it in all four languages in the same commit. The store holds
+  it as text too, for Apple TV, which opens no link: `node scripts/store-listing.mjs push`
+  sends the pages with the next version.
 - Dates, times and team names are locale-aware: kickoff times in the viewer's time zone, day names via `Date.FormatStyle`, never hand-formatted.
 - Product name **TV Scores**, bundle id `com.julienmalige.tvscores`, Xcode scheme and target `TVScores`.
 - One feature per commit, with a message that says what changed for the user.

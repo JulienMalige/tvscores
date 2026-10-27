@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 // Checks the store listing (docs/store-listing.md) against Apple's limits and
 // our own rules, and prints each field's length; `push` then sends it to App
-// Store Connect, changing only what differs there. Zero dependencies.
+// Store Connect, changing only what differs there. Apple TV shows the privacy
+// policy itself rather than its link, so push sends the website's page as text.
+// Zero dependencies.
 //
 //   node scripts/store-listing.mjs
 //   node scripts/store-listing.mjs push [--dry-run]
@@ -10,7 +12,9 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { asc } from './asc.mjs'
 
-const FILE = join(dirname(fileURLToPath(import.meta.url)), '..', 'docs', 'store-listing.md')
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
+const FILE = join(ROOT, 'docs', 'store-listing.md')
+const SITE = join(ROOT, 'site')
 const BUNDLE_ID = 'com.julienmalige.tvscores'
 export const LOCALES = ['en-US', 'fr-FR', 'pt-BR', 'es-ES']
 // App Store Connect's limits, in characters.
@@ -21,10 +25,12 @@ const SHARED = ['Name', 'Category', 'Price', 'Copyright', 'Support URL', 'Market
 // Names that belong to someone else: kept out of the keywords (guideline 2.3.7).
 const TRADEMARKS = ['nfl', 'nba', 'f1', 'motogp', 'premier', 'laliga', 'liga', 'serie a', 'bundesliga', 'ligue 1', 'champions', 'europa', 'brasileirão', 'libertadores', 'atp', 'wta', 'espn', 'canal', 'dazn', 'globo', 'apple']
 // Where each field goes in App Store Connect: the app's information, or the version's.
-const INFO_FIELDS = { Name: 'name', Subtitle: 'subtitle', 'Privacy policy URL': 'privacyPolicyUrl' }
+const INFO_FIELDS = { Name: 'name', Subtitle: 'subtitle', 'Privacy policy URL': 'privacyPolicyUrl', 'Privacy policy text': 'privacyPolicyText' }
 const VERSION_FIELDS = { Description: 'description', Keywords: 'keywords', 'Promotional text': 'promotionalText', 'Marketing URL': 'marketingUrl', 'Support URL': 'supportUrl' }
 // The states in which App Store Connect lets a version, and its app information, change.
 const EDITABLE = ['PREPARE_FOR_SUBMISSION', 'DEVELOPER_REJECTED', 'REJECTED', 'METADATA_REJECTED', 'INVALID_BINARY']
+// The entities a hand-written page of site/ may use.
+const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", nbsp: '\u00a0' }
 
 /** { locale: { field: text } } from the "## locale" and "### field" headings,
  *  and `shared`: the "- Field: value" lines that hold for every locale. */
@@ -45,6 +51,32 @@ export function parse (markdown) {
   return out
 }
 
+/** A page of site/ as plain text: its headings and paragraphs, a link's
+ *  address after its words, a mail address once. */
+export function privacyText (html) {
+  const blocks = [...html.matchAll(/<(h1|h2|p)\b[^>]*>([\s\S]*?)<\/\1>/g)].map(([, tag, inner]) => ({
+    heading: tag !== 'p',
+    text: inner
+      .replace(/<a href="mailto:[^"]*">([^<]*)<\/a>/g, '$1')
+      .replace(/<a href="([^"]*)">([^<]*)<\/a>/g, '$2 ($1)')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&(amp|lt|gt|quot|#39|nbsp);/g, (_, e) => ENTITIES[e])
+      .replace(/[ \t\r\n]+/g, ' ') // not \s, which would take French's non-breaking spaces too
+      .trim()
+  }))
+  // A heading sits right above its paragraph; a blank line parts the sections.
+  return blocks.map((b, i) => (i === 0 ? '' : blocks[i - 1].heading ? '\n' : '\n\n') + b.text).join('')
+}
+
+/** docs/store-listing.md, with each locale's privacy policy text from site/<lang>/privacy.html. */
+export function load () {
+  const listing = parse(readFileSync(FILE, 'utf8'))
+  for (const locale of LOCALES) {
+    if (listing[locale]) listing[locale]['Privacy policy text'] = privacyText(readFileSync(join(SITE, locale.slice(0, 2), 'privacy.html'), 'utf8'))
+  }
+  return listing
+}
+
 const words = (text) => text.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean)
 
 /** Every broken rule, as sentences; empty when the listing may go. */
@@ -63,6 +95,7 @@ export function problems (listing) {
       if (!text) found.push(`${locale}: no ${field}`)
       else if ([...text].length > limit) found.push(`${locale}: ${field} is ${[...text].length} characters, over ${limit}`)
     }
+    if (!fields['Privacy policy text']) found.push(`${locale}: no Privacy policy text, made from site/${locale.slice(0, 2)}/privacy.html`)
     const keywords = (fields.Keywords ?? '').split(',')
     if (/,\s|\s,/.test(fields.Keywords ?? '')) found.push(`${locale}: a space beside a comma in Keywords wastes a character`)
     if (new Set(keywords).size !== keywords.length) found.push(`${locale}: a keyword is listed twice`)
@@ -149,7 +182,7 @@ export async function push (listing, { call = asc, dryRun = false, log = console
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const listing = parse(readFileSync(FILE, 'utf8'))
+  const listing = load()
   for (const locale of LOCALES) {
     const fields = listing[locale] ?? {}
     console.log(`${locale}  ${Object.keys(LIMITS).map((f) => `${f} ${[...(fields[f] ?? '')].length}/${LIMITS[f]}`).join('  ')}`)
