@@ -17,6 +17,9 @@ export function normalise(name) {
     .replace(/\s+(jr|sr|ii|iii)$/, ""); // "Carlos Sainz Jr." and "Carlos Sainz" are the same name to us: two hits = ambiguous
 }
 
+/** "Nico Hülkenberg" -> "hulkenberg": where two sources' spellings of a driver meet. */
+export const surname = (name) => normalise(name).split(" ").at(-1);
+
 /** The name a row is looked up and cached under: full name for people, nothing for teams or abbreviations. */
 /**
  * TheSportsDB serves a 200 px version of any artwork at `<url>/preview`, a

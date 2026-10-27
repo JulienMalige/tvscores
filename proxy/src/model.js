@@ -41,11 +41,17 @@ export function team(name, code, { nick = false, logo } = {}) {
   return { name, short: code || OVERRIDES[name] || shortName(name), nick: nick ? nickname(name) : name, logo: logo || undefined };
 }
 
+// A nationality as the sources write it: Jolpica's "Dutch", TheSportsDB's "The Netherlands".
 const NATIONALITY_ISO = {
   Italian: "IT", Dutch: "NL", British: "GB", Spanish: "ES", Monegasque: "MC", Australian: "AU", Mexican: "MX",
   Canadian: "CA", French: "FR", German: "DE", Finnish: "FI", Danish: "DK", Thai: "TH", Japanese: "JP", Chinese: "CN",
   American: "US", Brazilian: "BR", Argentine: "AR", "New Zealander": "NZ", Swiss: "CH", Belgian: "BE", Austrian: "AT",
   Russian: "RU", Polish: "PL", Swedish: "SE", Irish: "IE", Colombian: "CO", Indonesian: "ID", Venezuelan: "VE",
+  Italy: "IT", "The Netherlands": "NL", Netherlands: "NL", "United Kingdom": "GB", England: "GB", Scotland: "GB",
+  Wales: "GB", Spain: "ES", Monaco: "MC", Australia: "AU", Mexico: "MX", Canada: "CA", France: "FR", Germany: "DE",
+  Finland: "FI", Denmark: "DK", Thailand: "TH", Japan: "JP", China: "CN", "United States": "US", Brazil: "BR",
+  Argentina: "AR", "New Zealand": "NZ", Switzerland: "CH", Belgium: "BE", Austria: "AT", Russia: "RU", Poland: "PL",
+  Sweden: "SE", Ireland: "IE", Colombia: "CO", Indonesia: "ID", Venezuela: "VE",
 };
 
 const ISO3_TO_2 = {
@@ -71,7 +77,7 @@ export function flagIso2(code) {
   return [...iso].map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65)).join("");
 }
 
-/** "Italian" -> "🇮🇹" (regional indicator pair); undefined when unknown. */
+/** "Italian" or "Italy" -> "🇮🇹" (regional indicator pair); undefined when unknown. */
 export function flag(nationality) {
   const iso = NATIONALITY_ISO[nationality];
   if (!iso) return undefined;

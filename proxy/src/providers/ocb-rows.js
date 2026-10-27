@@ -1,4 +1,5 @@
 import { flag } from "../model.js";
+import { surname } from "../photos.js";
 
 /**
  * Orange Cat Blacktop's result rows, turned into ours. Shared by a race, a
@@ -23,7 +24,7 @@ export const placed = (r) => /^\d+$/.test(String(r.position));
 
 /** Who it is: the fields every row carries, whatever the session. */
 export function driverFields(r, nationalities = {}) {
-  const nat = nationalities[r.driver?.lastName];
+  const nat = nationalities[surname(r.driver?.lastName)];
   return {
     driver: `${(r.driver?.firstName || "?")[0]}. ${r.driver?.lastName || "?"}`,
     fullName: [r.driver?.firstName, r.driver?.lastName].filter(Boolean).join(" ") || undefined,

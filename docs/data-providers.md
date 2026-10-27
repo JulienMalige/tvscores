@@ -9,7 +9,7 @@ Prices are as published on the dates checked; re-check before subscribing.
 | football-data.org | CL (+ 11 other football comps) | 10 calls/min, delayed scores and schedules, "free forever" | paid tiers up to €199/mo; +€29 deep-data add-on | Only on paid plans | Football only. Cleanest terms for a reviewer. |
 | TheSportsDB | all five incl. tennis | demo key, ~30/min, 10 results per call, no live | $9/mo Patreon: production key, V2 API, 2-min livescores | Requires the $9 plan | Crowd-sourced data, quality varies; cheapest single key for everything. |
 | balldontlie | NBA, NFL (separate subs) | 5 req/min, scores and standings, **no live** | $9.99/mo per sport (60/min, live); $159.99 all sports | Yes on paid | US leagues focus. |
-| Jolpica F1 (Ergast successor) | F1 results, standings, schedule | free, no key, volunteer-run | donation | Terms of use on GitHub, no commercial restriction stated | Results after the race, not live timing. Fine for "Race · Final". |
+| Jolpica F1 (Ergast successor) | F1 results, standings, schedule | free, no key, volunteer-run | donation | CC BY-NC-SA 4.0: non-commercial, credit, share-alike (`docs/motorsport-sources.md`) | Results after the race, not live timing. Development only since 2026-10-27. |
 | OpenF1 | F1 live timing | free, 3 req/s | contact for licence | **Non-commercial only** | Not usable in a store app without a licence. |
 | SportMonks | CL (football) | 2 leagues, 14-day trial of paid | €29/mo | Yes | Football only, no advantage over the two above for us. |
 | SportsDataIO / Sportradar | all five | trial with scrambled data | ~$99–149/mo per sport, sales for production | Yes | Enterprise tier, out of budget. |
@@ -51,9 +51,11 @@ sprint, race) and cleaner names ("Bahrain Grand Prix" where Jolpica had a
 placeholder). Endpoints: `GET /v1/{formula1|moto-gp}/events?limit=100`
 (`season` param is ignored, filter by `dateStart` year) and
 `GET /v1/{sport}/events/{eventId}/sessions/{sessionId}/results`. No driver
-nationality, so F1 flags come from one Jolpica driver-list call per day; MotoGP
-has no flags. Jolpica stays as the keyless fallback. Free tier is
-non-commercial: a paid OCB plan is due before the store release.
+nationality, so the F1 flags come from TheSportsDB's F1 teams, one list a day
+(`providers/sportsdb-drivers.js`; Jolpica's driver list until 2026-10-27);
+MotoGP has no flags. Jolpica stands in only on a proxy with no OCB key, in
+development. The free tier is "for prototyping and non-commercial projects",
+which the free, ad-free store app is (Julien, 2026-10-27).
 
 **Tennis, decided 2026-09-14:** livetennisapi.com free key (Julien's, stored at
 `~/.config/tvscores/livetennisapi.key`). Base `https://api.livetennisapi.com/api/public/v1`,
@@ -462,7 +464,8 @@ Blacktop, livetennisapi and Jolpica on their free tiers, the community TV
 guides. Nothing is bought for a public release yet. Before the app goes to
 anyone else, the licensing of every source is reviewed again
 (docs/motorsport-sources.md, docs/tennis-stats-sources.md,
-docs/broadcast-sources.md hold what was found).
+docs/broadcast-sources.md hold what was found). Reviewed for the store on
+2026-10-27: `docs/store-release.md` has what Julien decided.
 
 ## Live numbers for the Brasileirão from API-Sports (2026-10-03)
 

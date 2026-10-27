@@ -171,15 +171,13 @@ writes its own number is a bug, and rows all use `rowSurface(focused:)`.
 
 ## Open decisions (ask Julien, do not guess)
 
-- **Private beta, single user (Julien, 2026-10-03).** Every source stays on
-  its current tier while Julien is the only user; licensing is reviewed
-  again before the app reaches anyone else (docs/data-providers.md).
 - **The store release** (`docs/store-release.md`): free, and the takedown risk
   on crests and photos accepted (Julien, 2026-10-16); the proxy's address is
-  his domain (2026-10-25). Still his to decide: the sources whose terms forbid
-  public use (Orange Cat Blacktop's "prototyping" tier, which carries F1 and
-  MotoGP; Jolpica's non-commercial F1 flags; tennis and the TV guides,
-  unstated), and the badges in the public repository.
+  his domain (2026-10-25); the sources reviewed for the public (2026-10-27):
+  Orange Cat Blacktop stays free, as a non-commercial project, the F1 flags
+  come from TheSportsDB rather than Jolpica, and tennis and the TV guides
+  carry the logos' risk. Still his to decide: the badges in the public
+  repository.
 - **A seven-day Upcoming for football** needs a source with date ranges; the
   free plan serves yesterday to tomorrow only. See `docs/data-providers.md`.
 - Leagues in the MVP: Premier League, Champions League, NFL, NBA, F1, MotoGP,

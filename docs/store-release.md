@@ -58,6 +58,16 @@ What stands between TestFlight and the public store, and what Julien decided.
   government ICP filing number: 174 of Apple's 175 territories, and any it
   adds later (`availableInNewTerritories`).
 
+- **The sources, for the public** (Julien, 2026-10-27, "ok" to this
+  proposal): Orange Cat Blacktop, which carries F1 and MotoGP, stays on its
+  free plan, "for prototyping and non-commercial projects", which a free app
+  without ads is; the F1 drivers' flags come from TheSportsDB, on the key we
+  pay for, instead of Jolpica, whose licence wants no commercial use, a credit
+  and the same licence passed on; tennis and the TV guides, whose terms say
+  nothing, carry the same risk as the logos: if one objects, it is turned off
+  on the proxy, with no app update. The player photos come through the paid
+  TheSportsDB key, their own rights under the takedown risk above.
+
 ## Still to do
 
 Free, can be done now:
@@ -66,8 +76,8 @@ Free, can be done now:
   website: Business → Compliance → Digital Services Act. Until then the 27 EU
   countries, France, Spain and Portugal among them, read
   `TRADER_STATUS_NOT_PROVIDED` and the app cannot be sold there.
-- The content rights question (whether the app has the rights to the
-  third-party content it shows) waits on the sources below.
+- The content rights question, at submission: yes, the app shows third-party
+  content, answered on the sources decision above.
 
 Done, all on 2026-10-27: the store page, its words in fr-FR, en-US, pt-BR and
 es-ES, the category, the copyright and the free price (`docs/store-listing.md`,
@@ -91,16 +101,7 @@ Julien's decisions:
   macOS minutes count ten times against the plan's included minutes, and the
   last 30 days used about 1,775 of them over 126 runs. Deleting the files stops
   the proxy (it reads `proxy/assets/teams` at startup) and leaves them in git history.
-- **Sources whose terms forbid public use whatever the price:** Orange Cat
-  Blacktop's free tier, "prototyping and non-commercial projects", carries both
-  F1 and MotoGP; Jolpica, the F1 driver flags and keyless fallback, is CC
-  BY-NC-SA (`docs/motorsport-sources.md`); tennis and the TV guides have
-  unstated terms (`docs/data-providers.md`). The player photos come through
-  the paid TheSportsDB key; their pictures' own rights are crowd-uploaded and
-  fall under the takedown risk above. Each needs its paid plan, a replacement,
-  or to be left out, on the proxy, since one proxy serves every build.
 
 External TestFlight (a public link, up to 10,000 testers, behind Apple's
-lighter beta review) skips the store paperwork, not the licensing: the private
-beta decision (AGENTS.md) wants the sources above settled before anyone but
-Julien installs the app.
+lighter beta review) skips the store paperwork, not the licensing, which the
+sources decision above settles for both.

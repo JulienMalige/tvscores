@@ -38,17 +38,7 @@ export function normaliseRace(r, league, results) {
   };
 }
 
-/** { familyName: nationality } for the current season, cached 24 h. Used to put flags on OCB podiums. */
-let natCache = { at: 0, map: {} };
-export async function f1Nationalities(year = new Date().getUTCFullYear()) {
-  if (Date.now() - natCache.at < 24 * 3600e3) return natCache.map;
-  const { body } = await getJson(`${BASE}/${year}/drivers.json?limit=100`);
-  const map = {};
-  for (const d of body.MRData.DriverTable.Drivers) map[d.familyName] = d.nationality;
-  natCache = { at: Date.now(), map };
-  return map;
-}
-
+/** Formula 1 without an Orange Cat Blacktop key, in development only: the data is non-commercial (docs/motorsport-sources.md). */
 export function f1Provider(league, log = () => {}, meta) {
   // No daily cap is known for Jolpica; the counter is for the health page.
   const quota = meta ? new Quota(meta, { dailyQuota: Infinity, quotaReserve: 0 }) : { record() {} };

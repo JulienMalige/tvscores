@@ -19,7 +19,7 @@ test("a grand prix carries its country's flag and the weekend's sessions, practi
 });
 
 test("completed grand prix with podium, gaps and flags", () => {
-  const e = normaliseEvent(spain, { sport: "formula1", league: F1, results: fx.results, nationalities: { Antonelli: "Italian", Verstappen: "Dutch" } });
+  const e = normaliseEvent(spain, { sport: "formula1", league: F1, results: fx.results, nationalities: { antonelli: "Italian", verstappen: "Dutch" } });
   assert.equal(e.kind, "race");
   assert.equal(e.status.state, "final");
   assert.equal(e.start, "2026-09-13T13:00:00.000Z");
@@ -103,7 +103,7 @@ const idOf = (e, name) => e.schedule.find((s) => s.name === name).id;
 test("F1 qualifying: the grid with lap times, fetched once", async () => {
   const e = sx.f1.event;
   const f = feed({ [idOf(e, "Qualifying")]: sx.f1.qualifying });
-  const { sessionResults: got, calls } = await sessionResults(e, { fetch: f.fetch, now: AFTER, nationalities: { Verstappen: "Dutch" } });
+  const { sessionResults: got, calls } = await sessionResults(e, { fetch: f.fetch, now: AFTER, nationalities: { verstappen: "Dutch" } });
   assert.equal(calls, 1, "one call: the race is not run yet");
   assert.equal(got.length, 1);
   const q = got[0];

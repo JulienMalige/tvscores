@@ -58,6 +58,11 @@ standings). TheSportsDB is the only cheap fallback and is much thinner.
 
 ## Recommendation
 
+Decided otherwise on 2026-10-27 (`docs/store-release.md`): OCB stays on its
+free plan, whose "non-commercial projects" the free, ad-free store app is one
+of, and the flags come from TheSportsDB (follow-up 1, done). The 2026-10-03
+recommendation stands below for the day the app earns money.
+
 **Keep OCB for both series and move to Hobby at $9/month before release**
 (750k requests, commercial rights per its FAQ). It is the cheapest legitimate
 setup with today's granularity; nothing in the proxy changes but the key.

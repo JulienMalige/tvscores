@@ -11,6 +11,7 @@ notes when a version ships.
   only TestFlight builds have; the App Store version will not show it.
 - The international friendlies are named in your language: Matchs amicaux, Amistosos, rather
   than Friendlies, in the menu, in Settings and above their games.
+- Hülkenberg and Pérez get their flags in the Formula 1 results, like the rest of the grid.
 
 ## 1.0 build 45 — 26 October 2026
 - The app now reaches its server at an address of its own, tvscores.julienmalige.com, the

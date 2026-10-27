@@ -52,7 +52,7 @@ function titleCase(s) {
 /**
  * @param sport   "formula1" | "moto-gp"
  * @param league  { id: "f1" | "motogp", name, short }
- * @param nationalities optional async () => { lastName: nationality } for flags
+ * @param nationalities optional async () => { surname: nationality } for flags, keyed by photos.js's surname()
  */
 export function motorsportProvider({ sport, league, key, quota, log = () => {}, nationalities }) {
   const headers = { "x-api-key": key };

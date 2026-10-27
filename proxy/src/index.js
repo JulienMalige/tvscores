@@ -3,7 +3,8 @@ import { config } from "./config.js";
 import { Store } from "./cache.js";
 import { Quota } from "./quota.js";
 import { sportsDbSport } from "./providers/sportsdb.js";
-import { f1Provider, f1Nationalities } from "./providers/jolpica.js";
+import { f1Provider } from "./providers/jolpica.js";
+import { driverNationalities } from "./providers/sportsdb-drivers.js";
 import { motorsportProvider } from "./providers/ocblacktop.js";
 import { tennisProvider } from "./providers/livetennis.js";
 import { TeamSportScheduler } from "./scheduler.js";
@@ -48,6 +49,7 @@ for (const sport of ["football", "nfl", "nba"]) {
   schedulers.push(new TeamSportScheduler({ provider, store, cfg, log }));
 }
 if (config.ocBlacktopKey) {
+  const f1Nationalities = driverNationalities({ key: config.theSportsDbKey });
   for (const [sport, leagueKey] of [["formula1", "f1"], ["moto-gp", "motogp"]]) {
     const league = config.leagues[leagueKey][0];
     const quota = new Quota(store.sportMeta(leagueKey), { dailyQuota: config.schedule.ocbDailyQuota, quotaReserve: 10 });
