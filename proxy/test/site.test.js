@@ -158,3 +158,15 @@ test("a browser's languages are read in its order of preference", () => {
   assert.equal(pickLang(""), "en");
   assert.equal(pickLang(undefined), "en");
 });
+
+test("a stray ?tz= on a page still gets the page, while the API still refuses it", async () => {
+  const s = await serve();
+  try {
+    const page = await s.get("/en/privacy?tz=Not/AZone");
+    assert.equal(page.status, 200);
+    assert.equal(page.headers.get("content-type"), "text/html; charset=utf-8");
+    assert.equal((await s.get("/v1/scoreboard?tz=Not/AZone")).status, 400);
+  } finally {
+    await s.close();
+  }
+});

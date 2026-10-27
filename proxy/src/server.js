@@ -85,7 +85,8 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
     if (config.pathPrefix && path.startsWith(config.pathPrefix)) path = path.slice(config.pathPrefix.length) || "/";
     const rawTz = url.searchParams.get("tz") || "UTC";
     const tz = canonicalTz(rawTz);
-    if (!tz) return send(res, 400, { error: `unknown tz ${rawTz.slice(0, 64)}` });
+    // The API's alone: a page of the website ignores a stray ?tz=.
+    if (!tz && path.startsWith("/v1/")) return send(res, 400, { error: `unknown tz ${rawTz.slice(0, 64)}` });
 
     if (path === "/v1/scoreboard") {
       const prepared = remember(`board|${tz}`, () => {
