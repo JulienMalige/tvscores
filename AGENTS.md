@@ -178,8 +178,8 @@ writes its own number is a bug, and rows all use `rowSurface(focused:)`.
   his domain (2026-10-25); the sources reviewed for the public (2026-10-27):
   Orange Cat Blacktop stays free, as a non-commercial project, the F1 flags
   come from TheSportsDB rather than Jolpica, and tennis and the TV guides
-  carry the logos' risk. Version 1.0 (build 46) was approved on
-  2026-11-05, and its release waits for his go. Still his to decide: the
+  carry the logos' risk. Version 1.0 (build 46) is on the App Store
+  since 2026-11-05. Still his to decide: the
   badges in the public repository.
 - **A seven-day Upcoming for football** needs a source with date ranges; the
   free plan serves yesterday to tomorrow only. See `docs/data-providers.md`.

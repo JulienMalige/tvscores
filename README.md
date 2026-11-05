@@ -45,14 +45,14 @@ GitHub Actions macOS runners, which is the only place Xcode exists.
 
 ## Status
 
-On TestFlight, installable on a real Apple TV. What each build changed is in
-[CHANGELOG.md](CHANGELOG.md).
+On the App Store for Apple TV since 2026-11-05, version 1.0 (build 46), in
+every country but China mainland; test builds still go out on TestFlight.
+What each build changed is in [CHANGELOG.md](CHANGELOG.md).
 
-The proxy has its public address, `tvscores.julienmalige.com`. What still
-stands before the store (the sources whose terms forbid public use, the badges
-in this public repository, the store paperwork) is in
-[docs/store-release.md](docs/store-release.md); the other open decisions are in
-[AGENTS.md](AGENTS.md).
+The proxy has its public address, `tvscores.julienmalige.com`. How the store
+release went, and what Julien decided for it, is in
+[docs/store-release.md](docs/store-release.md); the open decisions, the badges
+in this public repository among them, are in [AGENTS.md](AGENTS.md).
 
 ## Where things are
 

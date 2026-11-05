@@ -104,7 +104,9 @@ the file is too heavy to attach) and replied on 2026-11-05 with the video and
 the answers drafted below; the review went on the same day
 ("In Review" at 17:52 São Paulo time), with no new submission, and Apple
 approved the version three minutes later: "Pending Developer Release", until
-Julien's go. The Notes field
+Julien's go ("Go, you can release it"). Released at 19:35 the same day, with
+`POST /v1/appStoreVersionReleaseRequests` (`READY_FOR_DISTRIBUTION`); Apple
+allows up to 24 hours before the store lists it. The Notes field
 is left alone while Apple reviews: the answers go there with the next version,
 as Apple asked, and the video can go along as an App Review attachment.
 
