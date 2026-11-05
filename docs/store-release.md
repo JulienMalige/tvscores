@@ -92,6 +92,56 @@ What can come back: Apple's reasons for a rejection arrive in App Store
 Connect (App Review) and by email to the account holder. A version under
 review can still be withdrawn, and changed, then sent again.
 
+**Information needed, then in review** (Guideline 2.1, three hours after the
+submission): a developer account with little review history is asked for a
+video of the app on a physical device, from its launch through the usual
+flow, and for its purpose, how to use it, the services behind it, what
+differs by region and its right to any third-party material, in a reply in
+App Store Connect (App Review, the submission, Apple's message) and in the
+Notes field. tvOS records no screen and there is no Mac, so Julien filmed
+the television with his iPhone (720p, from iMovie or the camera's settings, if
+the file is too heavy to attach) and replied on 2026-11-05 with the video and
+the answers drafted below; the review went on the same day
+("In Review" at 17:52 São Paulo time), with no new submission. The Notes field
+is left alone while Apple reviews: the answers go there with the next version,
+as Apple asked, and the video can go along as an App Review attachment.
+
+The answers, as drafted for that reply:
+
+```text
+Hello,
+
+Thank you for the review. Here is the information you asked for.
+
+1. Screen recording
+The attached video is filmed with an iPhone, because Apple TV cannot record its own screen. It shows my Apple TV, on the latest tvOS, running build 46, the build submitted, installed from TestFlight. It starts on the Home screen, opens TV Scores and goes through the usual flow: today's games, a game's details and where to watch it, the menu of competitions, a competition's table, a Formula 1 weekend and Settings. The app has no account, no user-generated content and no paid content.
+
+2. Purpose and audience
+TV Scores puts sports scores on the television: today's games live, yesterday's results, the games to come, the tables and, for every game, the channels that show it. It is for fans who follow several competitions and want the scores on the screen where they watch sport, without reaching for a phone, and want to know where a game is on. It is free, with no account, no ads, no in-app purchase and no tracking.
+
+3. How to use it
+There is nothing to set up and no login. The app opens on Today, with the day's games by competition. Select a game for its score, its statistics and How to Watch, which opens the broadcaster's or the streaming service's app, or its App Store page. Back, or a press left from the left edge of the screen, opens the menu: every competition with its games and table, Formula 1 and MotoGP with their race weekends, and Settings, where the viewer picks and orders the competitions and chooses the countries whose channels are shown, the streaming apps and the language. What the screens show depends on the games scheduled that day.
+
+4. External services
+The app talks to my own server (tvscores.julienmalige.com, reached through Cloudflare), which collects the sports data on a schedule and serves it with the pictures; for a picture the server has not copied yet, the app loads it from the site that publishes it, such as TheSportsDB. The server uses:
+- TheSportsDB, on a paid plan: football, NFL and NBA schedules, scores, statistics and tables; team crests, competition badges and athlete photos; TV listings.
+- Orange Cat Blacktop: Formula 1 and MotoGP calendars, results and championships.
+- Live Tennis API (livetennisapi.com): ATP and WTA matches and scores.
+- API-Sports: live statistics for Brazilian football matches when TheSportsDB has none yet.
+- Public TV programme guides, XML TV Fr for France and epgshare01 for the United States and Brazil, from which only channel names and times are read.
+- Apple's iTunes lookup service, for the icons of the apps How to Watch opens.
+No authentication, payment, advertising or AI service is used.
+
+5. Regions
+The app works the same in every region. Times follow the Apple TV's time zone, and the app is in English, French, Portuguese and Spanish (English elsewhere). How to Watch names the channels of France, the United States and Brazil, whichever the viewer chooses in Settings; a viewer elsewhere can choose any of them, or none.
+
+6. Third-party material
+TV Scores is not affiliated with the leagues, teams, players or broadcasters it shows, and its description says so. Scores, schedules and results are facts, taken from the providers above under their terms. Crests, badges and athlete photos come from TheSportsDB and are shown only to identify a team, a competition or a player beside its result, as score apps do; I hold no licence from the leagues themselves. Should a rights holder object, the picture is removed from my server and the app shows the team's initials instead, with no app update needed.
+
+Best regards,
+Julien Malige
+```
+
 ## Done before the submission
 
 All on 2026-10-27: the store page, its words in fr-FR, en-US, pt-BR and
