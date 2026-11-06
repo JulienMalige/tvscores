@@ -106,9 +106,15 @@ the answers drafted below; the review went on the same day
 approved the version three minutes later: "Pending Developer Release", until
 Julien's go ("Go, you can release it"). Released at 19:35 the same day, with
 `POST /v1/appStoreVersionReleaseRequests` (`READY_FOR_DISTRIBUTION`); Apple
-allows up to 24 hours before the store lists it. The Notes field
-is left alone while Apple reviews: the answers go there with the next version,
-as Apple asked, and the video can go along as an App Review attachment.
+allows up to 24 hours before the store lists it, and it took under three:
+by 22:42 Brazil, the US, France and Spain all showed it, at
+https://apps.apple.com/app/id6811973076, which the website's home now links
+to. A storefront lists the app once
+`https://itunes.apple.com/lookup?id=6811973076&country=br` answers
+`resultCount: 1`; with `&entity=tvSoftware` that lookup answers 0 even then.
+The Notes field is left alone while Apple reviews: the answers go there with
+the next version, as Apple asked, and the video can go along as an App Review
+attachment.
 
 The answers, as drafted for that reply:
 

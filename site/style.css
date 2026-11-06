@@ -74,16 +74,18 @@ main { max-width: var(--wide); margin: 0 auto; padding: 0 var(--gutter) 72px; }
 .hero-mark { width: clamp(72px, 12vw, 104px); border-radius: 22%; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); }
 .hero h1 { margin: 18px 0 12px; font-size: clamp(2.6rem, 7vw, 4.4rem); line-height: 1.05; letter-spacing: -0.035em; }
 .lede { margin: 0 auto 24px; max-width: 36rem; color: var(--soft); font-size: clamp(1.1rem, 2.4vw, 1.4rem); line-height: 1.45; }
-.soon {
+.store { margin: 0 0 40px; }
+.store a {
   display: inline-block;
-  margin: 0 0 40px;
   padding: 8px 18px;
-  border: 1px solid var(--line);
   border-radius: 999px;
-  background: var(--card);
+  color: var(--pill-ink);
+  background: var(--ink);
   font-size: 0.95rem;
   font-weight: 600;
+  text-decoration: none;
 }
+.store a:hover { background: var(--soft); }
 .shot {
   display: block;
   width: 100%;

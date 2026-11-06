@@ -45,9 +45,10 @@ GitHub Actions macOS runners, which is the only place Xcode exists.
 
 ## Status
 
-On the App Store for Apple TV since 2026-11-05, version 1.0 (build 46), in
-every country but China mainland; test builds still go out on TestFlight.
-What each build changed is in [CHANGELOG.md](CHANGELOG.md).
+On the [App Store](https://apps.apple.com/app/id6811973076) for Apple TV since
+2026-11-05, version 1.0 (build 46), in every country but China mainland; test
+builds still go out on TestFlight. What each build changed is in
+[CHANGELOG.md](CHANGELOG.md).
 
 The proxy has its public address, `tvscores.julienmalige.com`. How the store
 release went, and what Julien decided for it, is in
