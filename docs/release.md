@@ -18,13 +18,16 @@ as repository secrets.
 | Bundle ID | `com.julienmalige.tvscores` |
 | App ID (App Store Connect) | `6811973076`, SKU `tvscores` |
 | API key | `72PN8L6U72`, role App Manager |
+| Admin API key | `H9K3P6K7JM` (2026-11-05), the VPS's key for any project there, used as `ASC_ENV=~/.config/secrets/asc-admin.env`; not in GitHub. TV Scores uses it for the analytics reports, which an App Manager key cannot read |
+| Analytics reports | ongoing request `2d5f6086-cc3f-4e67-bf83-5316fdbe2f70` (2026-11-05): Apple's daily reports, among them App Downloads, App Store Installation and Deletion, App Sessions and App Store Discovery and Engagement, the first a day or two after the request |
 | Issuer ID | `69a6de7c-7178-47e3-e053-5b8c7c11a4d1` |
 | Internal TestFlight group | `Internal`, account holder added as tester |
 | Distribution certificate | `TLAS59R725`, expires 2027-09-14 |
 | Provisioning profile | `TV Scores tvOS App Store 2` (`3YA4WZL5X6`), expires 2027-09-14 — minted 2026-09-19 with the User Management capability; build 19 shipped on it and the first profile was deleted |
 
-The `.p8` private key lives only in `~/.config/tvscores/` on the VPS (mode 600)
-and in GitHub Actions secrets. It is never committed; `.gitignore` blocks
+The App Manager key's `.p8` lives only in `~/.config/tvscores/` on the VPS
+(mode 600) and in GitHub Actions secrets, the Admin key's only in
+`~/.config/secrets/` on the VPS. Neither is ever committed; `.gitignore` blocks
 `*.p8`.
 
 ## GitHub secrets
