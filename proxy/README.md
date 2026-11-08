@@ -10,7 +10,7 @@ Node 22, no npm dependencies; the image mirror calls `python3` with Pillow to sh
 
 | Path | Purpose |
 |---|---|
-| `GET /v1/scoreboard?tz=Europe/Paris` | `days.yesterday / today / upcoming`, each a list of `{sport, league, events[]}` groups, bucketed in the viewer's time zone. Live games always sit in `today`. `stale` flags per sport. |
+| `GET /v1/scoreboard?tz=Europe/Paris&sports=football,rugby,…` | `days.yesterday / today / upcoming`, each a list of `{sport, league, events[]}` groups, bucketed in the viewer's time zone. Live games always sit in `today`. `stale` flags per sport. `sports` names the sports the app can show; without it the board holds `firstSports` (`src/config.js`), those of builds up to 1.0, which have no place for rugby. |
 | `GET /v1/fixtures?date=YYYY-MM-DD&tz=` | flat list of events on one local date |
 | `GET /v1/standings` | every table we hold, keyed `sport:league` |
 | `GET /v1/standings/{sport}/{league}` | one league's tables (drivers, constructors, rankings) |

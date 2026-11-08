@@ -55,17 +55,18 @@ for (const sport of ["football", "nfl", "nba"]) {
 {
   const meta = store.sportMeta("rugby");
   const cfg = { ...config.schedule, liveIntervalSeconds: config.schedule.liveIntervalSeconds.rugby };
+  const fixturesQuota = new Quota(store.sportMeta("rugbyFixtures"), { dailyQuota: config.schedule.sportsDbDailyQuota, quotaReserve: config.schedule.quotaReserve });
   const fixtures = sportsDbSport({
     sport: "rugby",
     key: config.theSportsDbKey,
     leagues: config.leagues.rugby,
     window: config.schedule.teamSportWindow,
-    quota: new Quota(store.sportMeta("rugbyFixtures"), { dailyQuota: config.schedule.sportsDbDailyQuota, quotaReserve: config.schedule.quotaReserve }),
+    quota: fixturesQuota,
     seasons: (meta.seasons ??= {}),
     next: (meta.next ??= {}),
     log,
   });
-  const provider = rugbyProvider({ fixtures, leagues: config.leagues.rugby, key: config.apiSportsKey, quota: new Quota(meta, cfg), meta, log });
+  const provider = rugbyProvider({ fixtures, fixturesQuota, leagues: config.leagues.rugby, key: config.apiSportsKey, quota: new Quota(meta, cfg), meta, log });
   schedulers.push(new TeamSportScheduler({ provider, store, cfg, log }));
 }
 if (config.ocBlacktopKey) {

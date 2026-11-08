@@ -115,7 +115,8 @@ enum CompetitionName {
         "Six Nations": "competition.sixnations.menu",
         "Nations Championship": "competition.nations",
         "Rugby World Cup": "competition.rugbyworldcup",
-        "World Cup": "competition.rugbyworldcup.menu",
+        // Any sport's: football's World Cup will say it the same way.
+        "World Cup": "competition.worldcup.menu",
     ]
 
     static func said(_ given: String) -> String {

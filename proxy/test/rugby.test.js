@@ -53,7 +53,8 @@ test("a rugby side is said without the word the feed tells it from a football on
 });
 
 test("API-Sports' statuses read as ours, and an unknown one after kickoff as play", () => {
-  const read = (short) => statusOf({ status: { short } });
+  const kickoff = SUNDAY_NIGHT - 3600e3;
+  const read = (short, now = SUNDAY_NIGHT) => statusOf({ status: { short }, timestamp: kickoff / 1000 }, now);
   assert.deepEqual(read("FT"), { state: STATE.final, detail: undefined });
   assert.deepEqual(read("AET"), { state: STATE.final, detail: "After extra time" });
   assert.deepEqual(read("AW"), { state: STATE.final, detail: "Awarded" });
@@ -67,6 +68,10 @@ test("API-Sports' statuses read as ours, and an unknown one after kickoff as pla
   assert.deepEqual(read("CANC"), { state: STATE.other, detail: "Cancelled" });
   assert.deepEqual(read("3H"), { state: STATE.live, detail: undefined });
   assert.deepEqual(read("constructor"), { state: STATE.live, detail: undefined }, "a status is a key of ours, not of every object");
+  const late = kickoff + 3 * 3600e3;
+  assert.equal(read("2H", late), undefined, "no game is in its second half three hours after kickoff: a feed that stopped");
+  assert.equal(read("PEN", late), undefined, "nor kept live by an ending we do not know");
+  assert.deepEqual(read("FT", late), { state: STATE.final, detail: undefined }, "an ending is an ending, however late");
 });
 
 test("every game of the weekend is found in the other feed, and its score with it", () => {
@@ -102,8 +107,10 @@ test("what API-Sports says wins over the fixture list, but does not keep a game 
   assert.equal(over.home.logo, england.home.logo, "the fixture's crests stay");
 
   const finished = { ...england, status: { state: STATE.final }, score: { home: 45, away: 22 } };
-  const inPlay = resultOf({ status: { short: "2H" }, scores: { home: 30, away: 22 } });
+  const inPlay = resultOf({ status: { short: "2H" }, scores: { home: 30, away: 22 }, timestamp: Date.now() / 1000 });
   assert.equal(withResult(finished, inPlay), finished, "a game last seen in play by polls that stopped");
+  const calledOff = resultOf({ status: { short: "POST" }, scores: { home: null, away: null } });
+  assert.equal(withResult(finished, calledOff), finished, "and one called off, then played after all");
   assert.equal(withResult(england, resultOf({ status: { short: "NS" } })), england, "nothing to say yet");
   const off = withResult(england, resultOf({ status: { short: "POST" }, scores: { home: null, away: null } }));
   assert.deepEqual([off.status.state, off.status.detail, off.score.home], [STATE.other, "Postponed", null]);
@@ -183,4 +190,57 @@ test("a score is kept four days, then let go", async () => {
   assert.equal((await at(Date.parse("2026-11-10T22:00:00Z")).byDate("2026-11-07"))[0].score.home, 54);
   await at(Date.parse("2026-11-12T00:00:00Z")).byDate("2026-11-07");
   assert.deepEqual(meta.results, {});
+});
+
+test("API-Sports saying a game has not started clears what it said of it before", async (t) => {
+  const answer = structuredClone(API["2026-11-08"]);
+  answer.response.find((g) => g.teams.home.name === "England").status = { long: "Not Started", short: "NS" };
+  network(t, { "eventsday.php?d=2026-11-08": { events: TSDB["2026-11-08"] }, "games?date=2026-11-08": answer });
+  const england = named(ours("2026-11-08"), "England");
+  const meta = { results: { [england.id]: { state: STATE.other, detail: "Postponed", home: null, away: null, at: new Date(SUNDAY_NIGHT).toISOString() } } };
+  const { p } = provider({ meta });
+  const rows = await p.byDate("2026-11-08");
+  assert.equal(meta.results[england.id], undefined, "set again: nothing to lay over");
+  assert.equal(named(rows, "England").status.detail, "No update", "the fixture list's word, not a postponement");
+});
+
+test("a day whose games all ended costs no call, and a day asked just now is not asked again", async (t) => {
+  const calls = network(t, { "eventsday.php?d=2026-11-08": { events: TSDB["2026-11-08"] }, "games?date=2026-11-08": API["2026-11-08"] });
+  let now = SUNDAY_NIGHT;
+  const fixtures = sportsDbSport({ sport: "rugby", key: "tsdb", leagues: LEAGUES, window: { back: 1, ahead: 7 }, quota: { record() {} } });
+  const p = rugbyProvider({ fixtures, leagues: LEAGUES, key: "k", quota: { record() {}, spendable: () => 50 }, meta: {}, now: () => now });
+  const api = () => calls.filter((c) => c.url.includes("api-sports")).length;
+  await p.live();
+  await p.byDate("2026-11-08");
+  assert.equal(api(), 1, "the scheduler's look at an overdue game, right after the round");
+  now += 10 * 60e3;
+  await p.live();
+  assert.equal(api(), 1, "all three ended: nothing left to learn of the day");
+});
+
+test("only a whole pass that got yesterday settles it", async (t) => {
+  const calls = network(t, { "games?date=2026-11-07": API["2026-11-07"] });
+  const meta = {};
+  let week = Object.assign([...ours("2026-11-08")], { partial: true, missing: ["2026-11-07"] });
+  const fixtures = { daily: async () => week, byDate: async () => [], dailyCost: 9 };
+  const p = rugbyProvider({ fixtures, leagues: LEAGUES, key: "k", quota: { record() {}, spendable: () => 50 }, meta, now: () => SUNDAY_NIGHT });
+  await p.daily();
+  assert.equal(meta.settled, undefined, "yesterday's fixtures failed: none to ask about, and not settled");
+  week = Object.assign([...ours("2026-11-08")], { partial: false, missing: [] });
+  await p.daily({ dates: ["2026-11-07"] });
+  assert.equal(meta.settled, undefined, "a retry is not the whole week");
+  week = Object.assign([...ours("2026-11-07"), ...ours("2026-11-08")], { partial: false, missing: [] });
+  await p.daily();
+  assert.equal(meta.settled, "2026-11-07");
+  assert.equal(calls.length, 1);
+});
+
+test("the fixtures' own budget is a ceiling, as football's is", async () => {
+  const spent = { spendable: () => 5 };
+  const fixtures = { daily: async () => [], byDate: async () => [], dailyCost: 9 };
+  const p = rugbyProvider({ fixtures, fixturesQuota: spent, leagues: LEAGUES, key: "k", quota: { record() {}, spendable: () => 50 }, meta: {}, now: () => SUNDAY_NIGHT });
+  await assert.rejects(p.daily(), /TheSportsDB rugby/, "five left will not buy a week of nine days");
+  assert.equal((await p.byDate("2026-11-08")).length, 0, "but they buy one day");
+  spent.spendable = () => 0;
+  await assert.rejects(p.byDate("2026-11-08"), /TheSportsDB rugby/);
 });

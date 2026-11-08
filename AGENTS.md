@@ -77,7 +77,7 @@ xcrun simctl io booted screenshot /tmp/tvscores.png
 ```
 
 Send the screenshot to Julien after every visible change. Judge on the image, not on the code.
-Julien watches from Brazil (America/Sao_Paulo): capture `Resources/sample-scoreboard.json` with `?tz=America/Sao_Paulo` and run the demo simulator in that zone so dates and buckets agree.
+Julien watches from Brazil (America/Sao_Paulo): capture `Resources/sample-scoreboard.json` with `?tz=America/Sao_Paulo&sports=football,rugby,f1,motogp,nfl,nba,tennis` (the sports the app names; without `sports` the proxy leaves out rugby, as for builds up to 1.0) and run the demo simulator in that zone so dates and buckets agree.
 
 ## Conventions
 

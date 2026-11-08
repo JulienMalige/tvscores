@@ -374,34 +374,6 @@
         }
       }
     },
-    "competition.rugbyworldcup.menu": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "World Cup"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Coupe du monde"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copa do Mundo"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copa Mundial"
-          }
-        }
-      }
-    },
     "competition.sixnations": {
       "localizations": {
         "en": {
@@ -454,6 +426,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Seis Naciones"
+          }
+        }
+      }
+    },
+    "competition.worldcup.menu": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "World Cup"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coupe du monde"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copa do Mundo"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copa Mundial"
           }
         }
       }
