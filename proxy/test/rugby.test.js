@@ -48,6 +48,8 @@ test("a rugby side is said without the word the feed tells it from a football on
   assert.deepEqual([named(sat, "France").away.name, named(sat, "Italy").away.name], ["Fiji", "South Africa"]);
   assert.ok(named(sat, "Montpellier Hérault"), "a club with the word in its own name loses it as well");
   assert.equal(named(sat, "Castres Olympique").away.name, "Racing 92", "and Racing 92 has its name since 2015");
+  assert.equal(named(sat, "Stade Toulousain").away.name, "Clermont Auvergne", "short enough for a row");
+  assert.equal(named(ours("2026-11-08"), "Vannes").away.name, "Bordeaux Bègles");
   assert.equal(rugbyName("Stade Toulousain"), "Stade Toulousain");
   assert.equal(rugbyName("Rugby Club Vannes"), "Rugby Club Vannes", "only the last word");
 });

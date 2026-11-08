@@ -41,8 +41,16 @@ export const SPORTS = {
   rugby: { feed: "Rugby", nick: false, rename: rugbyName },
 };
 
-/** Names the feed has kept from before a club changed its own. */
-const RUGBY_NAMES = { "Racing Métro 92": "Racing 92" };
+/**
+ * Names the feed has kept from before a club changed its own, and the two
+ * of the Top 14 too long for a row ("ASM Clermont Auve…"), said as their
+ * own supporters say them.
+ */
+const RUGBY_NAMES = {
+  "Racing Métro 92": "Racing 92",
+  "ASM Clermont Auvergne": "Clermont Auvergne",
+  "Union Bordeaux Bègles": "Bordeaux Bègles",
+};
 
 /**
  * A rugby side as a rugby row says it. The feed tells a country's rugby side

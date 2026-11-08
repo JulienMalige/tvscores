@@ -257,7 +257,7 @@ jobs:
           for spec in "upcoming 5852 fr" "upcoming 5852 en" "yesterday 4430 en"; do
             read -r tab league lang <<< "$spec"
             xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
-            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresTab "$tab" -TVScoresLeague "$league" -AppleLanguages "($lang)"
+            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresTab "$tab" -TVScoresLeague "$league" -AppleLanguages "($lang)" -AppleLocale "$lang"
             sleep 14
             xcrun simctl io "$UDID" screenshot "shots/live-league-$league-$tab-$lang.png"
           done
