@@ -39,6 +39,17 @@ struct ElementsTests {
         }
     }
 
+    @Test("every competition said in the viewer's language has all four")
+    func competitionNamesAreTranslated() throws {
+        for key in Set(CompetitionName.keys.values) {
+            for lang in ["en", "fr", "pt", "es"] {
+                let path = try #require(Bundle.main.path(forResource: lang, ofType: "lproj"), "\(lang).lproj is bundled")
+                let value = Bundle(path: path)?.localizedString(forKey: key, value: "MISSING", table: nil)
+                #expect(value != "MISSING" && value != key, "\(key) in \(lang)")
+            }
+        }
+    }
+
     @Test("an ending folded into the Final line is not printed twice")
     func combinedEndingsAreConsistent() {
         // "After overtime" folds into "Final/OT"; it must not also be a detail line.

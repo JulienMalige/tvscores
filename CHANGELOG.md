@@ -7,6 +7,10 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- Rugby union, in a section of its own in the menu: the Top 14, the Champions Cup, the
+  Premiership, the Nations Championship, the Six Nations and the World Cup. During a game
+  the score is a few minutes behind at most. The competitions have no tables yet: no source
+  we can use has this season's.
 - Tennis's season finals are listed before they start, under their own name: the WTA Finals
   at Indian Wells this week, then the ATP Finals in Turin. They used to appear only once a
   match was under way, headed with the name of the WTA's former host, Riyadh.

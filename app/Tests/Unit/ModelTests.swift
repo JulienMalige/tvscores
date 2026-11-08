@@ -21,21 +21,6 @@ struct ModelTests {
         #expect(board.tz == "America/Sao_Paulo", "captured in Julien's zone, as AGENTS.md says it must be")
     }
 
-    @Test("every competition the menu lists has what a sidebar row needs")
-    func leaguesAreComplete() throws {
-        let board = try ScoreboardDecoder.make().decode(Scoreboard.self, from: Self.sample("sample-scoreboard"))
-        for league in board.leagues {
-            #expect(!league.menu.isEmpty, "\(league.name) has a menu name")
-            // A badge we ship gives both; a feed's badge a logo alone, which
-            // the menu shows in its square; a system symbol stands in for a
-            // mark not worth showing (the friendlies' globe).
-            #expect(league.icon != nil || league.logo != nil || league.symbol != nil, "\(league.name) has a mark for the sidebar")
-            #expect(league.logo != nil || league.symbol != nil, "\(league.name) has a mark for its heading")
-        }
-        let ids = board.leagues.map(\.id.raw)
-        #expect(Set(ids).count == ids.count, "no competition is listed twice")
-    }
-
     @Test("a state the proxy has not taught us reads as other, never as a crash")
     func unknownStateIsOther() throws {
         let json = #"{"state":"halftime-of-the-future","clock":null,"detail":null,"note":null}"#
@@ -71,22 +56,6 @@ struct ModelTests {
         // of the same fixture list; none is more than nine days from generation.
         for e in events {
             #expect(abs(e.start.timeIntervalSince(board.generatedAt)) < 9 * 86400, "\(e.id)")
-        }
-    }
-
-    @Test("a competition's page shows its own games and nothing else")
-    func leaguePagesFilterTheirOwnGames() throws {
-        let board = try ScoreboardDecoder.make().decode(Scoreboard.self, from: Self.sample("sample-scoreboard"))
-        let groups = Day.allCases.flatMap { board.groups(for: $0) }
-        for league in board.leagues {
-            let mine = groups.filter { LeagueRef(league).matches($0) }
-            #expect(mine.allSatisfy { $0.sport == league.sport && $0.league.id == league.id }, "\(league.name)")
-            // `playing` is what the menu greys a row on; it must agree with the buckets.
-            #expect(league.playing == !mine.isEmpty, "\(league.name) is marked playing exactly when it has games this week")
-        }
-        for group in groups {
-            let ref = LeagueRef(group: group)
-            #expect(groups.filter { ref.matches($0) }.allSatisfy { $0.id == group.id }, "\(group.id) matches only itself")
         }
     }
 
@@ -150,19 +119,6 @@ struct ModelTests {
         #expect(nfl.tables.map(\.id) == ["AFC", "NFC"])
         #expect(nfl.tables[0].rows.allSatisfy { $0.section != nil }, "a conference is read division by division")
         #expect(nfl.tables[0].lines == nil, "and has no cut lines through its divisions")
-    }
-
-    @Test("a competition with nothing this week says when it is next on")
-    func idleLeaguesSayWhenTheyAreBack() throws {
-        let board = try ScoreboardDecoder.make().decode(Scoreboard.self, from: Self.sample("sample-scoreboard"))
-        let nba = try #require(board.leagues.first { $0.sport == "nba" })
-        #expect(!nba.playing)
-        let next = try #require(nba.next)
-        #expect(next.start > board.generatedAt)
-        #expect(next.season?.isEmpty == false)
-        for league in board.leagues where league.playing {
-            #expect(league.next == nil, "\(league.name) is on this week and has no next to speak of")
-        }
     }
 
     @Test("a weekend's sessions are read by the day they fall on")

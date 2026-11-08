@@ -87,6 +87,7 @@ enum Sport {
         case "f1": "flag.checkered"
         case "motogp": "flag.checkered.2.crossed"
         case "tennis": "tennisball"
+        case "rugby": "figure.rugby"
         default: "sportscourt"
         }
     }
@@ -99,6 +100,7 @@ enum Sport {
         case "f1": .red
         case "motogp": .orange
         case "tennis": .green
+        case "rugby": .teal
         default: .secondary
         }
     }

@@ -42,6 +42,16 @@ extension ScoreboardStore {
         }
     }
 
+    /// The board's address: the viewer's time zone, and the sports this build
+    /// can show and hide. The proxy holds back any other, which is how a build
+    /// up to 1.0, naming none, never sees rugby.
+    nonisolated static func boardURL(_ base: URL, zone: TimeZone = .current) -> URL {
+        base.appending(path: "v1/scoreboard").appending(queryItems: [
+            URLQueryItem(name: "tz", value: zone.identifier),
+            URLQueryItem(name: "sports", value: SportSection.sports.joined(separator: ",")),
+        ])
+    }
+
     func load() async throws -> Scoreboard {
         let data: Data
         switch source {
@@ -51,9 +61,7 @@ extension ScoreboardStore {
             }
             data = try Data(contentsOf: url)
         case .remote(let base):
-            var comps = URLComponents(url: base.appending(path: "v1/scoreboard"), resolvingAgainstBaseURL: false)!
-            comps.queryItems = [URLQueryItem(name: "tz", value: TimeZone.current.identifier)]
-            var req = URLRequest(url: comps.url!)
+            var req = URLRequest(url: Self.boardURL(base))
             req.timeoutInterval = 15
             let (d, resp) = try await URLSession.shared.data(for: req)
             guard let http = resp as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {

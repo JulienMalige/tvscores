@@ -247,6 +247,24 @@ jobs:
           SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresTab upcoming -TVScoresLeague wta -AppleLanguages "(en)"
           sleep 12
           xcrun simctl io "$UDID" screenshot shots/live-league-wta-en.png
+          # Rugby on live data, which the demo sample predates (2026-11-08):
+          # the menu with its section, a competition's games to come and its
+          # results, and a finished game's page.
+          xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+          SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresTab today -TVScoresMenuOpen -AppleLanguages "(fr)" -AppleLocale fr_FR
+          sleep 16
+          xcrun simctl io "$UDID" screenshot shots/live-menu-fr.png
+          for spec in "upcoming 5852 fr" "upcoming 5852 en" "yesterday 4430 en"; do
+            read -r tab league lang <<< "$spec"
+            xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresTab "$tab" -TVScoresLeague "$league" -AppleLanguages "($lang)"
+            sleep 14
+            xcrun simctl io "$UDID" screenshot "shots/live-league-$league-$tab-$lang.png"
+          done
+          xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+          SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresTab yesterday -TVScoresGame final:rugby -AppleLanguages "(en)"
+          sleep 14
+          xcrun simctl io "$UDID" screenshot shots/live-game-final-rugby-en.png
           if xcrun simctl spawn "$UDID" launchctl list 2>/dev/null | grep -q com.julienmalige.tvscores; then
             echo "live run: still running"
           else

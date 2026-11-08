@@ -12,10 +12,16 @@ struct SportSection: Identifiable {
         // National teams, after the clubs: leagues say so themselves, by
         // their `section` (Julien, 2026-09-28).
         SportSection(id: "international", title: "sidebar.international", sports: []),
+        // Its national sides too: the Six Nations and the World Cup are
+        // rugby's, not the football section's (2026-11-08).
+        SportSection(id: "rugby", title: "sidebar.rugby", sports: ["rugby"]),
         SportSection(id: "motorsport", title: "sidebar.motorsport", sports: ["f1", "motogp"]),
         SportSection(id: "us", title: "sidebar.us", sports: ["nfl", "nba"]),
         SportSection(id: "tennis", title: "sidebar.tennis", sports: ["tennis"]),
     ]
+
+    /// Every sport the menu has a place for, which the board is asked for.
+    static var sports: [String] { all.flatMap(\.sports) }
 }
 
 extension SportSection {

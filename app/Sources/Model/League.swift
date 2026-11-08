@@ -111,6 +111,11 @@ enum CompetitionName {
     static let keys: [String: String] = [
         "International Friendlies": "competition.friendlies",
         "Friendlies": "competition.friendlies.menu",
+        "Six Nations Championship": "competition.sixnations",
+        "Six Nations": "competition.sixnations.menu",
+        "Nations Championship": "competition.nations",
+        "Rugby World Cup": "competition.rugbyworldcup",
+        "World Cup": "competition.rugbyworldcup.menu",
     ]
 
     static func said(_ given: String) -> String {

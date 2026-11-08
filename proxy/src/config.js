@@ -164,7 +164,7 @@ export const config = {
       { id: 4550, name: "European Rugby Champions Cup", menu: "Champions Cup", short: "ERCC", color: "#0f1f45", badge: "ercc", apiSports: 54 },
       { id: 4414, name: "Premiership Rugby", menu: "Premiership", short: "PREM", color: "#4a1a05", badge: "prem", apiSports: 13 },
       { id: 5852, name: "Nations Championship", short: "NC", color: "#22260a", badge: "nations", apiSports: 145 },
-      { id: 4714, name: "Six Nations", short: "6N", color: "#4a0f0a", badge: "sixnations", apiSports: 51 },
+      { id: 4714, name: "Six Nations Championship", menu: "Six Nations", short: "6N", color: "#4a0f0a", badge: "sixnations", apiSports: 51 },
       { id: 4574, name: "Rugby World Cup", menu: "World Cup", short: "RWC", color: "#0b2a3d", badge: "rwc", apiSports: 69 },
     ],
   },
