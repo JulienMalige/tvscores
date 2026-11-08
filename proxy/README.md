@@ -106,6 +106,7 @@ avatar the app draws. Anything unasked-for for 60 days is pruned.
 | nfl | TheSportsDB, same key | shared | 9 calls, same | 30 s, 1 call | 60 s (assumed, as football) | ~800 | yes |
 | nba | TheSportsDB, same key | shared | 9 calls, same | 30 s, 1 call | 60 s (assumed, as football) | ~800 | yes |
 | tennis (ATP/WTA, majors and 1000s) | livetennisapi, free | **100/day** | 1 call daily + catalogue once a month | 30 min, 1 call | seconds | ~55 | free tier only |
+| rugby (6 competitions) | fixtures: TheSportsDB, same key; scores: API-Sports Rugby, free | 100/min; **100/day** | 9 calls, as football, +1 per idle competition; +1 API-Sports a day to settle yesterday | 5 min at best (about 8 on a full Saturday), 1 TheSportsDB + 1 API-Sports call | not measured yet | ~15 TheSportsDB, ~90 API-Sports | as football; API-Sports, as the Brasileirão backup |
 | f1, motogp | Orange Cat Blacktop, free | 7,500/month | calendar every 6 h; 30 min within 6 h of the race and for 3 h after a qualifying or sprint starts | — (results, not live timing) | post-session | ~13 each (+1 F1 qualifying, +3 MotoGP Q1, Q2, sprint per weekend) | **no — non-commercial** |
 | portraits | TheSportsDB, same key | 25/min, soft 1,000/day | once per athlete, kept a month | — | static | ~120 on a new sport | yes |
 | crests, badges | mirrored on this proxy | none after first fetch | on first sight | — | static | ~0 | trademark risk accepted |

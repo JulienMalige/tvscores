@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const ASSETS = join(dirname(fileURLToPath(import.meta.url)), "..", "assets");
 const SITE = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "site");
-import { buildScoreboard, localDate, withTablePhotos, withBroadcasts } from "./scoreboard.js";
+import { buildScoreboard, localDate, shownSports, withTablePhotos, withBroadcasts } from "./scoreboard.js";
 import { slug } from "./model.js";
 import { createWatch } from "./watch.js";
 import { prepare, send, canonicalTz } from "./respond.js";
@@ -89,8 +89,9 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
     if (!tz && path.startsWith("/v1/")) return send(res, 400, { error: `unknown tz ${rawTz.slice(0, 64)}` });
 
     if (path === "/v1/scoreboard") {
-      const prepared = remember(`board|${tz}`, () => {
-        const body = buildScoreboard(store.all(), { tz, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, mirror, broadcastsFor, watch, appIcon, activeSports, upcomingDays: config.schedule.upcomingDays });
+      const sports = shownSports(url.searchParams.get("sports"), config);
+      const prepared = remember(`board|${tz}|${sports}`, () => {
+        const body = buildScoreboard(store.all(), { tz, sports, sportOrder: config.sportOrder, meta: store.meta, leagues: config.leagues, publicBase: config.publicBase, standings: store.standings, photoFor, mirror, broadcastsFor, watch, appIcon, activeSports, upcomingDays: config.schedule.upcomingDays });
         // The tables' crests and portraits are registered with the mirror here
         // too, so the warmer has them before any television opens a table:
         // a crest first mirrored while a page waits for it is the one that

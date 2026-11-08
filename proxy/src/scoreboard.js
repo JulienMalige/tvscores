@@ -178,7 +178,27 @@ function withWatch(e, watch) {
   return Object.keys(watchOn).length ? { ...e, watchOn } : e;
 }
 
-export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, mirror, broadcastsFor, watch, appIcon, activeSports = [], upcomingDays = 7 } = {}) {
+/**
+ * The sports a television's board holds: those it names in `sports`, or
+ * without that the first ones (`config.firstSports`), as every build up to
+ * 1.0 asks. Another sport on one of those boards would sit on its Today with
+ * no menu entry and no way to hide it (rugby, 2026-11-08). Only ours are
+ * kept, in our order, so the boards remembered stay few.
+ */
+export function shownSports(param, config) {
+  const ours = Object.keys(config.leagues || {});
+  const asked = param == null ? config.firstSports : param.split(",");
+  if (!asked) return ours; // a config naming no first sports holds back none
+  return ours.filter((sport) => asked.includes(sport));
+}
+
+export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sports, sportOrder = [], meta = {}, leagues = {}, publicBase = "", standings = {}, photoFor, mirror, broadcastsFor, watch, appIcon, activeSports = [], upcomingDays = 7 } = {}) {
+  // Only the sports the television knows (shownSports), when it is said which.
+  const shown = sports && new Set(sports);
+  if (shown) {
+    events = events.filter((e) => shown.has(e.sport));
+    leagues = Object.fromEntries(Object.entries(leagues).filter(([sport]) => shown.has(sport)));
+  }
   // An event with no readable start cannot be placed on a day; one of them must
   // not be the reason nobody gets a board.
   events = events.filter((e) => Number.isFinite(Date.parse(e.start))).map((e) => withWatch(withBroadcasts(withPhotos(e, photoFor, mirror), broadcastsFor), watch));
@@ -213,7 +233,7 @@ export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sportOrd
   // Only sports that actually have a scheduler this run are judged stale.
   const active = activeSports.length ? new Set(activeSports) : new Set(Object.keys(meta));
   const stale = Object.fromEntries(
-    Object.entries(meta).filter(([sport]) => active.has(sport)).map(([sport, m]) => [sport, !m.lastOk || now - Date.parse(m.lastOk) > 6 * 3600e3]),
+    Object.entries(meta).filter(([sport]) => active.has(sport) && (!shown || shown.has(sport))).map(([sport, m]) => [sport, !m.lastOk || now - Date.parse(m.lastOk) > 6 * 3600e3]),
   );
   const grouped = Object.fromEntries(Object.entries(days).map(([k, v]) => [k, groupByLeague(v, sportOrder, leagues, publicBase, standings)]));
   return {

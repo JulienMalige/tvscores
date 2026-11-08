@@ -75,7 +75,7 @@ export const config = {
   port: Number(env.TVSCORES_PORT || 8787),
   cacheDir: env.TVSCORES_CACHE_DIR || join(homedir(), ".local/state/tvscores"),
   liveTennisKey: readKey("TVSCORES_LIVETENNIS_KEY", "livetennisapi.key"),
-  /** API-Sports (free plan, 100 calls a day): only the live-numbers backup for the Brasileirão. */
+  /** API-Sports (free plans, 100 calls a day each): rugby's scores, and the live-numbers backup for the Brasileirão. */
   apiSportsKey: readKey("TVSCORES_APISPORTS_KEY", "api-sports.key"),
   ocBlacktopKey: readKey("TVSCORES_OCBLACKTOP_KEY", "ocblacktop.key"),
   /** TheSportsDB key for athlete cutouts and schedules; "3" is the public test key, capped so hard it is unusable for anything but a demo. */
@@ -153,6 +153,20 @@ export const config = {
       { id: "atp", name: "ATP Tour", short: "ATP", color: "#1f4a5c", badge: "atp" },
       { id: "wta", name: "WTA Tour", short: "WTA", color: "#3d1a6e", badge: "wta" },
     ],
+    /**
+     * Rugby union (Julien, 2026-11-08), the fixtures from TheSportsDB and the
+     * scores from API-Sports: `apiSports` is the competition's id there
+     * (providers/rugby.js). No tables: neither feed has this season's, and
+     * one built from results would miss the bonus points, which need tries.
+     */
+    rugby: [
+      { id: 4430, name: "Top 14", short: "T14", color: "#2a2316", badge: "top14", apiSports: 16 },
+      { id: 4550, name: "European Rugby Champions Cup", menu: "Champions Cup", short: "ERCC", color: "#0f1f45", badge: "ercc", apiSports: 54 },
+      { id: 4414, name: "Premiership Rugby", menu: "Premiership", short: "PREM", color: "#4a1a05", badge: "prem", apiSports: 13 },
+      { id: 5852, name: "Nations Championship", short: "NC", color: "#22260a", badge: "nations", apiSports: 145 },
+      { id: 4714, name: "Six Nations", short: "6N", color: "#4a0f0a", badge: "sixnations", apiSports: 51 },
+      { id: 4574, name: "Rugby World Cup", menu: "World Cup", short: "RWC", color: "#0b2a3d", badge: "rwc", apiSports: 69 },
+    ],
   },
   /**
    * Tennis plays somewhere every week of the year, most of it in front of
@@ -202,7 +216,13 @@ export const config = {
   channelApps: JSON.parse(readFileSync(new URL("../channel-apps.json", import.meta.url), "utf8")),
   broadcastRights: Object.fromEntries(BROADCAST_COUNTRIES.map((cc) => [cc, readRights(cc)])),
   /** Display order of sports on the scoreboard. */
-  sportOrder: ["football", "f1", "motogp", "tennis", "nba", "nfl"],
+  sportOrder: ["football", "rugby", "f1", "motogp", "tennis", "nba", "nfl"],
+  /**
+   * What a board asked for without `sports` holds: the sports of every build
+   * up to 1.0 (46), which can neither show another in its menu nor hide it
+   * in Settings. A build that knows more names them all.
+   */
+  firstSports: ["football", "nfl", "nba", "f1", "motogp", "tennis"],
   schedule: {
     /**
      * The days every team sport is fetched for, one call each: yesterday for
@@ -217,10 +237,12 @@ export const config = {
      * per *minute*, so half a minute apart — half the feed's own 60 s period,
      * see proxy/README.md — costs them nothing: a full twelve-hour Saturday is
      * 1,440 calls against a ceiling of 100 a minute. Tennis is still on a
-     * 100-a-day key and stays slow. The quota stretches any of these further
-     * when the day's budget would not survive it.
+     * 100-a-day key and stays slow, and so are rugby's scores (API-Sports'
+     * free plan): five minutes at best, about eight on a Saturday of games
+     * from noon to ten. The quota stretches any of these further when the
+     * day's budget would not survive it.
      */
-    liveIntervalSeconds: { default: 1800, football: 30, nfl: 30, nba: 30, tennis: 1800 },
+    liveIntervalSeconds: { default: 1800, football: 30, nfl: 30, nba: 30, tennis: 1800, rugby: 300 },
     /** Never spend the last N calls of a sport's daily quota. */
     quotaReserve: 8,
     dailyQuota: 100,

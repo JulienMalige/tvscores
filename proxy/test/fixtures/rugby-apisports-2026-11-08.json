@@ -1,0 +1,246 @@
+{
+ "get": "games",
+ "parameters": {
+  "date": "2026-11-08"
+ },
+ "errors": [],
+ "results": 4,
+ "response": [
+  {
+   "id": 54142,
+   "date": "2026-11-08T14:00:00+00:00",
+   "time": "14:00",
+   "timestamp": 1794146400,
+   "timezone": "UTC",
+   "week": "9",
+   "status": {
+    "long": "Finished",
+    "short": "FT"
+   },
+   "country": {
+    "id": 7,
+    "name": "France",
+    "code": "FR",
+    "flag": "https://media.api-sports.io/flags/fr.svg"
+   },
+   "league": {
+    "id": 16,
+    "name": "Top 14",
+    "type": "League",
+    "logo": "https://media.api-sports.io/rugby/leagues/16.png",
+    "season": 2026
+   },
+   "teams": {
+    "home": {
+     "id": 123,
+     "name": "Vannes",
+     "logo": "https://media.api-sports.io/rugby/teams/123.png"
+    },
+    "away": {
+     "id": 96,
+     "name": "Bordeaux Begles",
+     "logo": "https://media.api-sports.io/rugby/teams/96.png"
+    }
+   },
+   "scores": {
+    "home": 23,
+    "away": 14
+   },
+   "periods": {
+    "first": {
+     "home": null,
+     "away": null
+    },
+    "second": {
+     "home": null,
+     "away": null
+    },
+    "overtime": {
+     "home": null,
+     "away": null
+    },
+    "second_overtime": {
+     "home": null,
+     "away": null
+    }
+   }
+  },
+  {
+   "id": 53236,
+   "date": "2026-11-08T15:10:00+00:00",
+   "time": "15:10",
+   "timestamp": 1794150600,
+   "timezone": "UTC",
+   "week": "4",
+   "status": {
+    "long": "Finished",
+    "short": "FT"
+   },
+   "country": {
+    "id": 26,
+    "name": "World",
+    "code": null,
+    "flag": null
+   },
+   "league": {
+    "id": 145,
+    "name": "Nations Championship",
+    "type": "League",
+    "logo": "https://media.api-sports.io/rugby/leagues/145.png",
+    "season": 2026
+   },
+   "teams": {
+    "home": {
+     "id": 386,
+     "name": "England",
+     "logo": "https://media.api-sports.io/rugby/teams/386.png"
+    },
+    "away": {
+     "id": 461,
+     "name": "Australia",
+     "logo": "https://media.api-sports.io/rugby/teams/461.png"
+    }
+   },
+   "scores": {
+    "home": 45,
+    "away": 22
+   },
+   "periods": {
+    "first": {
+     "home": null,
+     "away": null
+    },
+    "second": {
+     "home": null,
+     "away": null
+    },
+    "overtime": {
+     "home": null,
+     "away": null
+    },
+    "second_overtime": {
+     "home": null,
+     "away": null
+    }
+   }
+  },
+  {
+   "id": 54140,
+   "date": "2026-11-08T20:05:00+00:00",
+   "time": "20:05",
+   "timestamp": 1794168300,
+   "timezone": "UTC",
+   "week": "9",
+   "status": {
+    "long": "Finished",
+    "short": "FT"
+   },
+   "country": {
+    "id": 7,
+    "name": "France",
+    "code": "FR",
+    "flag": "https://media.api-sports.io/flags/fr.svg"
+   },
+   "league": {
+    "id": 16,
+    "name": "Top 14",
+    "type": "League",
+    "logo": "https://media.api-sports.io/rugby/leagues/16.png",
+    "season": 2026
+   },
+   "teams": {
+    "home": {
+     "id": 100,
+     "name": "Stade Rochelais",
+     "logo": "https://media.api-sports.io/rugby/teams/100.png"
+    },
+    "away": {
+     "id": 95,
+     "name": "Aviron Bayonnais",
+     "logo": "https://media.api-sports.io/rugby/teams/95.png"
+    }
+   },
+   "scores": {
+    "home": 22,
+    "away": 18
+   },
+   "periods": {
+    "first": {
+     "home": null,
+     "away": null
+    },
+    "second": {
+     "home": null,
+     "away": null
+    },
+    "overtime": {
+     "home": null,
+     "away": null
+    },
+    "second_overtime": {
+     "home": null,
+     "away": null
+    }
+   }
+  },
+  {
+   "id": 55908,
+   "date": "2026-11-08T10:00:00+00:00",
+   "time": "10:00",
+   "timestamp": 1794132000,
+   "timezone": "UTC",
+   "week": "6",
+   "status": {
+    "long": "Finished",
+    "short": "FT"
+   },
+   "country": {
+    "id": 8,
+    "name": "Georgia",
+    "code": "GE",
+    "flag": "https://media.api-sports.io/flags/ge.svg"
+   },
+   "league": {
+    "id": 19,
+    "name": "Didi 10",
+    "type": "League",
+    "logo": "https://media.api-sports.io/rugby/leagues/19.png",
+    "season": 2026
+   },
+   "teams": {
+    "home": {
+     "id": 772,
+     "name": "Khvamli Tbilisi",
+     "logo": "https://media.api-sports.io/rugby/teams/772.png"
+    },
+    "away": {
+     "id": 150,
+     "name": "Vepkhvebi",
+     "logo": "https://media.api-sports.io/rugby/teams/150.png"
+    }
+   },
+   "scores": {
+    "home": 43,
+    "away": 20
+   },
+   "periods": {
+    "first": {
+     "home": null,
+     "away": null
+    },
+    "second": {
+     "home": null,
+     "away": null
+    },
+    "overtime": {
+     "home": null,
+     "away": null
+    },
+    "second_overtime": {
+     "home": null,
+     "away": null
+    }
+   }
+  }
+ ]
+}

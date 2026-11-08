@@ -7,6 +7,7 @@ import { f1Provider } from "./providers/jolpica.js";
 import { driverNationalities } from "./providers/sportsdb-drivers.js";
 import { motorsportProvider } from "./providers/ocblacktop.js";
 import { tennisProvider } from "./providers/livetennis.js";
+import { rugbyProvider } from "./providers/rugby.js";
 import { TeamSportScheduler } from "./scheduler.js";
 import { CalendarScheduler } from "./calendar-scheduler.js";
 import { createApp } from "./server.js";
@@ -48,6 +49,25 @@ for (const sport of ["football", "nfl", "nba"]) {
   });
   schedulers.push(new TeamSportScheduler({ provider, store, cfg, log }));
 }
+// Rugby union: the fixtures from TheSportsDB on the same key, on a budget of
+// their own, and the scores from API-Sports' free rugby plan, whose 100 calls
+// a day are what this scheduler counts and paces its polls by.
+{
+  const meta = store.sportMeta("rugby");
+  const cfg = { ...config.schedule, liveIntervalSeconds: config.schedule.liveIntervalSeconds.rugby };
+  const fixtures = sportsDbSport({
+    sport: "rugby",
+    key: config.theSportsDbKey,
+    leagues: config.leagues.rugby,
+    window: config.schedule.teamSportWindow,
+    quota: new Quota(store.sportMeta("rugbyFixtures"), { dailyQuota: config.schedule.sportsDbDailyQuota, quotaReserve: config.schedule.quotaReserve }),
+    seasons: (meta.seasons ??= {}),
+    next: (meta.next ??= {}),
+    log,
+  });
+  const provider = rugbyProvider({ fixtures, leagues: config.leagues.rugby, key: config.apiSportsKey, quota: new Quota(meta, cfg), meta, log });
+  schedulers.push(new TeamSportScheduler({ provider, store, cfg, log }));
+}
 if (config.ocBlacktopKey) {
   const f1Nationalities = driverNationalities({ key: config.theSportsDbKey });
   for (const [sport, leagueKey] of [["formula1", "f1"], ["moto-gp", "motogp"]]) {
@@ -72,6 +92,7 @@ const images = new ImageMirror({ dir: join(config.cacheDir, "images"), publicBas
 const limits = Object.fromEntries(schedulers.filter((s) => s.quota).map((s) => [s.p.sport, s.quota.dailyQuota]));
 limits.photos = 1000; // a soft daily line for the health page, well under the paid key's rate
 limits.footballBackup = 100; // API-Sports' free plan, for the Brasileirão's live numbers
+limits.rugbyFixtures = config.schedule.sportsDbDailyQuota;
 const backup = new LiveBackup({ key: config.apiSportsKey, meta: store.sportMeta("footballBackup"), log });
 const details = new EventDetails({ key: config.theSportsDbKey, store, log, backup });
 // The test key "3" has no v2 access: without a real key the TV rows are skipped.

@@ -31,12 +31,27 @@ const PERIOD = { Q1: "1st", Q2: "2nd", Q3: "3rd", Q4: "4th", OT: "OT" };
  * One entry per sport we take from this provider: the name its schedule
  * endpoint wants, the path its livescore endpoint lives at, and whether its
  * teams are known by nickname ("Lions") or in full ("Manchester City").
+ * Rugby has no livescore there (checked 2026-11-08): its scores come from
+ * API-Sports (providers/rugby.js), and `rename` says its sides' names.
  */
 export const SPORTS = {
   football: { feed: "Soccer", live: "soccer", nick: false },
   nfl: { feed: "American Football", live: "americanfootball", nick: true },
   nba: { feed: "Basketball", live: "basketball", nick: true },
+  rugby: { feed: "Rugby", nick: false, rename: rugbyName },
 };
+
+/** Names the feed has kept from before a club changed its own. */
+const RUGBY_NAMES = { "Racing Métro 92": "Racing 92" };
+
+/**
+ * A rugby side as a rugby row says it. The feed tells a country's rugby side
+ * from its football one by the word ("France Rugby"), which a row under a
+ * rugby heading says twice; clubs carry it too ("Bath Rugby").
+ */
+export function rugbyName(name) {
+  return (RUGBY_NAMES[name] ?? name).replace(/ Rugby$/, "");
+}
 
 /**
  * `strTimestamp` is UTC but carries no zone, so it has to be marked as UTC
@@ -85,7 +100,7 @@ export function normaliseEvent(row, league, sport = "football", now = Date.now()
   // A postponed match says "NS" as well, and it knows why — that wins.
   const called = row.strPostponed === "yes" || NOT_PLAYED.has(short);
   const lost = state === STATE.other && !called && (!short || short === "NS");
-  const { nick } = SPORTS[sport];
+  const { nick, rename = (name) => name } = SPORTS[sport];
   // `strProgress` is where the game is: a minute in football, the period clock
   // elsewhere. Neither means anything while the teams are off the pitch.
   const stopped = ["HT", "BT", "P"].includes(short);
@@ -104,8 +119,8 @@ export function normaliseEvent(row, league, sport = "football", now = Date.now()
     start,
     round: row.intRound ? `Round ${row.intRound}` : undefined,
     status: { state, clock, detail: lost ? "No update" : row.strPostponed === "yes" ? "Postponed" : DETAIL[short] },
-    home: team(row.strHomeTeam, undefined, { nick, logo: row.strHomeTeamBadge || undefined }),
-    away: team(row.strAwayTeam, undefined, { nick, logo: row.strAwayTeamBadge || undefined }),
+    home: team(rename(row.strHomeTeam), undefined, { nick, logo: row.strHomeTeamBadge || undefined }),
+    away: team(rename(row.strAwayTeam), undefined, { nick, logo: row.strAwayTeamBadge || undefined }),
     score: { home: score(row.intHomeScore), away: score(row.intAwayScore) },
   };
 }

@@ -125,7 +125,7 @@ This is the mechanic to preserve; `proxy/src/scheduler.js` owns it and
 | What | When | Cost per round |
 |---|---|---|
 | Schedules (`daily`) | once per UTC day after `dailyRefreshHourUtc`, or after `idleRefreshMinutes` — but never while a game could be in progress | 9 calls per team sport, one per day of the window, plus one per competition with nothing in it (when it is next on) |
-| Scores (`live`) | only inside a live window, then every `liveIntervalSeconds` — 30 s for the sports on the paid key, 30 min for tennis | 1 call per sport |
+| Scores (`live`) | only inside a live window, then every `liveIntervalSeconds` — 30 s for the sports on the paid key, 30 min for tennis, 5 min or more for rugby | 1 call per sport; rugby 2, today's fixtures and API-Sports' games of the day |
 | Standings | every 6 hours, and within 10 min of a final whistle in that league | 1 per league (the season's results for the leagues the feed has no table for) |
 | Motorsport calendar | every 6 hours, or every 30 min within 6 h of a session and for 3 h after a qualifying or sprint starts | 1 + one per newly finished race, qualifying or sprint |
 | Portraits | once per athlete, kept a month | background, 25/min |
@@ -184,7 +184,10 @@ writes its own number is a bug, and rows all use `rowSurface(focused:)`.
 - **A seven-day Upcoming for football** needs a source with date ranges; the
   free plan serves yesterday to tomorrow only. See `docs/data-providers.md`.
 - Leagues in the MVP: Premier League, Champions League, NFL, NBA, F1, MotoGP,
-  ATP/WTA. Rugby is available on the same plan if Julien wants it.
+  ATP/WTA. Rugby union since 2026-11-08 (Julien's six: Top 14, Champions
+  Cup, Premiership, Nations Championship, Six Nations, World Cup), from
+  version 1.1: builds up to 1.0 send no `sports` list and are given none of
+  it (`firstSports` in `proxy/src/config.js`).
 - **The menu is ours, not tvOS's sidebar** (Julien, 2026-09-28, keeping
   every competition in it). tvOS's `sidebarAdaptable` loses focus past
   seven tabs — the menu opened and shut in one movement from its lower

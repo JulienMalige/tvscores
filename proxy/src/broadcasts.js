@@ -11,7 +11,7 @@ const V2 = "https://www.thesportsdb.com/api/v2/json";
 /** Names shown per event, at most. */
 const MAX_NAMES = 4;
 /** The team sports whose daily pass should land before we match against it. */
-const TEAM_SPORTS = ["football", "nfl", "nba"];
+const TEAM_SPORTS = ["football", "nfl", "nba", "rugby"];
 const day = Quota.utcDay; // the same UTC day the quotas roll over on
 
 /**

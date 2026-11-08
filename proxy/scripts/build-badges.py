@@ -9,7 +9,8 @@ Two shapes per competition, because they are read in two places:
                   the sidebar — where tvOS lays icons out itself and a wide
                   wordmark would tower over a crest beside it
 
-Re-run when a league is added. Sources listed in docs/data-providers.md."""
+Re-run when a league is added, naming it (`build-badges.py top14`); with no
+name it builds them all. Sources listed in docs/data-providers.md."""
 import io, os, sys, urllib.request
 
 from PIL import Image
@@ -33,12 +34,25 @@ BADGES = {
     "libertadores": "https://r2.thesportsdb.com/images/media/league/badge/9shr931685425181.png",
     "uel": "https://r2.thesportsdb.com/images/media/league/badge/mlsr7d1718774547.png",
     "brasileirao": "https://r2.thesportsdb.com/images/media/league/badge/lywv7t1766787179.png",
+    "top14": "https://r2.thesportsdb.com/images/media/league/badge/xrsqtw1452903237.png",
+    "ercc": "https://r2.thesportsdb.com/images/media/league/badge/kohne11716546580.png",
+    "prem": "https://r2.thesportsdb.com/images/media/league/badge/r59qxy1755025703.png",
+    "nations": "https://r2.thesportsdb.com/images/media/league/badge/jifczi1773608397.png",
+    "sixnations": "https://r2.thesportsdb.com/images/media/league/badge/7h1wr91738670253.png",
+    "rwc": "https://r2.thesportsdb.com/images/media/league/badge/1otaxh1773613283.png",
 }
 OUT = os.path.join(os.path.dirname(__file__), "..", "assets", "leagues")
 HEIGHT = 160  # px; the app scales down, Retina-safe
 # Badges printed on a solid ground, where that ground is the badge's box and
 # not part of the mark. Cleared from the edges in, so white inside a mark stays.
 DROP_GROUND = {"seriea"}
+# Cut from the artwork before anything else, so from both shapes: fractions
+# of the file as downloaded (left, top, right, bottom). The Six Nations' mark
+# carries its beer sponsor's name, which France's Loi Évin keeps off its
+# sports broadcasts, over the M6N.
+CROP = {
+    "sixnations": (0.00, 0.40, 1.00, 1.00),
+}
 
 # Most league lockups are a mark with the competition's name set under it. At
 # the size a sidebar draws an icon that name is an illegible smudge, so the
@@ -48,6 +62,9 @@ DROP_GROUND = {"seriea"}
 DISC_CROP = {
     "brasileirao": (0.00, 0.00, 1.00, 0.80),   # shield, without BRASILEIRÃO
     "bundesliga": (0.00, 0.00, 1.00, 0.78),    # the striker, without the name
+    "ercc": (0.00, 0.00, 1.00, 0.59),          # the star, without its sponsor and CHAMPIONS CUP
+    "nations": (0.00, 0.00, 1.00, 0.70),       # the ring, without NATIONS CHAMPIONSHIP
+    "prem": (0.00, 0.00, 1.00, 0.49),          # PREM, without RUGBY
     "laliga": (0.00, 0.00, 1.00, 0.68),        # the stripes, without LALIGA
     "libertadores": (0.00, 0.00, 1.00, 0.72),  # the trophy alone
     "ligue1": (0.00, 0.00, 1.00, 0.70),        # the numeral, without LIGUE 1
@@ -56,9 +73,15 @@ DISC_CROP = {
     "uel": (0.00, 0.00, 1.00, 0.45),           # the trophy, without UEFA EUROPA LEAGUE
 }
 
-for name, url in BADGES.items():
+# Named on the command line, only those: an added league need not fetch the
+# others again, which would bring whatever their artwork has become since.
+for name in sys.argv[1:] or BADGES:
+    url = BADGES[name]
     data = urllib.request.urlopen(url, timeout=20).read()
     im = Image.open(io.BytesIO(data)).convert("RGBA")
+    if name in CROP:
+        box = CROP[name]
+        im = im.crop((round(box[0] * im.width), round(box[1] * im.height), round(box[2] * im.width), round(box[3] * im.height)))
     alpha = im.getchannel("A").point(lambda a: 255 if a > 24 else 0)
     box = alpha.getbbox()
     im = im.crop(box) if box else im

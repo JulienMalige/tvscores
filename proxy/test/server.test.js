@@ -37,6 +37,37 @@ test("the tag follows the content, not the clock", async () => {
   }
 });
 
+test("a board holds the sports the television knows: without a list, those of every build up to 1.0", async () => {
+  const s = await serve({ activeSports: ["football", "rugby"] });
+  try {
+    const game = (sport, league, home, away) => ({
+      id: `${sport}:tsdb:${home}`, sport, league, kind: "match", start: new Date().toISOString(),
+      status: { state: "scheduled" }, home: { name: home, short: home.slice(0, 3) }, away: { name: away, short: away.slice(0, 3) }, score: { home: null, away: null },
+    });
+    s.store.upsert([game("rugby", { id: 4430, name: "Top 14", short: "T14" }, "Vannes", "Pau"), game("football", { id: 4334, name: "Ligue 1", short: "L1" }, "Lens", "Lille")]);
+    s.store.sportMeta("rugby"); // never fetched: stale, for a board that holds rugby
+    const sports = (board) => [...new Set([...Object.values(board.days).flat().map((g) => g.sport), ...board.leagues.map((l) => l.sport), ...Object.keys(board.stale)])].sort();
+    const old = await (await s.get("/v1/scoreboard?tz=Europe/Paris")).json();
+    assert.ok(!sports(old).includes("rugby"), "build 46 could neither show rugby in its menu nor hide it");
+    assert.ok(sports(old).includes("football"));
+    const knows = await (await s.get("/v1/scoreboard?tz=Europe/Paris&sports=football,rugby,curling")).json();
+    assert.deepEqual(sports(knows), ["football", "rugby"], "what it names and we have, nothing more");
+    assert.equal(knows.stale.rugby, true);
+    assert.equal(knows.days.today.find((g) => g.sport === "rugby").events[0].home.name, "Vannes");
+  } finally {
+    await s.close();
+  }
+});
+
+test("every competition's badge is on disk in both shapes", () => {
+  const assets = new URL("../assets/leagues/", import.meta.url);
+  for (const league of Object.values(config.leagues).flat().filter((l) => l.badge)) {
+    for (const file of [`${league.badge}.png`, `icon/${league.badge}.png`]) {
+      assert.ok(statSync(new URL(file, assets)).size > 0, `${league.name}: ${file}`);
+    }
+  }
+});
+
 test("a competition's badge is served in both shapes, and nothing else is", async () => {
   const s = await serve();
   try {

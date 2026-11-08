@@ -96,6 +96,33 @@ API-Sports **Rugby** is on Julien's free plan (`v1.rugby.api-sports.io/games?dat
 same ±1 day window and 100 calls/day. Leagues: Top 14, Premiership, URC,
 Six Nations, Rugby Championship, World Cup. Adapter = copy of the NFL one.
 
+**Rugby union, decided 2026-11-08.** Julien's six: Top 14, Champions Cup,
+Premiership, Nations Championship, Six Nations, World Cup (not the Rugby
+Championship nor the URC). Checked that day, on the weekend of 7 and 8
+November:
+
+- **TheSportsDB** (our paid key, `eventsday.php?s=Rugby`, which also holds
+  rugby league) has every competition a week ahead, with crests. It has **no
+  rugby at all in its livescore** (`livescore/all` listed ice hockey, soccer,
+  basketball, American football and baseball), and its scores are typed in
+  late and sometimes wrong: England v Australia still "not started" seven
+  hours after kickoff, La Rochelle v Bayonne at "1H 12-8" after the final
+  whistle, and France 34-21 Fiji for a 54-17 that API-Sports and ESPN agree
+  on. No tables either (`lookuptable.php` answers empty for the Top 14, the
+  Premiership and the Nations Championship).
+- **API-Sports Rugby**, free (active until 2027-09-13): every game of a day,
+  finished ones included, in one call; dates from yesterday to tomorrow only,
+  seasons 2022 to 2024 only (so no current table), no `live` filter. All
+  twelve of our games that weekend had their final scores.
+
+So the fixtures come from TheSportsDB and the scores from API-Sports, joined
+on competition, kickoff (45 minutes) and both sides' names
+(`proxy/src/providers/rugby.js`); a score from API-Sports wins over
+TheSportsDB's. No league tables: built from results they would miss the
+bonus points, which need the tries. The Six Nations badge is cut below its
+sponsor's name, Guinness, which France's Loi Évin keeps off its sports
+broadcasts.
+
 ## Competition logos (2026-09-14)
 
 Julien asked for official league marks in the section headers. Sources:
