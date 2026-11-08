@@ -1,0 +1,245 @@
+{
+  "data": [
+    {
+      "court": null,
+      "created_at": "2026-11-04T05:23:13.079682Z",
+      "draw": "singles",
+      "event_status": "Cancelled",
+      "event_status_updated_at": "2026-11-07T20:30:22.028383Z",
+      "format": "BO3",
+      "gender": "women",
+      "has_analysis": true,
+      "has_market": true,
+      "id": 215426,
+      "indoor": true,
+      "is_doubles": false,
+      "is_qualifying": null,
+      "live_at": null,
+      "outcome": null,
+      "players": {
+        "p1": {
+          "archive_player_id": 214981,
+          "backhand": null,
+          "birthday": "1999-06-17",
+          "country": "kaz",
+          "data_completeness": {
+            "known": 4,
+            "missing": [
+              "backhand"
+            ],
+            "of": 5
+          },
+          "hand": "R",
+          "id": 47,
+          "is_doubles_team": false,
+          "itf_ranking": null,
+          "name": "Elena Rybakina",
+          "ranking": 1,
+          "ranking_checked_at": "2026-11-08T14:51:13.443985Z",
+          "ranking_movement": "same",
+          "ranking_points": 8099,
+          "ranking_status": "ranked",
+          "tour": "wta"
+        },
+        "p2": {
+          "archive_player_id": 222328,
+          "backhand": null,
+          "birthday": "2004-11-17",
+          "country": "cze",
+          "data_completeness": {
+            "known": 4,
+            "missing": [
+              "backhand"
+            ],
+            "of": 5
+          },
+          "hand": "R",
+          "id": 768,
+          "is_doubles_team": false,
+          "itf_ranking": null,
+          "name": "Linda Noskova",
+          "ranking": 8,
+          "ranking_checked_at": "2026-11-08T14:51:13.443985Z",
+          "ranking_movement": "down",
+          "ranking_points": 4343,
+          "ranking_status": "ranked",
+          "tour": "wta"
+        }
+      },
+      "result_restated_at": null,
+      "result_version": 1,
+      "round": null,
+      "round_code": null,
+      "scheduled_time": "2026-11-08T20:00:00Z",
+      "score": null,
+      "status": "upcoming",
+      "surface": "hard",
+      "tier": null,
+      "tier_source": null,
+      "tour": "wta",
+      "tournament": "Finals - Riyadh",
+      "tournament_id": "3195",
+      "updated_at": "2026-11-08T14:59:31.849463Z"
+    },
+    {
+      "court": null,
+      "created_at": "2026-11-04T05:23:13.101515Z",
+      "draw": "singles",
+      "event_status": null,
+      "event_status_updated_at": null,
+      "format": "BO3",
+      "gender": "women",
+      "has_analysis": true,
+      "has_market": true,
+      "id": 215427,
+      "indoor": true,
+      "is_doubles": false,
+      "is_qualifying": null,
+      "live_at": null,
+      "outcome": null,
+      "players": {
+        "p1": {
+          "archive_player_id": 221103,
+          "backhand": null,
+          "birthday": "2004-03-13",
+          "country": "usa",
+          "data_completeness": {
+            "known": 4,
+            "missing": [
+              "backhand"
+            ],
+            "of": 5
+          },
+          "hand": "R",
+          "id": 42,
+          "is_doubles_team": false,
+          "itf_ranking": null,
+          "name": "Coco Gauff",
+          "ranking": 4,
+          "ranking_checked_at": "2026-11-08T14:51:13.443985Z",
+          "ranking_movement": "down",
+          "ranking_points": 5763,
+          "ranking_status": "ranked",
+          "tour": "wta"
+        },
+        "p2": {
+          "archive_player_id": 202468,
+          "backhand": null,
+          "birthday": "1994-02-24",
+          "country": "usa",
+          "data_completeness": {
+            "known": 4,
+            "missing": [
+              "backhand"
+            ],
+            "of": 5
+          },
+          "hand": "R",
+          "id": 50,
+          "is_doubles_team": false,
+          "itf_ranking": null,
+          "name": "Jessica Pegula",
+          "ranking": 5,
+          "ranking_checked_at": "2026-11-08T14:51:13.443985Z",
+          "ranking_movement": "up",
+          "ranking_points": 5760,
+          "ranking_status": "ranked",
+          "tour": "wta"
+        }
+      },
+      "result_restated_at": null,
+      "result_version": 1,
+      "round": null,
+      "round_code": null,
+      "scheduled_time": "2026-11-08T21:30:00Z",
+      "score": null,
+      "status": "upcoming",
+      "surface": "hard",
+      "tier": null,
+      "tier_source": null,
+      "tour": "wta",
+      "tournament": "Finals - Riyadh",
+      "tournament_id": "3195",
+      "updated_at": "2026-11-08T14:59:31.864307Z"
+    },
+    {
+      "court": null,
+      "created_at": "2026-11-04T03:27:19.149691Z",
+      "draw": "doubles",
+      "event_status": null,
+      "event_status_updated_at": null,
+      "format": "BO3",
+      "gender": "women",
+      "has_analysis": false,
+      "has_market": false,
+      "id": 215399,
+      "indoor": true,
+      "is_doubles": true,
+      "is_qualifying": null,
+      "live_at": null,
+      "outcome": null,
+      "players": {
+        "p1": {
+          "archive_player_id": null,
+          "backhand": null,
+          "birthday": null,
+          "country": null,
+          "data_completeness": {
+            "known": null,
+            "missing": [],
+            "note": "doubles team — per-player profile fields do not apply",
+            "of": null
+          },
+          "hand": null,
+          "id": 1834,
+          "is_doubles_team": true,
+          "itf_ranking": null,
+          "name": "Katerina Siniakova / Taylor Townsend",
+          "ranking": null,
+          "ranking_checked_at": null,
+          "ranking_movement": null,
+          "ranking_points": null,
+          "ranking_status": null,
+          "tour": "wta"
+        },
+        "p2": {
+          "archive_player_id": null,
+          "backhand": null,
+          "birthday": null,
+          "country": "ita",
+          "data_completeness": {
+            "known": null,
+            "missing": [],
+            "note": "doubles team — per-player profile fields do not apply",
+            "of": null
+          },
+          "hand": null,
+          "id": 10106,
+          "is_doubles_team": true,
+          "itf_ranking": null,
+          "name": "Errani / Paolini",
+          "ranking": null,
+          "ranking_checked_at": null,
+          "ranking_movement": null,
+          "ranking_points": null,
+          "ranking_status": null,
+          "tour": "wta"
+        }
+      },
+      "result_restated_at": null,
+      "result_version": 1,
+      "round": null,
+      "round_code": null,
+      "scheduled_time": "2026-11-08T23:00:00Z",
+      "score": null,
+      "status": "upcoming",
+      "surface": "hard",
+      "tier": null,
+      "tier_source": null,
+      "tour": "wta",
+      "tournament": "Finals - Riyadh",
+      "tournament_id": "3190",
+      "updated_at": "2026-11-08T14:59:33.283784Z"
+    }
+  ]
+}

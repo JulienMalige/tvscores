@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- Tennis's season finals are listed before they start, under their own name: the WTA Finals
+  at Indian Wells this week, then the ATP Finals in Turin. They used to appear only once a
+  match was under way, headed with the name of the WTA's former host, Riyadh.
 
 ## 1.0 build 46 — 27 October 2026
 - Settings: Open apps moves from About to a Debug section of its own at the bottom, which

@@ -19,10 +19,17 @@ function shiftDay(day, days) {
  * whose UTC day is the eve of its local one, and one after. A tournament with
  * no town is matched on its country instead, but only when a single entry of
  * that tour is on there that week, so two events never get each other's name.
+ * The season finals join on being the finals of that tour: they move (the
+ * WTA's from Riyadh to Indian Wells in 2026), and the feed names them after
+ * a host, "Finals - Riyadh", with no town or country of their own.
  */
 export function calendarEntry(calendar, { tour, info, day }) {
   if (!Array.isArray(calendar) || !tour || !info || !/^\d{4}-\d{2}-\d{2}$/.test(day || "")) return undefined;
   const on = calendar.filter((c) => c?.tour === tour && c.start && c.end && shiftDay(c.start, -3) <= day && day <= shiftDay(c.end, 1));
+  if (info.category === "tour_finals") {
+    const finals = on.filter((c) => c.tier === "tour_finals");
+    return finals.length === 1 ? finals[0] : undefined;
+  }
   const towns = [info.city, info.name].map(place).filter(Boolean);
   const byTown = on.find((c) => towns.includes(place(c.city)));
   if (byTown) return byTown;

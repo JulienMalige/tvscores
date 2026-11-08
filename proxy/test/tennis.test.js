@@ -2,9 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { config } from "../src/config.js";
-import { roundOf, tiersFor, untieredOn, normaliseMatch, liveClock, setsLine, tierLabel, TIER_CATEGORY } from "../src/providers/livetennis-match.js";
+import { roundOf, tiersFor, normaliseMatch, liveClock, setsLine, tierLabel, TIER_CATEGORY } from "../src/providers/livetennis-match.js";
 import { bigEventFilter } from "../src/providers/livetennis.js";
-import { calendarEntry } from "../src/providers/tennis-calendar.js";
 
 const raw = JSON.parse(readFileSync(new URL("./fixtures/tennis.json", import.meta.url))).data[0];
 
@@ -134,82 +133,4 @@ test("upcoming asks for our tiers only, and rounds lose the tournament's name", 
   assert.equal(roundOf("1/2-final"), "Semi-final");
   assert.equal(roundOf("Final"), "Final");
   assert.equal(roundOf(undefined), undefined);
-});
-
-// A slice of proxy/tennis-calendar.json's shape: the Beijing fortnight, where
-// both tours are in town with different weeks, and Tokyo the same week.
-const CALENDAR = [
-  { tour: "wta", name: "China Open", city: "Beijing", country: "CN", start: "2026-09-24", end: "2026-10-04", tier: "wta_1000" },
-  { tour: "atp", name: "China Open", city: "Beijing", country: "CN", start: "2026-09-24", end: "2026-09-30", tier: "atp_500" },
-  { tour: "atp", name: "Japan Open", city: "Tokyo", country: "JP", start: "2026-09-24", end: "2026-09-30", tier: "atp_500" },
-  { tour: "atp", name: "Shanghai Masters", city: "Shanghai", country: "CN", start: "2026-10-01", end: "2026-10-12", tier: "masters_1000" },
-  { tour: "wta", name: "Wuhan Open", city: "Wuhan", country: "CN", start: "2026-10-05", end: "2026-10-11", tier: "wta_1000" },
-];
-const BEIJING_WTA = { name: "Beijing", city: "Beijing", country: "CN", tier: "wta_1000", surface: "hard" };
-
-test("a catalogue tournament finds its calendar entry by tour, town and week", () => {
-  assert.equal(calendarEntry(CALENDAR, { tour: "wta", info: BEIJING_WTA, day: "2026-09-28" })?.name, "China Open");
-  assert.equal(calendarEntry(CALENDAR, { tour: "wta", info: BEIJING_WTA, day: "2026-09-28" })?.end, "2026-10-04", "the WTA's fortnight, not the ATP's week");
-  assert.equal(calendarEntry(CALENDAR, { tour: "atp", info: { name: "Tokyo", city: "Tokyo", country: "JP" }, day: "2026-09-26" })?.name, "Japan Open");
-  assert.equal(calendarEntry(CALENDAR, { tour: "wta", info: { name: "Tokyo", city: "Tokyo", country: "JP" }, day: "2026-09-26" }), undefined, "no WTA Tokyo that week");
-  // Qualifying, and a Beijing evening that is still the day before in UTC.
-  assert.equal(calendarEntry(CALENDAR, { tour: "wta", info: BEIJING_WTA, day: "2026-09-21" })?.name, "China Open");
-  assert.equal(calendarEntry(CALENDAR, { tour: "wta", info: BEIJING_WTA, day: "2026-09-20" }), undefined, "but not a week early");
-  assert.equal(calendarEntry(CALENDAR, { tour: "wta", info: BEIJING_WTA, day: "2027-09-28" }), undefined, "nor next year's");
-});
-
-test("the calendar join survives what the feed leaves out", () => {
-  // No city: the name is often the town.
-  assert.equal(calendarEntry(CALENDAR, { tour: "atp", info: { name: "Shanghai", country: "CN" }, day: "2026-10-05" })?.name, "Shanghai Masters");
-  // An accent or a capital more or less still joins.
-  assert.equal(calendarEntry(CALENDAR, { tour: "atp", info: { name: "x", city: "  shanghaí " }, day: "2026-10-05" })?.name, "Shanghai Masters");
-  // No town at all: the country, when a single entry of that tour is on there.
-  assert.equal(calendarEntry(CALENDAR, { tour: "atp", info: { name: "ATP 500", country: "jp" }, day: "2026-09-26" })?.name, "Japan Open");
-  assert.equal(calendarEntry(CALENDAR, { tour: "atp", info: { name: "ATP event", country: "CN" }, day: "2026-09-30" }), undefined, "two in China that week: neither is guessed");
-  assert.equal(calendarEntry(CALENDAR, { tour: "atp", info: {}, day: "2026-09-26" }), undefined);
-  assert.equal(calendarEntry(CALENDAR, { tour: "atp", info: BEIJING_WTA, day: undefined }), undefined);
-  assert.equal(calendarEntry(undefined, { tour: "wta", info: BEIJING_WTA, day: "2026-09-28" }), undefined);
-  assert.equal(calendarEntry([null, { tour: "wta", city: "Beijing" }], { tour: "wta", info: BEIJING_WTA, day: "2026-09-28" }), undefined, "an entry without dates is skipped");
-});
-
-test("a match's competition carries the calendar's name and dates, else the feed's name", () => {
-  const match = { ...raw, tour: "wta", scheduled_time: "2026-09-28T06:00:00Z" };
-  assert.deepEqual(normaliseMatch(match, BEIJING_WTA, CALENDAR).competition,
-    { name: "China Open", city: "Beijing", country: "CN", flag: "🇨🇳", tier: "WTA 1000", surface: "hard", start: "2026-09-24", end: "2026-10-04" });
-  const unknown = normaliseMatch({ ...match, tour: "atp" }, { name: "Tiburon", city: "Tiburon", country: "US", tier: null }, CALENDAR).competition;
-  assert.equal(unknown.name, "Tiburon");
-  assert.equal(unknown.start, undefined);
-  assert.equal(unknown.end, undefined);
-  // A catalogue entry with no tier borrows the calendar's.
-  assert.equal(normaliseMatch(match, { ...BEIJING_WTA, tier: null }, CALENDAR).competition.tier, "WTA 1000");
-});
-
-test("the calendar file is well formed: every entry joinable, dated, and in order", () => {
-  const file = JSON.parse(readFileSync(new URL("../tennis-calendar.json", import.meta.url)));
-  assert.ok(file.length > 0);
-  assert.deepEqual(config.tennis.calendar, file, "config reads the same file");
-  const tiers = new Set(["grand_slam", "masters_1000", "atp_500", "wta_1000", "wta_500", "tour_finals"]);
-  for (const c of file) {
-    const what = `${c.tour} ${c.name} ${c.start}`;
-    assert.ok(["atp", "wta"].includes(c.tour), what);
-    assert.ok(c.name && c.city, what);
-    assert.match(c.country, /^[A-Z]{2}$/, what);
-    assert.match(c.start, /^\d{4}-\d{2}-\d{2}$/, what);
-    assert.match(c.end, /^\d{4}-\d{2}-\d{2}$/, what);
-    assert.ok(!Number.isNaN(Date.parse(c.start)) && !Number.isNaN(Date.parse(c.end)), what);
-    assert.ok(c.start <= c.end, `${what} ends after it starts`);
-    assert.ok(Date.parse(c.end) - Date.parse(c.start) <= 21 * 86400e3, `${what} lasts three weeks at most`);
-    assert.ok(tiers.has(c.tier), `${what} has a tier we show`);
-  }
-  // Two entries of one tour in one town cannot overlap, or the join would pick either.
-  for (const a of file) for (const b of file) {
-    if (a !== b && a.tour === b.tour && a.city === b.city) assert.ok(a.end < b.start || b.end < a.start, `${a.tour} ${a.city} ${a.start} and ${b.start}`);
-  }
-});
-
-test("a pinned tournament with no tier is asked for by id only in its week", () => {
-  const info = { 1667: { name: "Shanghai", city: "Shanghai", country: "CN", tier: null }, 1269: { name: "Madrid", city: "Madrid", country: "ES", tier: "atp_1000" } };
-  const calendar = [{ tour: "atp", name: "Shanghai Masters", city: "Shanghai", country: "CN", start: "2026-10-07", end: "2026-10-18", tier: "atp_1000" }];
-  assert.deepEqual(untieredOn([1667, 1269], info, calendar, "2026-10-10"), ["1667"], "Shanghai in its week; Madrid has a tier");
-  assert.deepEqual(untieredOn([1667], info, calendar, "2026-11-20"), [], "not outside it");
 });

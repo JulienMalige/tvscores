@@ -1,16 +1,23 @@
 import { getJson } from "../http.js";
 import { flagIso3 } from "../model.js";
-import { TIER_CATEGORY, tiersFor, untieredOn, normaliseMatch } from "./livetennis-match.js";
+import { TIER_CATEGORY, tiersFor, untieredOn, doublesOnly, normaliseMatch } from "./livetennis-match.js";
 
 const BASE = "https://api.livetennisapi.com/api/public/v1";
 
 /** Bumped when what the catalogue holds changes, so an older one is fetched again. */
 // 3: the 500s' tiers stand for a category now, so a catalogue that
 // filed an unlabelled 500 as null is read again.
-const CATALOGUE_VERSION = 3;
+// 4: each tournament keeps its tour and category, which find the season
+// finals: the feed gives them no tier.
+const CATALOGUE_VERSION = 4;
 
 /** A month: tournament identity is stable across seasons, so the catalogue is nearly static. */
 const CATALOGUE_TTL = 30 * 86400e3;
+
+/** A tournament as the catalogue keeps it: what a heading, the calendar join and the filter need. */
+export function catalogued(t, tour) {
+  return { name: t.name, city: t.city, country: t.country, tier: t.tier, surface: t.surface, tour, category: t.category || TIER_CATEGORY[t.tier] || null };
+}
 
 /**
  * Keeps only the matches of a tournament whose category is one we want.
@@ -60,8 +67,8 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
       for (let offset = 0, pages = 0; pages++ < 20; ) {
         const { body } = await call(`${BASE}/tournaments?tour=${tour}&limit=200&offset=${offset}`);
         for (const t of body?.data || []) {
-          byId[String(t.id)] = t.category || TIER_CATEGORY[t.tier] || null;
-          info[String(t.id)] = { name: t.name, city: t.city, country: t.country, tier: t.tier, surface: t.surface };
+          info[String(t.id)] = catalogued(t, tour);
+          byId[String(t.id)] = info[String(t.id)].category;
         }
         if (!body?.meta?.has_more) break;
         offset += body.data?.length || 200;
@@ -74,7 +81,8 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
 
   async function list(status) {
     if (!key) throw new Error("Live Tennis API key missing");
-    const { byId, info } = await catalogue();
+    const held = await catalogue();
+    const { byId, info } = held;
     // Upcoming is asked for our tiers only: unfiltered, the first 200 are
     // Challengers and ITF, and the Beijing WTA 1000 fell outside them on
     // 28 September. The live list is short enough to take whole, which
@@ -85,12 +93,16 @@ export function tennisProvider({ key, quota, meta = {}, tennis, log = () => {} }
     // A pinned tournament the feed gives no tier (Shanghai, WTA Montreal)
     // falls outside that filter, so it is asked for by id — only in its week
     // on our calendar, a call per refresh while it is on (review, build 29).
+    // So are the season finals, which have no tier either: the WTA Finals'
+    // matches stayed off the board until they were in play (2026-11-08).
+    // A tournament's doubles id answers once and is not asked for again.
     if (status === "upcoming") {
       const today = new Date().toISOString().slice(0, 10);
       const seen = new Set(data.map((m) => m.id));
-      for (const id of untieredOn(tennis.alsoBig, info, tennis.calendar, today)) {
-        const extra = await call(`${BASE}/matches?status=upcoming&tournament_id=${id}&limit=200`);
-        for (const m of extra.body?.data || []) if (!seen.has(m.id)) { seen.add(m.id); data.push(m); }
+      for (const id of untieredOn(tennis.alsoBig, info, tennis.calendar, today, held.doubles)) {
+        const found = (await call(`${BASE}/matches?status=upcoming&tournament_id=${id}&limit=200`)).body?.data || [];
+        if (doublesOnly(found)) held.doubles = [...(held.doubles || []), id];
+        for (const m of found) if (!seen.has(m.id)) { seen.add(m.id); data.push(m); }
       }
     }
     const big = bigEventFilter({ byId, ...tennis });

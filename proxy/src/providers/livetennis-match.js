@@ -108,10 +108,25 @@ export function tiersFor(categories) {
 /** The tier names the feed's filter accepts; "tour_finals" is only ours (HTTP 400). */
 const FEED_TIERS = ["grand_slam", "atp_1000", "wta_1000", "atp_500", "wta_500", "atp_finals", "wta_finals"];
 
-/** Pinned tournaments with no tier the feed can filter on, on our calendar today. */
-export function untieredOn(pinned = [], info = {}, calendar = [], day) {
-  return pinned.map(String).filter((id) => info[id] && !FEED_TIERS.includes(info[id].tier)
-    && ["atp", "wta"].some((tour) => calendarEntry(calendar, { tour, info: info[id], day })));
+/**
+ * The tournaments to ask for by id today: the ones pinned in `alsoBig` and the
+ * season finals, when the feed gives them no tier its filter takes, they are
+ * on our calendar today for their tour, and they are not a draw known to hold
+ * only doubles.
+ */
+export function untieredOn(pinned = [], info = {}, calendar = [], day, doubles = []) {
+  const finals = Object.keys(info).filter((id) => info[id]?.category === "tour_finals");
+  const skip = new Set(doubles.map(String));
+  return [...new Set([...pinned.map(String), ...finals])].filter((id) => info[id] && !skip.has(id) && !FEED_TIERS.includes(info[id].tier)
+    && (info[id].tour ? [info[id].tour] : ["atp", "wta"]).some((tour) => calendarEntry(calendar, { tour, info: info[id], day })));
+}
+
+/**
+ * A tournament id whose matches are all doubles: each tournament has a second
+ * id for its doubles draw, which the board leaves out.
+ */
+export function doublesOnly(matches) {
+  return matches.length > 0 && matches.every((m) => m.is_doubles);
 }
 
 /** The feed's winner, 1 or 2, by side: a retirement can leave the winner behind on sets. */
