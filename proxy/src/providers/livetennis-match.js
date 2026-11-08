@@ -132,6 +132,9 @@ export function doublesOnly(matches) {
 /** The feed's winner, 1 or 2, by side: a retirement can leave the winner behind on sets. */
 const WINNER = { 1: "home", 2: "away" };
 
+/** The feed's statuses as the board's states. */
+const STATES = { upcoming: STATE.scheduled, live: STATE.live, completed: STATE.final };
+
 export function normaliseMatch(m, info, calendar = []) {
   const league = TOURS[m.tour];
   if (!league || m.is_doubles) return null;
@@ -146,15 +149,16 @@ export function normaliseMatch(m, info, calendar = []) {
   }
   const start = new Date(when).toISOString();
   const entry = info ? calendarEntry(calendar, { tour: m.tour, info, day: start.slice(0, 10) }) : undefined;
-  let state = STATE.other;
-  if (m.status === "upcoming") state = STATE.scheduled;
-  else if (m.status === "live") state = STATE.live;
-  else if (m.status === "completed") state = STATE.final;
+  // A match called off says so in its event status alone and stays
+  // "upcoming": Rybakina's three at the 2026 WTA Finals, after she withdrew,
+  // were still to come beside Kostyuk's, which replaced them.
+  const cancelled = m.event_status === "Cancelled";
+  const state = cancelled ? STATE.other : STATES[m.status] ?? STATE.other;
   const interrupted = m.event_status === "Interrupted";
   const sets = setsLine(m.score);
   // The round is the caption over the row now ("Beijing · Round of 64"):
   // under the time as well, it said the same thing twice (Julien, build 28).
-  const detail = state === STATE.final ? sets : undefined;
+  const detail = cancelled ? "Cancelled" : state === STATE.final ? sets : undefined;
   // A match we never saw in play carries a 0-0 score block from the upcoming
   // feed. Showing "Final 0-0" would be a lie, so report no score instead.
   const known = state === STATE.live || (state === STATE.final && sets !== undefined);

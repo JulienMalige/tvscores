@@ -10,6 +10,9 @@ notes when a version ships.
 - Tennis's season finals are listed before they start, under their own name: the WTA Finals
   at Indian Wells this week, then the ATP Finals in Turin. They used to appear only once a
   match was under way, headed with the name of the WTA's former host, Riyadh.
+- A tennis match that is called off says Cancelled instead of showing its time. At the WTA
+  Finals, Rybakina's matches were still listed after she withdrew, beside Kostyuk's, which
+  replaced them.
 
 ## 1.0 build 46 — 27 October 2026
 - Settings: Open apps moves from About to a Debug section of its own at the bottom, which

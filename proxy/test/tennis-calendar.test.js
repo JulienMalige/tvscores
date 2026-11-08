@@ -126,11 +126,23 @@ test("the season finals are asked for by id in their week, and a doubles draw on
 });
 
 test("a finals match is headed by our calendar's name and town, not the feed's host", () => {
-  const [rybakina, , doubles] = finals;
-  const m = normaliseMatch(rybakina, FINALS_INFO[3195], FINALS);
+  const [, gauff, doubles] = finals;
+  const m = normaliseMatch(gauff, FINALS_INFO[3195], FINALS);
   assert.equal(m.status.state, "scheduled");
-  assert.equal(m.start, "2026-11-08T20:00:00.000Z");
-  assert.equal(m.home.name, "Elena Rybakina");
+  assert.equal(m.start, "2026-11-08T21:30:00.000Z");
+  assert.equal(m.home.name, "Coco Gauff");
   assert.deepEqual(m.competition, { name: "WTA Finals", city: "Indian Wells", country: "US", flag: "🇺🇸", tier: "Tour Finals", surface: "hard", start: "2026-11-08", end: "2026-11-15" });
   assert.equal(normaliseMatch(doubles, FINALS_INFO[3190], FINALS), null, "doubles stay off the board");
+});
+
+// Rybakina withdrew on 2026-11-07: the feed called her three matches off by
+// their event status, left them "upcoming", and listed Kostyuk's beside them.
+test("a match the feed has called off says so, and is not shown as still to come", () => {
+  const [rybakina] = finals;
+  assert.equal(rybakina.status, "upcoming", "the feed's own status says nothing");
+  const m = normaliseMatch(rybakina, FINALS_INFO[3195], FINALS);
+  assert.equal(m.status.state, "other");
+  assert.equal(m.status.detail, "Cancelled");
+  assert.deepEqual([m.score.home, m.score.away], [null, null]);
+  assert.equal(m.competition.name, "WTA Finals", "still under its tournament");
 });
