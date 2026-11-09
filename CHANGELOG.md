@@ -13,6 +13,7 @@ notes when a version ships.
 - Settings, Competitions: a press shows or hides a competition and does nothing else; it
   also started moving it. To change their order, hold the select button on a competition
   and choose Move Up or Move Down.
+- The Nations League has its flag in the menu, where its mark did not show.
 
 ## 1.1 build 47 — 9 November 2026
 - Rugby union, in a section of its own in the menu: the Top 14, the Champions Cup, the

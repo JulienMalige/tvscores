@@ -40,6 +40,7 @@ BADGES = {
     "nations": "https://r2.thesportsdb.com/images/media/league/badge/jifczi1773608397.png",
     "sixnations": "https://r2.thesportsdb.com/images/media/league/badge/7h1wr91738670253.png",
     "rwc": "https://r2.thesportsdb.com/images/media/league/badge/1otaxh1773613283.png",
+    "unl": "https://r2.thesportsdb.com/images/media/league/badge/cwsp321698386224.png",
 }
 OUT = os.path.join(os.path.dirname(__file__), "..", "assets", "leagues")
 HEIGHT = 160  # px; the app scales down, Retina-safe
@@ -71,6 +72,7 @@ DISC_CROP = {
     "seriea": (0.15, 0.04, 0.85, 0.76),        # the A on its tile
     "ucl": (0.15, 0.00, 0.85, 0.47),           # the starball
     "uel": (0.00, 0.00, 1.00, 0.45),           # the trophy, without UEFA EUROPA LEAGUE
+    "unl": (0.00, 0.00, 1.00, 0.60),           # the flag, without UEFA NATIONS LEAGUE
 }
 
 # Named on the command line, only those: an added league need not fetch the

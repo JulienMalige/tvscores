@@ -133,7 +133,10 @@ variants. `proxy/scripts/build-badges.py` downloads them once, trims the
 transparent padding and writes `proxy/assets/leagues/<id>.png`, which the
 proxy serves at `/v1/assets/leagues/<id>.png` (so nothing is hotlinked and
 the app gets a stable URL). Trademark caveat as for crests: the marks belong
-to the leagues.
+to the leagues. The Nations League's was linked straight from TheSportsDB
+until 2026-11-09, its whole lockup squeezed into the menu's icon where
+Julien saw no mark (build 47); it is mirrored like the others since, its
+icon the flag alone.
 
 ## Player and driver photos (checked 2026-09-14)
 
