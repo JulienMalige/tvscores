@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { section, topSection, closeSection, marketingVersion } from "../testflight.mjs";
+import { section, topSection, closeSection, marketingOf, lastMarketing } from "../testflight.mjs";
 
 const CHANGELOG = `# Changelog
 
@@ -57,12 +56,20 @@ test("the heading carries the version the build was made with, not the last head
   assert.match(closed, /^## 1\.0 build 9 — /m, "the builds before it keep theirs");
 });
 
-test("the version is the project's MARKETING_VERSION", () => {
-  assert.equal(marketingVersion('settings:\n  base:\n    MARKETING_VERSION: "1.1"\n    CURRENT_PROJECT_VERSION: "1"\n'), "1.1");
-  assert.equal(marketingVersion("    MARKETING_VERSION: 2.0.1\n"), "2.0.1");
-  assert.throws(() => marketingVersion("name: TVScores\n"), /no MARKETING_VERSION/);
-  // The real file, which the release job reads.
-  assert.match(marketingVersion(readFileSync(new URL("../../app/project.yml", import.meta.url), "utf8")), /^\d+\.\d+(\.\d+)?$/);
+test("the version is the one Apple read from the upload", () => {
+  // The shape of App Store Connect's answer for build 47, 9 November 2026.
+  const build = { type: "builds", id: "b47", attributes: { version: "47" },
+    relationships: { preReleaseVersion: { data: { type: "preReleaseVersions", id: "p11" } } } };
+  const included = [{ type: "preReleaseVersions", id: "p10", attributes: { version: "1.0" } },
+    { type: "preReleaseVersions", id: "p11", attributes: { version: "1.1" } }];
+  assert.equal(marketingOf(build, included), "1.1");
+  assert.equal(marketingOf(build, []), undefined, "an answer without it says nothing");
+  assert.equal(marketingOf(build), undefined);
+});
+
+test("without Apple's word, the heading keeps the last build's version", () => {
+  assert.equal(lastMarketing(CHANGELOG), "1.0");
+  assert.equal(lastMarketing("# Changelog\n\n## Unreleased\n\n- First.\n"), "1.0", "and 1.0 before any build");
 });
 
 test("closing twice changes nothing the second time", () => {

@@ -17,15 +17,18 @@ const LOCALE = "en-US";
 const MAX_NOTE = 4000;
 
 /**
- * The version the store shows, as the build was made: `MARKETING_VERSION` in
- * app/project.yml. Not the last heading's, which is the version before a bump
- * (build 47 went out as 1.1 under "1.0 build 47", 9 November 2026).
+ * The version the store shows for `build`, as Apple read it from the upload:
+ * its pre-release version, which a listing with `include=preReleaseVersion`
+ * puts in `included`. Not the last heading's, which is the version before a
+ * bump (build 47 went out as 1.1 under "1.0 build 47", 9 November 2026).
  */
-export function marketingVersion(projectYml) {
-  const found = projectYml.match(/^\s*MARKETING_VERSION:\s*"?([\d.]+)"?\s*$/m);
-  if (!found) throw new Error("app/project.yml has no MARKETING_VERSION");
-  return found[1];
+export function marketingOf(build, included = []) {
+  const ref = build?.relationships?.preReleaseVersion?.data;
+  return included.find((i) => i.type === ref?.type && i.id === ref?.id)?.attributes?.version;
 }
+
+/** The newest closed section's version: the heading's when Apple said none. */
+export const lastMarketing = (markdown) => (markdown.match(/^## ([\d.]+) build /m) || [])[1] || "1.0";
 
 /** Rewrite the Unreleased heading as the build that just took it, in the version it carries. */
 export function closeSection(markdown, version, marketing, today = new Date()) {
@@ -60,9 +63,9 @@ async function waitForBuild(version, minutes = 30) {
   const deadline = Date.now() + minutes * 60e3;
   while (Date.now() < deadline) {
     // Newest first: /apps/{id}/builds lists the oldest and takes no sort, so past twenty builds the one just uploaded was never in the page (build 38, 4 October 2026).
-    const { data } = await asc(`/v1/builds?filter[app]=${APP_ID}&sort=-uploadedDate&limit=20`);
+    const { data, included } = await asc(`/v1/builds?filter[app]=${APP_ID}&sort=-uploadedDate&limit=20&include=preReleaseVersion`);
     const build = data.find((b) => b.attributes.version === String(version));
-    if (build?.attributes.processingState === "VALID") return build;
+    if (build?.attributes.processingState === "VALID") return { build, marketing: marketingOf(build, included) };
     if (build?.attributes.processingState === "FAILED") throw new Error(`build ${version} failed processing`);
     console.log(`build ${version}: ${build?.attributes.processingState ?? "not uploaded yet"}`);
     await new Promise((r) => setTimeout(r, 30000));
@@ -107,15 +110,13 @@ if (process.argv[1] && process.argv[1].endsWith("testflight.mjs")) {
     process.exit(2);
   }
   try {
-    // Read before anything is sent to Apple: a project with no version stops here.
-    const marketing = marketingVersion(readFileSync(join(ROOT, "app/project.yml"), "utf8"));
-    const build = await waitForBuild(version);
+    const { build, marketing } = await waitForBuild(version);
     const path = join(ROOT, "CHANGELOG.md");
     const markdown = readFileSync(path, "utf8");
     await setNote(build.id, topSection(markdown));
     await addToGroup(build.id, group);
     // Close the section this build just took, or the next one sends it again.
-    const closed = closeSection(markdown, version, marketing);
+    const closed = closeSection(markdown, version, marketing ?? lastMarketing(markdown));
     if (closed !== markdown) {
       writeFileSync(path, closed);
       console.log(`CHANGELOG.md: Unreleased is now build ${version}`);
