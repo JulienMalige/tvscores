@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { section, topSection, closeSection } from "../testflight.mjs";
+import { readFileSync } from "node:fs";
+import { section, topSection, closeSection, marketingVersion } from "../testflight.mjs";
 
 const CHANGELOG = `# Changelog
 
@@ -40,7 +41,7 @@ test("a note is capped so App Store Connect will take it", () => {
 });
 
 test("shipping a build closes the section it took", () => {
-  const closed = closeSection(CHANGELOG, "12", new Date("2026-09-16T12:00:00Z"));
+  const closed = closeSection(CHANGELOG, "12", "1.0", new Date("2026-09-16T12:00:00Z"));
   assert.match(closed, /^## 1\.0 build 12 — 16 September 2026$/m);
   // A fresh empty Unreleased is left open above it, so the next thing written
   // and the release job's own commit do not fight over the same line.
@@ -49,19 +50,29 @@ test("shipping a build closes the section it took", () => {
   assert.equal(section(closed, /build 12/), "- The icon sits on flat black now.\n- A second line.");
 });
 
-test("the marketing version is carried over from the last build", () => {
-  const next = CHANGELOG.replace("1.0 build 9", "1.1 build 9");
-  assert.match(closeSection(next, "12", new Date("2026-09-16T12:00:00Z")), /## 1\.1 build 12 —/);
+test("the heading carries the version the build was made with, not the last heading's", () => {
+  // Build 47, the first of 1.1: the job wrote "1.0 build 47" (9 November 2026).
+  const closed = closeSection(CHANGELOG, "47", "1.1", new Date("2026-11-09T00:30:00Z"));
+  assert.match(closed, /^## 1\.1 build 47 — 9 November 2026$/m);
+  assert.match(closed, /^## 1\.0 build 9 — /m, "the builds before it keep theirs");
+});
+
+test("the version is the project's MARKETING_VERSION", () => {
+  assert.equal(marketingVersion('settings:\n  base:\n    MARKETING_VERSION: "1.1"\n    CURRENT_PROJECT_VERSION: "1"\n'), "1.1");
+  assert.equal(marketingVersion("    MARKETING_VERSION: 2.0.1\n"), "2.0.1");
+  assert.throws(() => marketingVersion("name: TVScores\n"), /no MARKETING_VERSION/);
+  // The real file, which the release job reads.
+  assert.match(marketingVersion(readFileSync(new URL("../../app/project.yml", import.meta.url), "utf8")), /^\d+\.\d+(\.\d+)?$/);
 });
 
 test("closing twice changes nothing the second time", () => {
-  const once = closeSection(CHANGELOG, "12", new Date("2026-09-16T12:00:00Z"));
-  assert.equal(closeSection(once, "13", new Date("2026-09-17T12:00:00Z")), once);
+  const once = closeSection(CHANGELOG, "12", "1.0", new Date("2026-09-16T12:00:00Z"));
+  assert.equal(closeSection(once, "13", "1.0", new Date("2026-09-17T12:00:00Z")), once);
 });
 
 test("an empty Unreleased section is left open", () => {
   const empty = "# Changelog\n\n## Unreleased\n\n## 1.0 build 9 — 15 September 2026\n\n- New app icon.\n";
-  assert.equal(closeSection(empty, "12", new Date("2026-09-16T12:00:00Z")), empty);
+  assert.equal(closeSection(empty, "12", "1.0", new Date("2026-09-16T12:00:00Z")), empty);
   assert.equal(topSection(empty), "", "and it sends no note rather than a placeholder");
 });
 
@@ -69,10 +80,10 @@ test("closing a section leaves an empty one open behind it", () => {
   // The release job commits this file, and so does whoever is working while
   // a build uploads. Both used to rewrite the same line.
   const md = "# Changelog\n\n## Unreleased\n\n- Something visible.\n\n## 1.0 build 8 — 1 September 2026\n";
-  const closed = closeSection(md, "9", new Date("2026-09-17T12:00:00Z"));
+  const closed = closeSection(md, "9", "1.0", new Date("2026-09-17T12:00:00Z"));
   assert.match(closed, /## Unreleased\n\n## 1\.0 build 9 — 17 September 2026/);
   // The note is taken before the section is closed, so it is unaffected.
   assert.equal(topSection(md), "- Something visible.");
   assert.equal(section(closed, /build 9/), "- Something visible.", "and the entry sits under the build that shipped it");
-  assert.equal(closeSection(closed, "10", new Date("2026-09-17T12:00:00Z")), closed, "the empty one it left stays open");
+  assert.equal(closeSection(closed, "10", "1.0", new Date("2026-09-17T12:00:00Z")), closed, "the empty one it left stays open");
 });

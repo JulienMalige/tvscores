@@ -86,9 +86,10 @@ the archived Info.plist does not carry the edition it was asked for.
 
 The build number is the workflow run number, so every run is unique. The
 marketing version comes from `MARKETING_VERSION` in `app/project.yml`; bump it
-there for a new version. Processing in App Store Connect takes a few minutes,
-after which the build appears in TestFlight for the `Internal` group and can be
-installed on the Apple TV from the TestFlight app.
+there for a new version, and the changelog heading the job writes follows it.
+Processing in App Store Connect takes a few minutes, after which the build
+appears in TestFlight for the `Internal` group and can be installed on the
+Apple TV from the TestFlight app.
 
 ## Talking to App Store Connect from the shell
 

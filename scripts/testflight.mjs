@@ -16,13 +16,23 @@ const APP_ID = "6811973076";
 const LOCALE = "en-US";
 const MAX_NOTE = 4000;
 
-/** Rewrite the Unreleased heading as the build that just took it. */
-export function closeSection(markdown, version, today = new Date()) {
+/**
+ * The version the store shows, as the build was made: `MARKETING_VERSION` in
+ * app/project.yml. Not the last heading's, which is the version before a bump
+ * (build 47 went out as 1.1 under "1.0 build 47", 9 November 2026).
+ */
+export function marketingVersion(projectYml) {
+  const found = projectYml.match(/^\s*MARKETING_VERSION:\s*"?([\d.]+)"?\s*$/m);
+  if (!found) throw new Error("app/project.yml has no MARKETING_VERSION");
+  return found[1];
+}
+
+/** Rewrite the Unreleased heading as the build that just took it, in the version it carries. */
+export function closeSection(markdown, version, marketing, today = new Date()) {
   // An empty section stays open: a build that changed nothing a tester could
   // notice does not deserve a heading of its own.
   if (!section(markdown, /^## Unreleased/)) return markdown;
   const date = today.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-  const marketing = (markdown.match(/^## ([\d.]+) build /m) || [])[1] || "1.0";
   // Leave a fresh, empty Unreleased behind. Without it the release job's
   // commit and whatever was written locally in the meantime both edit the
   // same line, and every release lands as a merge conflict.
@@ -97,13 +107,15 @@ if (process.argv[1] && process.argv[1].endsWith("testflight.mjs")) {
     process.exit(2);
   }
   try {
+    // Read before anything is sent to Apple: a project with no version stops here.
+    const marketing = marketingVersion(readFileSync(join(ROOT, "app/project.yml"), "utf8"));
     const build = await waitForBuild(version);
     const path = join(ROOT, "CHANGELOG.md");
     const markdown = readFileSync(path, "utf8");
     await setNote(build.id, topSection(markdown));
     await addToGroup(build.id, group);
     // Close the section this build just took, or the next one sends it again.
-    const closed = closeSection(markdown, version);
+    const closed = closeSection(markdown, version, marketing);
     if (closed !== markdown) {
       writeFileSync(path, closed);
       console.log(`CHANGELOG.md: Unreleased is now build ${version}`);

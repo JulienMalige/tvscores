@@ -8,7 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
-## 1.0 build 47 — 9 November 2026
+## 1.1 build 47 — 9 November 2026
 - Rugby union, in a section of its own in the menu: the Top 14, the Champions Cup, the
   Premiership, the Nations Championship, the Six Nations and the World Cup. During a game
   the score is a few minutes behind at most. The competitions have no tables yet: no source
