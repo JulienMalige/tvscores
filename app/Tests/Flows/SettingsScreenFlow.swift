@@ -40,10 +40,18 @@ final class SettingsScreenFlow: FlowCase {
         let below = { self.row(app, self.second).frame.minY }
         XCTAssertLessThan(top(), below())
         move(app, "Move Down")
-        XCTAssertGreaterThan(top(), below(), "it is now below the one that followed it")
+        XCTAssertTrue(settles { top() > below() }, "it is now below the one that followed it")
         XCTAssertTrue(app.buttons[first].isSelected, "and still shown: holding select only moves it")
         move(app, "Move Up")
-        XCTAssertLessThan(top(), below(), "and back in its place")
+        XCTAssertTrue(settles { top() < below() }, "and back in its place")
+    }
+
+    /// Whether `order` holds within a few seconds: as the menu shuts, its
+    /// picture of the row glides from the old place to the new, and read
+    /// too soon both rows stand at the same height (the first run, build 47).
+    private func settles(_ order: () -> Bool) -> Bool {
+        for _ in 0..<20 where !order() { usleep(300_000) }
+        return order()
     }
 
     /// Holds select on the focused competition and takes `choice`, the first
