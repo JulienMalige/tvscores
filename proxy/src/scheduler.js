@@ -125,18 +125,24 @@ export class TeamSportScheduler {
    * A finished game moves a league table — but only where the table is a
    * table of results. Tennis rankings move once a week whatever happens on
    * court, so chasing them after every match would spend a 100-a-day budget
-   * on a number that has not changed. Providers opt in.
+   * on a number that has not changed. Providers opt in. Only a game the
+   * store does not hold as finished yet counts, so this is asked before the
+   * store is told: rugby's live answer is the whole day's games, finished
+   * ones included, and would mark its league again on every poll.
    */
   noteResults(rows) {
     if (!this.p.standingsFollowResults) return;
-    for (const e of rows) if (e.status.state === STATE.final) this.dirtyLeagues.add(String(e.league.id));
+    for (const e of rows) {
+      const ended = e.status.state === STATE.final && this.store.events.get(e.id)?.status?.state !== STATE.final;
+      if (ended) this.dirtyLeagues.add(String(e.league.id));
+    }
   }
 
   async live(now = Date.now()) {
     if (this.quota.spendable(now) <= 0) return this.log(`${this.p.sport}: skip live, quota exhausted`);
     const rows = await this.p.live();
-    this.store.upsert(rows);
     this.noteResults(rows);
+    this.store.upsert(rows);
     // Games that should have started but are not in the live feed: they ended or were
     // postponed. Refresh today at most every 20 min to learn their final state.
     const liveIds = new Set(rows.map((r) => r.id));
@@ -169,8 +175,8 @@ export class TeamSportScheduler {
       // Refetch its own UTC date: a game that started before midnight is not in "today".
       const date = new Date(needsLook[0].start).toISOString().slice(0, 10);
       const back = await this.p.byDate(date);
-      this.store.upsert(back);
       this.noteResults(back);
+      this.store.upsert(back);
       this.meta.lastToday = new Date(now).toISOString();
     }
     // A provider with no way to ask for a day (tennis on the free tier) cannot find out

@@ -171,6 +171,11 @@ enum Metrics {
     /// room above and below its line: rows 80 apart, as Apple's 40.
     static let tableMark: CGFloat = 40
     static let tableRowPad: CGFloat = 14
+    /// How small a column's word or number may be set to keep to one line:
+    /// "1.000", French's "Bonus".
+    static let tableShrink: CGFloat = 0.7
+    /// The lines of small print about a table, its source and its legend.
+    static let tableNoteGap: CGFloat = 4
     /// Focus on glass: the pane's white and its edge's.
     static let glassFill: CGFloat = 0.2
     static let glassEdge: CGFloat = 0.35

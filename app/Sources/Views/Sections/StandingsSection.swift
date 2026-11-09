@@ -57,7 +57,7 @@ struct StandingsSection: View {
     /// Under the heading, before the rows: the games a table does not count
     /// yet, and the article it comes from with its licence, as CC BY-SA asks.
     private func credit(_ source: StandingsSource) -> some View {
-        VStack(alignment: carded ? .center : .leading, spacing: 4) {
+        VStack(alignment: carded ? .center : .leading, spacing: Metrics.tableNoteGap) {
             if let missing = source.missing, missing > 0 {
                 Text("standings.missing \(missing)")
                     .accessibilityIdentifier("standings.missing")
@@ -106,7 +106,7 @@ struct StandingsSection: View {
                 }
             }
             if let legend = table.legend, !legend.isEmpty {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: Metrics.tableNoteGap) {
                     ForEach(legend, id: \.key) { zone in
                         // A key built from a value, not interpolated: inside
                         // a LocalizedStringKey literal, "\(x)" is a format

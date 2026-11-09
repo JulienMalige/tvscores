@@ -111,6 +111,12 @@ test("a result marks its league's table stale, and only where results make the t
   await s.live(KICKOFF + 2 * 3600e3);
   assert.deepEqual([...s.dirtyLeagues], ["4335"], "the league that just finished a game");
 
+  // Rugby's live answer is the day's games, finished ones included: the
+  // game that ended an hour ago does not mark its table again.
+  s.dirtyLeagues.clear();
+  await s.live(KICKOFF + 3 * 3600e3);
+  assert.equal(s.dirtyLeagues.size, 0, "once per game, not once per poll");
+
   // Tennis: the rankings move weekly, not when a match ends.
   const t = scheduler(fake({ live: [done] }));
   await t.live(KICKOFF + 2 * 3600e3);

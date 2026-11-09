@@ -114,10 +114,12 @@ export function finishedIn(games, [first, last], results = {}, now = Date.now())
 /**
  * One competition's tables as ours: each row under our name for the side
  * and with its crest, cut into the competition's zones, and the credit the
- * licence asks for, with how many of the `finished` games the tables do not
- * hold yet (each game is in two rows).
+ * licence asks for — the article that shows the tables, the `pages` they
+ * were read from when those are others (templates, a pool's own article) —
+ * with how many of the `finished` games the tables do not hold yet (each
+ * game is in two rows).
  */
-export function standingsFrom({ tables, sides, finished, source, title, lang }) {
+export function standingsFrom({ tables, sides, finished, source, title, pages = [], lang }) {
   const held = tables.reduce((n, t) => n + t.rows.reduce((m, r) => m + r.w + r.d + r.l, 0), 0) / 2;
   return {
     tables: tables.map(({ id, rows }) => {
@@ -131,7 +133,10 @@ export function standingsFrom({ tables, sides, finished, source, title, lang }) 
       }));
       return { id, columns: RUGBY_COLUMNS, rows: list, ...(source.zones ? zonesFor(source.zones, list.length) : {}) };
     }),
-    source: { site: "wikipedia", title, url: articleUrl(lang, title), license: "CC BY-SA 4.0", missing: Math.max(0, finished - Math.floor(held)) },
+    source: {
+      site: "wikipedia", title, url: articleUrl(lang, title), license: "CC BY-SA 4.0", missing: Math.max(0, finished - Math.floor(held)),
+      ...(pages.some((p) => p !== title) ? { pages: pages.map((p) => articleUrl(lang, p)) } : {}),
+    },
   };
 }
 
@@ -150,6 +155,7 @@ export function rugbyTables({ wiki, leagues, seasonOf, seasonGames, resting = ()
   const known = new Map(); // "lang|source of a name" -> { label, target }
   const looked = new Map(); // league id -> when its pages last came back
   const complete = new Map(); // league id -> its table held every game played, at that look
+  const latest = new Map(); // league id -> its tables as last read
   const seasons = new Map(); // league id -> { season, at, games }
 
   async function gamesOf(id, season, fresh) {
@@ -184,37 +190,51 @@ export function rugbyTables({ wiki, leagues, seasonOf, seasonGames, resting = ()
     }
     const credited = got.get(title)?.title ?? title;
     for (const t of found) t.rows = await named(source.lang, credited, t.rows);
-    const built = standingsFrom({ tables: found, sides: sidesOf(games), finished, source, title: credited, lang: source.lang });
+    const pages = [...new Set(tables.map((t) => got.get(t.page)?.title).filter(Boolean))];
+    const built = standingsFrom({ tables: found, sides: sidesOf(games), finished, source, title: credited, pages, lang: source.lang });
     complete.set(league.id, built.source.missing === 0);
     return built;
   }
 
   return async function standings(only) {
     const plans = [];
+    const out = {};
     for (const league of leagues) {
       const source = SOURCES[league.id];
       if (!source || (only && !only.has(String(league.id)))) continue;
-      if (!only && resting(league.id) && complete.get(league.id) && now() - (looked.get(league.id) ?? 0) < RESTING_LOOK) continue;
+      if (!only && resting(league.id) && complete.get(league.id) && now() - (looked.get(league.id) ?? 0) < RESTING_LOOK) {
+        if (latest.has(league.id)) out[league.id] = latest.get(league.id); // not moving: as last read
+        continue;
+      }
       const season = seasonOf(league.id);
       if (!season) continue;
       const tables = Object.entries(source.tables ?? { table: source.article }).map(([id, page]) => ({ id, page: filled(page, season) }));
       plans.push({ league, source, season, title: filled(source.article, season), tables });
     }
-    const out = {};
+    let read = 0;
     for (const lang of new Set(plans.map((p) => p.source.lang))) {
       const mine = plans.filter((p) => p.source.lang === lang);
-      const got = await wiki.pages(lang, [...new Set(mine.flatMap((p) => p.tables.map((t) => t.page)))]);
+      let got;
+      try {
+        got = await wiki.pages(lang, [...new Set(mine.flatMap((p) => p.tables.map((t) => t.page)))]);
+      } catch (err) {
+        log(`wikipedia ${lang}: ${err.message}`); // that language's tables stay as they were; the other's still come
+        continue;
+      }
       for (const plan of mine) {
         looked.set(plan.league.id, now());
         try {
           const built = await one(plan, got, Boolean(only));
-          if (built) out[plan.league.id] = { updatedAt: new Date(now()).toISOString(), ...built };
+          if (!built) continue;
+          out[plan.league.id] = { updatedAt: new Date(now()).toISOString(), ...built };
+          latest.set(plan.league.id, out[plan.league.id]);
+          read += 1;
         } catch (err) {
           log(`wikipedia rugby ${plan.league.id}: ${err.message}`); // its last table stays
         }
       }
     }
-    log(`GET wikipedia rugby tables -> ${Object.keys(out).length} of ${plans.length}`);
+    if (plans.length) log(`GET wikipedia rugby tables -> ${read} of ${plans.length}`);
     return out;
   };
 }

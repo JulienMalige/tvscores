@@ -91,6 +91,13 @@ test("the table is not bought with the last of the day's quota", async () => {
   assert.deepEqual(s.asked, [], "one call left is kept for the scores");
 });
 
+test("tables paid from a budget of their own are not held back by the scores'", async () => {
+  const s = subject({ standings: { 4430: TABLE }, lastStandings: 0, spendable: 0 });
+  s.p.standingsQuota = { spendable: () => 50 };
+  await refreshStandings(s, NOW);
+  assert.deepEqual(s.asked, ["all"], "rugby's API-Sports calls spent for the day, Wikipedia's tables still read");
+});
+
 test("a calendar sport's single table is kept under its own name, and an empty one changes nothing", async () => {
   const one = subject({ standings: TABLE, lastStandings: 0 });
   await refreshStandings(one, NOW);

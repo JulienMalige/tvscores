@@ -170,6 +170,18 @@ test("every competition's table in one request per Wikipedia, each name expanded
   assert.equal(wiki.asked.pages.at(-1), "fr:Championnat de France de rugby à XV 2026-2027", "after a game, only that competition's page");
 });
 
+test("a cup's pools are read from their own pages, which the credit lists; one Wikipedia down costs the other nothing", async () => {
+  const pool = (n) => [`Template:2026–27 European Rugby Champions Cup Pool ${n} table`, SPORTS_TABLE];
+  const wiki = fakeWiki(Object.fromEntries([1, 2, 3, 4].map(pool)));
+  const down = { ...wiki, pages: async (lang, titles) => (lang === "fr" ? Promise.reject(new Error("maxlag")) : wiki.pages(lang, titles)) };
+  const tables = rugbyTables({ wiki: down, leagues: [{ id: 4430 }, { id: 4550 }], seasonOf: () => "2026-2027", seasonGames: async () => [] });
+  const out = await tables();
+  assert.deepEqual(Object.keys(out), ["4550"], "the Top 14 waits for French Wikipedia; the Champions Cup does not");
+  assert.deepEqual(out[4550].tables.map((t) => t.id), ["pool-1", "pool-2", "pool-3", "pool-4"]);
+  assert.equal(out[4550].source.title, "2026–27 European Rugby Champions Cup", "the article that shows them");
+  assert.equal(out[4550].source.pages.length, 4, "and the four pages they were read from");
+});
+
 test("a competition that fails keeps its last table and costs the others nothing", async () => {
   const wiki = fakeWiki({ "2026–27 Premiership Rugby": SPORTS_TABLE, "Championnat de France de rugby à XV 2026-2027": CLS_RUGBY });
   const seen = [];
@@ -200,10 +212,11 @@ test("a complete table nobody plays in this week is looked at daily, and a seaso
   assert.equal(behind.pages.length, 2, "a table still missing games is looked at every hour, resting or not");
 
   const resting = run(true);
-  await resting.tables();
+  const first = await resting.tables();
   t += H;
-  await resting.tables();
+  const later = await resting.tables();
   assert.equal(resting.pages.length, 1, "an hour on, a resting table is not asked again");
+  assert.equal(later[4414], first[4414], "and is given as last read, not as missing");
   await resting.tables(new Set(["4414"]));
   assert.equal(resting.pages.length, 2, "a final whistle in it is asked about at once");
   t += 24 * H;

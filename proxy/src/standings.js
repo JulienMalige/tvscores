@@ -37,7 +37,10 @@ async function refresh(self, now) {
   // the season may start tomorrow, or the provider may simply have been down.
   const due = now - last >= (self.meta.standingsEmpty ? STANDINGS_RETRY : self.p.standingsEvery ?? STANDINGS_EVERY);
   if (!due && !(dirty && now - last >= STANDINGS_AFTER_GAME)) return;
-  if (self.quota && self.quota.spendable(now) < 2) return;
+  // A provider whose tables are paid from another budget than its scores
+  // names it: rugby's spend nothing of API-Sports' hundred a day.
+  const quota = self.p.standingsQuota ?? self.quota;
+  if (quota && quota.spendable(now) < 2) return;
   let data;
   try {
     data = await self.p.standings(due ? undefined : dirty);

@@ -13,7 +13,7 @@ Node 22, no npm dependencies; the image mirror calls `python3` with Pillow to sh
 | `GET /v1/scoreboard?tz=Europe/Paris&sports=football,rugby,…` | `days.yesterday / today / upcoming`, each a list of `{sport, league, events[]}` groups, bucketed in the viewer's time zone. Live games always sit in `today`. `stale` flags per sport. `sports` names the sports the app can show; without it the board holds `firstSports` (`src/config.js`), those of builds up to 1.0, which have no place for rugby. |
 | `GET /v1/fixtures?date=YYYY-MM-DD&tz=` | flat list of events on one local date |
 | `GET /v1/standings` | every table we hold, keyed `sport:league` |
-| `GET /v1/standings/{sport}/{league}` | one league's tables (drivers, constructors, rankings); rugby's carry `source`, the Wikipedia article to credit under them and how many games already played they still lack |
+| `GET /v1/standings/{sport}/{league}` | one league's tables (drivers, constructors, rankings); rugby's carry `source`: the Wikipedia article to credit under them (and `pages`, the pages read, when they are others) and how many games already played they still lack |
 | `GET /v1/img/{sha1}` | a mirrored crest or portrait, shrunk to at most 256 px WebP (`scripts/shrink.py`, Pillow; kept as it came when that is not possible); redirects to the original if the mirror is cold |
 | `GET /v1/assets/leagues/{id}.png` | competition badge we ship |
 | `GET /v1/assets/teams/{sport}/{slug}.png` | constructor or team badge we ship |

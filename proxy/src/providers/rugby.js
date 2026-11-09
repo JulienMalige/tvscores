@@ -235,6 +235,8 @@ export function rugbyProvider({ fixtures, fixturesQuota, leagues, key, quota, me
     standings,
     standingsFollowResults: true,
     standingsEvery: TABLES_EVERY,
+    // Wikipedia has no budget; the season's games are TheSportsDB's.
+    standingsQuota: fixturesQuota,
     // The week is TheSportsDB's, on its own budget, which daily() checks;
     // the one API-Sports call a day the pass may make checks this one.
     dailyCost: 0,

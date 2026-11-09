@@ -12,7 +12,7 @@ struct ColumnLabel: View {
             .font(.caption)
             .foregroundStyle(.secondary)
             .lineLimit(1)
-            .minimumScaleFactor(0.7)
+            .minimumScaleFactor(Metrics.tableShrink)
             .frame(width: Metrics.tableCell, alignment: .trailing)
             .accessibilityIdentifier("col." + column)
     }
