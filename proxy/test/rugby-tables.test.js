@@ -182,15 +182,22 @@ test("a competition that fails keeps its last table and costs the others nothing
   assert.ok(seen.some((m) => m.includes("4430") && m.includes("HTTP 429")));
 });
 
-test("a table nobody plays in this week is looked at daily, and a season's games are kept six hours", async () => {
+test("a complete table nobody plays in this week is looked at daily, and a season's games are kept six hours", async () => {
   const H = 3600e3;
   let t = Date.parse("2026-11-09T12:00:00Z");
-  const run = (resting) => {
+  const run = (resting, games = []) => {
     const wiki = fakeWiki({ "2026–27 Premiership Rugby": SPORTS_TABLE });
     const seasons = [];
-    const tables = rugbyTables({ wiki, leagues: [{ id: 4414 }], seasonOf: () => "2026-2027", resting: () => resting, now: () => t, seasonGames: async (id) => (seasons.push(id), []) });
+    const tables = rugbyTables({ wiki, leagues: [{ id: 4414 }], seasonOf: () => "2026-2027", resting: () => resting, now: () => t, seasonGames: async (id) => (seasons.push(id), games) });
     return { tables, pages: wiki.asked.pages, seasons };
   };
+
+  // Nine games played to the table's seven: the volunteers have yet to catch up.
+  const behind = run(true, Array.from({ length: 9 }, (_, i) => game(1, `H${i}`, `A${i}`)));
+  await behind.tables();
+  t += H;
+  await behind.tables();
+  assert.equal(behind.pages.length, 2, "a table still missing games is looked at every hour, resting or not");
 
   const resting = run(true);
   await resting.tables();

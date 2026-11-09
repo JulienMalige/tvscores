@@ -561,9 +561,9 @@ name is expanded once. The rendered pages are never read. As the API's
 etiquette and Wikimedia's User-Agent policy ask: a User-Agent naming the
 app and its site, one request at a time, `maxlag=5`, compressed answers.
 That is one request an hour per language (English and French) for every
-table at once, a competition with nothing this week looked at once a day,
-and another ten minutes after a final whistle in the competition whose
-table it moves.
+table at once, and another ten minutes after a final whistle in the
+competition whose table it moves. A competition with no game within a day
+whose table already holds every game played is looked at once a day.
 
 **Which pages** (`proxy/src/rugby-tables.js`), the season filled in from
 TheSportsDB's: the Top 14 from French Wikipedia (*Championnat de France de

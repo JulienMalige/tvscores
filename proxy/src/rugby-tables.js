@@ -13,7 +13,7 @@ import { plain, sameClub } from "./providers/live-backup.js";
 import { articleUrl } from "./providers/wikipedia.js";
 import { linkOf, tablesIn } from "./wiki-tables.js";
 
-/** A competition with nothing this week has a table that is not moving: it is looked at once a day. */
+/** A table that holds every game played, in a competition with nothing this week, is looked at once a day. */
 const RESTING_LOOK = 24 * 3600e3;
 /** A season's games are asked for again after this, and at once after a final whistle in it. */
 const SEASON_FOR = 6 * 3600e3;
@@ -142,11 +142,14 @@ export function standingsFrom({ tables, sides, finished, source, title, lang }) 
  * another for the names not seen before (a name expanded once is known for
  * good), and each competition's season of games from `seasonGames`, for the
  * crests and the games missing. A competition where nobody has played yet
- * has no table, and one `resting` (nothing this week) is looked at daily.
+ * has no table. One `resting` (no game within a day) is looked at daily once
+ * its table holds every game played; until then, every hour, which is when
+ * the volunteers catch up.
  */
 export function rugbyTables({ wiki, leagues, seasonOf, seasonGames, resting = () => false, results = {}, log = () => {}, now = () => Date.now() }) {
   const known = new Map(); // "lang|source of a name" -> { label, target }
   const looked = new Map(); // league id -> when its pages last came back
+  const complete = new Map(); // league id -> its table held every game played, at that look
   const seasons = new Map(); // league id -> { season, at, games }
 
   async function gamesOf(id, season, fresh) {
@@ -173,12 +176,17 @@ export function rugbyTables({ wiki, leagues, seasonOf, seasonGames, resting = ()
       const table = got.has(page) ? tablesIn(got.get(page).content)[k] : undefined;
       if (table) found.push({ id, rows: table.rows });
     }
-    if (!found.some((t) => t.rows.some((r) => r.w + r.d + r.l > 0))) return undefined;
-    const credited = got.get(title)?.title ?? title;
-    for (const t of found) t.rows = await named(source.lang, credited, t.rows);
     const games = await gamesOf(league.id, season, fresh);
     const finished = finishedIn(games, source.rounds, results, now());
-    return standingsFrom({ tables: found, sides: sidesOf(games), finished, source, title: credited, lang: source.lang });
+    if (!found.some((t) => t.rows.some((r) => r.w + r.d + r.l > 0))) {
+      complete.set(league.id, finished === 0);
+      return undefined;
+    }
+    const credited = got.get(title)?.title ?? title;
+    for (const t of found) t.rows = await named(source.lang, credited, t.rows);
+    const built = standingsFrom({ tables: found, sides: sidesOf(games), finished, source, title: credited, lang: source.lang });
+    complete.set(league.id, built.source.missing === 0);
+    return built;
   }
 
   return async function standings(only) {
@@ -186,7 +194,7 @@ export function rugbyTables({ wiki, leagues, seasonOf, seasonGames, resting = ()
     for (const league of leagues) {
       const source = SOURCES[league.id];
       if (!source || (only && !only.has(String(league.id)))) continue;
-      if (!only && resting(league.id) && now() - (looked.get(league.id) ?? 0) < RESTING_LOOK) continue;
+      if (!only && resting(league.id) && complete.get(league.id) && now() - (looked.get(league.id) ?? 0) < RESTING_LOOK) continue;
       const season = seasonOf(league.id);
       if (!season) continue;
       const tables = Object.entries(source.tables ?? { table: source.article }).map(([id, page]) => ({ id, page: filled(page, season) }));
