@@ -127,8 +127,9 @@ export const config = {
       // "England U19 vs Norway U19" — which `seniorOnly` leaves out.
       { id: 4490, name: "UEFA Nations League", menu: "Nations League", short: "UNL", color: "#0f2a4a", section: "international", badge: "unl" },
       // The feed's own mark, from its larger file (Julien chose it over a
-      // globe on build 28).
-      { id: 4562, name: "International Friendlies", menu: "Friendlies", short: "INT", color: "#1c3552", section: "international", logo: "https://r2.thesportsdb.com/images/media/league/logo/rs8euz1648659484.png", seniorOnly: true, seasonless: true,
+      // globe on build 28); the menu draws the globe, the wordmark being an
+      // unreadable strip there (Julien, build 47).
+      { id: 4562, name: "International Friendlies", menu: "Friendlies", short: "INT", color: "#1c3552", section: "international", logo: "https://r2.thesportsdb.com/images/media/league/logo/rs8euz1648659484.png", symbol: "globe.europe.africa.fill", seniorOnly: true, seasonless: true,
         // Every national side plays friendlies, Cook Islands v Tahiti too:
         // a game is kept when one side is a team people tune in for.
         teams: ["Brazil", "Argentina", "Uruguay", "Colombia", "Chile", "Ecuador", "Paraguay", "Peru",

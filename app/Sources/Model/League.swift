@@ -31,7 +31,8 @@ struct LeagueSummary: Decodable, Equatable, Identifiable, Hashable {
     let logo: URL?
     /// The same mark as a round icon, for the sidebar.
     let icon: URL?
-    /// A system symbol in place of a mark not worth showing (friendlies).
+    /// A system symbol where there is no mark, and in the menu where the
+    /// mark is a wordmark too wide to read there (the friendlies').
     let symbol: String?
     /// The menu section it goes in when not its sport's own: "international".
     let section: String?

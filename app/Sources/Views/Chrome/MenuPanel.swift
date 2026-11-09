@@ -128,6 +128,14 @@ enum MenuIcon {
     case symbol(String)
     case league(LeagueSummary)
 
+    /// The picture for a competition: its square icon; failing that its
+    /// symbol, when it has one, over a wordmark that is an unreadable strip
+    /// at this size (the friendlies', Julien, build 47); failing both, its
+    /// logo. Nil draws the symbol.
+    static func mark(of league: LeagueSummary) -> URL? {
+        league.icon ?? (league.symbol == nil ? league.logo : nil)
+    }
+
     @ViewBuilder
     func view(size: CGFloat) -> some View {
         switch self {
@@ -137,7 +145,7 @@ enum MenuIcon {
                 .font(.system(size: size * 0.7, weight: .medium))
                 .frame(width: size, height: size)
         case .league(let league):
-            CachedImage(url: league.icon ?? league.logo) {
+            CachedImage(url: Self.mark(of: league)) {
                 Image(systemName: league.symbol ?? Sport.icon(for: league.sport))
                     .font(.system(size: size * 0.6))
                     .foregroundStyle(Sport.tint(for: league.sport))

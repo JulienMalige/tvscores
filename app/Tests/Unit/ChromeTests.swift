@@ -19,6 +19,19 @@ struct ChromeTests {
         #expect(squeezed.height == free.height, "one line, not two")
     }
 
+    @Test("the menu draws a competition's icon; else its symbol over a wordmark; else its logo")
+    func menuMarkReadsAtItsSize() throws {
+        func league(_ extra: String) throws -> LeagueSummary {
+            let json = #"{"sport":"football","id":4562,"name":"International Friendlies","menu":"Friendlies","short":"INT","hasStandings":false,"playing":true"# + extra + "}"
+            return try ScoreboardDecoder.make().decode(LeagueSummary.self, from: Data(json.utf8))
+        }
+        let logo = #","logo":"https://tvscores.example/wordmark.png""#
+        #expect(MenuIcon.mark(of: try league(logo + #","icon":"https://tvscores.example/icon.png""#))?.lastPathComponent == "icon.png")
+        #expect(MenuIcon.mark(of: try league(logo + #","symbol":"globe.europe.africa.fill""#)) == nil,
+                "the friendlies: their globe, not their wordmark squeezed into a strip (build 47)")
+        #expect(MenuIcon.mark(of: try league(logo))?.lastPathComponent == "wordmark.png")
+    }
+
     @Test("only a build marked for the store is the store's; anything else is a tester's")
     func editionReadsInfoPlist() {
         #expect(Edition(info: ["TVScoresEdition": "store"]) == .store)
