@@ -157,8 +157,8 @@ export const config = {
     /**
      * Rugby union (Julien, 2026-11-08), the fixtures from TheSportsDB and the
      * scores from API-Sports: `apiSports` is the competition's id there
-     * (providers/rugby.js). No tables: neither feed has this season's, and
-     * one built from results would miss the bonus points, which need tries.
+     * (providers/rugby.js). The tables are Wikipedia's: where each one is,
+     * and its zones, are in src/rugby-tables.js.
      */
     rugby: [
       { id: 4430, name: "Top 14", short: "T14", color: "#2a2316", badge: "top14", apiSports: 16 },

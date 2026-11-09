@@ -1,6 +1,8 @@
 import { getJson } from "../http.js";
 import { STATE } from "../model.js";
 import { sameClub } from "./live-backup.js";
+import { wikipedia } from "./wikipedia.js";
+import { rugbyTables } from "../rugby-tables.js";
 
 const BASE = "https://v1.rugby.api-sports.io";
 const DAY = 86400e3;
@@ -16,6 +18,8 @@ const KEEP = 4 * DAY;
 const HEARD_FOR = 4 * 60e3;
 /** No rugby game is still being played this long after its kickoff, extra time and all. */
 const PLAYED_WITHIN = 3 * 3600e3;
+/** Wikipedia's tables are looked at this often, and ten minutes after a final whistle (rugby-tables.js). */
+const TABLES_EVERY = 3600e3;
 
 const utcDay = (t) => new Date(t).toISOString().slice(0, 10);
 
@@ -95,9 +99,11 @@ export function withResult(event, result) {
  * plan: yesterday to tomorrow, 100 calls a day, and no live filter, so one
  * call is a whole day's games, finished ones included — which is how a game
  * stops being live here. `quota` counts those calls, and is the scheduler's;
- * `meta.results` keeps what they said, through restarts.
+ * `meta.results` keeps what they said, through restarts. The tables are
+ * Wikipedia's (`wiki`), with the crests and the season's games from
+ * TheSportsDB.
  */
-export function rugbyProvider({ fixtures, fixturesQuota, leagues, key, quota, meta, log = () => {}, now = () => Date.now() }) {
+export function rugbyProvider({ fixtures, fixturesQuota, leagues, key, quota, meta, wiki = wikipedia(), log = () => {}, now = () => Date.now() }) {
   const apiLeague = new Map(leagues.map((l) => [String(l.id), l.apiSports]));
   const results = (meta.results ??= {});
   /** date -> { at, games }: the last answer for each day, for HEARD_FOR. */
@@ -205,11 +211,30 @@ export function rugbyProvider({ fixtures, fixturesQuota, leagues, key, quota, me
     return Object.assign(told(events), { partial: events.partial, missing: events.missing });
   }
 
+  const standings = rugbyTables({
+    wiki,
+    leagues,
+    // The season each competition's fixtures name, as the daily pass learned
+    // it, and whether its next game is more than a day off.
+    seasonOf: (id) => meta.seasons?.[id] ?? meta.next?.[id]?.season,
+    resting: (id) => Date.parse(meta.next?.[id]?.start) > now() + DAY,
+    seasonGames: async (id, season) => {
+      fixturesLeft(1);
+      return fixtures.seasonGames(id, season);
+    },
+    results,
+    log,
+    now,
+  });
+
   return {
     sport: "rugby",
     daily,
     live,
     byDate,
+    standings,
+    standingsFollowResults: true,
+    standingsEvery: TABLES_EVERY,
     // The week is TheSportsDB's, on its own budget, which daily() checks;
     // the one API-Sports call a day the pass may make checks this one.
     dailyCost: 0,

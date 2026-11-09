@@ -7,7 +7,8 @@ const LIST_TTL = 60e3;        // the live list is shared by every game that asks
 const MIN_GAP = 5 * 60e3;     // one game's numbers are not asked again sooner
 const KICKOFF_SLACK = 45 * 60e3;
 
-const plain = (name) => String(name || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+/** A name with its accents, case, spaces and punctuation left out: "Atlético-MG" is "atleticomg". */
+export const plain = (name) => String(name || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
 /** "Atletico-MG" and "Atlético Mineiro" are one club: one name holds the other, or they share six letters. */
 export function sameClub(a, b) {

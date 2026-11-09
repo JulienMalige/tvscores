@@ -126,7 +126,7 @@ This is the mechanic to preserve; `proxy/src/scheduler.js` owns it and
 |---|---|---|
 | Schedules (`daily`) | once per UTC day after `dailyRefreshHourUtc`, or after `idleRefreshMinutes` — but never while a game could be in progress | 9 calls per team sport, one per day of the window, plus one per competition with nothing in it (when it is next on) |
 | Scores (`live`) | only inside a live window, then every `liveIntervalSeconds` — 30 s for the sports on the paid key, 30 min for tennis, 5 min or more for rugby | 1 call per sport; rugby 2, today's fixtures and API-Sports' games of the day |
-| Standings | every 6 hours, and within 10 min of a final whistle in that league | 1 per league (the season's results for the leagues the feed has no table for) |
+| Standings | every 6 hours (rugby's, from Wikipedia, every hour), and within 10 min of a final whistle in that league | 1 per league (the season's results for the leagues the feed has no table for); rugby: 1 Wikipedia request per language, and the season's results per competition |
 | Motorsport calendar | every 6 hours, or every 30 min within 6 h of a session and for 3 h after a qualifying or sprint starts | 1 + one per newly finished race, qualifying or sprint |
 | Portraits | once per athlete, kept a month | background, 25/min |
 | Crests, badges | mirrored once, rechecked every 90 days, served with a year-long header; bump `VERSION` in `proxy/src/images.js` to replace them everywhere | none after the first |
@@ -187,7 +187,9 @@ writes its own number is a bug, and rows all use `rowSurface(focused:)`.
   ATP/WTA. Rugby union since 2026-11-08 (Julien's six: Top 14, Champions
   Cup, Premiership, Nations Championship, Six Nations, World Cup), from
   version 1.1: builds up to 1.0 send no `sports` list and are given none of
-  it (`firstSports` in `proxy/src/config.js`).
+  it (`firstSports` in `proxy/src/config.js`). Its tables come from
+  Wikipedia (2026-11-09), credited under each one as its licence asks
+  (`docs/data-providers.md`).
 - **The menu is ours, not tvOS's sidebar** (Julien, 2026-09-28, keeping
   every competition in it). tvOS's `sidebarAdaptable` loses focus past
   seven tabs — the menu opened and shut in one movement from its lower

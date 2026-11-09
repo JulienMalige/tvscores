@@ -16,6 +16,11 @@ notes when a version ships.
 - The Nations League has its flag in the menu, where its mark did not show.
 - The friendlies have a globe in the menu, where their wordmark was too small to read; it
   stays on their page and above their games.
+- Rugby has its tables, with the bonus points: the Top 14, the Champions Cup's four pools,
+  the Premiership and the Nations Championship's two hemispheres, and the Six Nations and
+  the World Cup once they start. They come from Wikipedia, whose volunteers update them
+  hours or days after a game: under the heading, each table names its article and says
+  how many games already played it does not count yet.
 
 ## 1.1 build 47 — 9 November 2026
 - Rugby union, in a section of its own in the menu: the Top 14, the Champions Cup, the

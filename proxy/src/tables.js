@@ -144,6 +144,6 @@ function byRecord(x, y) {
   return pct(y) - pct(x) || (y.f - y.a) - (x.f - x.a) || x.name.localeCompare(y.name);
 }
 
-function signed(n) {
+export function signed(n) {
   return n > 0 ? `+${n}` : String(n);
 }

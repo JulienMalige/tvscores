@@ -118,8 +118,9 @@ November:
 So the fixtures come from TheSportsDB and the scores from API-Sports, joined
 on competition, kickoff (45 minutes) and both sides' names
 (`proxy/src/providers/rugby.js`); a score from API-Sports wins over
-TheSportsDB's. No league tables: built from results they would miss the
-bonus points, which need the tries. The Six Nations badge is cut below its
+TheSportsDB's. No league tables from these two: built from results they
+would miss the bonus points, which need the tries. The tables come from
+Wikipedia since 2026-11-09 (below). The Six Nations badge is cut below its
 sponsor's name, Guinness, which France's Loi Évin keeps off its sports
 broadcasts.
 
@@ -524,3 +525,59 @@ The detail cache now takes a lease on a live game: the proxy refreshes it
 every 90 s while someone has asked for it in the last five minutes, so the
 calls follow the games being watched, not the number of viewers
 (`proxy/src/details.js`).
+
+## Rugby tables from Wikipedia (decided 2026-11-09)
+
+Julien, 2026-11-09: "Rugby from wiki, even a day late." What was checked
+that day, before:
+
+- **TheSportsDB**, our paid key: `lookuptable.php` answers with no rows for
+  all six competitions, this season and last, where the Premier League gets
+  its twenty; its v2 has no table call.
+- **API-Sports**' free plan has seasons 2022 to 2024 only. Its paid plan
+  (about $15 a month) would be faster; not taken.
+- **A French source**, as Julien asked: the LNR publishes no API and no open
+  data; data.gouv.fr has one rugby dataset (the 2023 World Cup's venues in
+  Tours); L'Équipe, Eurosport and Rugbyrama publish pages only, which rule 3
+  keeps us from reading. French Wikipedia is the French source.
+- **Oanor** (oanor.com, free for 3,000 calls a month) serves tables with the
+  bonus points, but says its data is "sourced continuously from ESPN", which
+  licenses nothing to it, and it has neither the Six Nations nor the Nations
+  Championship. Highlightly's terms forbid serving its data through a proxy.
+
+**Terms.** Wikipedia's text is under CC BY-SA 4.0. Reusing it means crediting
+it (a link or the address of the page reused), naming the licence, and
+sharing what is made from it under the same licence. A television has no
+links, so the app writes under each table the source, the article's title
+and the licence; the proxy's answer carries the article's address and the
+licence with the table, and those tables are CC BY-SA 4.0 as well.
+
+**How it is read.** Only the documented MediaWiki Action API
+(`https://<lang>.wikipedia.org/w/api.php`): `action=query&prop=revisions`
+for the source of the pages that hold the tables, and
+`action=expandtemplates` for the teams' names, which the tables write as
+templates (`{{ru|FRA}}`, `{{chemin équipes rugby à XV|ru Toulouse}}`); each
+name is expanded once. The rendered pages are never read. As the API's
+etiquette and Wikimedia's User-Agent policy ask: a User-Agent naming the
+app and its site, one request at a time, `maxlag=5`, compressed answers.
+That is one request an hour per language (English and French) for every
+table at once, a competition with nothing this week looked at once a day,
+and another ten minutes after a final whistle in the competition whose
+table it moves.
+
+**Which pages** (`proxy/src/rugby-tables.js`), the season filled in from
+TheSportsDB's: the Top 14 from French Wikipedia (*Championnat de France de
+rugby à XV 2026-2027*), whose table was edited on Saturday 7 November when
+the English page had not been since 16 October; the Premiership, the
+Nations Championship (its two tables) and the Six Nations from their English
+season articles; the Champions Cup's four pools from their templates, and
+the World Cup's six pools from their articles. A table where nobody has
+played yet is not served. The zones under the tables are ours, like
+football's.
+
+**How late.** Volunteers update the tables, hours to days after a game: on
+Monday 9 November the French Top 14 table held 1 of round 9's 7 games, played
+on the 7th and 8th, while the Nations Championship's was updated the morning
+after France v Fiji. So the app says under a table how many games already
+played it is still missing, counted from TheSportsDB's season results (and
+API-Sports' scores), and a late table never passes for a current one.

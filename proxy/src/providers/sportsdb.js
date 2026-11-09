@@ -148,6 +148,13 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
     return season;
   }
 
+  /** Every game of a competition's season, with the scores so far: one call. */
+  async function seasonGames(id, season) {
+    if (!key) throw new Error("TheSportsDB key missing");
+    const { body } = await call(`${V1}/${key}/eventsseason.php?id=${id}&s=${encodeURIComponent(season)}`);
+    return body?.events || [];
+  }
+
   /**
    * One league table per competition that has one. A knockout cup has no
    * table and a season that has not started has no rows: both come back
@@ -167,8 +174,7 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
         const season = seasons[String(league.id)] || (await currentSeason(league.id));
         if (!season) continue;
         if (league.table) {
-          const { body } = await call(`${V1}/${key}/eventsseason.php?id=${league.id}&s=${encodeURIComponent(season)}`);
-          const built = tableFromResults(body?.events || [], { ...league.table, groups: DIVISIONS[league.table.groups], zones: league.zones });
+          const built = tableFromResults(await seasonGames(league.id, season), { ...league.table, groups: DIVISIONS[league.table.groups], zones: league.zones });
           if (built) out[league.id] = { updatedAt: new Date().toISOString(), ...built };
           continue;
         }
@@ -191,5 +197,5 @@ export function sportsDbSport({ sport, key, leagues, window: win, quota, seasons
     return out;
   }
 
-  return { sport, daily, live, byDate, standings, standingsFollowResults: true, dailyCost: win.back + win.ahead + 1 };
+  return { sport, daily, live, byDate, standings, seasonGames, standingsFollowResults: true, dailyCost: win.back + win.ahead + 1 };
 }

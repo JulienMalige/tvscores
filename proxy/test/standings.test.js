@@ -50,6 +50,15 @@ test("a table is asked for every six hours, and not before", async () => {
   assert.equal(s.meta.lastStandings, new Date(NOW + H).toISOString());
 });
 
+test("a provider whose tables move on their own schedule says how often to look", async () => {
+  const s = subject({ standings: { 4430: TABLE }, lastStandings: NOW - 59 * 60e3 });
+  s.p.standingsEvery = H;
+  await refreshStandings(s, NOW);
+  assert.deepEqual(s.asked, [], "not before the hour");
+  await refreshStandings(s, NOW + 60e3);
+  assert.deepEqual(s.asked, ["all"], "Wikipedia's rugby tables, an hour after the last look");
+});
+
 test("a final whistle brings the next look forward to ten minutes, for that league only", async () => {
   const s = subject({ standings: { 4335: TABLE }, lastStandings: NOW - 30 * 60e3, dirty: ["4335"] });
   await refreshStandings(s, NOW);

@@ -7,10 +7,23 @@ import Foundation
 struct Standings: Decodable {
     let updatedAt: Date
     let tables: [StandingsTable]
+    /// Where the tables come from when not from one of our feeds: rugby's,
+    /// from Wikipedia, which its licence asks us to credit.
+    let source: StandingsSource?
+}
+
+/// The article a table was read from and its licence, and how many games
+/// already played it does not count yet: Wikipedia's volunteers update the
+/// tables hours, sometimes days, after a game.
+struct StandingsSource: Decodable, Equatable {
+    let site: String     // wikipedia
+    let title: String
+    let license: String
+    let missing: Int?
 }
 
 struct StandingsTable: Decodable, Identifiable {
-    let id: String   // drivers | constructors | teams | rankings | table | AFC | NFC | east | west
+    let id: String   // drivers | constructors | teams | rankings | table | AFC | NFC | east | west | north | south | pool-1 | pool-a
     let rows: [StandingsEntry]
     /// Column ids the rows' `cells` line up with ("p", "w", "pts"...), for the
     /// tables that are read as columns; a table of people has none.

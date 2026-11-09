@@ -45,6 +45,33 @@ struct ModelTests {
         #expect(constructors.rows.allSatisfy { $0.sub?.contains(",") == true }, "and every one has its drivers under it")
         let drivers = try #require(f1.tables.first { $0.id == "drivers" })
         #expect(drivers.rows.first?.pos == 1)
+        #expect(bundle.standings.values.allSatisfy { $0.source == nil }, "our feeds' own tables credit no one")
+    }
+
+    @Test("a rugby table names the Wikipedia article it comes from, and the games it does not count yet")
+    func standingsSource() throws {
+        let json = #"""
+        {"updatedAt":"2026-11-09T12:00:00.000Z","tables":[{"id":"pool-1","columns":["p","w","d","l","pd","bp","pts"],
+          "rows":[{"pos":1,"name":"Leinster","cells":["1","1","0","0","+25","1","5"],"value":5}],
+          "lines":[{"after":3,"line":"solid"}],"legend":[{"from":1,"to":3,"key":"r16"}]}],
+         "source":{"site":"wikipedia","title":"2026–27 European Rugby Champions Cup",
+          "url":"https://en.wikipedia.org/wiki/2026%E2%80%9327_European_Rugby_Champions_Cup","license":"CC BY-SA 4.0","missing":2}}
+        """#
+        let standings = try ScoreboardDecoder.make().decode(Standings.self, from: Data(json.utf8))
+        #expect(standings.source == StandingsSource(site: "wikipedia", title: "2026–27 European Rugby Champions Cup", license: "CC BY-SA 4.0", missing: 2))
+        #expect(standings.tables[0].rows[0].cells?.count == standings.tables[0].columns?.count)
+    }
+
+    @Test("a rugby table's words are in the catalogue, in the four languages")
+    func rugbyWords() throws {
+        let keys = ["col.pd", "col.bp", "zone.semifinals", "zone.playoffs", "standings.north", "standings.south", "standings.pool %@", "standings.wikipedia %@"]
+        for language in ["en", "fr", "pt", "es"] {
+            let path = try #require(Bundle.main.path(forResource: language, ofType: "lproj"), "\(language)")
+            let bundle = try #require(Bundle(path: path))
+            for key in keys {
+                #expect(bundle.localizedString(forKey: key, value: "?", table: nil) != "?", "\(key) in \(language)")
+            }
+        }
     }
 
     @Test("kickoff times arrive as instants, not as wall-clock guesses")

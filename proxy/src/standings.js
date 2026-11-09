@@ -17,6 +17,8 @@ const STANDINGS_RETRY = 30 * MIN;
  * Refresh a provider's standings: every 6 h, and within ten minutes of a final
  * whistle in a league whose table just changed. A table nobody can see move is
  * the thing that makes an app feel dead, and it costs one call per league.
+ * A provider whose tables move on their own schedule says how often to look
+ * (`standingsEvery`): rugby's are edited by Wikipedia's volunteers, hours after.
  */
 export async function refreshStandings(self, now) {
   try {
@@ -33,7 +35,7 @@ async function refresh(self, now) {
   const dirty = self.dirtyLeagues?.size ? new Set(self.dirtyLeagues) : null;
   // An attempt that found no table at all must not buy six hours of silence:
   // the season may start tomorrow, or the provider may simply have been down.
-  const due = now - last >= (self.meta.standingsEmpty ? STANDINGS_RETRY : STANDINGS_EVERY);
+  const due = now - last >= (self.meta.standingsEmpty ? STANDINGS_RETRY : self.p.standingsEvery ?? STANDINGS_EVERY);
   if (!due && !(dirty && now - last >= STANDINGS_AFTER_GAME)) return;
   if (self.quota && self.quota.spendable(now) < 2) return;
   let data;
