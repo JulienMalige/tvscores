@@ -83,4 +83,20 @@ struct CompetitionTests {
         #expect(rugby.leagues.map(\.id.raw).sorted() == ["4430", "4714"])
         #expect(families.first { $0.section.id == "international" }?.leagues.map(\.sport) == ["football"])
     }
+
+    @Test("the flows' reset forgets the competitions chosen, and only when asked")
+    @MainActor
+    func resetForgetsTheChoices() throws {
+        let name = "CompetitionTests.reset"
+        let defaults = try #require(UserDefaults(suiteName: name))
+        defer { defaults.removePersistentDomain(forName: name) }
+        defaults.set(["football:4351"], forKey: "hiddenLeagues")
+        defaults.set(["football:4331", "football:4351"], forKey: "leagueOrder")
+        LeagueChoice.resetIfAsked(defaults, arguments: ["TVScores"])
+        #expect(defaults.stringArray(forKey: "hiddenLeagues") == ["football:4351"], "a viewer's launch keeps them")
+        LeagueChoice.resetIfAsked(defaults, arguments: ["TVScores", "-TVScoresReset"])
+        #expect(defaults.stringArray(forKey: "hiddenLeagues") == nil)
+        #expect(defaults.stringArray(forKey: "leagueOrder") == nil)
+        #expect(LeagueChoice(defaults: defaults).isShown("football:4351"), "and the competition hidden before is shown")
+    }
 }

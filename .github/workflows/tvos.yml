@@ -110,11 +110,13 @@ jobs:
           APP=$(find build/Build/Products -name 'TVScores.app' -maxdepth 2 | head -1)
           echo "App bundle: $APP"
           mkdir -p shots
-          # A fresh install: the tests ran in this simulator, and a choice one
-          # leaves behind shows in every picture (a failed move test left
-          # Brasileirão below Bundesliga in the menu, 2026-11-09).
-          xcrun simctl uninstall "$UDID" com.julienmalige.tvscores 2>/dev/null || true
           xcrun simctl install "$UDID" "$APP"
+          # The tests ran in this simulator, and a choice one leaves behind
+          # shows in every picture (a failed move test left Brasileirão below
+          # Bundesliga in the menu, 2026-11-09). One launch with the reset
+          # forgets the choices and keeps the images the tests fetched.
+          xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresReset
+          sleep 3
           shot() { # $1 lang, $2 tab, $3 optional league sport (opens the league page)
             xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
             # Demo sample is bucketed in São Paulo time (see app/README note); run the simulator in the same zone.

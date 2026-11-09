@@ -174,9 +174,10 @@ struct SettingsScreen: View {
     private var competitionList: some View {
         List {
             ForEach(SportSection.grouped(leagues, all: true), id: \.section.id) { entry in
+                let siblings = entry.leagues.map(Sidebar.key)
                 Section(entry.section.title) {
                     ForEach(entry.leagues) { league in
-                        competitionRow(league, siblings: entry.leagues.map(Sidebar.key))
+                        competitionRow(league, siblings: siblings)
                     }
                 }
             }
@@ -199,13 +200,15 @@ struct SettingsScreen: View {
         }
         .accessibilityIdentifier("settings.league.\(key)")
         .accessibilityAddTraits(shown ? .isSelected : [])
+        // The menu is tvOS's own, drawn outside the locale the views are
+        // given: its words come from the chosen language's strings.
         .contextMenu {
             Button { leagueChoice.move(key, by: -1, among: siblings) } label: {
-                Label("settings.moveUp", systemImage: "arrow.up")
+                Label(String(localized: "settings.moveUp", bundle: LanguageChoice.bundle), systemImage: "arrow.up")
             }
             .disabled(key == siblings.first)
             Button { leagueChoice.move(key, by: 1, among: siblings) } label: {
-                Label("settings.moveDown", systemImage: "arrow.down")
+                Label(String(localized: "settings.moveDown", bundle: LanguageChoice.bundle), systemImage: "arrow.down")
             }
             .disabled(key == siblings.last)
         }

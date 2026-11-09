@@ -11,7 +11,8 @@ enum Flow {
     /// heading instead, since the switch is underneath it by then.
     static func launch(tab: String = "today", league: String? = nil, extra: [String] = [], ready: String? = nil) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-TVScoresDemo", "-TVScoresTab", tab, "-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+        // Reset: what a test before chose in Settings is not this one's.
+        app.launchArguments = ["-TVScoresDemo", "-TVScoresReset", "-TVScoresTab", tab, "-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         if let league { app.launchArguments += ["-TVScoresLeague", league] }
         app.launchArguments += extra
         app.launchEnvironment["TZ"] = "America/Sao_Paulo"

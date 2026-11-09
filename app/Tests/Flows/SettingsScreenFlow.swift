@@ -41,6 +41,7 @@ final class SettingsScreenFlow: FlowCase {
         XCTAssertLessThan(top(), below())
         move(app, "Move Down")
         XCTAssertTrue(settles { top() > below() }, "it is now below the one that followed it")
+        XCTAssertTrue(row(app, first).hasFocus, "the focus went with it, so the next hold is on it")
         XCTAssertTrue(app.buttons[first].isSelected, "and still shown: holding select only moves it")
         move(app, "Move Up")
         XCTAssertTrue(settles { top() < below() }, "and back in its place")
@@ -58,8 +59,10 @@ final class SettingsScreenFlow: FlowCase {
     /// the menu that opens offers (Move Up is greyed on the first row).
     private func move(_ app: XCUIApplication, _ choice: String, file: StaticString = #filePath, line: UInt = #line) {
         Flow.remote.press(.select, forDuration: 1.5)
-        XCTAssertTrue(app.descendants(matching: .any)[choice].waitForExistence(timeout: 5),
-                      "holding select opens a menu with \(choice)", file: file, line: line)
+        let item = app.descendants(matching: .any)[choice]
+        XCTAssertTrue(item.waitForExistence(timeout: 5), "holding select opens a menu with \(choice)", file: file, line: line)
+        // Greyed, it would be passed over and the press would take the other.
+        XCTAssertTrue(item.isEnabled, "\(choice) can be chosen here", file: file, line: line)
         Flow.remote.press(.select)
         sleep(2)
     }

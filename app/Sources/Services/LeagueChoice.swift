@@ -22,6 +22,15 @@ final class LeagueChoice {
         order = defaults.stringArray(forKey: Self.orderKey) ?? []
     }
 
+    /// `-TVScoresReset` forgets the choices before anything reads them: each
+    /// flow test, and CI's pictures after them, start from every competition
+    /// shown in the proxy's order, whatever a test before left (2026-11-09).
+    static func resetIfAsked(_ defaults: UserDefaults = .standard, arguments: [String] = ProcessInfo.processInfo.arguments) {
+        guard arguments.contains("-TVScoresReset") else { return }
+        defaults.removeObject(forKey: hiddenKey)
+        defaults.removeObject(forKey: orderKey)
+    }
+
     func isShown(_ key: String) -> Bool { !hidden.contains(key) }
 
     func toggle(_ key: String) {
