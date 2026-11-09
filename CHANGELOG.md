@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- A competition with a long name no longer pushes the date at the top of its page onto
+  two lines: the name is set a little smaller instead. The Six Nations and the Champions
+  Cup did it.
 
 ## 1.1 build 47 — 9 November 2026
 - Rugby union, in a section of its own in the menu: the Top 14, the Champions Cup, the

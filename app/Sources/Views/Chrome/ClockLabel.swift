@@ -21,6 +21,9 @@ struct ClockLabel: View {
             }
             .font(font)
             .foregroundStyle(.secondary)
+            // One line whatever stands beside it: the heading gives way, not
+            // the date (build 47, beside the Six Nations Championship).
+            .fixedSize()
         }
     }
 }

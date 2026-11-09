@@ -1,10 +1,24 @@
 import Foundation
+import SwiftUI
 import Testing
 @testable import TVScores
 
 /// The chrome: what the menu is built from, and what it is fed.
 @Suite("Chrome")
 struct ChromeTests {
+    @Test("the clock keeps to one line, however little room a heading leaves it")
+    @MainActor
+    func clockKeepsToOneLine() {
+        // Beside "European Rugby Champions Cup" the date went onto two lines
+        // (Julien, build 47). Squeezed, it runs past its place instead, and
+        // the name beside it gives way.
+        let host = UIHostingController(rootView: ClockLabel())
+        let free = host.sizeThatFits(in: CGSize(width: 4000, height: 1000))
+        let squeezed = host.sizeThatFits(in: CGSize(width: 150, height: 1000))
+        #expect(free.height > 0)
+        #expect(squeezed.height == free.height, "one line, not two")
+    }
+
     @Test("only a build marked for the store is the store's; anything else is a tester's")
     func editionReadsInfoPlist() {
         #expect(Edition(info: ["TVScoresEdition": "store"]) == .store)

@@ -24,6 +24,11 @@ struct CompetitionScreen: View {
                     LeagueMark(sport: ref.sport, logo: ref.logo, symbolName: ref.symbol)
                     Text(ref.name)
                         .font(.system(size: 48, weight: .bold))
+                        // A long name gives way to the clock, a little smaller
+                        // on its one line: "European Rugby Champions Cup" put
+                        // the date on two (Julien, build 47).
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                     Spacer()
                     ClockLabel()
                 }

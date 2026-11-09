@@ -249,12 +249,13 @@ jobs:
           xcrun simctl io "$UDID" screenshot shots/live-league-wta-en.png
           # Rugby on live data, which the demo sample predates (2026-11-08):
           # the menu with its section, a competition's games to come and its
-          # results, and a finished game's page.
+          # results, and a finished game's page. The Six Nations and the
+          # Champions Cup have the longest names beside the clock (build 47).
           xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
           SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresTab today -TVScoresMenuOpen -AppleLanguages "(fr)" -AppleLocale fr_FR
           sleep 16
           xcrun simctl io "$UDID" screenshot shots/live-menu-fr.png
-          for spec in "upcoming 5852 fr" "upcoming 5852 en" "yesterday 4430 en"; do
+          for spec in "upcoming 5852 fr" "upcoming 5852 en" "yesterday 4430 en" "today 4714 en" "today 4714 fr" "today 4550 en" "today 4550 fr"; do
             read -r tab league lang <<< "$spec"
             xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
             SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresTab "$tab" -TVScoresLeague "$league" -AppleLanguages "($lang)" -AppleLocale "$lang"
