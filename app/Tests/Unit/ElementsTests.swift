@@ -57,10 +57,10 @@ struct ElementsTests {
     func columnLabelKeepsToOneLine() {
         // "Bonus", French for the bonus points, broke in two over its column
         // (build 48's screenshots). A name the catalogue lacks shows its key,
-        // longer still.
+        // longer still: set smaller, it is no taller than one line.
         let size = { (column: String) in UIHostingController(rootView: ColumnLabel(column: column)).sizeThatFits(in: CGSize(width: 4000, height: 1000)) }
         #expect(size("p").height > 0)
-        #expect(size("a-name-far-too-long-for-its-column").height == size("p").height, "one line, not two")
+        #expect(size("a-name-far-too-long-for-its-column").height <= size("p").height, "one line, not two")
     }
 
     @Test("every competition said in the viewer's language has all four")
