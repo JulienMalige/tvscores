@@ -1579,25 +1579,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tick the competitions you want in the menu and on Home. To change their order, select the handle at the end of a row, move it up or down, then select again."
+            "value": "Tick the competitions you want in the menu and on Home. To change their order, hold the select button on a competition, then choose Move Up or Move Down."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cochez les compétitions à garder dans le menu et sur l'accueil. Pour changer leur ordre, sélectionnez la poignée au bout d'une ligne, déplacez-la vers le haut ou le bas, puis sélectionnez à nouveau."
+            "value": "Cochez les compétitions à garder dans le menu et sur l'accueil. Pour changer leur ordre, maintenez le bouton de sélection sur une compétition, puis choisissez Monter ou Descendre."
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Marque as competições que quer no menu e na tela inicial. Para mudar a ordem, selecione a alça no fim de uma linha, mova para cima ou para baixo e selecione de novo."
+            "value": "Marque as competições que quer no menu e na tela inicial. Para mudar a ordem, mantenha o botão de seleção pressionado sobre uma competição e escolha Mover para cima ou Mover para baixo."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Marca las competiciones que quieres en el menú y en Inicio. Para cambiar su orden, selecciona el asa al final de una fila, muévela arriba o abajo y vuelve a seleccionar."
+            "value": "Marca las competiciones que quieres en el menú y en Inicio. Para cambiar su orden, mantén pulsado el botón de selección sobre una competición y elige Subir o Bajar."
           }
         }
       }
@@ -1776,60 +1776,60 @@
         }
       }
     },
-    "settings.move": {
+    "settings.moveDown": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Move"
+            "value": "Move Down"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Déplacer"
+            "value": "Descendre"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mover"
+            "value": "Mover para baixo"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mover"
+            "value": "Bajar"
           }
         }
       }
     },
-    "settings.movingNote": {
+    "settings.moveUp": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Move it with up and down, then select to set it down."
+            "value": "Move Up"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Déplacez-la avec haut et bas, puis sélectionnez pour la poser."
+            "value": "Monter"
           }
         },
         "pt": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mova com cima e baixo, depois selecione para soltar."
+            "value": "Mover para cima"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Muévela con arriba y abajo y selecciona para soltarla."
+            "value": "Subir"
           }
         }
       }

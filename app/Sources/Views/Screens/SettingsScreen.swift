@@ -8,8 +8,8 @@ import SwiftUI
 ///
 /// - the top: Competitions, Where to watch, Language (each with its value),
 ///   Sources, Version, and in a tester's build Debug, with Open apps;
-/// - Competitions: every competition by family, ticked to show it, with a
-///   handle to move it up or down (build 36);
+/// - Competitions: every competition by family, ticked to show it, and
+///   moved up or down by holding select on it (builds 36 and 47);
 /// - Where to watch: a checklist of countries — none, one or several;
 /// - Language: the Apple TV's, or one of the app's four.
 struct SettingsScreen: View {
@@ -23,8 +23,6 @@ struct SettingsScreen: View {
     @State private var leagueChoice = LeagueChoice.shared
     @State private var appChoice = AppChoice.shared
     @State private var language = LanguageChoice.current
-    /// The competition being moved with the remote, if any.
-    @State private var lifted: String?
     @Environment(\.dismiss) private var dismiss
 
     private var version: String {
@@ -63,10 +61,9 @@ struct SettingsScreen: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(PageTint(color: .homeTint))
         .ignoresSafeArea()
-        // Back sets a lifted competition down, climbs one level, then puts
-        // Settings away.
+        // Back climbs one level, then puts Settings away.
         .onExitCommand {
-            if lifted != nil { lifted = nil } else if page == .top { dismiss() } else { page = .top }
+            if page == .top { dismiss() } else { page = .top }
         }
         .accessibilityIdentifier("page.settings")
         .task {
@@ -90,7 +87,7 @@ struct SettingsScreen: View {
                     .font(.system(size: Metrics.settingsMark * 0.45, weight: .light))
                     .frame(height: Metrics.settingsMark * 0.6)
             }
-            Text(page.blurb(moving: lifted != nil))
+            Text(page.blurb)
                 .font(.callout.weight(.medium))
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: Metrics.settingsMark * 1.2)
@@ -172,9 +169,8 @@ struct SettingsScreen: View {
         return String(localized: "settings.shownCount \(shown) \(leagues.count)", bundle: LanguageChoice.bundle)
     }
 
-    /// Every competition by family: select its row to show or hide it;
-    /// select its handle to lift it, move it with up and down, select
-    /// again to set it down — as tvOS's own language list orders.
+    /// Every competition by family: select its row to show or hide it; hold
+    /// select on it to move it up or down, from the menu tvOS opens there.
     private var competitionList: some View {
         List {
             ForEach(SportSection.grouped(leagues, all: true), id: \.section.id) { entry in
@@ -187,36 +183,31 @@ struct SettingsScreen: View {
         }
     }
 
+    /// One button: a list row is one place for the focus, so a handle beside
+    /// the tick was pressed with it, and a press both hid a competition and
+    /// lifted it (Julien, build 47). Moving is the row's held press instead.
     private func competitionRow(_ league: LeagueSummary, siblings: [String]) -> some View {
         let key = Sidebar.key(league)
         let shown = leagueChoice.isShown(key)
-        return HStack(spacing: 20) {
-            Button { leagueChoice.toggle(key) } label: {
-                HStack(spacing: 18) {
-                    MenuIcon.league(league).view(size: Metrics.menuIcon)
-                    Text(verbatim: league.menu)
-                    Spacer()
-                    if shown { Image(systemName: "checkmark") }
-                }
+        return Button { leagueChoice.toggle(key) } label: {
+            HStack(spacing: 18) {
+                MenuIcon.league(league).view(size: Metrics.menuIcon)
+                Text(verbatim: league.menu)
+                Spacer()
+                if shown { Image(systemName: "checkmark") }
             }
-            .accessibilityIdentifier("settings.league.\(key)")
-            .accessibilityAddTraits(shown ? .isSelected : [])
-            // While one is lifted only its handle takes focus, so up and
-            // down move it rather than the remote's place in the list.
-            .disabled(lifted != nil)
-            Button { lifted = lifted == key ? nil : key } label: {
-                Image(systemName: lifted == key ? "arrow.up.arrow.down" : "line.3.horizontal")
+        }
+        .accessibilityIdentifier("settings.league.\(key)")
+        .accessibilityAddTraits(shown ? .isSelected : [])
+        .contextMenu {
+            Button { leagueChoice.move(key, by: -1, among: siblings) } label: {
+                Label("settings.moveUp", systemImage: "arrow.up")
             }
-            .accessibilityLabel(Text("settings.move"))
-            .disabled(lifted != nil && lifted != key)
-            .onMoveCommand { direction in
-                guard lifted == key else { return }
-                switch direction {
-                case .up: leagueChoice.move(key, by: -1, among: siblings)
-                case .down: leagueChoice.move(key, by: 1, among: siblings)
-                default: break
-                }
+            .disabled(key == siblings.first)
+            Button { leagueChoice.move(key, by: 1, among: siblings) } label: {
+                Label("settings.moveDown", systemImage: "arrow.down")
             }
+            .disabled(key == siblings.last)
         }
     }
 

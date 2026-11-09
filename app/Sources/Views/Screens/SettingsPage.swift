@@ -28,11 +28,11 @@ enum SettingsPage {
         }
     }
 
-    /// The sentence under it; a competition being moved has its own.
-    func blurb(moving: Bool) -> LocalizedStringKey {
+    /// The sentence under it.
+    var blurb: LocalizedStringKey {
         switch self {
         case .top: "settings.blurb"
-        case .competitions: moving ? "settings.movingNote" : "settings.competitionsNote"
+        case .competitions: "settings.competitionsNote"
         case .countries: "settings.countryNote"
         case .language: "settings.languageNote"
         case .apps: "settings.appsNote"
