@@ -14,7 +14,8 @@ jobs:
   build:
     name: Build, run in simulator, screenshot
     runs-on: macos-latest
-    timeout-minutes: 30
+    # About 26 minutes on a quick runner, past 30 on a slow one (2026-11-09).
+    timeout-minutes: 40
     defaults:
       run:
         working-directory: app

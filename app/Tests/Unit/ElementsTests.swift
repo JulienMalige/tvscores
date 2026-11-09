@@ -39,6 +39,30 @@ struct ElementsTests {
         }
     }
 
+    @Test("a rugby table's words have all four: its columns, zones, pools and hemispheres, and its credit")
+    func rugbyTableWordsAreTranslated() throws {
+        let keys = ["col.pd", "col.bp", "zone.semifinals", "zone.playoffs", "standings.north", "standings.south",
+                    "standings.pool %@", "standings.wikipedia %@", "standings.missing %lld"]
+        for key in keys {
+            for lang in ["en", "fr", "pt", "es"] {
+                let path = try #require(Bundle.main.path(forResource: lang, ofType: "lproj"), "\(lang).lproj is bundled")
+                let value = Bundle(path: path)?.localizedString(forKey: key, value: "MISSING", table: nil)
+                #expect(value != "MISSING" && value != key, "\(key) in \(lang)")
+            }
+        }
+    }
+
+    @Test("a column's name keeps to one line, however long its word")
+    @MainActor
+    func columnLabelKeepsToOneLine() {
+        // "Bonus", French for the bonus points, broke in two over its column
+        // (build 48's screenshots). A name the catalogue lacks shows its key,
+        // longer still.
+        let size = { (column: String) in UIHostingController(rootView: ColumnLabel(column: column)).sizeThatFits(in: CGSize(width: 4000, height: 1000)) }
+        #expect(size("p").height > 0)
+        #expect(size("a-name-far-too-long-for-its-column").height == size("p").height, "one line, not two")
+    }
+
     @Test("every competition said in the viewer's language has all four")
     func competitionNamesAreTranslated() throws {
         for key in Set(CompetitionName.keys.values) {

@@ -62,18 +62,6 @@ struct ModelTests {
         #expect(standings.tables[0].rows[0].cells?.count == standings.tables[0].columns?.count)
     }
 
-    @Test("a rugby table's words are in the catalogue, in the four languages")
-    func rugbyWords() throws {
-        let keys = ["col.pd", "col.bp", "zone.semifinals", "zone.playoffs", "standings.north", "standings.south", "standings.pool %@", "standings.wikipedia %@"]
-        for language in ["en", "fr", "pt", "es"] {
-            let path = try #require(Bundle.main.path(forResource: language, ofType: "lproj"), "\(language)")
-            let bundle = try #require(Bundle(path: path))
-            for key in keys {
-                #expect(bundle.localizedString(forKey: key, value: "?", table: nil) != "?", "\(key) in \(language)")
-            }
-        }
-    }
-
     @Test("kickoff times arrive as instants, not as wall-clock guesses")
     func startsAreInstants() throws {
         let board = try ScoreboardDecoder.make().decode(Scoreboard.self, from: Self.sample("sample-scoreboard"))

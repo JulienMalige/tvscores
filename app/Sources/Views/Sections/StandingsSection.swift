@@ -134,13 +134,7 @@ struct StandingsSection: View {
 
     private func columnLabels(_ columns: [String]) -> some View {
         HStack(spacing: Metrics.tableGap) {
-            ForEach(columns, id: \.self) { column in
-                Text(LocalizedStringKey("col." + column))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .frame(width: Metrics.tableCell, alignment: .trailing)
-                    .accessibilityIdentifier("col." + column)
-            }
+            ForEach(columns, id: \.self) { ColumnLabel(column: $0) }
         }
     }
 
