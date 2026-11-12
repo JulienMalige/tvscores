@@ -39,6 +39,15 @@ struct SettingsScreen: View {
         return "\(short) (\(build))"
     }
 
+    /// The system's own language, named after the device the app is on.
+    private var systemLanguage: String {
+        #if os(tvOS)
+        return String(localized: "settings.languageSystem", bundle: LanguageChoice.bundle)
+        #else
+        return String(localized: "settings.languageDevice", bundle: LanguageChoice.bundle)
+        #endif
+    }
+
     var body: some View {
         #if os(tvOS)
         television
@@ -57,7 +66,7 @@ struct SettingsScreen: View {
         // The rows' words in the text's colour, not the tint's.
         .tint(.primary)
         .accessibilityIdentifier("page.settings")
-        .task { openRequested() }
+        .task { await openRequested() }
         #endif
     }
 
@@ -74,13 +83,15 @@ struct SettingsScreen: View {
     }
 
     /// `-TVScoresSettings countries` opens on that list (CI screenshots).
-    private func openRequested() {
+    private func openRequested() async {
         guard let wanted = LaunchRequest.argument("-TVScoresSettings") else { return }
         var asked = ["countries": SettingsPage.countries, "competitions": .competitions, "language": .language, "apps": .apps, "openApps": .openApps][wanted] ?? .top
         if asked == .openApps, !Edition.current.hasTesterTools { asked = .top }
         #if os(tvOS)
         page = asked
         #else
+        // Once the sheet is up: a list pushed while it rose never showed (CI, 2026-11-12).
+        try? await Task.sleep(for: .milliseconds(800))
         if asked != .top { path = [asked] }
         #endif
     }
@@ -112,7 +123,7 @@ struct SettingsScreen: View {
             if page == .top { dismiss() } else { page = .top }
         }
         .accessibilityIdentifier("page.settings")
-        .task { openRequested() }
+        .task { await openRequested() }
     }
 
     /// The left: what this page is for.
@@ -155,7 +166,7 @@ struct SettingsScreen: View {
             }
             .accessibilityIdentifier("settings.apps")
             link(.language) {
-                LabeledContent("settings.language") { Text(verbatim: language.map(LanguageChoice.name) ?? String(localized: "settings.languageSystem", bundle: LanguageChoice.bundle)) }
+                LabeledContent("settings.language") { Text(verbatim: language.map(LanguageChoice.name) ?? systemLanguage) }
             }
             .accessibilityIdentifier("settings.language")
             Section("settings.sources") {
@@ -199,7 +210,7 @@ struct SettingsScreen: View {
                     language = code
                 } label: {
                     HStack {
-                        Text(verbatim: code.map(LanguageChoice.name) ?? String(localized: "settings.languageSystem", bundle: LanguageChoice.bundle))
+                        Text(verbatim: code.map(LanguageChoice.name) ?? systemLanguage)
                         Spacer()
                         if language == code { Image(systemName: "checkmark") }
                     }
@@ -228,7 +239,11 @@ struct SettingsScreen: View {
             LabeledContent(label) { Text(verbatim: value) }
         }
         #else
-        LabeledContent(label) { Text(verbatim: value) }
+        // A phone's row is too narrow for the sources beside their name.
+        VStack(alignment: .leading, spacing: .tv(4)) {
+            Text(label)
+            Text(verbatim: value).font(.subheadline).foregroundStyle(.secondary)
+        }
         #endif
     }
 }

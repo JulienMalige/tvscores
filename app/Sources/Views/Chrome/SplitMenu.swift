@@ -76,7 +76,8 @@ struct SplitMenu: View {
             // `-TVScoresMenuOpen` shows the list, `-TVScoresSettings` the
             // settings (CI screenshots).
             try? await Task.sleep(for: .seconds(1.5))
-            if LaunchRequest.argument("-TVScoresMenuOpen") != nil { column = .sidebar }
+            // A phone shows the list when nothing in it is chosen.
+            if LaunchRequest.argument("-TVScoresMenuOpen") != nil { selection = nil; column = .sidebar }
             if LaunchRequest.argument("-TVScoresSettings") != nil { settingsOpen = true }
         }
     }

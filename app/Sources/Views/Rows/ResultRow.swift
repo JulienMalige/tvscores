@@ -12,11 +12,13 @@ struct ResultRow: View {
     @FocusState private var isFocused: Bool
 
     /// Shared with the column titles above the list.
-    static let nameWidth: CGFloat = .tv(640, phone: 170)
-    static let numberWidth: CGFloat = .tv(160, phone: 34)
+    static let nameWidth: CGFloat = .tv(640, phone: 150)
+    static let numberWidth: CGFloat = .tv(160, phone: 30)
+    /// Between two columns: none on the television's wide ones.
+    static let columnGap: CGFloat = .tv(0, phone: 6)
 
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: Self.columnGap) {
             HStack(spacing: Metrics.headingGap) {
                 Text(result.pos.map { String($0) } ?? "–")
                     .font(.callout.weight(.bold))

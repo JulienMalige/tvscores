@@ -28,15 +28,19 @@ private struct StandingsRowContent: View {
     var body: some View {
         // Apple Sports' table, doubled for the room (docs/design-measures.md):
         // rank and name at the row's text size, a small crest, rows 80 apart.
-        HStack(spacing: .tv(24)) {
+        HStack(spacing: .tv(24, phone: 8)) {
             Text("\(entry.pos)")
                 .font(.callout)
                 .monospacedDigit()
-                .frame(width: .tv(44), alignment: .trailing)
+                .frame(width: .tv(44, phone: 18), alignment: .trailing)
             mark
             VStack(alignment: .leading, spacing: 0) {
+                // On one line, smaller before it is cut: a phone leaves a
+                // rugby table's names the room its seven columns do not take.
                 Text(entry.name)
                     .font(.callout.weight(highlighted ? .bold : .regular))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
                 if let sub = entry.sub {
                     Text(sub).font(.caption).foregroundStyle(.secondary)
                 }

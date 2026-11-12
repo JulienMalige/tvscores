@@ -1803,6 +1803,34 @@
         }
       }
     },
+    "settings.languageDevice": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Device language"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Langue de l'appareil"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idioma do aparelho"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idioma del dispositivo"
+          }
+        }
+      }
+    },
     "settings.languageNote": {
       "extractionState": "manual",
       "localizations": {

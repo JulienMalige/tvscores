@@ -36,7 +36,7 @@ struct ResultSection: View {
 
     /// Aligned with the rows below by sharing their inset and column widths.
     private var columnTitles: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: ResultRow.columnGap) {
             Text("race.driver").frame(width: ResultRow.nameWidth, alignment: .leading)
             if showsGrid {
                 Text("race.start").frame(width: ResultRow.numberWidth, alignment: .trailing)
@@ -46,6 +46,8 @@ struct ResultSection: View {
         }
         .font(.caption)
         .foregroundStyle(.secondary)
+        .lineLimit(1)
+        .minimumScaleFactor(Metrics.tableShrink)
         .padding(.horizontal, Metrics.rowInsetH)
     }
 }

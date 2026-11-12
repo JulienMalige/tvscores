@@ -171,9 +171,9 @@ enum Metrics {
     static let menuFont: CGFloat = .tv(26)
     static let menuRadius: CGFloat = .tv(40)
     /// One column of a table read as numbers — played, won, points.
-    static let tableCell: CGFloat = .tv(70)
+    static let tableCell: CGFloat = .tv(70, phone: 24)
     /// The gap between two number columns: a column every 82, as Apple's.
-    static let tableGap: CGFloat = .tv(12)
+    static let tableGap: CGFloat = .tv(12, phone: 2)
     /// A table row's crest or portrait (Apple's 19 pt, doubled), and the
     /// room above and below its line: rows 80 apart, as Apple's 40.
     static let tableMark: CGFloat = .tv(40)
