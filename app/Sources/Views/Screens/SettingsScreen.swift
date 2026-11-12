@@ -214,7 +214,7 @@ struct SettingsScreen: View {
     @ViewBuilder
     private func link<Content: View>(_ target: SettingsPage, @ViewBuilder label: () -> Content) -> some View {
         #if os(tvOS)
-        Button { page = target } label: label
+        Button(action: { page = target }, label: label)
         #else
         NavigationLink(value: target, label: label)
         #endif

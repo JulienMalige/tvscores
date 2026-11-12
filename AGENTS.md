@@ -9,7 +9,7 @@ else.
 ## Layout
 
 ```
-app/          tvOS app (SwiftUI). Xcode project generated from app/project.yml with XcodeGen.
+app/          the app (SwiftUI): tvOS, and iPhone and iPad from the same sources. Xcode project generated from app/project.yml with XcodeGen.
 proxy/        caching proxy that runs on Julien's VPS. Owns every provider key.
 site/         the app's website (home, privacy, support) in the four languages; the proxy serves it outside /v1/.
 docs/         decisions, provider terms, release notes, the roadmap (docs/roadmap.md). One markdown file per topic.
@@ -21,7 +21,7 @@ CHANGELOG.md  what each TestFlight build changed, for whoever installs it.
 ## Hard rules
 
 1. **The sports API key never enters `app/`.** The app talks only to the proxy. If you need data in the app, add an endpoint to the proxy.
-2. **Native SwiftUI for tvOS only.** No React Native, Flutter, or web views.
+2. **Native SwiftUI only.** No React Native, Flutter, or web views. One set of sources builds the tvOS app and, since 2026-11-12, the iPhone and iPad app (`docs/iphone.md`); what one platform alone has goes behind `#if os(tvOS)` or `#if os(iOS)`.
 3. **Licensed data only.** Do not add code that scrapes a website or calls an undocumented endpoint. If a provider is proposed, record its terms in `docs/data-providers.md` first.
 4. **No odds, no betting, and no links to unofficial streams** anywhere in the app. Opening a broadcaster's official app (the CANAL+ app for Canal+) is allowed (Julien, 2026-10-03); a pirate or unlicensed stream never is.
 5. **Crests come from the proxy** (`team.logo`, mirrored from TheSportsDB), decided by Julien on 2026-09-14 knowing the trademark risk; the monogram stays as the fallback. Never bundle logo files in the app.
@@ -65,7 +65,13 @@ Always from `app/`:
 xcodegen generate
 xcodebuild -project TVScores.xcodeproj -scheme TVScores \
   -destination 'platform=tvOS Simulator,name=Apple TV' build
+xcodebuild -project TVScores.xcodeproj -scheme TVScoresiOS \
+  -destination 'generic/platform=iOS Simulator' build   # iPhone and iPad
 ```
+
+The `iOS build` workflow (`ios.yml`) builds the second on every push that
+touches `app/`, on any branch, and runs it on an iPhone and an iPad simulator
+for the `ios-screenshots` artifact, launched with the arguments below.
 
 To see it, boot a simulator and take a screenshot rather than describing the UI:
 
@@ -82,7 +88,7 @@ Julien watches from Brazil (America/Sao_Paulo): capture `Resources/sample-scoreb
 ## Conventions
 
 - Swift, SwiftUI, Swift Concurrency (`async/await`). No Combine unless a framework forces it.
-- Minimum tvOS 18.0 (`app/project.yml`). Raise it only for a feature worth losing a TV over.
+- Minimum tvOS 18.0 and iOS 18.0 (`app/project.yml`). Raise one only for a feature worth losing a device over.
 - **Four languages from day one: French, English, Portuguese, Spanish.** Development language is English. Every user-facing string goes through a String Catalog (`Localizable.xcstrings`) with all four translations filled in before a feature is called done; no hard-coded strings in views. Store listing (name, subtitle, keywords, screenshots) is localised for the same four. Default store locales: fr-FR, en-US, pt-BR, es-ES; add pt-PT and es-MX as copies later if wanted.
 - **The privacy policy says what leaves the Apple TV** (`site/<lang>/privacy.html`, and
   App Privacy in App Store Connect). A change to what the app sends, or to what the proxy
@@ -170,8 +176,17 @@ The code behind it is named in `docs/design-system.md`: five levels — screen,
 section, row, element, chrome — each with its folder under `app/Sources/Views`
 and its name ending, and the tests under `app/Tests` mirror them. Every measurement lives in `Views/Metrics.swift`; a view that
 writes its own number is a bug, and rows all use `rowSurface(focused:)`.
+Numbers are the television's, written through `.tv()`, which halves them on
+an iPhone or an iPad — Apple Sports' own sizes — or takes `phone:` where half
+does not fit a phone's width: `.tv(48)`, `.tv(180, phone: 66)`.
 
 ## Open decisions (ask Julien, do not guess)
+
+- **The iPhone and iPad app** (Julien, 2026-11-12: "lets do it";
+  `docs/iphone.md`): the same app on the App Store page, the same bundle id.
+  TestFlight waits on Julien adding iOS to the app in App Store Connect; the
+  store release on iPhone and iPad screenshots, and the privacy pages and the
+  store's copy naming the iPhone and the iPad.
 
 - **The store release** (`docs/store-release.md`): free, and the takedown risk
   on crests and photos accepted (Julien, 2026-10-16); the proxy's address is
