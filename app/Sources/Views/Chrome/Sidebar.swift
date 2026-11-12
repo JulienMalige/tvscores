@@ -193,7 +193,7 @@ struct Sidebar: View {
     /// A competition opened from the front page: its own row, on the day the
     /// front page was showing.
     private func open(_ ref: LeagueRef) {
-        let key = "\(ref.sport):\(ref.leagueId)"
+        let key = MenuItem.key(ref)
         guard store.leagues.contains(where: { MenuItem.key($0) == key }), LeagueChoice.shared.isShown(key) else { return }
         leagueDays[key] = day
         selection = .league(key)
@@ -201,9 +201,7 @@ struct Sidebar: View {
 
     /// `-TVScoresLeague f1` opens that competition (CI screenshots).
     private func openRequestedLeague() {
-        guard let wanted = LaunchRequest.argument("-TVScoresLeague"),
-              let hit = store.leagues.first(where: { $0.sport == wanted || $0.id.raw == wanted })
-        else { return }
+        guard let hit = LaunchRequest.league(in: store.leagues) else { return }
         selection = .league(MenuItem.key(hit))
     }
 

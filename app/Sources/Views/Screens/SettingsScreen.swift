@@ -21,10 +21,10 @@ struct SettingsScreen: View {
     /// The apps How to Watch points at, for the Apps page and Debug's Open apps.
     var apps: [String: WatchApp] = [:]
 
-    @State private var page = SettingsPage.top
+    @State private var page = SettingsScreen.requested
     #if os(iOS)
     /// The lists opened from the top one, on a phone's stack.
-    @State private var path: [SettingsPage] = []
+    @State private var path: [SettingsPage] = SettingsScreen.requested == .top ? [] : [SettingsScreen.requested]
     #endif
     @State private var choice = ChannelChoice.shared
     @State private var leagueChoice = LeagueChoice.shared
@@ -66,7 +66,6 @@ struct SettingsScreen: View {
         // The rows' words in the text's colour, not the tint's.
         .tint(.primary)
         .accessibilityIdentifier("page.settings")
-        .task { await openRequested() }
         #endif
     }
 
@@ -82,18 +81,13 @@ struct SettingsScreen: View {
         }
     }
 
-    /// `-TVScoresSettings countries` opens on that list (CI screenshots).
-    private func openRequested() async {
-        guard let wanted = LaunchRequest.argument("-TVScoresSettings") else { return }
-        var asked = ["countries": SettingsPage.countries, "competitions": .competitions, "language": .language, "apps": .apps, "openApps": .openApps][wanted] ?? .top
-        if asked == .openApps, !Edition.current.hasTesterTools { asked = .top }
-        #if os(tvOS)
-        page = asked
-        #else
-        // Once the sheet is up: a list pushed while it rose never showed (CI, 2026-11-12).
-        try? await Task.sleep(for: .milliseconds(800))
-        if asked != .top { path = [asked] }
-        #endif
+    /// `-TVScoresSettings countries` opens on that list (CI screenshots),
+    /// from the first frame: a list pushed while a phone's sheet rose never
+    /// showed (CI, 2026-11-12).
+    private static var requested: SettingsPage {
+        guard let wanted = LaunchRequest.argument("-TVScoresSettings") else { return .top }
+        let asked = ["countries": SettingsPage.countries, "competitions": .competitions, "language": .language, "apps": .apps, "openApps": .openApps][wanted] ?? .top
+        return asked == .openApps && !Edition.current.hasTesterTools ? .top : asked
     }
 
     #if os(tvOS)
@@ -123,7 +117,6 @@ struct SettingsScreen: View {
             if page == .top { dismiss() } else { page = .top }
         }
         .accessibilityIdentifier("page.settings")
-        .task { await openRequested() }
     }
 
     /// The left: what this page is for.

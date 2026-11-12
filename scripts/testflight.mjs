@@ -4,7 +4,11 @@
  * the release note from the top of CHANGELOG.md, and hand it to the internal
  * testers. Without the note a tester sees a version number and nothing else.
  *
- *   node scripts/testflight.mjs <build number> [--group "Internal"]
+ *   node scripts/testflight.mjs <build number> [--group "Internal"] [--platform IOS|TV_OS] [--keep-open]
+ *
+ * `--platform` looks for the build among that platform's only; `--keep-open`
+ * leaves the changelog's Unreleased section for the next build, as an
+ * iPhone build does for the television's (2026-11-12).
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -58,12 +62,16 @@ export const topSection = (markdown) => section(markdown);
 
 export { setNote, waitForBuild };
 
+/** The newest builds, with their versions; one platform's when one is named ("IOS", "TV_OS"). */
+export const buildsQuery = (platform) =>
+  `/v1/builds?filter[app]=${APP_ID}${platform ? `&filter[preReleaseVersion.platform]=${platform}` : ""}&sort=-uploadedDate&limit=20&include=preReleaseVersion`;
+
 // Apple took more than 15 minutes to list build 33 (3 October 2026): 30.
-async function waitForBuild(version, minutes = 30) {
+async function waitForBuild(version, minutes = 30, platform) {
   const deadline = Date.now() + minutes * 60e3;
   while (Date.now() < deadline) {
     // Newest first: /apps/{id}/builds lists the oldest and takes no sort, so past twenty builds the one just uploaded was never in the page (build 38, 4 October 2026).
-    const { data, included } = await asc(`/v1/builds?filter[app]=${APP_ID}&sort=-uploadedDate&limit=20&include=preReleaseVersion`);
+    const { data, included } = await asc(buildsQuery(platform));
     const build = data.find((b) => b.attributes.version === String(version));
     if (build?.attributes.processingState === "VALID") return { build, marketing: marketingOf(build, included) };
     if (build?.attributes.processingState === "FAILED") throw new Error(`build ${version} failed processing`);
@@ -105,18 +113,21 @@ if (process.argv[1] && process.argv[1].endsWith("testflight.mjs")) {
   const version = process.argv[2];
   const groupIndex = process.argv.indexOf("--group");
   const group = groupIndex === -1 ? "Internal" : process.argv[groupIndex + 1];
+  const platformIndex = process.argv.indexOf("--platform");
+  const platform = platformIndex === -1 ? undefined : process.argv[platformIndex + 1];
+  const keepOpen = process.argv.includes("--keep-open");
   if (!version) {
     console.error("usage: testflight.mjs <build number> [--group NAME]");
     process.exit(2);
   }
   try {
-    const { build, marketing } = await waitForBuild(version);
+    const { build, marketing } = await waitForBuild(version, 30, platform);
     const path = join(ROOT, "CHANGELOG.md");
     const markdown = readFileSync(path, "utf8");
     await setNote(build.id, topSection(markdown));
     await addToGroup(build.id, group);
     // Close the section this build just took, or the next one sends it again.
-    const closed = closeSection(markdown, version, marketing ?? lastMarketing(markdown));
+    const closed = keepOpen ? markdown : closeSection(markdown, version, marketing ?? lastMarketing(markdown));
     if (closed !== markdown) {
       writeFileSync(path, closed);
       console.log(`CHANGELOG.md: Unreleased is now build ${version}`);

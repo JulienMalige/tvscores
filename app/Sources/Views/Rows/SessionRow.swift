@@ -20,8 +20,7 @@ struct SessionRow: View {
             }
         }
         .rowSurface(focused: isFocused, resting: 0, insetV: Metrics.tableRowPad)
-        .focusable()
-        .focused($isFocused)
+        .remoteFocus($isFocused)
         .accessibilityIdentifier("session.\(session.kind)")
     }
 

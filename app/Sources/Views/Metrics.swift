@@ -121,8 +121,8 @@ enum Metrics {
     /// Its header: each side's column, the middle between them, and the
     /// score's tall figures, measured against Apple Sports' 60-point score
     /// on a 17-point name (build 26 review).
-    static let gameSide: CGFloat = .tv(560, phone: 110)
-    static let gameCentre: CGFloat = .tv(460, phone: 133)
+    static let gameSide: CGFloat = .tv(560, phone: 100)
+    static let gameCentre: CGFloat = .tv(460, phone: 115)
     static let gameScore: CGFloat = .tv(166, phone: 60)
     /// A tennis match's set table under the two players: as wide as the
     /// header above it, so the names start under the first portrait and
@@ -174,6 +174,15 @@ enum Metrics {
     static let tableCell: CGFloat = .tv(70, phone: 26)
     /// The gap between two number columns: a column every 82, as Apple's.
     static let tableGap: CGFloat = .tv(12, phone: 2)
+    /// A table row's rank column, and the space between its rank, mark,
+    /// name and numbers.
+    static let tableRank: CGFloat = .tv(44, phone: 24)
+    static let tableRowSpacing: CGFloat = .tv(24, phone: 8)
+    /// A race classification's columns: the driver, the start and the
+    /// points, and the space between them, none on the television's wide ones.
+    static let resultName: CGFloat = .tv(640, phone: 150)
+    static let resultNumber: CGFloat = .tv(160, phone: 30)
+    static let resultGap: CGFloat = .tv(0, phone: 6)
     /// A table row's inset at its sides: a row's on the television; on a
     /// phone, little, so the names keep the room seven columns leave them.
     static let tableRowInsetH: CGFloat = .tv(28, phone: 6)

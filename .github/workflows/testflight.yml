@@ -108,7 +108,8 @@ jobs:
           # its name, with the key this job already holds, rather than kept
           # as one more secret; the television's is the secret it always was.
           if [ "$PLATFORM" = ios ]; then
-            profile=$(node ../scripts/asc.mjs get "/v1/profiles?filter[name]=TV%20Scores%20iOS%20App%20Store&filter[profileState]=ACTIVE&fields[profiles]=profileContent" \
+            name=$(jq -rn --arg n "$PROFILE_NAME" '$n | @uri')
+            profile=$(node ../scripts/asc.mjs get "/v1/profiles?filter[name]=$name&filter[profileState]=ACTIVE&fields[profiles]=profileContent" \
               | jq -r '.data[0].attributes.profileContent // empty')
             test -n "$profile"
           else
@@ -196,7 +197,14 @@ jobs:
       - name: Send the release note and hand the build to the testers
         env:
           ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
-        run: node ../scripts/testflight.mjs "$BUILD_NUMBER"
+        run: |
+          # An iPhone build leaves the changelog's section open: the
+          # television's next build sends the same notes and closes it.
+          if [ "$PLATFORM" = ios ]; then
+            node ../scripts/testflight.mjs "$BUILD_NUMBER" --platform IOS --keep-open
+          else
+            node ../scripts/testflight.mjs "$BUILD_NUMBER" --platform TV_OS
+          fi
 
       # closeSection rewrites CHANGELOG.md on the runner; without this the
       # heading it just wrote is thrown away with the runner, and the next

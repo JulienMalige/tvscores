@@ -26,8 +26,7 @@ struct StartingGridRow: View {
         .lineLimit(1)
         .minimumScaleFactor(0.7)
         .rowSurface(focused: isFocused, resting: 0, insetV: Metrics.tableRowPad)
-        .focusable()
-        .focused($isFocused)
+        .remoteFocus($isFocused)
         .accessibilityIdentifier("grid.\(result.pos.map(String.init) ?? "-")")
     }
 }

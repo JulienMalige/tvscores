@@ -11,6 +11,7 @@ enum MenuItem: Hashable {
     /// What a competition is filed under, in the menu and in Settings'
     /// choices: "football:4328".
     static func key(_ league: LeagueSummary) -> String { "\(league.sport):\(league.id.raw)" }
+    static func key(_ ref: LeagueRef) -> String { "\(ref.sport):\(ref.leagueId)" }
 }
 
 extension EnvironmentValues {

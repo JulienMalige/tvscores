@@ -42,6 +42,10 @@ struct SplitMenu: View {
             openRequested()
             // A competition gone from the list leaves nothing to show: back to Home.
             if case .league(let key) = selection, league(key) == nil { selection = .home }
+            opened.removeAll { item in
+                guard case .league(let key) = item else { return false }
+                return league(key) == nil
+            }
         }
         // A new row of the menu is a new page, with nothing pushed over it.
         .onChange(of: selection) { _, _ in opened = [] }
@@ -71,6 +75,10 @@ struct SplitMenu: View {
         // A competition hidden in Settings while its page was up: back to Home.
         .onChange(of: LeagueChoice.shared.hidden) { _, hidden in
             if case .league(let key) = selection, hidden.contains(key) { selection = .home }
+            opened.removeAll { item in
+                guard case .league(let key) = item else { return false }
+                return hidden.contains(key)
+            }
         }
         .task {
             // `-TVScoresMenuOpen` shows the list, `-TVScoresSettings` the
@@ -132,7 +140,7 @@ struct SplitMenu: View {
     /// A competition opened from the front page: pushed over it, on the day
     /// the front page was showing.
     private func open(_ ref: LeagueRef) {
-        let key = "\(ref.sport):\(ref.leagueId)"
+        let key = MenuItem.key(ref)
         guard league(key) != nil, LeagueChoice.shared.isShown(key) else { return }
         leagueDays[key] = day
         opened.append(.league(key))
@@ -141,10 +149,7 @@ struct SplitMenu: View {
     /// `-TVScoresLeague f1` opens that competition, `-TVScoresGame final`
     /// the first game in that state (CI screenshots).
     private func openRequested() {
-        if let wanted = LaunchRequest.argument("-TVScoresLeague"),
-           let hit = store.leagues.first(where: { $0.sport == wanted || $0.id.raw == wanted }) {
-            selection = .league(MenuItem.key(hit))
-        }
+        if let hit = LaunchRequest.league(in: store.leagues) { selection = .league(MenuItem.key(hit)) }
         if let wanted = LaunchRequest.argument("-TVScoresGame"), let board = store.board {
             game = LaunchRequest.game(wanted, in: board)
         }

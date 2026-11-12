@@ -11,14 +11,8 @@ struct ResultRow: View {
     var showsGrid = true
     @FocusState private var isFocused: Bool
 
-    /// Shared with the column titles above the list.
-    static let nameWidth: CGFloat = .tv(640, phone: 150)
-    static let numberWidth: CGFloat = .tv(160, phone: 30)
-    /// Between two columns: none on the television's wide ones.
-    static let columnGap: CGFloat = .tv(0, phone: 6)
-
     var body: some View {
-        HStack(spacing: Self.columnGap) {
+        HStack(spacing: Metrics.resultGap) {
             HStack(spacing: Metrics.headingGap) {
                 Text(result.pos.map { String($0) } ?? "–")
                     .font(.callout.weight(.bold))
@@ -38,14 +32,14 @@ struct ResultRow: View {
                     Text(result.team ?? "").font(.caption).foregroundStyle(.secondary)
                 }
             }
-            .frame(width: Self.nameWidth, alignment: .leading)
+            .frame(width: Metrics.resultName, alignment: .leading)
             if showsGrid {
                 Text(result.grid.map { String($0) } ?? "")
-                    .frame(width: Self.numberWidth, alignment: .trailing)
+                    .frame(width: Metrics.resultNumber, alignment: .trailing)
             }
             // A blank reads better than a column of zeros for the non-scorers.
             Text((result.points ?? 0) > 0 ? String(result.points ?? 0) : "")
-                .frame(width: Self.numberWidth, alignment: .trailing)
+                .frame(width: Metrics.resultNumber, alignment: .trailing)
             Text(result.gap ?? "")
                 .frame(maxWidth: .infinity, alignment: .trailing)
         }
@@ -55,8 +49,7 @@ struct ResultRow: View {
         .rowSurface(focused: isFocused, resting: 0, insetV: Metrics.tableRowPad)
         // tvOS scrolls by moving focus. Without this the page would be stuck
         // at the top and most of the field unreachable.
-        .focusable()
-        .focused($isFocused)
+        .remoteFocus($isFocused)
         .accessibilityIdentifier("result.\(result.pos.map(String.init) ?? "dnf")")
     }
 }

@@ -36,12 +36,12 @@ struct ResultSection: View {
 
     /// Aligned with the rows below by sharing their inset and column widths.
     private var columnTitles: some View {
-        HStack(spacing: ResultRow.columnGap) {
-            Text("race.driver").frame(width: ResultRow.nameWidth, alignment: .leading)
+        HStack(spacing: Metrics.resultGap) {
+            Text("race.driver").frame(width: Metrics.resultName, alignment: .leading)
             if showsGrid {
-                Text("race.start").frame(width: ResultRow.numberWidth, alignment: .trailing)
+                Text("race.start").frame(width: Metrics.resultNumber, alignment: .trailing)
             }
-            Text("race.points").frame(width: ResultRow.numberWidth, alignment: .trailing)
+            Text("race.points").frame(width: Metrics.resultNumber, alignment: .trailing)
             Text("race.gap").frame(maxWidth: .infinity, alignment: .trailing)
         }
         .font(.caption)

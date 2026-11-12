@@ -22,6 +22,12 @@ enum LaunchRequest {
         return day
     }
 
+    /// `-TVScoresLeague f1` or `4430`: the competition of that sport or id.
+    static func league(in leagues: [LeagueSummary]) -> LeagueSummary? {
+        guard let wanted = argument("-TVScoresLeague") else { return nil }
+        return leagues.first { $0.sport == wanted || $0.id.raw == wanted }
+    }
+
     /// "final" or "final:football": a state, and the sport to take it from;
     /// then "tv", a game with channels, or a competition's id, a game of that
     /// competition: "scheduled:nfl:tv", "final:football:4328".
