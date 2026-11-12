@@ -22,7 +22,7 @@ struct EmptyDay: View {
     }
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: .tv(12)) {
             title
                 .font(.headline)
             if let line {

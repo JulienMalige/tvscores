@@ -81,7 +81,7 @@ private struct RaceRowContent: View {
 
     @ViewBuilder
     private var compact: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: .tv(6)) {
             // The country's flag says which weekend it is, until a podium does.
             if podiumRows.isEmpty {
                 FlagMark(flag: event.flag, size: Metrics.raceRowFlag)
@@ -95,7 +95,7 @@ private struct RaceRowContent: View {
                 if let channels = event.channelList { ChannelsLabel(channels: channels) }
             } else {
                 ForEach(shown) { session in
-                    VStack(spacing: 6) {
+                    VStack(spacing: .tv(6)) {
                         caption(session.name)
                         Text(session.start, format: .dateTime.weekday(.wide).hour().minute())
                             .font(.title2.weight(.semibold))
@@ -125,7 +125,7 @@ private struct RaceRowContent: View {
     /// 2026-10-03), the whole timetable being the race page's.
     private var schedule: some View {
         VStack(spacing: 0) {
-            VStack(spacing: 8) {
+            VStack(spacing: .tv(8)) {
                 FlagMark(flag: event.flag, size: Metrics.markHero * 0.6)
                 Text(event.name ?? "").font(.headline)
                 if let circuit = event.circuit {
@@ -151,7 +151,7 @@ private struct RaceRowContent: View {
                     HStack {
                         Text(session.title).font(.callout)
                         Spacer()
-                        VStack(alignment: .trailing, spacing: 2) {
+                        VStack(alignment: .trailing, spacing: .tv(2)) {
                             Text(session.start, format: .dateTime.weekday(.abbreviated).day().month(.abbreviated))
                                 .font(.callout)
                             Text(session.start, format: .dateTime.hour().minute())
@@ -159,7 +159,7 @@ private struct RaceRowContent: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
-                    .padding(.vertical, 12)
+                    .padding(.vertical, .tv(12))
                 }
                 if pending.isEmpty && finished == nil {
                     StatusLabel(status: event.status, start: event.start)
@@ -175,14 +175,14 @@ private struct RaceRowContent: View {
     @ViewBuilder
     private var podium: some View {
         if !podiumRows.isEmpty {
-            HStack(spacing: 24) {
+            HStack(spacing: .tv(24)) {
                 ForEach(podiumRows) { r in
-                    HStack(spacing: 14) {
+                    HStack(spacing: .tv(14)) {
                         Text("\(r.pos ?? 0)")
-                            .font(.system(size: 34, weight: .bold))
+                            .font(.system(size: .tv(34), weight: .bold))
                         PersonMark(photo: r.photo, flag: r.flag, color: Color(hex: r.teamColor),
                                    monogram: r.code ?? PersonMark.monogram(for: r.driver), size: Metrics.mark)
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading, spacing: .tv(2)) {
                             Text(r.driver).font(.callout.weight(.semibold))
                             // Qualifying gives each its lap; a race or a sprint the gap.
                             Text(r.time ?? r.gap ?? r.team ?? "").font(.footnote).foregroundStyle(.secondary)

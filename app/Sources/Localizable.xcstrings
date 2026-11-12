@@ -970,6 +970,34 @@
         }
       }
     },
+    "menu.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Competitions"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compétitions"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Competições"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Competiciones"
+          }
+        }
+      }
+    },
     "offseason.checkUpcoming": {
       "extractionState": "manual",
       "localizations": {
@@ -1714,6 +1742,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Depuración"
+          }
+        }
+      }
+    },
+    "settings.done": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
           }
         }
       }

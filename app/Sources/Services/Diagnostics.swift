@@ -42,8 +42,14 @@ final class Diagnostics {
 
     /// Where the lines go: the proxy's, for a tester's build that has one.
     static func endpoint(source: ScoreboardSource, edition: Edition) -> URL? {
+        #if os(tvOS)
         guard edition.hasTesterTools, case .remote(let base) = source else { return nil }
         return base.appending(path: "v1/diag")
+        #else
+        // It exists for the television's focus; a phone or a tablet keeps
+        // its lines in the system log and posts nothing.
+        return nil
+        #endif
     }
 
     /// Start writing. Idempotent.

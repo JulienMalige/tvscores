@@ -31,7 +31,7 @@ struct TennisRowContent: View {
                 // Over with no games known (a result from before build 32):
                 // "Final" says it rather than nothing.
                 if event.status.state != .final || sets.isEmpty {
-                    VStack(spacing: 4) {
+                    VStack(spacing: .tv(4)) {
                         StatusLabel(status: event.status, start: event.start, compact: true,
                                     setsShown: !sets.isEmpty, sport: event.sport)
                             .fixedSize()

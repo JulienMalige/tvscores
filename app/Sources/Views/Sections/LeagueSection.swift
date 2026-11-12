@@ -49,8 +49,8 @@ struct LeagueSection: View {
                     // apart so they do not read as the heading's above.
                     Text("tournament.other")
                         .font(.callout.weight(.semibold))
-                        .padding(.top, 6)
-                        .padding(.horizontal, 16)
+                        .padding(.top, .tv(6))
+                        .padding(.horizontal, .tv(16))
                 }
                 VStack(spacing: 0) {
                     ForEach(Array(run.events.enumerated()), id: \.element.id) { i, event in
@@ -83,7 +83,7 @@ struct LeagueHeader: View {
     @Environment(\.isFocused) private var isFocused
 
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: .tv(14)) {
             // Small, as Apple Sports sets a list's league: the games under
             // it are what the eye is for (Julien, build 28).
             LeagueMark(sport: group.sport, logo: group.league.logo, symbolName: group.league.symbol, height: Metrics.leagueMarkSmall)
@@ -95,9 +95,9 @@ struct LeagueHeader: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 16)
-        .focusGlass(isFocused, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .padding(.vertical, .tv(8))
+        .padding(.horizontal, .tv(16))
+        .focusGlass(isFocused, in: RoundedRectangle(cornerRadius: .tv(14), style: .continuous))
         .scaleEffect(isFocused ? 1.03 : 1)
         .animation(.easeOut(duration: 0.15), value: isFocused)
     }
@@ -112,7 +112,7 @@ struct TournamentHeader: View {
     let competition: Competition
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: .tv(8)) {
             FlagMark(flag: competition.flag, size: Metrics.markHero * 0.6)
             Text(verbatim: competition.name)
                 .font(.headline)

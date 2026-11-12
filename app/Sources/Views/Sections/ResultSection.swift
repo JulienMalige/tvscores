@@ -30,7 +30,7 @@ struct ResultSection: View {
         }
         // On a panel, as a game's table is.
         .padding(.vertical, Metrics.cardInsetV)
-        .padding(.horizontal, 16)
+        .padding(.horizontal, .tv(16))
         .gameCardSurface(radius: Metrics.gameCardRadius)
     }
 

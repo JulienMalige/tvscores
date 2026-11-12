@@ -24,7 +24,7 @@ struct StandingsSection: View {
         VStack(alignment: carded ? .center : .leading, spacing: Metrics.headingGap) {
             Text("standings.title")
                 .font(carded ? .callout.weight(.semibold) : .title2.weight(.bold))
-                .padding(.top, 12)
+                .padding(.top, .tv(12))
             if let standings, !standings.tables.isEmpty {
                 if let source = standings.source { credit(source) }
                 if standings.tables.count > 1 { tabs(standings) }
@@ -39,7 +39,7 @@ struct StandingsSection: View {
         }
         .frame(maxWidth: .infinity, alignment: carded ? .center : .leading)
         .padding(.vertical, carded ? Metrics.cardInsetV : 0)
-        .padding(.horizontal, carded ? 16 : 0)
+        .padding(.horizontal, carded ? .tv(16) : 0)
         .background { if carded { Color.clear.gameCardSurface() } }
         .task {
             standings = if let preloaded { preloaded } else { await store.standings(for: ref) }
@@ -142,17 +142,17 @@ struct StandingsSection: View {
     private func cut(_ style: String) -> some View {
         Rectangle()
             .fill(.clear)
-            .frame(height: 2)
+            .frame(height: .tv(2))
             .overlay(
                 Path { p in
                     p.move(to: .zero)
                     p.addLine(to: CGPoint(x: 4000, y: 0))
                 }
-                .stroke(Color.white.opacity(0.45), style: StrokeStyle(lineWidth: 2, dash: style == "dashed" ? [14, 12] : []))
+                .stroke(Color.white.opacity(0.45), style: StrokeStyle(lineWidth: 2, dash: style == "dashed" ? [.tv(14), .tv(12)] : []))
             )
             .clipped()
             .padding(.horizontal, Metrics.rowInsetH)
-            .padding(.vertical, 6)
+            .padding(.vertical, .tv(6))
             .accessibilityIdentifier("table.cut.\(style)")
     }
 

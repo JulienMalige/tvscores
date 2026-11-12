@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generate the tvOS brand assets: a tennis court seen from above, white
-lines on blue (Julien's pick, 2026-10-01, from three colourways).
+lines on blue (Julien's pick, 2026-10-01, from three colourways). The
+iPhone and iPad app has the same court as one square (2026-11-12).
 
 The court is drawn as geometry, so it needs no artwork and stays sharp at
 every size. tvOS wants it in layers: the blue ground on the back, the
@@ -27,6 +28,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 CATALOG = ROOT / "app" / "Resources" / "Assets.xcassets"
 BRAND = CATALOG / "App Icon & Top Shelf Image.brandassets"
 SITE_IMG = ROOT / "site" / "img"
+PHONE_CATALOG = ROOT / "app" / "iOS" / "Assets.xcassets"
 
 # Lit from the top left and falling to a deeper blue at the bottom right,
 # as in the chosen render.
@@ -151,6 +153,19 @@ def top_shelf(size, line=LINE):
     return img.convert("RGB")
 
 
+def phone_icon():
+    """The court for an iPhone or an iPad: one opaque square, which iOS
+    rounds and scales for every place it shows an icon."""
+    icon = PHONE_CATALOG / "AppIcon.appiconset"
+    if icon.exists():
+        shutil.rmtree(icon)
+    write_json(PHONE_CATALOG / "Contents.json", {})
+    write_png(top_shelf((1024, 1024)), icon / "AppIcon.png")
+    write_json(icon / "Contents.json", {
+        "images": [{"filename": "AppIcon.png", "idiom": "universal", "platform": "ios", "size": "1024x1024"}],
+    })
+
+
 def site_marks():
     """The court for the website. Drawn small, as in a page's header or a
     browser tab, the brand's line greys out, so the vector and the tab's PNG
@@ -195,8 +210,9 @@ def main():
     imagestack(BRAND / "App Icon.imagestack", (400, 240), [1, 2])
     imageset(BRAND / "Top Shelf Image.imageset", (1920, 720), [1, 2], top_shelf)
     imageset(BRAND / "Top Shelf Image Wide.imageset", (2320, 720), [1, 2], top_shelf)
+    phone_icon()
     site_marks()
-    print("wrote", BRAND, "and", SITE_IMG)
+    print("wrote", BRAND, PHONE_CATALOG, "and", SITE_IMG)
 
 
 if __name__ == "__main__":

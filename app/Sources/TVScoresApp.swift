@@ -16,9 +16,17 @@ struct TVScoresApp: App {
 
     var body: some Scene {
         WindowGroup {
-            Sidebar(store: store)
-                .environment(\.locale, LanguageChoice.locale)
-                .id(language ?? "system")
+            Group {
+                // The remote's menu on a television, the system's split view
+                // on an iPhone or an iPad.
+                #if os(tvOS)
+                Sidebar(store: store)
+                #else
+                SplitMenu(store: store)
+                #endif
+            }
+            .environment(\.locale, LanguageChoice.locale)
+            .id(language ?? "system")
         }
     }
 }

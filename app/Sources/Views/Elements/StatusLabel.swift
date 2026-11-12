@@ -29,7 +29,7 @@ struct StatusLabel: View {
     }
 
     var body: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: .tv(4)) {
             switch status.state {
             case .scheduled where start.timeIntervalSince(boardNow ?? .now) < -overdue:
                 // Long past its start with no word from the feed: a time

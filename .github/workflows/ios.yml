@@ -1,0 +1,128 @@
+name: iOS build
+
+# The iPhone and iPad app (Julien, 2026-11-12): the television's sources
+# built for iOS, then run on an iPhone and an iPad simulator for pictures of
+# its pages, the demo board first, then the live proxy.
+
+on:
+  push:
+    paths: ["app/**", ".github/workflows/ios.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build, run on iPhone and iPad, screenshot
+    runs-on: macos-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain info
+        run: |
+          sw_vers
+          xcodebuild -version
+          xcrun simctl list runtimes | grep -i ios || echo "no iOS runtime"
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build for iOS simulator
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project TVScores.xcodeproj \
+            -scheme TVScoresiOS \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            build 2>&1 | tee build.log | grep -E "error:|warning:|BUILD" || true
+          grep -q "BUILD SUCCEEDED" build.log
+
+      - name: Run in simulators and take screenshots
+        run: |
+          set -euo pipefail
+          APP=$(find build/Build/Products -path '*iphonesimulator*' -name 'TVScores.app' -maxdepth 2 | head -1)
+          echo "App bundle: $APP"
+          mkdir -p shots
+          # The newest simulator of a kind: an iPhone Pro, a 13-inch iPad Pro.
+          device() {
+            xcrun simctl list devices available -j \
+              | jq -r --arg p "$1" '.devices | to_entries[] | select(.key | test("iOS")) | .value[] | select(.name | test($p)) | .udid' \
+              | tail -1
+          }
+          start() { # $1 udid: boot it, the status bar as Apple's pictures show it, the app installed
+            xcrun simctl boot "$1" 2>/dev/null || true
+            xcrun simctl bootstatus "$1" -b
+            xcrun simctl status_bar "$1" override --time 9:41 --batteryState charged --batteryLevel 100 --wifiBars 3 --cellularBars 4 || true
+            xcrun simctl install "$1" "$APP"
+          }
+          shoot() { # $1 udid, $2 file name, $3 seconds to wait, then the launch arguments
+            local udid="$1" name="$2" wait="$3"; shift 3
+            xcrun simctl terminate "$udid" com.julienmalige.tvscores 2>/dev/null || true
+            # The demo board is bucketed in São Paulo time (AGENTS.md); run in the same zone.
+            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$udid" com.julienmalige.tvscores "$@"
+            sleep "$wait"
+            xcrun simctl io "$udid" screenshot "shots/$name.png"
+          }
+          PHONE=$(device '^iPhone [0-9]+ Pro$')
+          echo "iPhone: $PHONE"
+          start "$PHONE"
+          demo() { local name="$1"; shift; shoot "$PHONE" "$name" 8 -TVScoresDemo "$@"; }
+          for lang in en fr; do demo "today-$lang" -TVScoresTab today -AppleLanguages "($lang)" -AppleLocale "$lang"; done
+          demo yesterday-en -TVScoresTab yesterday -AppleLanguages "(en)"
+          demo upcoming-en -TVScoresTab upcoming -AppleLanguages "(en)"
+          demo menu-en -TVScoresTab today -TVScoresMenuOpen -AppleLanguages "(en)"
+          demo league-football-yesterday-en -TVScoresTab yesterday -TVScoresLeague football -AppleLanguages "(en)"
+          demo league-nba-today-en -TVScoresTab today -TVScoresLeague nba -AppleLanguages "(en)"
+          demo league-f1-today-en -TVScoresTab today -TVScoresLeague f1 -AppleLanguages "(en)"
+          demo game-final-football-en -TVScoresTab today -TVScoresGame final:football -AppleLanguages "(en)"
+          demo game-final-nfl-en -TVScoresTab today -TVScoresGame final:nfl -AppleLanguages "(en)"
+          demo game-tennis-final-en -TVScoresSample race -TVScoresTab today -TVScoresGame final:tennis -AppleLanguages "(en)"
+          demo race-f1-en -TVScoresSample race -TVScoresTab yesterday -TVScoresRace f1 -AppleLanguages "(en)"
+          for page in top competitions countries; do demo "settings-$page-fr" -TVScoresTab today -TVScoresSettings "$page" -AppleLanguages "(fr)"; done
+          # The live proxy, the path a TestFlight build takes: today, and
+          # rugby's tables, which the demo board predates.
+          shoot "$PHONE" live-today-en 20 -AppleLanguages "(en)"
+          shoot "$PHONE" live-league-4430-today-fr 20 -TVScoresTab today -TVScoresLeague 4430 -AppleLanguages "(fr)" -AppleLocale fr_FR
+          IPAD=$(device '^iPad Pro 13')
+          echo "iPad: $IPAD"
+          start "$IPAD"
+          shoot "$IPAD" ipad-today-en 10 -TVScoresDemo -TVScoresTab today -AppleLanguages "(en)"
+          shoot "$IPAD" ipad-game-final-football-en 10 -TVScoresDemo -TVScoresTab today -TVScoresGame final:football -AppleLanguages "(en)"
+          ls -la shots
+          mkdir -p crash
+          cp ~/Library/Logs/DiagnosticReports/TVScores*.ips crash/ 2>/dev/null || echo "no crash report"
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-screenshots
+          path: app/shots/*.png
+          if-no-files-found: warn
+
+      - name: Upload crash reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-crash-reports
+          path: app/crash/*
+          if-no-files-found: ignore
+
+      - name: Upload build log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-log
+          path: app/build.log

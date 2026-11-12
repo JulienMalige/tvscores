@@ -56,7 +56,7 @@ struct GameScreen: View {
                     // statistics, and the table and venue arriving
                     // before them, moved the page about (Julien, build 30).
                     ProgressView()
-                        .frame(maxWidth: .infinity, minHeight: 320)
+                        .frame(maxWidth: .infinity, minHeight: .tv(320))
                 } else {
                     if event.status.state != .scheduled {
                         if let periods = detail?.periods { PeriodSection(periods: periods, home: event.home, away: event.away) }
@@ -137,12 +137,20 @@ extension View {
     /// was opened from: inset at the top and sides, running off the bottom,
     /// on its own backdrop, the page behind dimmed.
     func eventSheet(_ backdrop: some View) -> some View {
-        self
+        #if os(tvOS)
+        return self
             .background(backdrop)
             .clipShape(UnevenRoundedRectangle(topLeadingRadius: Metrics.gameRadius,
                                               topTrailingRadius: Metrics.gameRadius, style: .continuous))
             .padding([.top, .horizontal], Metrics.gameMargin)
             .ignoresSafeArea()
             .presentationBackground(Color.black.opacity(0.6))
+        #else
+        // On a phone or a tablet the system's sheet is that card: it rises
+        // over the page, rounded, and a swipe down puts it away.
+        return self
+            .background(backdrop.ignoresSafeArea())
+            .presentationDragIndicator(.visible)
+        #endif
     }
 }

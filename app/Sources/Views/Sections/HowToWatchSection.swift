@@ -13,7 +13,7 @@ struct HowToWatchSection: View {
             Text("watch.title")
                 .font(.body.weight(.semibold))
                 .frame(maxWidth: .infinity)
-                .padding(.bottom, 6)
+                .padding(.bottom, .tv(6))
             // Rows of even columns: the cards of a line share its height, whatever their names, and a
             // last line with fewer keeps the same widths.
             let perLine = Metrics.watchCardsPerLine
@@ -61,12 +61,12 @@ private struct WatchTile: View {
             AppIconMark(app: card.app, height: Metrics.watchTileIconHeight)
             // A long name takes a second line rather than being cut off (Julien: option A); the block
             // keeps the room for it, so a row of cards is even.
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: .tv(2)) {
                 Text("watch.open \(card.app.name)").font(.callout.weight(.semibold)).lineLimit(2).fixedSize(horizontal: false, vertical: true)
                 Text("watch.appOf \(card.app.name)").font(.caption).foregroundStyle(.secondary).lineLimit(1)
             }
 
-            Spacer(minLength: 4)
+            Spacer(minLength: .tv(4))
             Image(systemName: "arrow.up.forward.app").font(.callout).foregroundStyle(.secondary)
         }
         // As wide and as tall as the cell the grid gives it, so the card's surface fills it.

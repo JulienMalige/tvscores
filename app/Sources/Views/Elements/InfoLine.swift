@@ -8,7 +8,7 @@ struct InfoLine: View {
     let value: Text
 
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: .tv(14)) {
             Image(systemName: symbol).foregroundStyle(.secondary)
             Text(label).foregroundStyle(.secondary) + Text(verbatim: " ") + value
         }

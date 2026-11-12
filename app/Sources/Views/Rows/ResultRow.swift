@@ -12,8 +12,8 @@ struct ResultRow: View {
     @FocusState private var isFocused: Bool
 
     /// Shared with the column titles above the list.
-    static let nameWidth: CGFloat = 640
-    static let numberWidth: CGFloat = 160
+    static let nameWidth: CGFloat = .tv(640, phone: 170)
+    static let numberWidth: CGFloat = .tv(160, phone: 34)
 
     var body: some View {
         HStack(spacing: 0) {
@@ -23,8 +23,8 @@ struct ResultRow: View {
                     .frame(width: Metrics.placeWidth, alignment: .trailing)
                 PersonMark(photo: result.photo, flag: result.flag, color: Color(hex: result.teamColor),
                            monogram: result.code ?? PersonMark.monogram(for: result.driver), size: Metrics.tableMark * 1.2)
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 10) {
+                VStack(alignment: .leading, spacing: .tv(2)) {
+                    HStack(spacing: .tv(10)) {
                         Text(result.driver).font(.callout.weight(.semibold))
                         if result.fastestLap == true {
                             Image(systemName: "stopwatch")

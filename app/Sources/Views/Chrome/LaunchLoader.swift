@@ -26,7 +26,7 @@ struct LaunchLoader: View {
                 .opacity(breathing ? 1 : 0.85)
             VStack(spacing: Metrics.headingGap) {
                 Text("app.title")
-                    .font(.system(size: 46, weight: .bold))
+                    .font(.system(size: .tv(46), weight: .bold))
                 bar
                 if error != nil {
                     Text("launch.retrying")

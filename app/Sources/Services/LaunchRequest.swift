@@ -1,13 +1,27 @@
 import Foundation
 
 /// What a launch argument asks the app to open first: the flows and the CI's
-/// screenshots name a game (`-TVScoresGame`) or a race (`-TVScoresRace`).
+/// screenshots name a day (`-TVScoresTab`), a game (`-TVScoresGame`) or a
+/// race (`-TVScoresRace`).
 ///
 /// Choices split by "|" are tried in turn. The store's screenshots run on live
 /// data (`store-shots.yml`), so they name the best game first and what will do
 /// when it is not on: "scheduled:nfl:tv|scheduled:football:tv".
 @MainActor
 enum LaunchRequest {
+    /// What follows a launch argument; "" for one given alone, nil when absent.
+    static func argument(_ name: String) -> String? {
+        let args = ProcessInfo.processInfo.arguments
+        if let i = args.firstIndex(of: name), i + 1 < args.count { return args[i + 1] }
+        return args.contains(name) ? "" : nil
+    }
+
+    /// `-TVScoresTab upcoming` picks the first day shown (CI screenshots).
+    static func initialDay() -> Day {
+        guard let raw = argument("-TVScoresTab"), let day = Day(rawValue: raw) else { return .today }
+        return day
+    }
+
     /// "final" or "final:football": a state, and the sport to take it from;
     /// then "tv", a game with channels, or a competition's id, a game of that
     /// competition: "scheduled:nfl:tv", "final:football:4328".

@@ -17,7 +17,7 @@ struct SessionSection: View {
             }
         }
         .padding(.vertical, Metrics.cardInsetV)
-        .padding(.horizontal, 16)
+        .padding(.horizontal, .tv(16))
         .frame(maxWidth: .infinity)
         .gameCardSurface(radius: Metrics.gameCardRadius)
     }

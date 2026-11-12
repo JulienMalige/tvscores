@@ -10,19 +10,24 @@ struct BoardCard<Content: View>: View {
     /// switch centred, tvOS put first focus on the first game, and the page
     /// then moved it up to the chosen day — a jump Julien saw on build 28.
     /// With nothing else to take, focus lands on the switch at once. A
-    /// second at most, in case it never does.
+    /// second at most, in case it never does. A touch screen has no focus
+    /// to wait for.
+    #if os(tvOS)
     @State private var open = false
+    #else
+    @State private var open = true
+    #endif
 
     var body: some View {
         VStack(spacing: 0) {
             DayTabs(selected: $day) { open = true }
                 .padding(.vertical, Metrics.cardInsetV / 2)
             Divider().overlay(Color.white.opacity(0.15))
-                .padding(.horizontal, 20)
+                .padding(.horizontal, .tv(20))
             content()
                 .disabled(!open)
                 // Room for a lit row, which grows 2%, inside the rounded edge.
-                .padding(.horizontal, 16)
+                .padding(.horizontal, .tv(16))
                 .padding(.vertical, Metrics.cardInsetV)
         }
         .task {
@@ -38,6 +43,6 @@ struct RowRule: View {
     var body: some View {
         Divider()
             .overlay(Color.white.opacity(0.12))
-            .padding(.horizontal, 20)
+            .padding(.horizontal, .tv(20))
     }
 }

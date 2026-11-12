@@ -6,7 +6,7 @@ struct MomentsSection: View {
 
     var body: some View {
         GameCard(title: "game.moments", identifier: "game.moments") {
-            VStack(spacing: 14) {
+            VStack(spacing: .tv(14)) {
                 ForEach(Array(moments.enumerated()), id: \.offset) { _, moment in
                     MomentRow(moment: moment)
                 }

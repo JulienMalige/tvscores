@@ -33,9 +33,9 @@ extension SportSection {
         return SportSection.all.compactMap { section in
             // A league naming its own section goes there, not in its sport's.
             let mine = leagues.filter { $0.section.map { $0 == section.id } ?? section.sports.contains($0.sport) }
-                .filter { all || choice.isShown(Sidebar.key($0)) }
-            let byKey = Dictionary(mine.map { (Sidebar.key($0), $0) }, uniquingKeysWith: { a, _ in a })
-            let ordered = choice.arranged(mine.map(Sidebar.key)).compactMap { byKey[$0] }
+                .filter { all || choice.isShown(MenuItem.key($0)) }
+            let byKey = Dictionary(mine.map { (MenuItem.key($0), $0) }, uniquingKeysWith: { a, _ in a })
+            let ordered = choice.arranged(mine.map(MenuItem.key)).compactMap { byKey[$0] }
             return ordered.isEmpty ? nil : (section, ordered)
         }
     }

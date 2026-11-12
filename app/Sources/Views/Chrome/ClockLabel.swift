@@ -9,7 +9,7 @@ struct ClockLabel: View {
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 60)) { tick in
-            HStack(spacing: 14) {
+            HStack(spacing: .tv(14)) {
                 if showsDate {
                     Text(tick.date, format: .dateTime.weekday(.wide).day().month(.wide))
                 }

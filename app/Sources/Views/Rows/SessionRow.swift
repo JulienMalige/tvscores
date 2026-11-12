@@ -10,7 +10,7 @@ struct SessionRow: View {
             Text(title)
                 .font(.callout)
             Spacer()
-            VStack(alignment: .trailing, spacing: 2) {
+            VStack(alignment: .trailing, spacing: .tv(2)) {
                 Text(session.start, format: .dateTime.weekday(.abbreviated).day().month(.abbreviated))
                     .font(.callout)
                 Text(session.start, format: .dateTime.hour().minute())
