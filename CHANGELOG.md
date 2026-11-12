@@ -7,6 +7,12 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- TV Scores on iPhone and iPad, the same app as on the Apple TV: the day's games by
+  competition, each competition's page and table, a game's page with where to watch it,
+  and Settings. On an iPhone the competitions are one step back, behind the arrow at the
+  top left; on an iPad they stand beside the page. A game's page closes with a swipe down.
+- Rugby tables no longer name their source under the heading; Settings, Sources credits
+  Wikipedia for them. A table still says how many games it does not count yet.
 
 ## 1.1 build 48 — 9 November 2026
 - A competition with a long name no longer pushes the date at the top of its page onto

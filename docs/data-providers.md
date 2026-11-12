@@ -548,9 +548,12 @@ that day, before:
 **Terms.** Wikipedia's text is under CC BY-SA 4.0. Reusing it means crediting
 it (a link or the address of the page reused), naming the licence, and
 sharing what is made from it under the same licence. A television has no
-links, so the app writes under each table the source, the article's title
-and the licence; the proxy's answer carries the article's address and the
-licence with the table, and those tables are CC BY-SA 4.0 as well.
+links. Build 48 wrote under each table the source, the article's title and
+the licence; Julien wants no source there (2026-11-09: "I don't want you to
+mention the source"), so the credit is a line of Settings, Sources ("Rugby
+tables: Wikipedia, CC BY-SA 4.0"), and a table says only how many games it
+does not count yet. The proxy's answer still carries each table's article
+address and licence, and those tables are CC BY-SA 4.0 as well.
 
 **How it is read.** Only the documented MediaWiki Action API
 (`https://<lang>.wikipedia.org/w/api.php`): `action=query&prop=revisions`

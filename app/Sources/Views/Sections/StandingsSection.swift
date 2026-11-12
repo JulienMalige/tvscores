@@ -26,7 +26,7 @@ struct StandingsSection: View {
                 .font(carded ? .callout.weight(.semibold) : .title2.weight(.bold))
                 .padding(.top, .tv(12))
             if let standings, !standings.tables.isEmpty {
-                if let source = standings.source { credit(source) }
+                if let missing = standings.source?.missing, missing > 0 { missingNote(missing) }
                 if standings.tables.count > 1 { tabs(standings) }
                 rows(standings.tables[min(table, standings.tables.count - 1)])
             } else if loaded {
@@ -55,25 +55,14 @@ struct StandingsSection: View {
     }
 
     /// Under the heading, before the rows: the games a table does not count
-    /// yet, and the article it comes from with its licence, as CC BY-SA asks.
-    private func credit(_ source: StandingsSource) -> some View {
-        VStack(alignment: carded ? .center : .leading, spacing: Metrics.tableNoteGap) {
-            if let missing = source.missing, missing > 0 {
-                Text("standings.missing \(missing)")
-                    .accessibilityIdentifier("standings.missing")
-            }
-            Group {
-                if source.site == "wikipedia" {
-                    Text("standings.wikipedia \(source.title)")
-                } else {
-                    Text(verbatim: "\(source.title), \(source.license)")
-                }
-            }
-            .accessibilityIdentifier("standings.source")
-        }
-        .font(.caption)
-        .foregroundStyle(.secondary)
-        .multilineTextAlignment(carded ? .center : .leading)
+    /// yet. Where it comes from is said in Settings, Sources, not here
+    /// (Julien, 2026-11-09: "I don't want you to mention the source").
+    private func missingNote(_ missing: Int) -> some View {
+        Text("standings.missing \(missing)")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(carded ? .center : .leading)
+            .accessibilityIdentifier("standings.missing")
     }
 
     private func tabs(_ standings: Standings) -> some View {
@@ -92,13 +81,13 @@ struct StandingsSection: View {
                         Text(section)
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                            .padding(.leading, Metrics.rowInsetH)
+                            .padding(.leading, Metrics.tableRowInsetH)
                             .accessibilityIdentifier("division.\(section)")
                         Spacer()
                         if let columns = table.columns { columnLabels(columns) }
                     }
                     .padding(.top, i == 0 ? 0 : Metrics.headingGap)
-                    .padding(.trailing, Metrics.rowInsetH)
+                    .padding(.trailing, Metrics.tableRowInsetH)
                 }
                 StandingsRow(entry: entry, highlighted: highlight.contains(entry.name), plain: carded)
                 if let line = table.lines?.first(where: { $0.after == entry.pos && entry.section == nil }) {
@@ -117,7 +106,7 @@ struct StandingsSection: View {
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading) // under the names, not centred
-                .padding(.leading, Metrics.rowInsetH)
+                .padding(.leading, Metrics.tableRowInsetH)
                 .padding(.top, Metrics.headingGap)
             }
         }
@@ -129,7 +118,7 @@ struct StandingsSection: View {
             Spacer()
             columnLabels(columns)
         }
-        .padding(.trailing, Metrics.rowInsetH)
+        .padding(.trailing, Metrics.tableRowInsetH)
     }
 
     private func columnLabels(_ columns: [String]) -> some View {
@@ -151,7 +140,7 @@ struct StandingsSection: View {
                 .stroke(Color.white.opacity(0.45), style: StrokeStyle(lineWidth: 2, dash: style == "dashed" ? [.tv(14), .tv(12)] : []))
             )
             .clipped()
-            .padding(.horizontal, Metrics.rowInsetH)
+            .padding(.horizontal, Metrics.tableRowInsetH)
             .padding(.vertical, .tv(6))
             .accessibilityIdentifier("table.cut.\(style)")
     }

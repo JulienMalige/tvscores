@@ -172,6 +172,8 @@ struct SettingsScreen: View {
             Section("settings.sources") {
                 fact("settings.scores", "TheSportsDB, Live Tennis API, Orange Cat, Jolpica")
                 fact("settings.listings", "TheSportsDB, XML TV Fr, epgshare01")
+                // Their licence asks for the credit; the tables themselves name no source (2026-11-09).
+                fact("settings.rugbyTables", "Wikipedia, CC BY-SA 4.0")
             }
             Section("settings.about") {
                 fact("settings.version", version)

@@ -8,7 +8,8 @@ struct Standings: Decodable {
     let updatedAt: Date
     let tables: [StandingsTable]
     /// Where the tables come from when not from one of our feeds: rugby's,
-    /// from Wikipedia, which its licence asks us to credit.
+    /// from Wikipedia, which its licence asks us to credit — in Settings,
+    /// Sources, since the tables name no source (2026-11-09).
     let source: StandingsSource?
 }
 

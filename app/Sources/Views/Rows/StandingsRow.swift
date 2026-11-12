@@ -32,7 +32,8 @@ private struct StandingsRowContent: View {
             Text("\(entry.pos)")
                 .font(.callout)
                 .monospacedDigit()
-                .frame(width: .tv(44, phone: 18), alignment: .trailing)
+                .lineLimit(1)
+                .frame(width: .tv(44, phone: 24), alignment: .trailing)
             mark
             VStack(alignment: .leading, spacing: 0) {
                 // On one line, smaller before it is cut: a phone leaves a
@@ -66,7 +67,7 @@ private struct StandingsRowContent: View {
             }
             }
         }
-        .rowSurface(focused: isFocused, resting: plain ? 0 : 0.04, insetV: Metrics.tableRowPad)
+        .rowSurface(focused: isFocused, resting: plain ? 0 : 0.04, insetV: Metrics.tableRowPad, insetH: Metrics.tableRowInsetH)
         // A game's two sides, a shade lighter, as Apple Sports picks them out.
         .background(
             RoundedRectangle(cornerRadius: Metrics.rowRadius, style: .continuous)

@@ -1,7 +1,8 @@
 name: TestFlight
 
-# Manual only: archives a signed Release build and uploads it to App Store
-# Connect, with no Mac involved. Signing is manual: the distribution
+# Manual only: archives a signed Release build — the Apple TV's, or with
+# `platform: ios` the iPhone and iPad's (2026-11-12) — and uploads it to App
+# Store Connect, with no Mac involved. Signing is manual: the distribution
 # certificate and the App Store profile were created through the App Store
 # Connect API and live in repository secrets. Xcode's cloud signing is not
 # used because it needs an Admin API key, and ours is App Manager.
@@ -19,6 +20,12 @@ on:
         required: false
         type: boolean
         default: false
+      platform:
+        description: The Apple TV's app (tvos) or the iPhone and iPad's (ios)
+        required: false
+        type: choice
+        options: [tvos, ios]
+        default: tvos
 
 concurrency:
   group: testflight
@@ -42,6 +49,10 @@ jobs:
       ASC_TEAM_ID: ${{ secrets.ASC_TEAM_ID }}
       BUILD_NUMBER: ${{ inputs.build || github.run_number }}
       EDITION: ${{ inputs.store && 'store' || 'tester' }}
+      PLATFORM: ${{ inputs.platform || 'tvos' }}
+      SCHEME: ${{ inputs.platform == 'ios' && 'TVScoresiOS' || 'TVScores' }}
+      DESTINATION: ${{ inputs.platform == 'ios' && 'generic/platform=iOS' || 'generic/platform=tvOS' }}
+      PROFILE_NAME: ${{ inputs.platform == 'ios' && 'TV Scores iOS App Store' || 'TV Scores tvOS App Store 2' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -66,6 +77,7 @@ jobs:
           xcodebuild -version
 
       - name: Ensure a tvOS platform is installed
+        if: env.PLATFORM == 'tvos'
         run: |
           if ! xcodebuild -showsdks | grep -q appletvos; then
             sudo xcodebuild -downloadPlatform tvOS
@@ -90,7 +102,18 @@ jobs:
           DIST_P12_BASE64: ${{ secrets.DIST_P12_BASE64 }}
           DIST_P12_PASSWORD: ${{ secrets.DIST_P12_PASSWORD }}
           DIST_PROFILE_BASE64: ${{ secrets.DIST_PROFILE_BASE64 }}
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
         run: |
+          # The iPhone's App Store profile (2026-11-12) is read from Apple by
+          # its name, with the key this job already holds, rather than kept
+          # as one more secret; the television's is the secret it always was.
+          if [ "$PLATFORM" = ios ]; then
+            profile=$(node ../scripts/asc.mjs get "/v1/profiles?filter[name]=TV%20Scores%20iOS%20App%20Store&filter[profileState]=ACTIVE&fields[profiles]=profileContent" \
+              | jq -r '.data[0].attributes.profileContent // empty')
+            test -n "$profile"
+          else
+            profile="$DIST_PROFILE_BASE64"
+          fi
           keychain="$RUNNER_TEMP/signing.keychain-db"
           pass="$(openssl rand -hex 24)"
           security create-keychain -p "$pass" "$keychain"
@@ -108,7 +131,7 @@ jobs:
           for dir in ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles \
                      ~/Library/MobileDevice/Provisioning\ Profiles; do
             mkdir -p "$dir"
-            echo "$DIST_PROFILE_BASE64" | base64 --decode > "$dir/tvscores.mobileprovision"
+            echo "$profile" | base64 --decode > "$dir/tvscores.mobileprovision"
           done
 
       - name: Archive
@@ -116,16 +139,16 @@ jobs:
           set -o pipefail
           xcodebuild archive \
             -project TVScores.xcodeproj \
-            -scheme TVScores \
+            -scheme "$SCHEME" \
             -configuration Release \
-            -destination 'generic/platform=tvOS' \
+            -destination "$DESTINATION" \
             -archivePath "$RUNNER_TEMP/TVScores.xcarchive" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
             TVSCORES_EDITION="$EDITION" \
             DEVELOPMENT_TEAM="$ASC_TEAM_ID" \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Apple Distribution" \
-            PROVISIONING_PROFILE_SPECIFIER="TV Scores tvOS App Store 2" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
             OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/signing.keychain-db" \
             2>&1 | tee "$RUNNER_TEMP/archive.log" | grep -E "error:|warning:|Signing|ARCHIVE" || true
           grep -q "ARCHIVE SUCCEEDED" "$RUNNER_TEMP/archive.log"
@@ -151,7 +174,7 @@ jobs:
             <key>provisioningProfiles</key>
             <dict>
               <key>com.julienmalige.tvscores</key>
-              <string>TV Scores tvOS App Store 2</string>
+              <string>$PROFILE_NAME</string>
             </dict>
             <key>uploadSymbols</key><true/>
             <key>manageAppVersionAndBuildNumber</key><false/>

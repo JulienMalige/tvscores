@@ -84,12 +84,13 @@ jobs:
           demo() { local name="$1"; shift; shoot "$PHONE" "$name" 8 -TVScoresDemo "$@"; }
           for lang in en fr; do demo "today-$lang" -TVScoresTab today -AppleLanguages "($lang)" -AppleLocale "$lang"; done
           demo upcoming-en -TVScoresTab upcoming -AppleLanguages "(en)"
-          demo menu-en -TVScoresTab today -TVScoresMenuOpen -AppleLanguages "(en)"
+          # The list and Settings come 1.5 s after the board, Settings on a sheet that rises.
+          shoot "$PHONE" menu-en 12 -TVScoresDemo -TVScoresTab today -TVScoresMenuOpen -AppleLanguages "(en)"
           demo league-football-yesterday-en -TVScoresTab yesterday -TVScoresLeague football -AppleLanguages "(en)"
           demo league-f1-today-en -TVScoresTab today -TVScoresLeague f1 -AppleLanguages "(en)"
           demo game-tennis-final-en -TVScoresSample race -TVScoresTab today -TVScoresGame final:tennis -AppleLanguages "(en)"
           demo race-f1-en -TVScoresSample race -TVScoresTab yesterday -TVScoresRace f1 -AppleLanguages "(en)"
-          for page in top competitions countries; do demo "settings-$page-fr" -TVScoresTab today -TVScoresSettings "$page" -AppleLanguages "(fr)"; done
+          for page in top competitions countries; do shoot "$PHONE" "settings-$page-fr" 12 -TVScoresDemo -TVScoresTab today -TVScoresSettings "$page" -AppleLanguages "(fr)"; done
           # The live proxy, the path a TestFlight build takes, for what the
           # demo board predates: rugby and its tables, the apps to watch in.
           live() { local name="$1"; shift; shoot "$PHONE" "live-$name" 16 "$@"; }

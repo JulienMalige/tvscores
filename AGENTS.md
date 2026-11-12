@@ -203,8 +203,8 @@ does not fit a phone's width: `.tv(48)`, `.tv(180, phone: 66)`.
   Cup, Premiership, Nations Championship, Six Nations, World Cup), from
   version 1.1: builds up to 1.0 send no `sports` list and are given none of
   it (`firstSports` in `proxy/src/config.js`). Its tables come from
-  Wikipedia (2026-11-09), credited under each one as its licence asks
-  (`docs/data-providers.md`).
+  Wikipedia (2026-11-09), credited in Settings, Sources as its licence
+  asks; Julien wants no source under the tables (`docs/data-providers.md`).
 - **The menu is ours, not tvOS's sidebar** (Julien, 2026-09-28, keeping
   every competition in it). tvOS's `sidebarAdaptable` loses focus past
   seven tabs — the menu opened and shut in one movement from its lower
