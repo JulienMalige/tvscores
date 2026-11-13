@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- Rugby tables no longer name their source under the heading; Settings, Sources credits
+  Wikipedia for them. A table still says how many games it does not count yet.
 
 ## 1.1 build 48 — 9 November 2026
 - A competition with a long name no longer pushes the date at the top of its page onto

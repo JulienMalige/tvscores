@@ -39,10 +39,10 @@ struct ElementsTests {
         }
     }
 
-    @Test("a rugby table's words have all four: its columns, zones, pools and hemispheres, and its credit")
+    @Test("a rugby table's words have all four: its columns, zones, pools and hemispheres, the games it lacks, and its credit in Settings")
     func rugbyTableWordsAreTranslated() throws {
         let keys = ["col.pd", "col.bp", "zone.semifinals", "zone.playoffs", "standings.north", "standings.south",
-                    "standings.pool %@", "standings.wikipedia %@", "standings.missing %lld"]
+                    "standings.pool %@", "standings.missing %lld", "settings.rugbyTables"]
         for key in keys {
             for lang in ["en", "fr", "pt", "es"] {
                 let path = try #require(Bundle.main.path(forResource: lang, ofType: "lproj"), "\(lang).lproj is bundled")

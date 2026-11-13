@@ -26,7 +26,7 @@ struct StandingsSection: View {
                 .font(carded ? .callout.weight(.semibold) : .title2.weight(.bold))
                 .padding(.top, 12)
             if let standings, !standings.tables.isEmpty {
-                if let source = standings.source { credit(source) }
+                if let missing = standings.source?.missing, missing > 0 { missingNote(missing) }
                 if standings.tables.count > 1 { tabs(standings) }
                 rows(standings.tables[min(table, standings.tables.count - 1)])
             } else if loaded {
@@ -55,25 +55,14 @@ struct StandingsSection: View {
     }
 
     /// Under the heading, before the rows: the games a table does not count
-    /// yet, and the article it comes from with its licence, as CC BY-SA asks.
-    private func credit(_ source: StandingsSource) -> some View {
-        VStack(alignment: carded ? .center : .leading, spacing: Metrics.tableNoteGap) {
-            if let missing = source.missing, missing > 0 {
-                Text("standings.missing \(missing)")
-                    .accessibilityIdentifier("standings.missing")
-            }
-            Group {
-                if source.site == "wikipedia" {
-                    Text("standings.wikipedia \(source.title)")
-                } else {
-                    Text(verbatim: "\(source.title), \(source.license)")
-                }
-            }
-            .accessibilityIdentifier("standings.source")
-        }
-        .font(.caption)
-        .foregroundStyle(.secondary)
-        .multilineTextAlignment(carded ? .center : .leading)
+    /// yet. Where it comes from is said in Settings, Sources, not here
+    /// (Julien, 2026-11-09: "I don't want you to mention the source").
+    private func missingNote(_ missing: Int) -> some View {
+        Text("standings.missing \(missing)")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(carded ? .center : .leading)
+            .accessibilityIdentifier("standings.missing")
     }
 
     private func tabs(_ standings: Standings) -> some View {

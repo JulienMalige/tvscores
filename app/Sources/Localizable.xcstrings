@@ -1979,6 +1979,34 @@
         }
       }
     },
+    "settings.rugbyTables": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rugby tables"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Classements de rugby"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Classificações de rugby"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clasificaciones de rugby"
+          }
+        }
+      }
+    },
     "settings.scores": {
       "extractionState": "manual",
       "localizations": {
@@ -2706,35 +2734,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Oeste"
-          }
-        }
-      }
-    },
-    "standings.wikipedia %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Source: Wikipedia, “%@”, CC BY-SA 4.0"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Source : Wikipédia, « %@ », CC BY-SA 4.0"
-          }
-        },
-        "pt": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fonte: Wikipédia, “%@”, CC BY-SA 4.0"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fuente: Wikipedia, «%@», CC BY-SA 4.0"
           }
         }
       }
