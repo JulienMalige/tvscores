@@ -81,6 +81,7 @@ targets:
         # Dark, as Apple Sports: every page is drawn on a dark tint.
         UIUserInterfaceStyle: Dark
         ITSAppUsesNonExemptEncryption: false
+        LSRequiresIPhoneOS: true
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         UISupportedInterfaceOrientations~ipad:
