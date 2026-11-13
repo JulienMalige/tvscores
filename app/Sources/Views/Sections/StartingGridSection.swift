@@ -17,7 +17,7 @@ struct StartingGridSection: View {
         }
         // On a panel, as the race's result is.
         .padding(.vertical, Metrics.cardInsetV)
-        .padding(.horizontal, 16)
+        .padding(.horizontal, .tv(16))
         .gameCardSurface(radius: Metrics.gameCardRadius)
     }
 }

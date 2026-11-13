@@ -18,8 +18,7 @@ struct GameCard<Content: View>: View {
         .padding(.horizontal, Metrics.cardInsetH)
         .frame(maxWidth: .infinity)
         .gameCardSurface(lit: isFocused, radius: Metrics.gameCardRadius)
-        .focusable()
-        .focused($isFocused)
+        .remoteFocus($isFocused)
         .accessibilityIdentifier(identifier)
     }
 }

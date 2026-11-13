@@ -8,7 +8,7 @@ struct StatRow: View {
     var awayTint: Color?
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: .tv(8)) {
             HStack(alignment: .lastTextBaseline) {
                 value(stat.home)
                 Spacer()
@@ -21,13 +21,13 @@ struct StatRow: View {
             GeometryReader { geo in
                 let total = stat.home + stat.away
                 let share = total > 0 ? stat.home / total : 0.5
-                HStack(spacing: 8) {
+                HStack(spacing: .tv(8)) {
                     Capsule().fill(homeTint ?? Color.white.opacity(0.85))
-                        .frame(width: (geo.size.width - 8) * share)
+                        .frame(width: (geo.size.width - .tv(8)) * share)
                     Capsule().fill(awayTint ?? Color.white.opacity(0.4))
                 }
             }
-            .frame(height: 10)
+            .frame(height: .tv(10))
         }
     }
 

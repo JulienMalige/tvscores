@@ -34,7 +34,7 @@ private struct MatchRowContent: View {
     @Environment(\.watchApps) private var apps
 
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: .tv(6)) {
             // Where a tennis match is, in grey over it: "China Open · Round of 32".
             if let caption {
                 Text(verbatim: caption)
@@ -57,7 +57,7 @@ private struct MatchRowContent: View {
             side(event.home)
             middle(event.score?.home, record: event.records?.home, winner: winner == .home)
                 .frame(width: Metrics.matchScore, alignment: .center)
-            VStack(spacing: 4) {
+            VStack(spacing: .tv(4)) {
                 StatusLabel(status: event.status, start: event.start, compact: true, sport: event.sport)
                 if let channels = event.listing(apps) { ChannelsLabel(channels: channels) }
             }

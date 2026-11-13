@@ -30,7 +30,7 @@ struct AppsChoiceSection: View {
                     ForEach(keys(in: country), id: \.self) { key in
                         if let app = apps[key] {
                             Button { choice.toggle(key) } label: {
-                                HStack(spacing: 18) {
+                                HStack(spacing: .tv(18)) {
                                     AppIconMark(app: app, height: Metrics.watchIconHeight * 0.5)
                                     Text(verbatim: app.name)
                                     Spacer()
@@ -42,7 +42,7 @@ struct AppsChoiceSection: View {
                         }
                     }
                 } header: {
-                    HStack(spacing: 12) {
+                    HStack(spacing: .tv(12)) {
                         FlagMark(flag: ChannelChoice.flag(country), size: Metrics.settingsFlag)
                         Text(verbatim: LanguageChoice.locale.localizedString(forRegionCode: country) ?? country)
                     }

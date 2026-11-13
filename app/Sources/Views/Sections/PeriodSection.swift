@@ -10,7 +10,7 @@ struct PeriodSection: View {
 
     var body: some View {
         FocusBlock(identifier: "game.periods", surface: false) {
-            Grid(horizontalSpacing: 0, verticalSpacing: 18) {
+            Grid(horizontalSpacing: 0, verticalSpacing: .tv(18)) {
                 GridRow {
                     Text(verbatim: "").frame(width: Metrics.periodName, alignment: .leading)
                     ForEach(Array(periods.labels.enumerated()), id: \.offset) { _, label in

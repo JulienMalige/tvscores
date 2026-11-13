@@ -17,7 +17,7 @@ so a file says what it is before you open it.
 | **Section** | `app/Sources/Views/Sections` | a heading and the list under it | `LeagueSection`, `StandingsSection`, `PodiumSection`, `ResultSection`, `StartingGridSection`, `SessionSection`, `OffseasonSection`, `GameHeaderSection`, `PeriodSection`, `StatsSection`, `MomentsSection`, `GameInfoSection`, `CompetitionSection` |
 | **Row** | `app/Sources/Views/Rows` | one focusable line, on the shared row surface | `MatchRow`, `RaceRow`, `StandingsRow`, `ResultRow`, `StartingGridRow`, `SessionRow`, `StatRow`, `MomentRow` |
 | **Element** | `app/Sources/Views/Elements` | the atoms a row is made of | `TeamMark`, `PersonMark`, `LeagueMark`, `FlagMark`, `StatusLabel`, `EmptyDay`, `CachedImage`, `Segments`, `FocusBlock`, `GameCard`, `TeamTint`, `PageTint` |
-| **Chrome** | `app/Sources/Views/Chrome` | navigation that outlives any one screen | `Sidebar`, `MenuPanel`, `DayTabs`, `ClockLabel`, `LaunchLoader` |
+| **Chrome** | `app/Sources/Views/Chrome` | navigation that outlives any one screen | `Sidebar`, `MenuPanel` (tvOS), `SplitMenu` (iPhone and iPad), `MenuItem`, `DayTabs`, `ClockLabel`, `LaunchLoader` |
 
 Sections stack inside a screen; they never nest. A row never reaches outside
 itself for a measurement, and a screen never draws a row's insides. Chrome is
@@ -40,6 +40,11 @@ row, which is what makes the lists line up.
 
 They all live in `app/Sources/Views/Metrics.swift`. Nothing else in the app
 writes a measurement of its own.
+
+They are the television's, written through `.tv()`: as they stand on tvOS,
+halved on an iPhone or an iPad (Apple Sports' own sizes, `docs/iphone.md`), or
+the `phone:` value where half does not fit a phone's width. A number a view
+still writes for itself goes through `.tv()` too.
 
 | Name | Value | What it is |
 |---|---|---|

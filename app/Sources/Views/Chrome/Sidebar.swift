@@ -1,3 +1,4 @@
+#if os(tvOS)
 import SwiftUI
 import UIKit
 
@@ -25,7 +26,7 @@ struct Sidebar: View {
         self.store = store
     }
     @State private var selection = MenuItem.home
-    @State private var day: Day = Self.initialDay()
+    @State private var day: Day = LaunchRequest.initialDay()
     /// The day a competition's page was opened on from the front page, so
     /// Yesterday's La Liga header opens Yesterday's La Liga.
     @State private var leagueDays: [String: Day] = [:]
@@ -62,7 +63,7 @@ struct Sidebar: View {
             openRequestedGame()
             // A competition gone from the list leaves nothing to show and
             // nothing for the remote to stand on: back to Home.
-            if case .league(let key) = selection, !store.leagues.contains(where: { Self.key($0) == key }) {
+            if case .league(let key) = selection, !store.leagues.contains(where: { MenuItem.key($0) == key }) {
                 selection = .home
             }
         }
@@ -128,9 +129,9 @@ struct Sidebar: View {
         }
         .task {
             try? await Task.sleep(for: .seconds(1.5))
-            if Self.argument("-TVScoresMenuOpen") != nil { openMenu() }
+            if LaunchRequest.argument("-TVScoresMenuOpen") != nil { openMenu() }
             // `-TVScoresSettings` opens the settings card (CI screenshots).
-            if Self.argument("-TVScoresSettings") != nil { settingsOpen = true }
+            if LaunchRequest.argument("-TVScoresSettings") != nil { settingsOpen = true }
         }
     }
 
@@ -140,8 +141,8 @@ struct Sidebar: View {
         case .home:
             HomeScreen(store: store, day: $day, openLeague: open, openedInitialRace: $homeOpenedRace)
         case .league(let key):
-            if let league = store.leagues.first(where: { Self.key($0) == key }) {
-                CompetitionScreen(ref: LeagueRef(league), store: store, day: leagueDays[key] ?? Self.initialDay())
+            if let league = store.leagues.first(where: { MenuItem.key($0) == key }) {
+                CompetitionScreen(ref: LeagueRef(league), store: store, day: leagueDays[key] ?? LaunchRequest.initialDay())
                 // Made afresh for a day picked on the front page.
                 .id("\(key)|\(leagueDays[key].map { "\($0)" } ?? "")")
             }
@@ -192,58 +193,23 @@ struct Sidebar: View {
     /// A competition opened from the front page: its own row, on the day the
     /// front page was showing.
     private func open(_ ref: LeagueRef) {
-        let key = "\(ref.sport):\(ref.leagueId)"
-        guard store.leagues.contains(where: { Self.key($0) == key }), LeagueChoice.shared.isShown(key) else { return }
+        let key = MenuItem.key(ref)
+        guard store.leagues.contains(where: { MenuItem.key($0) == key }), LeagueChoice.shared.isShown(key) else { return }
         leagueDays[key] = day
         selection = .league(key)
     }
 
     /// `-TVScoresLeague f1` opens that competition (CI screenshots).
     private func openRequestedLeague() {
-        guard let wanted = Self.argument("-TVScoresLeague"),
-              let hit = store.leagues.first(where: { $0.sport == wanted || $0.id.raw == wanted })
-        else { return }
-        selection = .league(Self.key(hit))
+        guard let hit = LaunchRequest.league(in: store.leagues) else { return }
+        selection = .league(MenuItem.key(hit))
     }
 
     /// `-TVScoresGame final` opens the first game in that state (CI
     /// screenshots); `LaunchRequest` reads the rest of what it can say.
     private func openRequestedGame() {
-        guard let wanted = Self.argument("-TVScoresGame"), let board = store.board else { return }
+        guard let wanted = LaunchRequest.argument("-TVScoresGame"), let board = store.board else { return }
         game = LaunchRequest.game(wanted, in: board)
     }
-
-    static func key(_ league: LeagueSummary) -> String { "\(league.sport):\(league.id.raw)" }
-
-    private static func argument(_ name: String) -> String? {
-        let args = ProcessInfo.processInfo.arguments
-        if let i = args.firstIndex(of: name), i + 1 < args.count { return args[i + 1] }
-        return args.contains(name) ? "" : nil
-    }
-
-    /// `-TVScoresTab upcoming` picks the initial day (used by CI screenshots).
-    private static func initialDay() -> Day {
-        guard let raw = argument("-TVScoresTab"), let day = Day(rawValue: raw) else { return .today }
-        return day
-    }
 }
-
-/// A row of the menu.
-enum MenuItem: Hashable {
-    case home
-    case league(String)
-    /// The gear at the top: opens settings over the page, not a page.
-    case settings
-}
-
-extension EnvironmentValues {
-    /// Opens the menu; a page calls it on Back, as tvOS's sidebar does.
-    @Entry var openMenu: @MainActor () -> Void = {}
-    /// Opens a game's or a race's page, from its row.
-    @Entry var openGame: @MainActor (Event) -> Void = { _ in }
-    /// A page reports whether it is scrolled away from its top, for the menu
-    /// chip to shrink to its icon, as tvOS's own does.
-    @Entry var pageScrolled: @MainActor (Bool) -> Void = { _ in }
-    /// Whether the menu is open, read when asked, not when the view was made.
-    @Entry var menuIsOpen: @MainActor () -> Bool = { false }
-}
+#endif

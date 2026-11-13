@@ -10,7 +10,7 @@ struct StatsSection: View {
 
     var body: some View {
         GameCard(title: "game.statistics", identifier: "game.stats") {
-            VStack(spacing: 22) {
+            VStack(spacing: .tv(22)) {
                 ForEach(stats) { StatRow(stat: $0, homeTint: homeTint, awayTint: awayTint) }
             }
         }

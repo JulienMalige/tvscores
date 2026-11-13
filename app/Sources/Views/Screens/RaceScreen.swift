@@ -44,7 +44,7 @@ struct RaceScreen: View {
                     // As a game's page: one loader under the header, then
                     // the schedule, the table and the place at once.
                     ProgressView()
-                        .frame(maxWidth: .infinity, minHeight: 320)
+                        .frame(maxWidth: .infinity, minHeight: .tv(320))
                 } else {
                     // Nothing classified yet: the sprint and the grid once
                     // Saturday has given them, as Apple Sports' race card,
@@ -97,7 +97,7 @@ struct RaceHeaderSection: View {
 
     var body: some View {
         FocusBlock(identifier: "race.header", surface: false) {
-            VStack(spacing: 22) {
+            VStack(spacing: .tv(22)) {
                 FlagMark(flag: event.flag, size: Metrics.markHero * 0.6)
                 Text(verbatim: [series, event.name].compactMap { $0 }.joined(separator: " · "))
                     .font(.caption.weight(.semibold))
@@ -145,7 +145,7 @@ private struct RaceBackdrop: View {
                                    .init(color: .clear, location: 0.6)],
                            startPoint: .top, endPoint: .bottom)
             Canvas { context, size in
-                let side: CGFloat = 96
+                let side: CGFloat = .tv(96)
                 for row in 0...Int(size.height / side) {
                     for column in 0...Int(size.width / side) where (row + column).isMultiple(of: 2) {
                         context.fill(Path(CGRect(x: CGFloat(column) * side, y: CGFloat(row) * side,

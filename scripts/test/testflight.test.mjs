@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { section, topSection, closeSection, marketingOf, lastMarketing } from "../testflight.mjs";
+import { section, topSection, closeSection, marketingOf, lastMarketing, buildsQuery } from "../testflight.mjs";
 
 const CHANGELOG = `# Changelog
 
@@ -19,6 +19,11 @@ Some preamble that is not a section.
 
 - Constructor badges.
 `;
+
+test("a build is looked for among its own platform's, when one is named", () => {
+  assert.match(buildsQuery("IOS"), /&filter\[preReleaseVersion\.platform\]=IOS&/);
+  assert.doesNotMatch(buildsQuery(), /platform/);
+});
 
 test("the note is the newest section, without its heading", () => {
   assert.equal(topSection(CHANGELOG), "- The icon sits on flat black now.\n- A second line.");

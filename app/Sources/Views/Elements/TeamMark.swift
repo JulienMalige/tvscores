@@ -11,7 +11,7 @@ struct TeamMark: View {
         Group {
             if let logo {
                 CachedImage(url: logo) { monogram }
-                    .padding(6)
+                    .padding(.tv(6))
             } else {
                 monogram
             }

@@ -18,17 +18,17 @@ struct GameInfoSection: View {
 
     var body: some View {
         FocusBlock(identifier: "game.information", surface: false) {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: .tv(16)) {
                 Text("game.information")
                     .font(.body.weight(.semibold))
                     .frame(maxWidth: .infinity)
-                    .padding(.bottom, 6)
+                    .padding(.bottom, .tv(6))
                 InfoLine(symbol: "clock", label: "game.time", value: Text(start, format: .dateTime.weekday(.wide).day().month(.wide).hour().minute()))
                 if let location {
                     InfoLine(symbol: "mappin.and.ellipse", label: "game.location", value: Text(verbatim: location))
                 }
                 if let broadcasts, !broadcasts.isEmpty {
-                    HStack(spacing: 14) {
+                    HStack(spacing: .tv(14)) {
                         Image(systemName: "tv").foregroundStyle(.secondary)
                         Text("game.watchOn").foregroundStyle(.secondary)
                         ChannelsLabel(channels: broadcasts, limit: broadcasts.count, font: .callout, color: .primary)

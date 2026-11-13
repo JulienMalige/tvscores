@@ -16,7 +16,7 @@ struct StartingGridRow: View {
                 .frame(width: Metrics.placeWidth, alignment: .trailing)
             PersonMark(photo: result.photo, flag: result.flag, color: Color(hex: result.teamColor),
                        monogram: result.code ?? PersonMark.monogram(for: result.driver), size: Metrics.tableMark * 1.2)
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: .tv(2)) {
                 Text(result.driver).font(.callout.weight(.semibold))
                 Text(result.team ?? "").font(.caption).foregroundStyle(.secondary)
             }
@@ -26,8 +26,7 @@ struct StartingGridRow: View {
         .lineLimit(1)
         .minimumScaleFactor(0.7)
         .rowSurface(focused: isFocused, resting: 0, insetV: Metrics.tableRowPad)
-        .focusable()
-        .focused($isFocused)
+        .remoteFocus($isFocused)
         .accessibilityIdentifier("grid.\(result.pos.map(String.init) ?? "-")")
     }
 }

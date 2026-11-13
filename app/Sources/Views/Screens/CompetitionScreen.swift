@@ -5,7 +5,9 @@ struct CompetitionScreen: View {
     let ref: LeagueRef
     let store: ScoreboardStore
     @State var day: Day
+    #if os(tvOS)
     @Environment(\.openMenu) private var openMenu
+    #endif
     @Environment(\.pageScrolled) private var pageScrolled
     /// The logo's own colour, read only when the proxy names none.
     @State private var logoTint: Color?
@@ -23,7 +25,7 @@ struct CompetitionScreen: View {
                 HStack(spacing: Metrics.headingGap) {
                     LeagueMark(sport: ref.sport, logo: ref.logo, symbolName: ref.symbol)
                     Text(ref.name)
-                        .font(.system(size: 48, weight: .bold))
+                        .font(.system(size: .tv(48), weight: .bold))
                         // A long name gives way to the clock, smaller on its
                         // one line: "European Rugby Champions Cup" put the
                         // date on two (Julien, build 47). Beside a Portuguese
@@ -31,7 +33,9 @@ struct CompetitionScreen: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
                     Spacer()
+                    #if os(tvOS)
                     ClockLabel()
+                    #endif
                 }
                 CompetitionSection(ref: ref, store: store, day: $day)
             }
@@ -47,7 +51,12 @@ struct CompetitionScreen: View {
             guard Color(hex: ref.color) == nil else { return }
             logoTint = await TeamTint.of(logo: ref.logo)
         }
+        #if os(tvOS)
         // Back on a page opens the menu, as it does on tvOS's own sidebar.
         .onExitCommand(perform: openMenu)
+        #else
+        // The page's own heading says which competition it is.
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
     }
 }

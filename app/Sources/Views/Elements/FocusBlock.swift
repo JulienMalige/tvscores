@@ -17,9 +17,21 @@ struct FocusBlock<Content: View>: View {
         content()
             .frame(maxWidth: .infinity)
             .modifier(Surface(on: surface, focused: isFocused))
-            .focusable()
-            .focused($isFocused)
+            .remoteFocus($isFocused)
             .accessibilityIdentifier(identifier)
+    }
+}
+
+extension View {
+    /// A stop for the remote, on a television, told when it is there. A
+    /// phone scrolls under the finger, and an iPad's keyboard would only tab
+    /// through blocks that do nothing, so there it is no stop at all.
+    func remoteFocus(_ focused: FocusState<Bool>.Binding) -> some View {
+        #if os(tvOS)
+        return self.focusable().focused(focused)
+        #else
+        return self
+        #endif
     }
 }
 

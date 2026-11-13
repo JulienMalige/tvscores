@@ -28,15 +28,22 @@ private struct StandingsRowContent: View {
     var body: some View {
         // Apple Sports' table, doubled for the room (docs/design-measures.md):
         // rank and name at the row's text size, a small crest, rows 80 apart.
-        HStack(spacing: 24) {
+        HStack(spacing: Metrics.tableRowSpacing) {
             Text("\(entry.pos)")
                 .font(.callout)
                 .monospacedDigit()
-                .frame(width: 44, alignment: .trailing)
+                .lineLimit(1)
+                .frame(width: Metrics.tableRank, alignment: .trailing)
             mark
             VStack(alignment: .leading, spacing: 0) {
                 Text(entry.name)
                     .font(.callout.weight(highlighted ? .bold : .regular))
+                    #if os(iOS)
+                    // On one line, smaller before it is cut: a phone leaves a
+                    // rugby table's names the room its seven columns do not take.
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    #endif
                 if let sub = entry.sub {
                     Text(sub).font(.caption).foregroundStyle(.secondary)
                 }
@@ -62,7 +69,7 @@ private struct StandingsRowContent: View {
             }
             }
         }
-        .rowSurface(focused: isFocused, resting: plain ? 0 : 0.04, insetV: Metrics.tableRowPad)
+        .rowSurface(focused: isFocused, resting: plain ? 0 : 0.04, insetV: Metrics.tableRowPad, insetH: Metrics.tableRowInsetH)
         // A game's two sides, a shade lighter, as Apple Sports picks them out.
         .background(
             RoundedRectangle(cornerRadius: Metrics.rowRadius, style: .continuous)

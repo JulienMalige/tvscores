@@ -24,6 +24,7 @@ as repository secrets.
 | Internal TestFlight group | `Internal`, account holder added as tester |
 | Distribution certificate | `TLAS59R725`, expires 2027-09-14 |
 | Provisioning profile | `TV Scores tvOS App Store 2` (`3YA4WZL5X6`), expires 2027-09-14 — minted 2026-09-19 with the User Management capability; build 19 shipped on it and the first profile was deleted |
+| iPhone and iPad profile | `TV Scores iOS App Store` (`L928T77N6Y`), expires 2027-09-14 — minted 2026-11-12 on the same certificate and bundle id (`UNIVERSAL`). Not a secret: the workflow reads it from Apple by name with its key; a copy is in `~/.config/tvscores/dist-ios.mobileprovision` |
 
 The App Manager key's `.p8` lives only in `~/.config/tvscores/` on the VPS
 (mode 600) and in GitHub Actions secrets, the Admin key's only in
@@ -59,8 +60,14 @@ certificates at once, so revoke the old one when it is no longer referenced.
 Run the **TestFlight** workflow from the Actions tab, or:
 
 ```sh
-gh workflow run testflight.yml --repo JulienMalige/tvscores
+gh workflow run testflight.yml --repo JulienMalige/tvscores                  # the Apple TV's
+gh workflow run testflight.yml --repo JulienMalige/tvscores -f platform=ios  # iPhone and iPad's
 ```
+
+The iPhone and iPad app needs iOS added to TV Scores in App Store Connect
+first (one app record for both, `docs/iphone.md`). Its build leaves the
+changelog's Unreleased section open, so the television's next build sends the
+same notes and closes the section.
 
 The job finishes by waiting for Apple to process the build, giving it the top
 section of `CHANGELOG.md` as its "What to Test" note, adding it to the

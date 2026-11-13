@@ -22,7 +22,7 @@ struct GameHeaderSection: View {
 
     var body: some View {
         FocusBlock(identifier: "game.header", surface: false) {
-            VStack(spacing: 28) {
+            VStack(spacing: .tv(28)) {
                 Text(verbatim: caption)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
@@ -44,7 +44,7 @@ struct GameHeaderSection: View {
     }
 
     private var teams: some View {
-        Grid(horizontalSpacing: 0, verticalSpacing: 12) {
+        Grid(horizontalSpacing: 0, verticalSpacing: .tv(12)) {
             if scored {
                 GridRow {
                     score(event.score?.home, dim: loser == .home)
@@ -74,7 +74,7 @@ struct GameHeaderSection: View {
 
     /// Two portraits with their names, the state of the match between them.
     private var players: some View {
-        Grid(horizontalSpacing: 0, verticalSpacing: 12) {
+        Grid(horizontalSpacing: 0, verticalSpacing: .tv(12)) {
             GridRow {
                 mark(event.home)
                 status
@@ -125,7 +125,7 @@ struct GameHeaderSection: View {
         // Where it is on, under the time, as Apple Sports gives it: a page
         // that opens on a table keeps its Information block below the
         // screen, and the channel is what you came for (Julien, build 33).
-        VStack(spacing: 8) {
+        VStack(spacing: .tv(8)) {
             StatusLabel(status: event.status, start: event.start, setsShown: event.setScores != nil)
             if let channels = event.channelList { ChannelsLabel(channels: channels, limit: 3) }
         }

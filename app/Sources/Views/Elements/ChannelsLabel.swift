@@ -24,9 +24,9 @@ struct ChannelsLabel: View {
     private var shown: [Channel] { Array(channels.prefix(limit)) }
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: .tv(10)) {
             ForEach(Array(groups.enumerated()), id: \.offset) { _, group in
-                HStack(spacing: 8) {
+                HStack(spacing: .tv(8)) {
                     if group.worldwide {
                         Image(systemName: "globe").font(.system(size: Metrics.channelFlag * 0.8))
                     } else if let country = group.country {

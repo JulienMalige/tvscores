@@ -6,9 +6,9 @@ struct PodiumSection: View {
     let results: [RaceResult]
 
     var body: some View {
-        HStack(spacing: 24) {
+        HStack(spacing: .tv(24)) {
             ForEach(results.filter(\.finished).prefix(3)) { r in
-                VStack(spacing: 10) {
+                VStack(spacing: .tv(10)) {
                     PersonMark(photo: r.photo, flag: r.flag, color: Color(hex: r.teamColor),
                                monogram: r.code ?? PersonMark.monogram(for: r.driver), size: Metrics.markHero)
                     Text("\(r.pos ?? 0)")
@@ -19,7 +19,7 @@ struct PodiumSection: View {
                 .frame(maxWidth: .infinity)
             }
         }
-        .padding(.vertical, 28)
+        .padding(.vertical, .tv(28))
         .frame(maxWidth: .infinity)
         .gameCardSurface(radius: Metrics.gameCardRadius)
     }
