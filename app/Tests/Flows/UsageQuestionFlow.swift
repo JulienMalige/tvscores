@@ -37,11 +37,11 @@ final class UsageQuestionFlow: FlowCase {
         Flow.openMenu(app, file: file, line: line)
         XCTAssertTrue(Flow.walk(.up, until: app.buttons["menu.settings"], limit: 6), "focus reaches the gear", file: file, line: line)
         Flow.remote.press(.select)
-        let row = app.buttons["settings.privacy"]
+        let row = Flow.settingsRow(app, "settings.usage")
         XCTAssertTrue(row.waitForExistence(timeout: 8), "Settings lists Usage Data", file: file, line: line)
         XCTAssertTrue(Flow.walk(.down, until: row, limit: 8), "the remote reaches it", file: file, line: line)
         Flow.remote.press(.select)
-        let toggle = app.buttons["settings.usage"]
+        let toggle = app.buttons["settings.usageSwitch"]
         XCTAssertTrue(toggle.waitForExistence(timeout: 8), "its page has the switch", file: file, line: line)
         return toggle.value as? String
     }

@@ -78,7 +78,7 @@ struct SettingsScreen: View {
             case .countries: CountriesChoiceSection()
             case .language: languageList
             case .apps: AppsChoiceSection(apps: apps)
-            case .privacy: UsageChoiceSection()
+            case .usage: UsageChoiceSection()
             case .openApps: OpenAppsSection(apps: apps)
             }
         }
@@ -91,7 +91,7 @@ struct SettingsScreen: View {
     private static var requested: SettingsPage {
         guard let wanted = LaunchRequest.argument("-TVScoresSettings") else { return .top }
         let asked = ["countries": SettingsPage.countries, "competitions": .competitions, "language": .language, "apps": .apps,
-                     "privacy": .privacy, "openApps": .openApps][wanted] ?? .top
+                     "usage": .usage, "openApps": .openApps][wanted] ?? .top
         return asked == .openApps && !Edition.current.hasTesterTools ? .top : asked
     }
 
@@ -167,10 +167,10 @@ struct SettingsScreen: View {
                 LabeledContent("settings.language") { Text(verbatim: language.map(LanguageChoice.name) ?? systemLanguage) }
             }
             .accessibilityIdentifier("settings.language")
-            link(.privacy) {
+            link(.usage) {
                 LabeledContent("settings.usageTitle") { Text(LocalizedStringKey(usage.shares ? "settings.on" : "settings.off")) }
             }
-            .accessibilityIdentifier("settings.privacy")
+            .accessibilityIdentifier("settings.usage")
             Section("settings.sources") {
                 fact("settings.scores", "TheSportsDB, Live Tennis API, Orange Cat, Jolpica")
                 fact("settings.listings", "TheSportsDB, XML TV Fr, epgshare01")

@@ -16,7 +16,7 @@ struct UsageChoiceSection: View {
             Button { set(!choice.shares) } label: {
                 LabeledContent("settings.usage") { Text(state) }
             }
-            .accessibilityIdentifier("settings.usage")
+            .accessibilityIdentifier("settings.usageSwitch")
             .accessibilityValue(Text(state))
             #else
             Section {
@@ -24,7 +24,7 @@ struct UsageChoiceSection: View {
                     // The system's green: Settings tints its rows white, and
                     // a white switch hid its knob (CI, 2026-11-14).
                     .tint(.green)
-                    .accessibilityIdentifier("settings.usage")
+                    .accessibilityIdentifier("settings.usageSwitch")
             } footer: {
                 // On a phone or a tablet the screens are recorded too, and it says so.
                 Text("settings.usageNotePhone")

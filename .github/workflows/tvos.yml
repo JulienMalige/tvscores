@@ -170,9 +170,9 @@ jobs:
             sleep 10
             xcrun simctl io "$UDID" screenshot "shots/usage-question-$lang.png"
             xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
-            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab today -TVScoresSettings privacy -usageConsent granted -AppleLanguages "($lang)"
+            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab today -TVScoresSettings usage -usageConsent granted -AppleLanguages "($lang)"
             sleep 12
-            xcrun simctl io "$UDID" screenshot "shots/settings-privacy-$lang.png"
+            xcrun simctl io "$UDID" screenshot "shots/settings-usage-$lang.png"
           done
           xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
           SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresTab today -TVScoresLeague f1 -TVScoresTable constructors -AppleLanguages "(en)"

@@ -96,7 +96,7 @@ jobs:
           # (docs/analytics.md). Nothing is ever sent from a simulator.
           for lang in en fr; do
             shoot "$PHONE" "usage-question-$lang" 10 -TVScoresDemo -TVScoresTab today -TVScoresAskConsent -AppleLanguages "($lang)" -AppleLocale "$lang"
-            shoot "$PHONE" "settings-privacy-$lang" 12 -TVScoresDemo -TVScoresTab today -TVScoresSettings privacy -usageConsent granted -AppleLanguages "($lang)"
+            shoot "$PHONE" "settings-usage-$lang" 12 -TVScoresDemo -TVScoresTab today -TVScoresSettings usage -usageConsent granted -AppleLanguages "($lang)"
           done
           # The live proxy, the path a TestFlight build takes, for what the
           # demo board predates: rugby and its tables, the apps to watch in.

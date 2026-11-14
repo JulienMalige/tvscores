@@ -36,6 +36,12 @@ enum Flow {
         app.buttons[day.prefix(1).uppercased() + day.dropFirst()].firstMatch
     }
 
+    /// A row of a Settings list, by its button: the list's cell takes the
+    /// focus, and the button in it carries the name and the state.
+    static func settingsRow(_ app: XCUIApplication, _ id: String) -> XCUIElement {
+        app.cells.containing(.button, identifier: id).firstMatch
+    }
+
     /// Press until `element` is focused or `limit` presses have gone by.
     /// Focus is the only cursor a television has; a test walks, it does not tap.
     static func walk(_ direction: XCUIRemote.Button, until element: XCUIElement, limit: Int = 25) -> Bool {
