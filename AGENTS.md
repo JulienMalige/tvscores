@@ -197,8 +197,8 @@ does not fit a phone's width: `.tv(48)`, `.tv(180, phone: 66)`.
 - **The iPhone and iPad app** (Julien, 2026-11-12: "lets do it";
   `docs/iphone.md`): the same app on the App Store page, the same bundle id.
   TestFlight waits on Julien adding iOS to the app in App Store Connect; the
-  store release on iPhone and iPad screenshots, and the privacy pages and the
-  store's copy naming the iPhone and the iPad.
+  store release on iPhone and iPad screenshots, and the store's copy naming
+  the iPhone and the iPad (the privacy pages name them since 2026-11-14).
 
 - **The store release** (`docs/store-release.md`): free, and the takedown risk
   on crests and photos accepted (Julien, 2026-10-16); the proxy's address is
