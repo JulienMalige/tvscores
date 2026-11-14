@@ -47,7 +47,7 @@ struct Sidebar: View {
         }
         .task { Diagnostics.shared.start(); store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
-        .usageQuestion(store: store)
+        .usageQuestion(store: store, covered: game != nil || settingsOpen)
         // The pictures the system emptied while the app was in the background come back.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             Task { await store.rewarm() }
@@ -87,6 +87,8 @@ struct Sidebar: View {
                 .environment(\.pageScrolled) { scrolled in
                     if scrolled != chipShrunk { chipShrunk = scrolled }
                 }
+                // Under a game or Settings the page is out of sight.
+                .environment(\.usageCovered, game != nil || settingsOpen)
             if expanded {
                 Color.black.opacity(0.45)
                     .ignoresSafeArea()
@@ -193,8 +195,9 @@ struct Sidebar: View {
             settingsOpen = true
             return
         }
-        if case .league(let key) = item, let league = store.leagues.first(where: { MenuItem.key($0) == key }) {
-            Analytics.shared.competitionOpened(league, day: leagueDays[key] ?? LaunchRequest.initialDay(), from: "menu")
+        // A new page only: picking the one shown just shuts the menu.
+        if case .league(let key) = item, item != selection {
+            Analytics.shared.competitionOpened(key, day: leagueDays[key] ?? LaunchRequest.initialDay(), from: "menu")
         }
         selection = item
         shut()
@@ -204,10 +207,10 @@ struct Sidebar: View {
     /// front page was showing.
     private func open(_ ref: LeagueRef) {
         let key = MenuItem.key(ref)
-        guard let league = store.leagues.first(where: { MenuItem.key($0) == key }), LeagueChoice.shared.isShown(key) else { return }
+        guard store.leagues.contains(where: { MenuItem.key($0) == key }), LeagueChoice.shared.isShown(key) else { return }
         leagueDays[key] = day
         selection = .league(key)
-        Analytics.shared.competitionOpened(league, day: day, from: "home")
+        Analytics.shared.competitionOpened(key, day: day, from: "home")
     }
 
     /// `-TVScoresLeague f1` opens that competition (CI screenshots).

@@ -168,7 +168,7 @@ struct SettingsScreen: View {
             }
             .accessibilityIdentifier("settings.language")
             link(.usage) {
-                LabeledContent("settings.usageTitle") { Text(LocalizedStringKey(usage.shares ? "settings.on" : "settings.off")) }
+                LabeledContent("settings.usageTitle") { Text(UsageChoiceSection.state(usage.shares)) }
             }
             .accessibilityIdentifier("settings.usage")
             Section("settings.sources") {

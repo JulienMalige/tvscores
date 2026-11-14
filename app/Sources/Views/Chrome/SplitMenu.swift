@@ -34,7 +34,7 @@ struct SplitMenu: View {
         }
         .task { store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
-        .usageQuestion(store: store)
+        .usageQuestion(store: store, covered: game != nil || settingsOpen)
         // The pictures the system emptied while the app was away come back.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             Task { await store.rewarm() }
@@ -51,8 +51,8 @@ struct SplitMenu: View {
         // A new row of the menu is a new page, with nothing pushed over it.
         .onChange(of: selection) { _, new in
             opened = []
-            if case .league(let key) = new, let summary = league(key) {
-                Analytics.shared.competitionOpened(summary, day: leagueDays[key] ?? LaunchRequest.initialDay(), from: "menu")
+            if case .league(let key) = new {
+                Analytics.shared.competitionOpened(key, day: leagueDays[key] ?? LaunchRequest.initialDay(), from: "menu")
             }
         }
     }
@@ -66,6 +66,9 @@ struct SplitMenu: View {
                     .navigationDestination(for: MenuItem.self) { page($0) }
             }
         }
+        // Under a game or Settings the page is out of sight; the sheets
+        // themselves, outside this, count.
+        .environment(\.usageCovered, game != nil || settingsOpen)
         .sheet(item: $game) { event in
             if event.kind == .race {
                 RaceScreen(eventId: event.id, fallback: event, store: store)
@@ -151,10 +154,10 @@ struct SplitMenu: View {
     /// the front page was showing.
     private func open(_ ref: LeagueRef) {
         let key = MenuItem.key(ref)
-        guard let summary = league(key), LeagueChoice.shared.isShown(key) else { return }
+        guard league(key) != nil, LeagueChoice.shared.isShown(key) else { return }
         leagueDays[key] = day
         opened.append(.league(key))
-        Analytics.shared.competitionOpened(summary, day: day, from: "home")
+        Analytics.shared.competitionOpened(key, day: day, from: "home")
     }
 
     /// `-TVScoresLeague f1` opens that competition, `-TVScoresGame final`

@@ -8,7 +8,10 @@ import SwiftUI
 struct UsageChoiceSection: View {
     @State private var choice = UsageChoice.shared
 
-    private var state: LocalizedStringKey { choice.shares ? "settings.on" : "settings.off" }
+    private var state: LocalizedStringKey { Self.state(choice.shares) }
+
+    /// On or Off, here and on Settings' top list.
+    static func state(_ shares: Bool) -> LocalizedStringKey { shares ? "settings.on" : "settings.off" }
 
     var body: some View {
         List {

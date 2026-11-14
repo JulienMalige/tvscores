@@ -17,6 +17,7 @@ import AmplitudeSwiftSessionReplayPlugin
 /// iPhone or an iPad the screens of a visit are recorded too, for Amplitude's
 /// Session Replay; the television has no replay.
 @MainActor
+@Observable
 final class Analytics {
     static let shared = Analytics()
 
@@ -31,11 +32,14 @@ final class Analytics {
 
     /// The project's key and data centre, from Info.plist (`app/project.yml`).
     private let project: (key: String, zone: String)?
-    private var client: Amplitude?
-    private let launched = Date()
-    private var boardShown = false
+    @ObservationIgnored private var client: Amplitude?
+    #if os(iOS)
+    @ObservationIgnored private var replay: AmplitudeSwiftSessionReplayPlugin?
+    #endif
+    @ObservationIgnored private let launched = Date()
+    @ObservationIgnored private var boardShown = false
     /// The competitions the board names, for the profile; kept from the last board.
-    private var leagues: [LeagueSummary] = []
+    @ObservationIgnored private var leagues: [LeagueSummary] = []
 
     private init(info: [String: Any] = Bundle.main.infoDictionary ?? [:]) {
         project = Self.project(info: info)
@@ -49,8 +53,9 @@ final class Analytics {
         return (key, zone)
     }
 
-    /// Whether events leave the device now; never in the simulator.
-    var isSending: Bool { client.map { !$0.optOut } ?? false }
+    /// Whether events leave the device now; never in the simulator. The
+    /// pages watch it, to count from a yes and stop at a no (`UsageTracker`).
+    private(set) var isSending = false
 
     /// At launch: a viewer who said yes before is counted from the first frame.
     func launch() {
@@ -60,23 +65,40 @@ final class Analytics {
     /// After an answer, to the question or in Settings: starts or stops.
     func apply(_ choice: UsageChoice, from origin: String? = nil) {
         guard choice.shares else {
+            isSending = false
             // A new random number if they say yes again: what was sent stays
             // apart from what comes after.
             client?.optOut = true
             client?.reset()
+            #if os(iOS)
+            // The recording stops with the rest, said here rather than left
+            // to the plugin's reading of the opt-out.
+            replay?.stop()
+            #endif
             return
         }
-        let starting = client?.optOut ?? true
+        let starting = !isSending
         start()
-        if starting, let origin { track(.sharingStarted(from: origin)) }
+        if starting, isSending, let origin { track(.sharingStarted(from: origin)) }
     }
 
     private func start() {
         if let client {
             client.optOut = false
-            return
+            #if os(iOS)
+            replay?.start()
+            #endif
+        } else {
+            guard !Self.isSimulator, let project else { return }
+            client = makeClient(project)
         }
-        guard !Self.isSimulator, let project else { return }
+        isSending = true
+        // With every yes: after Off and On again the random number is new,
+        // and it has no setup until it is sent.
+        refreshProfile()
+    }
+
+    private func makeClient(_ project: (key: String, zone: String)) -> Amplitude {
         let configuration = Configuration(
             apiKey: project.key,
             serverZone: ServerZone(rawValue: project.zone) ?? .US,
@@ -95,19 +117,22 @@ final class Analytics {
         #if os(iOS)
         // Every visit recorded (the plugin records none by default), at its
         // default masking; the rate set here, not on Amplitude's site.
-        client.add(plugin: AmplitudeSwiftSessionReplayPlugin(sampleRate: 1, enableRemoteConfig: false))
+        let replay = AmplitudeSwiftSessionReplayPlugin(sampleRate: 1, enableRemoteConfig: false)
+        client.add(plugin: replay)
+        self.replay = replay
         #endif
-        self.client = client
-        refreshProfile()
+        return client
     }
 
     func track(_ event: UsageEvent) {
         client?.track(eventType: event.name, eventProperties: event.properties, options: nil)
     }
 
-    /// The setup as it now stands, after a change or a new board.
+    /// The setup as it now stands, after a change or a new board; not before
+    /// the first board, which names the competitions followed.
     func refreshProfile() {
-        client?.identify(userProperties: UsageProfile.current(leagues: leagues).properties)
+        guard let client, !leagues.isEmpty else { return }
+        client.identify(userProperties: UsageProfile.current(leagues: leagues).properties)
     }
 
     /// The board's competitions, kept for the profile.
@@ -125,7 +150,9 @@ final class Analytics {
         track(.boardShown(seconds: Date.now.timeIntervalSince(launched)))
     }
 
-    func competitionOpened(_ league: LeagueSummary, day: Day, from origin: String) {
+    /// A competition opened, by its menu key, from the menu or the front page.
+    func competitionOpened(_ key: String, day: Day, from origin: String) {
+        guard let league = leagues.first(where: { MenuItem.key($0) == key }) else { return }
         track(.competitionOpened(.competition(LeagueRef(league), day: day), from: origin))
     }
 

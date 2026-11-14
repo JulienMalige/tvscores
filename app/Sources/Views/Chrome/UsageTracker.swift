@@ -1,32 +1,32 @@
 import SwiftUI
 
-/// A page's figures (`UsageEvent`): viewed when it comes up, left with the
-/// seconds spent on it when it goes, or when the app goes to the background
-/// and comes back. Nothing leaves without the viewer's yes (`Analytics`).
+/// A page's figures (`UsageEvent`, through `PageClock`): counted while the
+/// page is in sight, which means placed in the navigation, with no game, race
+/// or Settings over it (`usageCovered`), the app in the foreground and the
+/// viewer sharing. A page left in the navigation under a pushed one, or
+/// under a cover, does not count; nor does the time before a yes, so every
+/// Page Left has its Page Viewed.
 struct UsageTracker: ViewModifier {
     let page: UsageEvent.Page
-    @State private var since: Date?
+    /// Between onAppear and onDisappear.
+    @State private var placed = false
+    @State private var clock = PageClock()
     @Environment(\.scenePhase) private var phase
+    @Environment(\.usageCovered) private var covered
 
     func body(content: Content) -> some View {
         content
-            .onAppear(perform: begin)
-            .onDisappear(perform: end)
-            .onChange(of: phase) { _, now in
-                if now == .active { begin() } else { end() }
-            }
+            .onAppear { placed = true; update() }
+            .onDisappear { placed = false; update() }
+            .onChange(of: phase) { update() }
+            .onChange(of: covered) { update() }
+            .onChange(of: Analytics.shared.isSending) { update() }
+            .onChange(of: page.identity) { update() }
     }
 
-    private func begin() {
-        guard since == nil else { return }
-        since = .now
-        Analytics.shared.track(.pageViewed(page))
-    }
-
-    private func end() {
-        guard let since else { return }
-        self.since = nil
-        Analytics.shared.track(.pageLeft(page, seconds: Int(Date.now.timeIntervalSince(since).rounded())))
+    private func update() {
+        let inSight = placed && phase == .active && !covered && Analytics.shared.isSending
+        for event in clock.update(page, inSight: inSight) { Analytics.shared.track(event) }
     }
 }
 

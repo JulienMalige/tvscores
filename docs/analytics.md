@@ -57,8 +57,8 @@ the same of an identifier kept on a device.
   with it underneath.
 - **Nothing before a yes**: the Amplitude client is not even made, so it
   stores nothing on the device. A no, or Off later, stops sending at once
-  (`optOut`) and resets the random number, so what came before stays apart
-  from any later yes.
+  (`optOut`), stops the iPhone's and iPad's recording, and resets the random
+  number, so what came before stays apart from any later yes.
 - **Never from the simulator**: CI runs the app against the live proxy on
   every push, and the flows answer the question. The simulator is not asked
   unless a launch says `-TVScoresAskConsent` (the flow and the screenshots),
@@ -81,9 +81,9 @@ The rest is ours (`UsageEvent`):
 
 | Event | Properties |
 |---|---|
-| Page Viewed, Page Left | the page (home, competition, game, race, settings) with its day, competition, sport, sides or Settings page; Page Left adds the seconds on it, also when the app goes to the background |
+| Page Viewed, Page Left | the page (home, competition, game, race, settings) with its day, competition, sport, sides or Settings page; Page Left adds the seconds on it. A page counts only while in sight (`PageClock`): not under a game, a race or Settings, not under a page pushed over it, not in the background, not before the yes; another day is another page, a game's state moving on is not |
 | Menu Opened, Menu Closed | the television's menu panel |
-| Competition Opened | the competition, its sport, the day, and from where (menu or home) |
+| Competition Opened | the competition, its sport, the day, and from where (menu or home); picking the one already shown is not an opening |
 | Game Opened, Race Opened | sport, competition, state, the two sides or the Grand Prix, from where (home or competition) |
 | Day Picked | the day, and on which page |
 | Watch App Tapped | the app chosen under How to Watch and the country: never whether it opened |
@@ -92,8 +92,9 @@ The rest is ours (`UsageEvent`):
 | Board Failed, Board Stale | the error, whether a board was on screen; a source behind |
 | Sharing Started | the yes, from the question or from Settings |
 
-The user properties (`UsageProfile`), sent with the yes and again after any
-change: the kind of device (tv, phone, pad), the edition (tester or store),
+The user properties (`UsageProfile`), sent with each yes (after Off and On,
+under the new random number) once the first board has named the
+competitions, and again after any change: the kind of device (tv, phone, pad), the edition (tester or store),
 the language chosen in Settings and the device's own, the locale, region and
 time zone, the competitions shown in the menu's order and those hidden, how
 many are followed, the countries chosen, the apps hidden, and when the yes

@@ -101,6 +101,37 @@ struct UsageTests {
         #expect(Set(properties.keys) == ["app", "app_name", "country"])
     }
 
+    @Test("a page counts only while in sight, and every Page Left has its Page Viewed")
+    func pageCountsWhileInSight() {
+        // The review of 2026-11-14: a page under a game or a pushed page, and
+        // the time before the yes, were counted.
+        var clock = PageClock()
+        let home = UsageEvent.Page.home(.today)
+        let start = Date(timeIntervalSince1970: 1_800_000_000)
+        #expect(clock.update(home, inSight: false, now: start).isEmpty, "before the yes, or under a game: nothing")
+        #expect(clock.update(home, inSight: true, now: start + 10) == [.pageViewed(home)])
+        #expect(clock.update(home, inSight: true, now: start + 20).isEmpty, "still the same view")
+        #expect(clock.update(home, inSight: false, now: start + 40) == [.pageLeft(home, seconds: 30)], "a game over it stops the clock")
+        #expect(clock.update(home, inSight: false, now: start + 90).isEmpty, "left once")
+        #expect(clock.update(home, inSight: true, now: start + 100) == [.pageViewed(home)], "back in sight, viewed again")
+    }
+
+    @Test("another day is another page; a game's state moving on is not")
+    func pageIdentity() {
+        let start = Date(timeIntervalSince1970: 1_800_000_000)
+        var home = PageClock()
+        let today = UsageEvent.Page.home(.today), yesterday = UsageEvent.Page.home(.yesterday)
+        _ = home.update(today, inSight: true, now: start)
+        #expect(home.update(yesterday, inSight: true, now: start + 300) == [.pageLeft(today, seconds: 300), .pageViewed(yesterday)])
+
+        var game = PageClock()
+        let live = UsageEvent.Page(name: "game", properties: ["game_id": "7", "status": "live"])
+        let final = UsageEvent.Page(name: "game", properties: ["game_id": "7", "status": "final"])
+        _ = game.update(live, inSight: true, now: start)
+        #expect(game.update(final, inSight: true, now: start + 60).isEmpty, "the final whistle does not make it another page")
+        #expect(game.update(final, inSight: false, now: start + 90) == [.pageLeft(live, seconds: 90)], "left as it was viewed")
+    }
+
     @Test("a game's page names its sport, competition, state and sides; a race's is a race")
     func gameAndRacePages() throws {
         let board = try ScoreboardDecoder.make().decode(Scoreboard.self, from: Self.sample("sample-scoreboard"))

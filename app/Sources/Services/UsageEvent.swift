@@ -83,6 +83,12 @@ enum UsageEvent: Equatable {
         let name: String
         let properties: [String: String]
 
+        /// What makes it another page: all it shows but a game's state,
+        /// which moves on while the page stays the same (`PageClock`).
+        var identity: [String: String] {
+            properties.filter { $0.key != "status" }.merging(["page": name]) { kept, _ in kept }
+        }
+
         static func home(_ day: Day) -> Page {
             Page(name: "home", properties: ["day": day.rawValue])
         }
