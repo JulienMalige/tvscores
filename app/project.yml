@@ -19,9 +19,9 @@ settings:
     AMPLITUDE_KEY: fa0da7c87bc2db2ac8e848cf0daab10d
     AMPLITUDE_ZONE: US
   configs:
-    # Simulator builds in CI have no team and need no signature. Release is
-    # left alone so the archive can sign automatically with the team passed
-    # on the xcodebuild command line.
+    # Simulator builds in CI have no team and need no signature. Release
+    # takes the team from the xcodebuild command line, and each app target
+    # its profile below.
     Debug:
       CODE_SIGNING_ALLOWED: "NO"
       CODE_SIGN_IDENTITY: ""
@@ -81,6 +81,14 @@ targets:
         # Written into Info.plist as TVScoresEdition (Sources/Services/Edition.swift);
         # the TestFlight workflow passes TVSCORES_EDITION=store for the store build.
         TVSCORES_EDITION: tester
+      configs:
+        # The archive's signing, for the app alone: given on the xcodebuild
+        # command line it would reach Amplitude's packages too, whose
+        # resource bundles take no profile (docs/release.md).
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: $(TVSCORES_PROFILE)
   # The same app on an iPhone or an iPad (Julien, 2026-11-12): the same
   # sources, drawn at Apple's own sizes (`Metrics`) with a touch menu
   # (`SplitMenu`) in place of the remote's. The television's bundle id, so
@@ -131,6 +139,12 @@ targets:
         TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         TVSCORES_EDITION: tester
+      configs:
+        # Signed as the television's app is, for the app alone.
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: $(TVSCORES_PROFILE)
   # Unit tests run inside the app, so they see its bundle — the sample JSON
   # and the string catalogue — and its internals through @testable.
   TVScoresTests:

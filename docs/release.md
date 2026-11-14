@@ -10,6 +10,15 @@ App Manager key can create the signing assets through the API directly, so the
 distribution certificate and the App Store profile were minted once and stored
 as repository secrets.
 
+The profile goes to the app targets alone (2026-11-14): `app/project.yml`
+gives their Release configuration `PROVISIONING_PROFILE_SPECIFIER:
+$(TVSCORES_PROFILE)` with manual signing, and the workflow passes
+`TVSCORES_PROFILE`. Passed as `PROVISIONING_PROFILE_SPECIFIER` on the
+xcodebuild command line, as builds up to 49 did, it would reach every target,
+and the Swift packages Amplitude brings (`docs/analytics.md`) build resource
+bundles that take no profile: Xcode stops with "does not support provisioning
+profiles".
+
 ## Apple side (already done)
 
 | Item | Value |
