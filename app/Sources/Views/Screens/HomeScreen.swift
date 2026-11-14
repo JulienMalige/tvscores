@@ -31,6 +31,8 @@ struct HomeScreen: View {
         // Scrolled away from the top, the menu chip drops its name.
         .onScrollGeometryChange(for: Bool.self, of: { $0.contentOffset.y > 60 }) { _, down in pageScrolled(down) }
         .pageTint(.homeTint)
+        .usagePage(.home(day))
+        .onChange(of: day) { _, picked in Analytics.shared.track(.dayPicked(picked, on: "home")) }
         #if os(tvOS)
         // Back on the page opens the menu, as on tvOS's own sidebar.
         .onExitCommand(perform: openMenu)

@@ -29,7 +29,11 @@ struct AppsChoiceSection: View {
                 Section {
                     ForEach(keys(in: country), id: \.self) { key in
                         if let app = apps[key] {
-                            Button { choice.toggle(key) } label: {
+                            Button {
+                                let shown = choice.isShown(key)
+                                choice.toggle(key)
+                                Analytics.shared.settingChanged("app", item: key, from: shown ? "shown" : "hidden", to: shown ? "hidden" : "shown")
+                            } label: {
                                 HStack(spacing: .tv(18)) {
                                     AppIconMark(app: app, height: Metrics.watchIconHeight * 0.5)
                                     Text(verbatim: app.name)

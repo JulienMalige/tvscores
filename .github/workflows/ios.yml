@@ -91,6 +91,13 @@ jobs:
           demo game-tennis-final-en -TVScoresSample race -TVScoresTab today -TVScoresGame final:tennis -AppleLanguages "(en)"
           demo race-f1-en -TVScoresSample race -TVScoresTab yesterday -TVScoresRace f1 -AppleLanguages "(en)"
           for page in top competitions countries; do shoot "$PHONE" "settings-$page-fr" 12 -TVScoresDemo -TVScoresTab today -TVScoresSettings "$page" -AppleLanguages "(fr)"; done
+          # The question about sharing usage, asked in a simulator only on
+          # request, and Settings' Privacy switch turned on (docs/analytics.md).
+          # Nothing is ever sent from a simulator.
+          for lang in en fr; do
+            shoot "$PHONE" "usage-question-$lang" 10 -TVScoresDemo -TVScoresTab today -TVScoresAskConsent -AppleLanguages "($lang)" -AppleLocale "$lang"
+            shoot "$PHONE" "settings-privacy-$lang" 12 -TVScoresDemo -TVScoresTab today -TVScoresSettings top -usageConsent granted -AppleLanguages "($lang)"
+          done
           # The live proxy, the path a TestFlight build takes, for what the
           # demo board predates: rugby and its tables, the apps to watch in.
           live() { local name="$1"; shift; shoot "$PHONE" "live-$name" 16 "$@"; }
@@ -106,6 +113,7 @@ jobs:
           start "$IPAD"
           shoot "$IPAD" ipad-live-today-en 25 -AppleLanguages "(en)"
           shoot "$IPAD" ipad-live-game-final-en 16 -TVScoresTab yesterday -TVScoresGame "final:football|final:rugby|final:nba" -AppleLanguages "(en)"
+          shoot "$IPAD" ipad-usage-question-en 12 -TVScoresDemo -TVScoresTab today -TVScoresAskConsent -AppleLanguages "(en)"
           ls -la shots
           mkdir -p crash
           cp ~/Library/Logs/DiagnosticReports/TVScores*.ips crash/ 2>/dev/null || echo "no crash report"

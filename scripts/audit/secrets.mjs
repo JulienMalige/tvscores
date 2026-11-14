@@ -37,9 +37,14 @@ function throughConfig({ jsAll, rel, read }, report) {
   }
 }
 
+// The one service the app talks to besides the proxy: Amplitude, for the
+// usage figures the viewer agrees to share (docs/analytics.md). Its key is
+// public, as in every app that uses it: it only lets an app send events.
+const ANALYTICS = "app/Sources/Services/Analytics.swift";
+
 function appTalksOnlyToTheProxy({ files, rel, read }, report) {
   for (const file of files) {
-    if (!rel(file).startsWith("app/") || !TEXT.has(extname(file))) continue;
+    if (!rel(file).startsWith("app/") || !TEXT.has(extname(file)) || rel(file) === ANALYTICS) continue;
     if (/(apiKey|api_key|x-apisports-key|authorization:\s*["'`]Bearer)/i.test(read(file))) {
       report("secrets", rel(file), "the app talks to a provider; it may only talk to the proxy");
     }

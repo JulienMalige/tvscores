@@ -69,6 +69,7 @@ struct RaceScreen: View {
             .eventPageInsets()
         }
         .eventSheet(RaceBackdrop(tint: Color(hex: found?.group.league.color)))
+        .usagePage(.game(event, league: found?.group.league))
         .accessibilityIdentifier("page.race")
         .task(id: eventId) {
             if let ref = standingsRef, !classified { standings = await store.standings(for: ref) }

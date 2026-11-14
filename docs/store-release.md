@@ -53,6 +53,8 @@ What stands between TestFlight and the public store, and what Julien decided.
   The policy says the store build collects nothing: the proxy logs no
   visitor, the tunnel's log names Cloudflare's edge rather than the viewer,
   and the trace is a tester's only. App Privacy is answered to match it.
+  From version 1.1 the app asks to share usage figures with Amplitude, and
+  both change with it (`docs/analytics.md`, 2026-11-14).
 
 - **Sold everywhere but China mainland** (Julien, 2026-10-27), which wants a
   government ICP filing number: 174 of Apple's 175 territories, and any it

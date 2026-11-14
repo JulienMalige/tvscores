@@ -20,7 +20,7 @@ CHANGELOG.md  what each TestFlight build changed, for whoever installs it.
 
 ## Hard rules
 
-1. **The sports API key never enters `app/`.** The app talks only to the proxy. If you need data in the app, add an endpoint to the proxy.
+1. **The sports API key never enters `app/`.** The app talks only to the proxy. If you need data in the app, add an endpoint to the proxy. The one exception is usage analytics: with the viewer's yes, the app sends Amplitude its events, with a key that is public by design (`docs/analytics.md`).
 2. **Native SwiftUI only.** No React Native, Flutter, or web views. One set of sources builds the tvOS app and, since 2026-11-12, the iPhone and iPad app (`docs/iphone.md`); what one platform alone has goes behind `#if os(tvOS)` or `#if os(iOS)`.
 3. **Licensed data only.** Do not add code that scrapes a website or calls an undocumented endpoint. If a provider is proposed, record its terms in `docs/data-providers.md` first.
 4. **No odds, no betting, and no links to unofficial streams** anywhere in the app. Opening a broadcaster's official app (the CANAL+ app for Canal+) is allowed (Julien, 2026-10-03); a pirate or unlicensed stream never is.
@@ -90,11 +90,16 @@ Julien watches from Brazil (America/Sao_Paulo): capture `Resources/sample-scoreb
 - Swift, SwiftUI, Swift Concurrency (`async/await`). No Combine unless a framework forces it.
 - Minimum tvOS 18.0 and iOS 18.0 (`app/project.yml`). Raise one only for a feature worth losing a device over.
 - **Four languages from day one: French, English, Portuguese, Spanish.** Development language is English. Every user-facing string goes through a String Catalog (`Localizable.xcstrings`) with all four translations filled in before a feature is called done; no hard-coded strings in views. Store listing (name, subtitle, keywords, screenshots) is localised for the same four. Default store locales: fr-FR, en-US, pt-BR, es-ES; add pt-PT and es-MX as copies later if wanted.
-- **The privacy policy says what leaves the Apple TV** (`site/<lang>/privacy.html`, and
-  App Privacy in App Store Connect). A change to what the app sends, or to what the proxy
-  keeps, rewrites it in all four languages in the same commit. The store holds
-  it as text too, for Apple TV, which opens no link: `node scripts/store-listing.mjs push`
-  sends the pages with the next version.
+- **The privacy policy says what leaves the device** (`site/<lang>/privacy.html`, and
+  App Privacy in App Store Connect). A change to what the app sends, to the proxy or to
+  Amplitude, or to what the proxy keeps, rewrites it in all four languages in the same
+  commit. The store holds it as text too, for Apple TV, which opens no link:
+  `node scripts/store-listing.mjs push` sends the pages with the next version.
+- **Usage analytics go through `Analytics`, after the viewer's yes, and never from
+  the simulator** (`docs/analytics.md`). A new event or property goes in `UsageEvent` or
+  `UsageProfile` and its tests; a new kind of data also goes in the privacy pages and
+  in the App Privacy answers of `docs/analytics.md`. Never the advertising identifier,
+  and never whether another app opened or is installed (Apple, 5.1.2(iv)).
 - Dates, times and team names are locale-aware: kickoff times in the viewer's time zone, day names via `Date.FormatStyle`, never hand-formatted.
 - Product name **TV Scores**, bundle id `com.julienmalige.tvscores`, Xcode scheme and target `TVScores`.
 - One feature per commit, with a message that says what changed for the user.
@@ -181,6 +186,13 @@ an iPhone or an iPad — Apple Sports' own sizes — or takes `phone:` where hal
 does not fit a phone's width: `.tv(48)`, `.tv(180, phone: 66)`.
 
 ## Open decisions (ask Julien, do not guess)
+
+- **Usage analytics** (Julien, 2026-11-14: "the most data we can";
+  `docs/analytics.md`): Amplitude, on the US data centre, with the address
+  kept and Session Replay on iPhone and iPad. Still his: the App Privacy form
+  in App Store Connect before the version is submitted (the answers are in
+  the note), the store description's "no tracking", and advertising, which is
+  not part of this ("We will see for advertising later", 2026-11-14).
 
 - **The iPhone and iPad app** (Julien, 2026-11-12: "lets do it";
   `docs/iphone.md`): the same app on the App Store page, the same bundle id.

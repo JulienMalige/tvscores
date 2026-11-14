@@ -80,6 +80,7 @@ struct GameScreen: View {
             .eventPageInsets()
         }
         .eventSheet(GameBackdrop(home: tints.home, away: tints.away))
+        .usagePage(.game(event, league: found?.group.league))
         .accessibilityIdentifier("page.game")
         .task(id: eventId) {
             tints = await TeamTint.pair(event.home, event.away)

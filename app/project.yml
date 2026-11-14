@@ -12,6 +12,12 @@ settings:
     SWIFT_VERSION: "5.10"
     MARKETING_VERSION: "1.1"
     CURRENT_PROJECT_VERSION: "1"
+    # Amplitude, for the usage figures the viewer agrees to share
+    # (docs/analytics.md). The key is public, as in every app that uses
+    # Amplitude: it only lets an app send events. The zone is the data
+    # centre the project was made in, US or EU; a new project means a new key.
+    AMPLITUDE_KEY: fa0da7c87bc2db2ac8e848cf0daab10d
+    AMPLITUDE_ZONE: US
   configs:
     # Simulator builds in CI have no team and need no signature. Release is
     # left alone so the archive can sign automatically with the team passed
@@ -19,6 +25,23 @@ settings:
     Debug:
       CODE_SIGNING_ALLOWED: "NO"
       CODE_SIGN_IDENTITY: ""
+# Amplitude's library, pinned exactly, and the two it builds on, so the
+# runner's fresh resolution builds the same code every time. Session Replay
+# exists for iOS only: the iPhone and iPad app links it, the television's
+# does not (docs/analytics.md).
+packages:
+  AmplitudeSwift:
+    url: https://github.com/amplitude/Amplitude-Swift.git
+    exactVersion: 1.20.0
+  AmplitudeCore:
+    url: https://github.com/amplitude/AmplitudeCore-Swift.git
+    exactVersion: 1.6.1
+  AnalyticsConnector:
+    url: https://github.com/amplitude/analytics-connector-ios.git
+    exactVersion: 1.3.3
+  AmplitudeSessionReplay:
+    url: https://github.com/amplitude/AmplitudeSessionReplay-iOS.git
+    exactVersion: 0.18.1
 targets:
   TVScores:
     type: application
@@ -27,6 +50,9 @@ targets:
       - path: Sources
       - path: Resources
         buildPhase: resources
+    dependencies:
+      - package: AmplitudeSwift
+        product: AmplitudeSwift
     info:
       path: Sources/Info.plist
       properties:
@@ -38,6 +64,8 @@ targets:
         TVScoresProxyURL: https://tvscores.julienmalige.com
         # "store" for the build submitted to Apple (TestFlight workflow, store: true).
         TVScoresEdition: $(TVSCORES_EDITION)
+        TVScoresAmplitudeKey: $(AMPLITUDE_KEY)
+        TVScoresAmplitudeZone: $(AMPLITUDE_ZONE)
         UIUserInterfaceStyle: Automatic
         ITSAppUsesNonExemptEncryption: false
     settings:
@@ -68,6 +96,11 @@ targets:
         excludes: ["Assets.xcassets"] # the television's icon and Top Shelf
       - path: iOS
         excludes: ["Info.plist"]
+    dependencies:
+      - package: AmplitudeSwift
+        product: AmplitudeSwift
+      - package: AmplitudeSessionReplay
+        product: AmplitudeSwiftSessionReplayPlugin
     info:
       path: iOS/Info.plist
       properties:
@@ -78,6 +111,8 @@ targets:
         CFBundleLocalizations: [en, fr, pt, es]
         TVScoresProxyURL: https://tvscores.julienmalige.com
         TVScoresEdition: $(TVSCORES_EDITION)
+        TVScoresAmplitudeKey: $(AMPLITUDE_KEY)
+        TVScoresAmplitudeZone: $(AMPLITUDE_ZONE)
         # Dark, as Apple Sports: every page is drawn on a dark tint.
         UIUserInterfaceStyle: Dark
         ITSAppUsesNonExemptEncryption: false

@@ -7,6 +7,9 @@ struct TVScoresApp: App {
         // so images would be refetched every time a row scrolled back into view.
         URLCache.shared = URLCache(memoryCapacity: 32 << 20, diskCapacity: 256 << 20)
         LeagueChoice.resetIfAsked()
+        UsageChoice.resetIfAsked()
+        // A viewer who said yes to sharing is counted from launch (docs/analytics.md).
+        Analytics.shared.launch()
     }
 
     /// Read here so a new choice in Settings rebuilds the screens in it at once.

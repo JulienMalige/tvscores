@@ -17,7 +17,7 @@ so a file says what it is before you open it.
 | **Section** | `app/Sources/Views/Sections` | a heading and the list under it | `LeagueSection`, `StandingsSection`, `PodiumSection`, `ResultSection`, `StartingGridSection`, `SessionSection`, `OffseasonSection`, `GameHeaderSection`, `PeriodSection`, `StatsSection`, `MomentsSection`, `GameInfoSection`, `CompetitionSection` |
 | **Row** | `app/Sources/Views/Rows` | one focusable line, on the shared row surface | `MatchRow`, `RaceRow`, `StandingsRow`, `ResultRow`, `StartingGridRow`, `SessionRow`, `StatRow`, `MomentRow` |
 | **Element** | `app/Sources/Views/Elements` | the atoms a row is made of | `TeamMark`, `PersonMark`, `LeagueMark`, `FlagMark`, `StatusLabel`, `EmptyDay`, `CachedImage`, `Segments`, `FocusBlock`, `GameCard`, `TeamTint`, `PageTint` |
-| **Chrome** | `app/Sources/Views/Chrome` | navigation that outlives any one screen | `Sidebar`, `MenuPanel` (tvOS), `SplitMenu` (iPhone and iPad), `MenuItem`, `DayTabs`, `ClockLabel`, `LaunchLoader` |
+| **Chrome** | `app/Sources/Views/Chrome` | navigation that outlives any one screen | `Sidebar`, `MenuPanel` (tvOS), `SplitMenu` (iPhone and iPad), `MenuItem`, `DayTabs`, `ClockLabel`, `LaunchLoader`, and around the pages the usage figures' `UsageQuestion` and `UsageTracker` (`docs/analytics.md`) |
 
 Sections stack inside a screen; they never nest. A row never reaches outside
 itself for a measurement, and a screen never draws a row's insides. Chrome is
