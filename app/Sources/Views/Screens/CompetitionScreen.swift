@@ -47,6 +47,7 @@ struct CompetitionScreen: View {
         // Scrolled away from the top, the menu chip drops its name.
         .onScrollGeometryChange(for: Bool.self, of: { $0.contentOffset.y > 60 }) { _, down in pageScrolled(down) }
         .pageTint(tint)
+        .usagePage(.competition(ref, day: day))
         .task(id: ref.logo) {
             guard Color(hex: ref.color) == nil else { return }
             logoTint = await TeamTint.of(logo: ref.logo)

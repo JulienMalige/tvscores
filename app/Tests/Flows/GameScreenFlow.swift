@@ -36,8 +36,11 @@ final class AppsSettingsFlow: FlowCase {
 final class StoreEditionFlow: FlowCase {
     func testATestersBuildHasTheDebugSection() {
         let app = Flow.launch(extra: ["-TVScoresSettings", "top"], ready: "Settings")
-        XCTAssertTrue(app.staticTexts["settings.debug"].waitForExistence(timeout: 10), "a tester's Settings ends with Debug")
-        XCTAssertTrue(app.buttons["settings.openApps"].exists, "where a tester can try every app's links")
+        // The list runs past the bottom of the screen since Usage Data joined
+        // it: the remote walks down to its end, as a tester would.
+        XCTAssertTrue(Flow.walk(.down, until: Flow.settingsRow(app, "settings.openApps"), limit: 15),
+                      "a tester's Settings ends with Open apps, where a tester can try every app's links")
+        XCTAssertTrue(app.staticTexts["settings.debug"].exists, "under Debug")
     }
 
     func testTheStoreBuildHasNoDebugSection() {

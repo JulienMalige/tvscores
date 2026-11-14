@@ -27,7 +27,10 @@ struct CompetitionsChoiceSection: View {
     private func row(_ league: LeagueSummary, siblings: [String]) -> some View {
         let key = MenuItem.key(league)
         let shown = leagueChoice.isShown(key)
-        return Button { leagueChoice.toggle(key) } label: {
+        return Button {
+            leagueChoice.toggle(key)
+            Analytics.shared.settingChanged("competition", item: key, from: shown ? "shown" : "hidden", to: shown ? "hidden" : "shown")
+        } label: {
             HStack(spacing: .tv(18)) {
                 MenuIcon.league(league).view(size: Metrics.menuIcon)
                 Text(verbatim: league.menu)
@@ -40,14 +43,22 @@ struct CompetitionsChoiceSection: View {
         // The menu is the system's own, drawn outside the locale the views
         // are given: its words come from the chosen language's strings.
         .contextMenu {
-            Button { leagueChoice.move(key, by: -1, among: siblings) } label: {
+            Button { move(key, by: -1, among: siblings) } label: {
                 Label(String(localized: "settings.moveUp", bundle: LanguageChoice.bundle), systemImage: "arrow.up")
             }
             .disabled(key == siblings.first)
-            Button { leagueChoice.move(key, by: 1, among: siblings) } label: {
+            Button { move(key, by: 1, among: siblings) } label: {
                 Label(String(localized: "settings.moveDown", bundle: LanguageChoice.bundle), systemImage: "arrow.down")
             }
             .disabled(key == siblings.last)
         }
+    }
+
+    /// Moved up or down its family, counted by its place before and after.
+    private func move(_ key: String, by step: Int, among siblings: [String]) {
+        let place = { leagueChoice.arranged(siblings).firstIndex(of: key).map { String($0 + 1) } ?? "" }
+        let old = place()
+        leagueChoice.move(key, by: step, among: siblings)
+        Analytics.shared.settingChanged("competition order", item: key, from: old, to: place())
     }
 }

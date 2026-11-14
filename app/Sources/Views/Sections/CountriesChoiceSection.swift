@@ -8,7 +8,11 @@ struct CountriesChoiceSection: View {
     var body: some View {
         List {
             ForEach(ChannelChoice.all, id: \.self) { country in
-                Button { choice.toggle(country) } label: {
+                Button {
+                    let old = choice.countries.joined(separator: ",")
+                    choice.toggle(country)
+                    Analytics.shared.settingChanged("countries", item: country, from: old, to: choice.countries.joined(separator: ","))
+                } label: {
                     HStack(spacing: .tv(18)) {
                         FlagMark(flag: ChannelChoice.flag(country), size: Metrics.settingsFlag)
                         Text(verbatim: LanguageChoice.locale.localizedString(forRegionCode: country) ?? country)

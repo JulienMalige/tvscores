@@ -7,10 +7,9 @@ final class SettingsScreenFlow: FlowCase {
     private let first = "settings.league.football:4351"
     private let second = "settings.league.football:4331"
 
-    /// A competition's row: the list's cell takes the focus, and the button
-    /// in it says whether the competition is shown.
+    /// A competition's row; its button says whether the competition is shown.
     private func row(_ app: XCUIApplication, _ id: String) -> XCUIElement {
-        app.cells.containing(.button, identifier: id).firstMatch
+        Flow.settingsRow(app, id)
     }
 
     private func open() -> XCUIApplication {

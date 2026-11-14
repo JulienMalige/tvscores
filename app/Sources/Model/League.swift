@@ -6,6 +6,9 @@ struct League: Decodable, Equatable {
     /// The proxy's name, in English; `name` says it in the viewer's language.
     fileprivate let given: String
     var name: String { CompetitionName.said(given) }
+    /// The proxy's name whatever the viewer's language: what the usage
+    /// figures file it under (docs/analytics.md).
+    var givenName: String { given }
     let short: String
     let logo: URL?
     /// A system symbol in place of a mark not worth showing (friendlies).
@@ -24,6 +27,9 @@ struct LeagueSummary: Decodable, Equatable, Identifiable, Hashable {
     let id: FlexibleID
     fileprivate let given: String
     var name: String { CompetitionName.said(given) }
+    /// The proxy's name whatever the viewer's language: what the usage
+    /// figures file it under (docs/analytics.md).
+    var givenName: String { given }
     /// The name a sidebar row has room for; the full one everywhere else.
     private let givenMenu: String
     var menu: String { CompetitionName.said(givenMenu) }
@@ -63,6 +69,9 @@ struct LeagueRef: Hashable {
     let leagueId: String
     private let given: String
     var name: String { CompetitionName.said(given) }
+    /// The proxy's name whatever the viewer's language: what the usage
+    /// figures file it under (docs/analytics.md).
+    var givenName: String { given }
     let short: String
     let logo: URL?
     let symbol: String?

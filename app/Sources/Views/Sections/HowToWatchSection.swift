@@ -23,6 +23,9 @@ struct HowToWatchSection: View {
                     GridRow {
                         ForEach(line) { card in
                             Button {
+                                // Which app was chosen, never whether it opened: that would
+                                // say what else is installed (docs/analytics.md).
+                                Analytics.shared.track(.watchAppTapped(app: card.key, name: card.app.name, country: card.country))
                                 Task {
                                     let tried = await AppOpener.open(card.app, key: card.key, country: card.country)
                                     failed = tried.contains { $0.opened } ? nil : card.app.name

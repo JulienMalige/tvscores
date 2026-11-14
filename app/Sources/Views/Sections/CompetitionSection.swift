@@ -14,6 +14,7 @@ struct CompetitionSection: View {
             BoardCard(day: $day) { games }
             StandingsSection(ref: ref, store: store, carded: true)
         }
+        .onChange(of: day) { _, picked in Analytics.shared.track(.dayPicked(picked, on: MenuItem.key(ref))) }
     }
 
     @ViewBuilder

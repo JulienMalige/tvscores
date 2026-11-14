@@ -38,9 +38,10 @@ then TestFlight): "lets do it".
 - **Before TestFlight:** Julien adds iOS to TV Scores in App Store Connect
   ("Add Platform", on the web). The TestFlight workflow then needs an iOS
   archive, and an App Store profile for iOS beside the tvOS one.
-- **Before the store:** iPhone and iPad screenshots; the privacy pages (four
-  languages) and the store's copy name the iPhone and the iPad. The App Privacy
-  answers stay as they are while the phone sends what the television sends.
+- **Before the store:** iPhone and iPad screenshots, and the store's copy
+  naming the iPhone and the iPad. The privacy pages name them since
+  2026-11-14, with the usage figures the viewer can share, Session Replay on
+  iPhone and iPad included; the App Privacy answers are in `docs/analytics.md`.
 
 ## Later
 

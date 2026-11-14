@@ -24,4 +24,7 @@ extension EnvironmentValues {
     @Entry var pageScrolled: @MainActor (Bool) -> Void = { _ in }
     /// Whether the menu is open, read when asked, not when the view was made.
     @Entry var menuIsOpen: @MainActor () -> Bool = { false }
+    /// A game, a race or Settings is up over the page: the page's time stops
+    /// counting (`UsageTracker`), since it is out of sight but not gone.
+    @Entry var usageCovered = false
 }

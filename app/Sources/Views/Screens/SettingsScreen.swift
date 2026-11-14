@@ -29,6 +29,7 @@ struct SettingsScreen: View {
     @State private var choice = ChannelChoice.shared
     @State private var leagueChoice = LeagueChoice.shared
     @State private var appChoice = AppChoice.shared
+    @State private var usage = UsageChoice.shared
     @State private var language = LanguageChoice.current
     @Environment(\.dismiss) private var dismiss
 
@@ -69,16 +70,19 @@ struct SettingsScreen: View {
         #endif
     }
 
-    @ViewBuilder
     private func list(for page: SettingsPage) -> some View {
-        switch page {
-        case .top: topList
-        case .competitions: CompetitionsChoiceSection(leagues: leagues)
-        case .countries: CountriesChoiceSection()
-        case .language: languageList
-        case .apps: AppsChoiceSection(apps: apps)
-        case .openApps: OpenAppsSection(apps: apps)
+        Group {
+            switch page {
+            case .top: topList
+            case .competitions: CompetitionsChoiceSection(leagues: leagues)
+            case .countries: CountriesChoiceSection()
+            case .language: languageList
+            case .apps: AppsChoiceSection(apps: apps)
+            case .usage: UsageChoiceSection()
+            case .openApps: OpenAppsSection(apps: apps)
+            }
         }
+        .usagePage(.settings(page))
     }
 
     /// `-TVScoresSettings countries` opens on that list (CI screenshots),
@@ -86,7 +90,8 @@ struct SettingsScreen: View {
     /// showed (CI, 2026-11-12).
     private static var requested: SettingsPage {
         guard let wanted = LaunchRequest.argument("-TVScoresSettings") else { return .top }
-        let asked = ["countries": SettingsPage.countries, "competitions": .competitions, "language": .language, "apps": .apps, "openApps": .openApps][wanted] ?? .top
+        let asked = ["countries": SettingsPage.countries, "competitions": .competitions, "language": .language, "apps": .apps,
+                     "usage": .usage, "openApps": .openApps][wanted] ?? .top
         return asked == .openApps && !Edition.current.hasTesterTools ? .top : asked
     }
 
@@ -162,6 +167,10 @@ struct SettingsScreen: View {
                 LabeledContent("settings.language") { Text(verbatim: language.map(LanguageChoice.name) ?? systemLanguage) }
             }
             .accessibilityIdentifier("settings.language")
+            link(.usage) {
+                LabeledContent("settings.usageTitle") { Text(UsageChoiceSection.state(usage.shares)) }
+            }
+            .accessibilityIdentifier("settings.usage")
             Section("settings.sources") {
                 fact("settings.scores", "TheSportsDB, Live Tennis API, Orange Cat, Jolpica")
                 fact("settings.listings", "TheSportsDB, XML TV Fr, epgshare01")
@@ -201,8 +210,10 @@ struct SettingsScreen: View {
         List {
             ForEach([String?.none] + LanguageChoice.codes.map(Optional.some), id: \.self) { code in
                 Button {
+                    let old = language ?? "system"
                     LanguageChoice.set(code)
                     language = code
+                    Analytics.shared.settingChanged("language", from: old, to: code ?? "system")
                 } label: {
                     HStack {
                         Text(verbatim: code.map(LanguageChoice.name) ?? systemLanguage)

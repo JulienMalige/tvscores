@@ -47,6 +47,7 @@ struct Sidebar: View {
         }
         .task { Diagnostics.shared.start(); store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
+        .usageQuestion(store: store, covered: game != nil || settingsOpen)
         // The pictures the system emptied while the app was in the background come back.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             Task { await store.rewarm() }
@@ -55,7 +56,10 @@ struct Sidebar: View {
             Diagnostics.shared.note("menu \(old) -> \(new)")
             chipShrunk = false
         }
-        .onChange(of: expanded) { _, open in Diagnostics.shared.note("menu \(open ? "opened" : "shut")") }
+        .onChange(of: expanded) { _, open in
+            Diagnostics.shared.note("menu \(open ? "opened" : "shut")")
+            Analytics.shared.track(open ? .menuOpened : .menuClosed)
+        }
         .onChange(of: store.iconsVersion) { _, v in Diagnostics.shared.note("icons version \(v)") }
         .onChange(of: store.leagues.count) { _, n in
             Diagnostics.shared.note("menu rebuilt: \(n) competitions")
@@ -73,13 +77,18 @@ struct Sidebar: View {
         ZStack(alignment: .topLeading) {
             page
                 .environment(\.openMenu, openMenu)
-                .environment(\.openGame) { game = $0 }
+                .environment(\.openGame) { event in
+                    game = event
+                    Analytics.shared.gameOpened(event, board: store.board, from: selection == .home ? "home" : "competition")
+                }
                 .environment(\.menuIsOpen) { expanded }
                 .environment(\.boardNow, store.board?.generatedAt)
                 .environment(\.watchApps, store.board?.apps)
                 .environment(\.pageScrolled) { scrolled in
                     if scrolled != chipShrunk { chipShrunk = scrolled }
                 }
+                // Under a game or Settings the page is out of sight.
+                .environment(\.usageCovered, game != nil || settingsOpen)
             if expanded {
                 Color.black.opacity(0.45)
                     .ignoresSafeArea()
@@ -122,7 +131,7 @@ struct Sidebar: View {
                 // A game's page over everything owns the remote: a press left
                 // on it is not the page underneath asking for the menu (build 28).
                 guard let context = note.userInfo?[UIFocusSystem.focusUpdateContextUserInfoKey] as? UIFocusUpdateContext,
-                      !moving, game == nil, !settingsOpen else { continue }
+                      !moving, game == nil, !settingsOpen, !UsageQuestion.isUp else { continue }
                 if context.focusHeading.contains(.left), !expanded { openMenu() }
                 if context.focusHeading.contains(.right), expanded { shut() }
             }
@@ -186,6 +195,10 @@ struct Sidebar: View {
             settingsOpen = true
             return
         }
+        // A new page only: picking the one shown just shuts the menu.
+        if case .league(let key) = item, item != selection {
+            Analytics.shared.competitionOpened(key, day: leagueDays[key] ?? LaunchRequest.initialDay(), from: "menu")
+        }
         selection = item
         shut()
     }
@@ -197,6 +210,7 @@ struct Sidebar: View {
         guard store.leagues.contains(where: { MenuItem.key($0) == key }), LeagueChoice.shared.isShown(key) else { return }
         leagueDays[key] = day
         selection = .league(key)
+        Analytics.shared.competitionOpened(key, day: day, from: "home")
     }
 
     /// `-TVScoresLeague f1` opens that competition (CI screenshots).

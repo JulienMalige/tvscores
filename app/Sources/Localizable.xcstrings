@@ -2005,6 +2005,62 @@
         }
       }
     },
+    "settings.off": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desativado"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No"
+          }
+        }
+      }
+    },
+    "settings.on": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oui"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ativado"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sí"
+          }
+        }
+      }
+    },
     "settings.openApps": {
       "extractionState": "manual",
       "localizations": {
@@ -2203,6 +2259,118 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ajustes"
+          }
+        }
+      }
+    },
+    "settings.usage": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share usage data"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partager les données d'utilisation"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartilhar dados de uso"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir datos de uso"
+          }
+        }
+      }
+    },
+    "settings.usageNote": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When this is on, TV Scores sends Amplitude the pages you open, for how long, your choices in Settings, and your approximate city, worked out from your IP address. Never your name or email."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quand c'est activé, TV Scores envoie à Amplitude les pages que vous ouvrez, combien de temps, vos choix dans les réglages et votre ville approximative, déduite de votre adresse IP. Jamais votre nom ni votre e-mail."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quando está ativado, o TV Scores envia à Amplitude as páginas que você abre, por quanto tempo, suas escolhas nos ajustes e sua cidade aproximada, deduzida do seu endereço IP. Nunca seu nome nem seu e-mail."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuando está activado, TV Scores envía a Amplitude las páginas que abres, durante cuánto tiempo, tus elecciones en los ajustes y tu ciudad aproximada, deducida de tu dirección IP. Nunca tu nombre ni tu correo."
+          }
+        }
+      }
+    },
+    "settings.usageNotePhone": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When this is on, TV Scores sends Amplitude the pages you open, for how long, your choices in Settings, your approximate city, worked out from your IP address, and a recording of the app's screens, to replay your visits. Never your name or email."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quand c'est activé, TV Scores envoie à Amplitude les pages que vous ouvrez, combien de temps, vos choix dans les réglages, votre ville approximative, déduite de votre adresse IP, et un enregistrement des écrans de l'app, pour revoir vos visites. Jamais votre nom ni votre e-mail."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quando está ativado, o TV Scores envia à Amplitude as páginas que você abre, por quanto tempo, suas escolhas nos ajustes, sua cidade aproximada, deduzida do seu endereço IP, e uma gravação das telas do app, para rever suas visitas. Nunca seu nome nem seu e-mail."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuando está activado, TV Scores envía a Amplitude las páginas que abres, durante cuánto tiempo, tus elecciones en los ajustes, tu ciudad aproximada, deducida de tu dirección IP, y una grabación de las pantallas de la app, para volver a ver tus visitas. Nunca tu nombre ni tu correo."
+          }
+        }
+      }
+    },
+    "settings.usageTitle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usage Data"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Données d'utilisation"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dados de uso"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datos de uso"
           }
         }
       }
@@ -4156,6 +4324,146 @@
           "stringUnit": {
             "state": "translated",
             "value": "Otros torneos"
+          }
+        }
+      }
+    },
+    "usage.decline": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Don't Share"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne pas partager"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não compartilhar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No compartir"
+          }
+        }
+      }
+    },
+    "usage.message": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share how you use TV Scores with its developer: the pages you open, for how long, your choices in Settings, and your approximate city, worked out from your IP address. It all goes to Amplitude. No name, no email, no ads. You can change your mind in Settings."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partagez avec son développeur la façon dont vous utilisez TV Scores : les pages ouvertes, combien de temps, vos choix dans les réglages et votre ville approximative, déduite de votre adresse IP. Le tout est envoyé à Amplitude. Ni nom, ni e-mail, ni publicité. Vous pourrez changer d'avis dans Réglages."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartilhe com o desenvolvedor como você usa o TV Scores: as páginas que abre, por quanto tempo, suas escolhas nos ajustes e sua cidade aproximada, deduzida do seu endereço IP. Tudo vai para a Amplitude. Sem nome, sem e-mail, sem anúncios. Você pode mudar de ideia em Ajustes."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comparte con su desarrollador cómo usas TV Scores: las páginas que abres, durante cuánto tiempo, tus elecciones en los ajustes y tu ciudad aproximada, deducida de tu dirección IP. Todo va a Amplitude. Sin nombre, sin correo, sin anuncios. Puedes cambiar de opinión en Ajustes."
+          }
+        }
+      }
+    },
+    "usage.messagePhone": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share how you use TV Scores with its developer: the pages you open, for how long, your choices in Settings, your approximate city, worked out from your IP address, and a recording of the app's screens during each visit, to replay it. It all goes to Amplitude. No name, no email, no ads. You can change your mind in Settings."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partagez avec son développeur la façon dont vous utilisez TV Scores : les pages ouvertes, combien de temps, vos choix dans les réglages, votre ville approximative, déduite de votre adresse IP, et un enregistrement des écrans de l'app pendant chaque visite, pour la revoir. Le tout est envoyé à Amplitude. Ni nom, ni e-mail, ni publicité. Vous pourrez changer d'avis dans Réglages."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartilhe com o desenvolvedor como você usa o TV Scores: as páginas que abre, por quanto tempo, suas escolhas nos ajustes, sua cidade aproximada, deduzida do seu endereço IP, e uma gravação das telas do app durante cada visita, para revê-la. Tudo vai para a Amplitude. Sem nome, sem e-mail, sem anúncios. Você pode mudar de ideia em Ajustes."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comparte con su desarrollador cómo usas TV Scores: las páginas que abres, durante cuánto tiempo, tus elecciones en los ajustes, tu ciudad aproximada, deducida de tu dirección IP, y una grabación de las pantallas de la app durante cada visita, para volver a verla. Todo va a Amplitude. Sin nombre, sin correo, sin anuncios. Puedes cambiar de opinión en Ajustes."
+          }
+        }
+      }
+    },
+    "usage.share": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partager"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartilhar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir"
+          }
+        }
+      }
+    },
+    "usage.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Help improve TV Scores?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aider à améliorer TV Scores ?"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajudar a melhorar o TV Scores?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Ayudar a mejorar TV Scores?"
           }
         }
       }

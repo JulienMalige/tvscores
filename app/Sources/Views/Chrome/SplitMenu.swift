@@ -34,6 +34,7 @@ struct SplitMenu: View {
         }
         .task { store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
+        .usageQuestion(store: store, covered: game != nil || settingsOpen)
         // The pictures the system emptied while the app was away come back.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             Task { await store.rewarm() }
@@ -48,7 +49,12 @@ struct SplitMenu: View {
             }
         }
         // A new row of the menu is a new page, with nothing pushed over it.
-        .onChange(of: selection) { _, _ in opened = [] }
+        .onChange(of: selection) { _, new in
+            opened = []
+            if case .league(let key) = new {
+                Analytics.shared.competitionOpened(key, day: leagueDays[key] ?? LaunchRequest.initialDay(), from: "menu")
+            }
+        }
     }
 
     private var split: some View {
@@ -60,6 +66,9 @@ struct SplitMenu: View {
                     .navigationDestination(for: MenuItem.self) { page($0) }
             }
         }
+        // Under a game or Settings the page is out of sight; the sheets
+        // themselves, outside this, count.
+        .environment(\.usageCovered, game != nil || settingsOpen)
         .sheet(item: $game) { event in
             if event.kind == .race {
                 RaceScreen(eventId: event.id, fallback: event, store: store)
@@ -69,7 +78,11 @@ struct SplitMenu: View {
         }
         .sheet(isPresented: $settingsOpen) { SettingsScreen(leagues: store.leagues, apps: store.board?.apps ?? [:]) }
         // Outside the sheets, so the pages on them read the same.
-        .environment(\.openGame) { game = $0 }
+        .environment(\.openGame) { event in
+            game = event
+            let from = opened.isEmpty && selection == .home ? "home" : "competition"
+            Analytics.shared.gameOpened(event, board: store.board, from: from)
+        }
         .environment(\.boardNow, store.board?.generatedAt)
         .environment(\.watchApps, store.board?.apps)
         // A competition hidden in Settings while its page was up: back to Home.
@@ -144,6 +157,7 @@ struct SplitMenu: View {
         guard league(key) != nil, LeagueChoice.shared.isShown(key) else { return }
         leagueDays[key] = day
         opened.append(.league(key))
+        Analytics.shared.competitionOpened(key, day: day, from: "home")
     }
 
     /// `-TVScoresLeague f1` opens that competition, `-TVScoresGame final`

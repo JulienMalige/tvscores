@@ -13,6 +13,11 @@ notes when a version ships.
   top left; on an iPad they stand beside the page. A game's page closes with a swipe down.
 - Rugby tables no longer name their source under the heading; Settings, Sources credits
   Wikipedia for them. A table still says how many games it does not count yet.
+- The first time the app opens, it asks whether you want to share how you use it: the
+  pages you open, for how long, your choices in Settings and your approximate city, sent
+  to Amplitude without your name; on iPhone and iPad, a recording of the app's screens
+  too. Nothing is sent unless you choose Share, and Settings, Usage Data, changes your
+  answer at any time.
 
 ## 1.1 build 48 — 9 November 2026
 - A competition with a long name no longer pushes the date at the top of its page onto
