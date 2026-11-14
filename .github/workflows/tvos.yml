@@ -162,7 +162,7 @@ jobs:
           sleep 12
           xcrun simctl io "$UDID" screenshot shots/settings-top-store-fr.png
           # The question about sharing usage, which the simulator is asked
-          # only on request, and Settings, Share usage data, turned on
+          # only on request, and Settings, Usage Data, turned on
           # (docs/analytics.md). Nothing is ever sent from a simulator.
           for lang in en fr; do
             xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true

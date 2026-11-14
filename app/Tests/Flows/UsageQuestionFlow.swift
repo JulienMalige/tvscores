@@ -2,7 +2,7 @@ import XCTest
 
 /// The question about sharing usage (docs/analytics.md): up over the front
 /// page once the board is in, answered with the remote, and the answer is
-/// what Settings, Share usage data says. The simulator is never asked on its
+/// what Settings, Usage Data says. The simulator is never asked on its
 /// own, so the flow asks for the question with `-TVScoresAskConsent`.
 final class UsageQuestionFlow: FlowCase {
     func testDontShareLeavesTheSwitchOff() {
@@ -31,14 +31,14 @@ final class UsageQuestionFlow: FlowCase {
         return app
     }
 
-    /// Settings, from the gear at the top of the menu, then Share usage data:
-    /// what its switch says.
+    /// Settings, from the gear at the top of the menu, then Usage Data: what
+    /// its switch says.
     private func usageSwitch(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) -> String? {
         Flow.openMenu(app, file: file, line: line)
         XCTAssertTrue(Flow.walk(.up, until: app.buttons["menu.settings"], limit: 6), "focus reaches the gear", file: file, line: line)
         Flow.remote.press(.select)
         let row = app.buttons["settings.privacy"]
-        XCTAssertTrue(row.waitForExistence(timeout: 8), "Settings lists Share usage data", file: file, line: line)
+        XCTAssertTrue(row.waitForExistence(timeout: 8), "Settings lists Usage Data", file: file, line: line)
         XCTAssertTrue(Flow.walk(.down, until: row, limit: 8), "the remote reaches it", file: file, line: line)
         Flow.remote.press(.select)
         let toggle = app.buttons["settings.usage"]

@@ -2,8 +2,8 @@ import SwiftUI
 
 /// The question, asked once when the first board shows, never over the
 /// loader: whether the viewer shares how they use the app (`UsageChoice`,
-/// docs/analytics.md). Share or Don't Share; Settings, Share usage data
-/// changes the answer later. Around the whole app, on the television and on a
+/// docs/analytics.md). Share or Don't Share; Settings, Usage Data changes
+/// the answer later. Around the whole app, on the television and on a
 /// phone, it also reports the board's own figures: how long the first one
 /// took, and when one fails or goes stale.
 struct UsageQuestion: ViewModifier {

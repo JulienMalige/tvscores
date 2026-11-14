@@ -2347,6 +2347,34 @@
         }
       }
     },
+    "settings.usageTitle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usage Data"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Données d'usage"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dados de uso"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datos de uso"
+          }
+        }
+      }
+    },
     "settings.version": {
       "extractionState": "manual",
       "localizations": {

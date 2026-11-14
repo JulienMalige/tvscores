@@ -51,7 +51,7 @@ the same of an identifier kept on a device.
   the first board shows: "Help improve TV Scores?", Share or Don't Share. It
   names what goes, the IP address and the city, Amplitude, and on iPhone and
   iPad the recording of the screens.
-- **Settings, Share usage data** shows the answer on the top list and opens
+- **Settings, Usage Data** shows the answer on the top list and opens
   a page of its own (`UsageChoiceSection`) to change it: On or Off on the
   television, with what sharing sends on the left, and a switch on a phone,
   with it underneath.

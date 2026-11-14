@@ -92,7 +92,7 @@ jobs:
           demo race-f1-en -TVScoresSample race -TVScoresTab yesterday -TVScoresRace f1 -AppleLanguages "(en)"
           for page in top competitions countries; do shoot "$PHONE" "settings-$page-fr" 12 -TVScoresDemo -TVScoresTab today -TVScoresSettings "$page" -AppleLanguages "(fr)"; done
           # The question about sharing usage, asked in a simulator only on
-          # request, and Settings, Share usage data, turned on
+          # request, and Settings, Usage Data, turned on
           # (docs/analytics.md). Nothing is ever sent from a simulator.
           for lang in en fr; do
             shoot "$PHONE" "usage-question-$lang" 10 -TVScoresDemo -TVScoresTab today -TVScoresAskConsent -AppleLanguages "($lang)" -AppleLocale "$lang"

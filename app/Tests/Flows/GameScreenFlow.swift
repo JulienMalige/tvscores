@@ -36,8 +36,8 @@ final class AppsSettingsFlow: FlowCase {
 final class StoreEditionFlow: FlowCase {
     func testATestersBuildHasTheDebugSection() {
         let app = Flow.launch(extra: ["-TVScoresSettings", "top"], ready: "Settings")
-        // The list runs past the bottom of the screen since Share usage data
-        // joined it: the remote walks down to its end, as a tester would.
+        // The list runs past the bottom of the screen since Usage Data joined
+        // it: the remote walks down to its end, as a tester would.
         XCTAssertTrue(Flow.walk(.down, until: app.buttons["settings.openApps"], limit: 15),
                       "a tester's Settings ends with Open apps, where a tester can try every app's links")
         XCTAssertTrue(app.staticTexts["settings.debug"].exists, "under Debug")

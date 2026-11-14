@@ -12,7 +12,7 @@ enum SettingsPage {
         case .countries: "settings.watch"
         case .language: "settings.language"
         case .apps: "settings.apps"
-        case .privacy: "settings.usage"
+        case .privacy: "settings.usageTitle"
         case .openApps: "settings.openApps"
         }
     }

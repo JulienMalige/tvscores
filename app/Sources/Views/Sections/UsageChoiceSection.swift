@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Settings, Share usage data: whether the app shares how it is used
+/// Settings, Usage Data: whether the app shares how it is used
 /// (`UsageChoice`, docs/analytics.md). The television's row says On or Off
 /// and a press turns it over, as tvOS's own settings do, with what sharing
 /// sends on the left of the page (`SettingsPage.blurb`); a phone's is a
@@ -21,6 +21,9 @@ struct UsageChoiceSection: View {
             #else
             Section {
                 Toggle("settings.usage", isOn: Binding(get: { choice.shares }, set: { set($0) }))
+                    // The system's green: Settings tints its rows white, and
+                    // a white switch hid its knob (CI, 2026-11-14).
+                    .tint(.green)
                     .accessibilityIdentifier("settings.usage")
             } footer: {
                 // On a phone or a tablet the screens are recorded too, and it says so.
