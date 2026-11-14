@@ -140,10 +140,10 @@ struct UsageTests {
         #expect(UsageProfile.platform(.tv) == "tv" && UsageProfile.platform(.pad) == "pad" && UsageProfile.platform(.phone) == "phone")
     }
 
-    @Test("the question and the Privacy switch have all four languages")
+    @Test("the question and the switch in Settings have all four languages")
     func usageWordsAreTranslated() throws {
         let keys = ["usage.title", "usage.message", "usage.messagePhone", "usage.share", "usage.decline",
-                    "settings.privacy", "settings.usage", "settings.usageNote", "settings.usageNotePhone",
+                    "settings.usage", "settings.usageNote", "settings.usageNotePhone",
                     "settings.on", "settings.off"]
         for lang in ["en", "fr", "pt", "es"] {
             let path = try #require(Bundle.main.path(forResource: lang, ofType: "lproj"), "\(lang).lproj is bundled")

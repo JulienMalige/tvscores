@@ -1,25 +1,17 @@
 import SwiftUI
 
-/// Settings, Privacy: whether the app shares how it is used (`UsageChoice`),
-/// with what that sends in a line under it. The television's row says On or
-/// Off and a press turns it over, as tvOS's own settings do; a phone's is a
-/// switch.
+/// Settings, Share usage data: whether the app shares how it is used
+/// (`UsageChoice`, docs/analytics.md). The television's row says On or Off
+/// and a press turns it over, as tvOS's own settings do, with what sharing
+/// sends on the left of the page (`SettingsPage.blurb`); a phone's is a
+/// switch, with it underneath.
 struct UsageChoiceSection: View {
     @State private var choice = UsageChoice.shared
-
-    /// On a phone or a tablet the screens are recorded too, and it says so.
-    private static var note: LocalizedStringKey {
-        #if os(tvOS)
-        return "settings.usageNote"
-        #else
-        return "settings.usageNotePhone"
-        #endif
-    }
 
     private var state: LocalizedStringKey { choice.shares ? "settings.on" : "settings.off" }
 
     var body: some View {
-        Section {
+        List {
             #if os(tvOS)
             Button { set(!choice.shares) } label: {
                 LabeledContent("settings.usage") { Text(state) }
@@ -27,13 +19,14 @@ struct UsageChoiceSection: View {
             .accessibilityIdentifier("settings.usage")
             .accessibilityValue(Text(state))
             #else
-            Toggle("settings.usage", isOn: Binding(get: { choice.shares }, set: { set($0) }))
-                .accessibilityIdentifier("settings.usage")
+            Section {
+                Toggle("settings.usage", isOn: Binding(get: { choice.shares }, set: { set($0) }))
+                    .accessibilityIdentifier("settings.usage")
+            } footer: {
+                // On a phone or a tablet the screens are recorded too, and it says so.
+                Text("settings.usageNotePhone")
+            }
             #endif
-        } header: {
-            Text("settings.privacy")
-        } footer: {
-            Text(Self.note)
         }
     }
 

@@ -3,8 +3,8 @@ import Observation
 
 /// Whether the viewer shares how they use the app (Julien, 2026-11-14;
 /// docs/analytics.md). Asked once, when the first board shows, and changed
-/// in Settings, Privacy. Until the viewer says yes, nothing is sent and
-/// Amplitude keeps nothing on the device (`Analytics`).
+/// in Settings, Share usage data. Until the viewer says yes, nothing is
+/// sent and Amplitude keeps nothing on the device (`Analytics`).
 @MainActor
 @Observable
 final class UsageChoice {

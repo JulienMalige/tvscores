@@ -3,7 +3,7 @@ import SwiftUI
 /// The pages of Settings: the top list and what it opens. Each says what it is called, what picture
 /// stands for it on the left, and what its sentence says (Julien, build 36, from the Apple TV's own).
 enum SettingsPage {
-    case top, competitions, countries, language, apps, openApps
+    case top, competitions, countries, language, apps, privacy, openApps
 
     var title: LocalizedStringKey {
         switch self {
@@ -12,6 +12,7 @@ enum SettingsPage {
         case .countries: "settings.watch"
         case .language: "settings.language"
         case .apps: "settings.apps"
+        case .privacy: "settings.usage"
         case .openApps: "settings.openApps"
         }
     }
@@ -24,6 +25,7 @@ enum SettingsPage {
         case .countries: "tv"
         case .language: "globe"
         case .apps: "square.grid.2x2"
+        case .privacy: "hand.raised"
         case .openApps: "arrow.up.forward.app"
         }
     }
@@ -36,6 +38,8 @@ enum SettingsPage {
         case .countries: "settings.countryNote"
         case .language: "settings.languageNote"
         case .apps: "settings.appsNote"
+        // What sharing sends; a phone says it under its switch instead.
+        case .privacy: "settings.usageNote"
         case .openApps: "settings.openAppsNote"
         }
     }
