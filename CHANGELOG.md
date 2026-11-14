@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+
+## 1.1 build 51 — 14 November 2026
 - TV Scores on iPhone and iPad, the same app as on the Apple TV: the day's games by
   competition, each competition's page and table, a game's page with where to watch it,
   and Settings. On an iPhone the competitions are one step back, behind the arrow at the
