@@ -7,10 +7,17 @@ name: Store screenshots
 # scripts/store-shots.mjs then sends the artifact to App Store Connect.
 on:
   workflow_dispatch:
+    inputs:
+      platform:
+        description: The Apple TV's pictures (tvos) or the iPhone's and iPad's (ios)
+        type: choice
+        options: [tvos, ios]
+        default: tvos
 
 jobs:
   shots:
     name: Store screenshots on live data
+    if: inputs.platform != 'ios'
     runs-on: macos-latest
     timeout-minutes: 40
     defaults:
@@ -105,3 +112,86 @@ jobs:
         with:
           name: checks
           path: app/checks
+
+  # The iPhone's and the iPad's (2026-11-15): the 6.9-inch iPhone's 1320x2868
+  # and the 13-inch iPad's 2064x2752, the same pages in the same storefronts,
+  # left as store/<locale>/iphone/ and ipad/ for `store-shots.mjs --platform IOS`.
+  phone-shots:
+    name: iPhone and iPad store screenshots on live data
+    if: inputs.platform == 'ios'
+    runs-on: macos-latest
+    timeout-minutes: 50
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build for iOS simulator
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project TVScores.xcodeproj \
+            -scheme TVScoresiOS \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            TVSCORES_EDITION=store \
+            build 2>&1 | tee build.log | grep -E "error:|BUILD" || true
+          grep -q "BUILD SUCCEEDED" build.log
+
+      - name: Take the screenshots
+        run: |
+          set -euo pipefail
+          APP=$(find build/Build/Products -path '*iphonesimulator*' -name 'TVScores.app' -maxdepth 2 | head -1)
+          device() {
+            xcrun simctl list devices available -j \
+              | jq -r --arg p "$1" '.devices | to_entries[] | select(.key | test("iOS")) | .value[] | select(.name | test($p)) | .udid' \
+              | tail -1
+          }
+          for kind in "iphone ^iPhone [0-9]+ Pro Max$" "ipad ^iPad Pro 13"; do
+            read -r folder pattern <<< "$kind"
+            UDID=$(device "$pattern")
+            echo "$folder: $UDID"
+            xcrun simctl boot "$UDID" 2>/dev/null || true
+            xcrun simctl bootstatus "$UDID" -b
+            xcrun simctl status_bar "$UDID" override --time 9:41 --batteryState charged --batteryLevel 100 --wifiBars 3 --cellularBars 4 || true
+            xcrun simctl install "$UDID" "$APP"
+            for spec in \
+              "fr-FR fr fr_FR Europe/Paris FR scheduled:football:4334:tv|scheduled:football:tv final:football:4334|final:football:4328|final:football 4334" \
+              "en-US en en_US America/New_York US scheduled:nfl:tv|live:nfl:tv|scheduled:football:tv final:football:4328|final:football nfl" \
+              "pt-BR pt-BR pt_BR America/Sao_Paulo BR scheduled:football:4351:tv|scheduled:football:tv final:football:4351|final:football 4351" \
+              "es-ES es es_ES Europe/Madrid US scheduled:football:4335:tv|scheduled:football:tv final:football:4335|final:football 4335"; do
+              read -r store lang locale zone countries watch final league <<< "$spec"
+              mkdir -p "store/$store/$folder"
+              shot() {
+                local name=$1
+                shift
+                xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+                SIMCTL_CHILD_TZ="$zone" xcrun simctl launch "$UDID" com.julienmalige.tvscores "$@" \
+                  -AppleLanguages "($lang)" -AppleLocale "$locale" -channelCountries "($countries)" > /dev/null
+                sleep 18
+                xcrun simctl io "$UDID" screenshot "store/$store/$folder/$name.png" > /dev/null
+              }
+              shot 1-today -TVScoresTab today
+              shot 2-watch -TVScoresTab today -TVScoresGame "$watch"
+              shot 3-game -TVScoresTab today -TVScoresGame "$final"
+              shot 4-race -TVScoresTab today -TVScoresRace "f1|f1:next"
+              shot 5-league -TVScoresTab upcoming -TVScoresLeague "$league"
+              shot 6-menu -TVScoresTab today -TVScoresMenuOpen
+            done
+            xcrun simctl shutdown "$UDID" || true
+          done
+          ls -R store
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: store-shots
+          path: app/store
