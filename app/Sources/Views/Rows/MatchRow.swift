@@ -30,7 +30,7 @@ struct MatchRow: View {
 
 private struct MatchRowContent: View {
     let event: Event
-    @State private var favourites = Favourites.shared
+    private let favourites = Favourites.shared
     @Environment(\.isFocused) private var isFocused
     @Environment(\.watchApps) private var apps
 
@@ -92,11 +92,11 @@ private struct MatchRowContent: View {
                 // A followed side has a star before its crest, as Apple
                 // Sports marks the viewer's teams (Julien, 2026-11-15).
                 .overlay(alignment: .leading) {
-                    if favourites.isFollowed(team.followKey(event.sport)) {
+                    if let key = team.followKey(event.sport), favourites.isFollowed(key) {
                         Image(systemName: "star.fill")
                             .font(.system(size: Metrics.matchMark * 0.22, weight: .semibold))
                             .offset(x: -Metrics.matchMark * 0.42)
-                            .accessibilityIdentifier("followed.\(team.followKey(event.sport) ?? "")")
+                            .accessibilityIdentifier("followed.\(key)")
                     }
                 }
                 Text(event.sport == "tennis" ? TennisRowContent.shortName(team) : team.label)

@@ -32,8 +32,8 @@ profiles".
 | Issuer ID | `69a6de7c-7178-47e3-e053-5b8c7c11a4d1` |
 | Internal TestFlight group | `Internal`, account holder added as tester |
 | Distribution certificate | `TLAS59R725`, expires 2027-09-14 |
-| Provisioning profile | `TV Scores tvOS App Store 2` (`3YA4WZL5X6`), expires 2027-09-14 — minted 2026-09-19 with the User Management capability; build 19 shipped on it and the first profile was deleted |
-| iPhone and iPad profile | `TV Scores iOS App Store` (`L928T77N6Y`), expires 2027-09-14 — minted 2026-11-12 on the same certificate and bundle id (`UNIVERSAL`). Not a secret: the workflow reads it from Apple by name with its key; a copy is in `~/.config/tvscores/dist-ios.mobileprovision` |
+| Provisioning profile | `TV Scores tvOS App Store 3` (`UF79A92DJ4`), expires 2027-09-14 — minted 2026-11-15 with User Management and iCloud (the key-value store My Teams keeps the followed sides in); the workflow reads it from Apple by name. `TV Scores tvOS App Store 2` (`3YA4WZL5X6`, 2026-09-19, builds 19 to 52) went invalid when iCloud was added to the App ID |
+| iPhone and iPad profile | `TV Scores iOS App Store 2` (`D67T24ZRBD`), expires 2027-09-14 — minted 2026-11-15 with iCloud, on the same certificate and bundle id (`UNIVERSAL`); the workflow reads it from Apple by name with its key. `TV Scores iOS App Store` (`L928T77N6Y`, 2026-11-12, builds 50 to 53) went invalid with the change |
 
 The App Manager key's `.p8` lives only in `~/.config/tvscores/` on the VPS
 (mode 600) and in GitHub Actions secrets, the Admin key's only in
@@ -43,10 +43,14 @@ The App Manager key's `.p8` lives only in `~/.config/tvscores/` on the VPS
 ## GitHub secrets
 
 `ASC_KEY_P8`, `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_TEAM_ID` authenticate the
-upload. `DIST_P12_BASE64`, `DIST_P12_PASSWORD`, `DIST_PROFILE_BASE64` carry the
-signing assets; the workflow imports them into a throwaway keychain that it
+upload. `DIST_P12_BASE64` and `DIST_P12_PASSWORD` carry the
+signing certificate (`DIST_PROFILE_BASE64`, the television's profile up to
+build 52, is no longer read); the workflow imports them into a throwaway keychain that it
 deletes afterwards. Copies live on the VPS in `~/.config/tvscores/` as
-`dist.p12`, `dist.p12.password`, `dist.key` and `dist.mobileprovision`.
+`dist.p12`, `dist.p12.password` and `dist.key`; `dist.mobileprovision` there is
+the television's profile up to build 52, invalid since iCloud was added to
+the App ID (2026-11-15), and the `DIST_PROFILE_BASE64` secret, its copy, is
+read no more.
 
 ## Renewing the certificate or the profile
 

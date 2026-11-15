@@ -40,7 +40,7 @@ export class Store {
       this.broadcasts = raw.broadcasts || {};
       this.appIcons = raw.appIcons || {};
       this.roster = raw.roster || {};
-      noteRoster(this.roster, [...this.events.values()]); // the games already kept, the first time
+      if (noteRoster(this.roster, [...this.events.values()])) this.dirty = true; // the games already kept, the first time
       this.meta = raw.meta || {};
       this.migrateBroadcasts();
       if (raw.schemaVersion !== SCHEMA_VERSION) {

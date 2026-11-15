@@ -42,8 +42,11 @@ test("the roster remembers who played in a competition, and forgets after a seas
   assert.equal(roster["football:4490"]["football:france"].logo, "https://x/France.png");
   noteRoster(roster, [{ sport: "f1", kind: "race", league: { id: "f1" } }], now);
   assert.equal(roster["f1:f1"], undefined, "drivers come from the standings");
+  noteRoster(roster, [game(4490, "France", "Spain", { start: "2026-11-10T20:00:00Z" })], now);
+  assert.equal(roster["football:4490"]["football:france"].seen, "2026-11-15", "a later sighting is not undone by an older game");
+  assert.equal(roster["football:4490"]["football:spain"].seen, "2026-11-10", "seen on the game's day, not the day it was read");
   assert.equal(pruneRoster(roster, now + (ROSTER_DAYS + 1) * 86400e3), true);
-  assert.deepEqual(roster["football:4490"], {});
+  assert.equal(roster["football:4490"], undefined, "an emptied competition goes too");
 });
 
 test("the store keeps the roster across a restart", () => {

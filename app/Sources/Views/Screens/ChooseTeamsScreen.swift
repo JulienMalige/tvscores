@@ -78,7 +78,9 @@ struct ChooseTeamsScreen: View {
         let named = leagues.filter { Self.fold($0.name).contains(words) || Self.fold($0.menu).contains(words) }
             .filter { !(teams[MenuItem.key($0)] ?? []).isEmpty }
         let sides = leagues.flatMap { league in
-            (teams[MenuItem.key(league)] ?? []).filter { Self.fold($0.name).contains(words) }.map { (league: league, entry: $0) }
+            (teams[MenuItem.key(league)] ?? []).filter { Self.fold($0.name).contains(words) }
+                // Once per competition, so the id is both.
+                .map { (id: "\(MenuItem.key(league))|\($0.key)", league: league, entry: $0) }
         }
         return List {
             if sides.isEmpty, named.isEmpty {
@@ -86,7 +88,7 @@ struct ChooseTeamsScreen: View {
             }
             if !sides.isEmpty {
                 Section("myTeams.teams") {
-                    ForEach(sides.prefix(60), id: \.entry.key) { hit in
+                    ForEach(sides.prefix(60), id: \.id) { hit in
                         TeamLine(entry: hit.entry, caption: hit.league.name)
                     }
                 }

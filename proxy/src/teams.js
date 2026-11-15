@@ -6,9 +6,10 @@ import { withTablePhotos } from "./scoreboard.js";
  *
  * A favourite is kept on the device as a key, `sport:slug-of-the-name`:
  * "football:paris-saint-germain", "f1:k-antonelli", "tennis:jannik-sinner".
- * The proxy writes it on every side of a game, every row of a race and every
- * row of a table, so the app never derives one itself, and a club named two
- * ways by two sources can later be given one key here. The games and the
+ * The proxy writes it on every side of a game and every row of a race, and
+ * on every side `/v1/teams` lists, so a club named two ways by two sources
+ * can later be given one key here; the app derives one itself only for a
+ * board without them (its bundled sample). The games and the
  * tables already agree on names (the records under a game to come are
  * matched on them), so the name is what the key is made of.
  */
@@ -41,16 +42,21 @@ export const ROSTER_DAYS = 400;
  */
 export function noteRoster(roster, events, now = Date.now()) {
   let changed = false;
+  const today = new Date(now).toISOString().slice(0, 10);
   for (const e of events) {
     if (e.kind === "race" || !e.league?.id) continue;
+    // Seen on the game's day, not on the day it was read: a restart reading
+    // the games kept does not make old sides new again.
+    const played = String(e.start || "").slice(0, 10);
+    const day = played && played < today ? played : today;
     const list = (roster[`${e.sport}:${e.league.id}`] ??= {});
     for (const side of [e.home, e.away]) {
       const key = side && teamKey(e.sport, side.name);
       if (!key) continue;
-      const day = new Date(now).toISOString().slice(0, 10);
       const old = list[key];
       const entry = { name: side.name, logo: side.logo || old?.logo, flag: side.flag || old?.flag, seen: day };
-      if (old?.seen === day && old.logo === entry.logo) continue;
+      if (old && old.seen >= day && old.logo === entry.logo) continue;
+      if (old?.seen > day) entry.seen = old.seen;
       list[key] = entry;
       changed = true;
     }
@@ -62,12 +68,16 @@ export function noteRoster(roster, events, now = Date.now()) {
 export function pruneRoster(roster, now = Date.now()) {
   const cutoff = new Date(now - ROSTER_DAYS * 86400e3).toISOString().slice(0, 10);
   let changed = false;
-  for (const list of Object.values(roster)) {
+  for (const [id, list] of Object.entries(roster)) {
     for (const [key, entry] of Object.entries(list)) {
       if (entry.seen < cutoff) {
         delete list[key];
         changed = true;
       }
+    }
+    if (!Object.keys(list).length) {
+      delete roster[id];
+      changed = true;
     }
   }
   return changed;

@@ -97,8 +97,9 @@ under the new random number) once the first board has named the
 competitions, and again after any change: the kind of device (tv, phone, pad), the edition (tester or store),
 the language chosen in Settings and the device's own, the locale, region and
 time zone, the competitions shown in the menu's order and those hidden, how
-many are followed, the countries chosen, the apps hidden, and when the yes
-was given.
+many are followed, the countries chosen, the apps hidden, the teams,
+drivers and players followed in My Teams by name, and how many (from 1.2,
+2026-11-15), and when the yes was given.
 
 **Session Replay**, on iPhone and iPad only: every visit recorded (the
 plugin's default rate is none; ours is 1.0), at Amplitude's default masking,
@@ -231,7 +232,7 @@ read 2026-11-14):
 | Location, Coarse Location | the city from the address | Analytics | yes | no |
 | Identifiers, Device ID | the random number per install | Analytics | yes | no |
 | Usage Data, Product Interaction | pages, time on them, taps, sessions; on iPhone and iPad the replays | Analytics | yes | no |
-| Usage Data, Other Usage Data | the choices in Settings: competitions, countries, apps, language | Analytics | yes | no |
+| Usage Data, Other Usage Data | the choices in Settings: competitions, countries, apps, language; from 1.2, the sides followed in My Teams (the same type, so App Privacy needs no new answer) | Analytics | yes | no |
 | Diagnostics, Performance Data | the time from launch to the first board | Analytics | yes | no |
 | Diagnostics, Other Diagnostic Data | a board that failed or went stale | Analytics | yes | no |
 | Other Data, Other Data Types | locale, region, time zone, device model and system version | Analytics | yes | no |

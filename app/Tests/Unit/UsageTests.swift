@@ -169,13 +169,18 @@ struct UsageTests {
         let profile = UsageProfile(platform: "tv", edition: "store", appLanguage: "system", systemLanguage: "fr-FR",
                                    locale: "fr_FR", region: "FR", timeZone: "Europe/Paris",
                                    shown: ["Top 14", "Premier League"], hidden: ["NBA"], countries: ["FR"],
-                                   hiddenApps: ["dazn"], since: Date(timeIntervalSince1970: 1_800_000_000))
+                                   hiddenApps: ["dazn"], since: Date(timeIntervalSince1970: 1_800_000_000),
+                                   teams: ["Paris Saint-Germain", "Stade Toulousain"])
         let properties = profile.properties
         #expect(properties["competitions_shown"] as? [String] == ["Top 14", "Premier League"], "in the menu's order")
         #expect(properties["competitions_followed"] as? Int == 2)
         #expect(properties["competitions_hidden"] as? [String] == ["NBA"])
         #expect(properties["sharing_since"] as? String == "2027-01-15T08:00:00Z")
         #expect(properties["time_zone"] as? String == "Europe/Paris")
+        #expect(properties["teams_followed"] as? [String] == ["Paris Saint-Germain", "Stade Toulousain"], "My Teams, by name")
+        #expect(properties["teams_count"] as? Int == 2)
+        #expect(UsageEvent.Page.myTeams(.today).identity == ["page": "my teams", "day": "today"])
+        #expect(UsageEvent.Page.chooseTeams.name == "choose teams")
         #expect(UsageProfile.platform(.tv) == "tv" && UsageProfile.platform(.pad) == "pad" && UsageProfile.platform(.phone) == "phone")
     }
 

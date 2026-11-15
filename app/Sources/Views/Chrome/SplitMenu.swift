@@ -149,7 +149,7 @@ struct SplitMenu: View {
                 .toolbar { ToolbarItem(placement: .topBarTrailing) { viewSwitch } }
         case .myTeams:
             MyTeamsScreen(store: store, day: $day, chooseTeams: { choosingTeams = true })
-                .toolbar { ToolbarItem(placement: .topBarLeading) { viewSwitch } }
+                .toolbar { ToolbarItem(placement: .topBarTrailing) { viewSwitch } }
         case .league(let key):
             if let league = league(key) {
                 CompetitionScreen(ref: LeagueRef(league), store: store, day: leagueDays[key] ?? LaunchRequest.initialDay())

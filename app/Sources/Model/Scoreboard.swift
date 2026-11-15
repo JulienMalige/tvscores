@@ -149,8 +149,6 @@ struct RaceResult: Decodable, Identifiable, Equatable {
     let points: Int?
     let laps: Int?
     let fastestLap: Bool?
-    /// The proxy's key for the driver or rider, "f1:k-antonelli" (My Teams).
-    let key: String?
     var id: String { "\(pos.map { String($0) } ?? "-")-\(driver)" }
     var finished: Bool { pos != nil }
 }

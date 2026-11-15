@@ -10,7 +10,7 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.10"
-    MARKETING_VERSION: "1.1"
+    MARKETING_VERSION: "1.2"
     CURRENT_PROJECT_VERSION: "1"
     # Amplitude, for the usage figures the viewer agrees to share
     # (docs/analytics.md). The key is public, as in every app that uses

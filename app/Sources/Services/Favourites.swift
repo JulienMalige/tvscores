@@ -10,29 +10,47 @@ import Observation
 /// Kept on the device and in the viewer's iCloud key-value store, so a team
 /// starred on the Apple TV is starred on their iPhone too (Julien,
 /// 2026-11-15: "iCloud sync, yes"). Nothing about it reaches the proxy.
+/// In iCloud each favourite is an entry of its own, "fav.<key>", so two
+/// devices starring different sides at once both keep theirs: a star or an
+/// unstar from elsewhere changes that one entry, never the whole list.
 @MainActor
 @Observable
 final class Favourites {
-    static let shared = Favourites()
+    static let shared = Favourites(cloud: usesCloud() ? .default : nil)
     static let storeKey = "favourites"
+    private static let cloudPrefix = "fav."
 
     /// Key → name.
-    private(set) var followed: [String: String]
+    private(set) var followed: [String: String] { didSet { indexed() } }
+    /// The sports with a driver, a rider or a player followed: all their
+    /// races are the viewer's. Kept with `followed`, read for every row.
+    private(set) var raceSports: Set<String> = []
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let cloud: NSUbiquitousKeyValueStore?
 
-    init(defaults: UserDefaults = .standard, cloud: NSUbiquitousKeyValueStore? = .default) {
+    init(defaults: UserDefaults = .standard, cloud: NSUbiquitousKeyValueStore? = nil) {
         self.defaults = defaults
         self.cloud = cloud
         followed = (defaults.dictionary(forKey: Self.storeKey) as? [String: String]) ?? [:]
+        indexed()
         guard let cloud else { return }
-        // What another device of the same Apple ID starred, now and later.
+        // What another device of the same Apple ID starred or unstarred, now and later.
         NotificationCenter.default.addObserver(forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
-                                               object: cloud, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.takeCloud() }
+                                               object: cloud, queue: .main) { [weak self] note in
+            let keys = note.userInfo?[NSUbiquitousKeyValueStoreChangedKeysKey] as? [String]
+            MainActor.assumeIsolated { self?.takeCloud(keys) }
         }
         cloud.synchronize()
-        takeCloud()
+        // Those in iCloud join those kept here: a star made while iCloud was
+        // out of reach is not lost to an older copy.
+        takeCloud(nil)
+    }
+
+    /// A launch that resets or sets the favourites (`-TVScoresReset`,
+    /// `-TVScoresFollow`: the flows, CI's pictures) leaves iCloud alone, or
+    /// its copy would come back over what the launch asked for.
+    static func usesCloud(_ arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        !arguments.contains("-TVScoresReset") && !arguments.contains("-TVScoresFollow")
     }
 
     /// `-TVScoresReset` forgets them, as it does the other choices; then
@@ -54,17 +72,10 @@ final class Favourites {
 
     func toggle(_ key: String, name: String) {
         let was = isFollowed(key)
-        if was { followed[key] = nil } else { followed[key] = name }
-        save()
+        followed[key] = was ? nil : name
+        defaults.set(followed, forKey: Self.storeKey)
+        if was { cloud?.removeObject(forKey: Self.cloudPrefix + key) } else { cloud?.set(name, forKey: Self.cloudPrefix + key) }
         Analytics.shared.settingChanged("team", item: key, from: was ? "followed" : "not followed", to: was ? "not followed" : "followed")
-    }
-
-    /// The sports with a driver, a rider or a player followed: all their races are the viewer's.
-    var raceSports: Set<String> {
-        Set(followed.keys.compactMap { key in
-            let sport = String(key.split(separator: ":").first ?? "")
-            return ["f1", "motogp"].contains(sport) ? sport : nil
-        })
     }
 
     /// A game one of whose sides is followed, or a race of a series one of
@@ -79,25 +90,39 @@ final class Favourites {
     /// The day's games of the followed, in kickoff order, each with its
     /// competition for the grey line over it.
     func games(in groups: [LeagueGroup]) -> [(group: LeagueGroup, event: Event)] {
+        guard !followed.isEmpty else { return [] }
         var seen = Set<String>()
         return groups.flatMap { group in group.events.filter(follows).map { (group: group, event: $0) } }
             .filter { seen.insert($0.event.id).inserted }
             .sorted { $0.event.start < $1.event.start }
     }
 
-    private func save() {
-        defaults.set(followed, forKey: Self.storeKey)
-        cloud?.set(followed, forKey: Self.storeKey)
+    private func indexed() {
+        let sports = Set(followed.keys.compactMap { $0.split(separator: ":").first.map(String.init) })
+        let races = sports.intersection(["f1", "motogp"])
+        if races != raceSports { raceSports = races }
     }
 
-    /// iCloud's copy wins: it is the last change made on any of the viewer's devices.
-    private func takeCloud() {
-        guard let remote = cloud?.dictionary(forKey: Self.storeKey) as? [String: String], remote != followed else { return }
-        followed = remote
-        defaults.set(remote, forKey: Self.storeKey)
+    /// iCloud's entries into the list: all of them on launch, which only
+    /// add; or the ones another device changed, which add or remove.
+    private func takeCloud(_ changed: [String]?) {
+        guard let cloud else { return }
+        var next = followed
+        if let changed {
+            for entry in changed where entry.hasPrefix(Self.cloudPrefix) {
+                next[String(entry.dropFirst(Self.cloudPrefix.count))] = cloud.string(forKey: entry)
+            }
+        } else {
+            for (entry, value) in cloud.dictionaryRepresentation where entry.hasPrefix(Self.cloudPrefix) {
+                if let name = value as? String { next[String(entry.dropFirst(Self.cloudPrefix.count))] = name }
+            }
+        }
+        guard next != followed else { return }
+        followed = next
+        defaults.set(next, forKey: Self.storeKey)
     }
 
-    /// A readable name from a key, when only the key is known: "paris saint germain".
+    /// A readable name from a key, when only the key is known: "Paris Saint Germain".
     static func nameOf(_ key: String) -> String {
         String(key.split(separator: ":").dropFirst().joined(separator: ":")).replacingOccurrences(of: "-", with: " ").capitalized
     }
@@ -108,10 +133,15 @@ extension TeamRef {
     /// (the bundled sample) derives the same from the name.
     func followKey(_ sport: String) -> String? { key ?? Self.derivedKey(sport, name) }
 
-    /// `proxy/src/teams.js`'s `teamKey`, for boards without keys only.
+    /// `proxy/src/teams.js`'s `teamKey`, step for step, for boards without
+    /// keys only: compatibility decomposition, the combining accents
+    /// (U+0300 to U+036F) dropped, lower case, then every run of anything
+    /// but a to z and 0 to 9 one hyphen. "ø" is not an accented "o" there,
+    /// so it is not here either: "Bodø/Glimt" is "bod-glimt" on both sides.
     static func derivedKey(_ sport: String, _ name: String) -> String? {
-        let folded = name.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: Locale(identifier: "en_US_POSIX")).lowercased()
-        let slug = folded.split(whereSeparator: { !($0.isASCII && ($0.isLetter || $0.isNumber)) }).joined(separator: "-")
+        let scalars = name.decomposedStringWithCompatibilityMapping.unicodeScalars.filter { !(0x300...0x36F).contains($0.value) }
+        let folded = String(String.UnicodeScalarView(scalars)).lowercased()
+        let slug = folded.split(whereSeparator: { !(("a"..."z").contains($0) || ("0"..."9").contains($0)) }).joined(separator: "-")
         return slug.isEmpty ? nil : "\(sport):\(slug)"
     }
 }

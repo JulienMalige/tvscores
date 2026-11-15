@@ -30,6 +30,15 @@ struct MyTeamsTests {
         #expect(TeamRef.derivedKey("football", "Atlético Madrid") == "football:atletico-madrid")
         #expect(TeamRef.derivedKey("f1", "K. Antonelli") == "f1:k-antonelli")
         #expect(TeamRef.derivedKey("rugby", "  ") == nil)
+        #expect(TeamRef.derivedKey("football", "Bodø/Glimt") == "football:bod-glimt", "ø is not an accented o for the proxy either")
+        #expect(TeamRef.derivedKey("football", "Borussia Mönchengladbach") == "football:borussia-monchengladbach")
+    }
+
+    @Test("a launch that resets or sets the favourites leaves iCloud alone")
+    func launchArgumentsKeepICloudOut() {
+        #expect(Favourites.usesCloud([]))
+        #expect(!Favourites.usesCloud(["-TVScoresReset"]))
+        #expect(!Favourites.usesCloud(["-TVScoresFollow", "football:lens"]))
     }
 
     @Test("a starred side is kept, and comes back on the next launch")
