@@ -63,16 +63,18 @@ const answer = (question, value, what, source) => `<div class="answer"><span cla
  * everyone, Amplitude for the exact count of the viewers who said yes.
  */
 function answers(days, amplitude, apple = []) {
-  const week = days.slice(0, 7).reduce((acc, d) => sum(acc, d), blank("week"));
   const today = days[0];
   const since = (n) => new Date(Date.parse(`${today.day}T00:00:00Z`) - (n - 1) * 864e5).toISOString().slice(0, 10);
+  // The last 7 calendar days, not the last 7 days that had a file.
+  const week = days.filter((d) => d.day >= since(7)).reduce((acc, d) => sum(acc, d), blank("week"));
   const first = apple.filter((r) => r.type === "First-time download");
   const count = (rows, from) => rows.filter((r) => r.date >= from).reduce((n, r) => n + r.count, 0);
-  const again = apple.filter((r) => r.type !== "First-time download");
+  // Re-downloads and restores, not the updates the same report counts.
+  const again = apple.filter((r) => r.type === "Redownload" || r.type === "Restore");
   const byKey = (rows, key) => rows.reduce((acc, r) => ({ ...acc, [r[key]]: (acc[r[key]] ?? 0) + r.count }), {});
   const deviceDays = week.devices;
   // The days counted so far, up to 7: the server began on 2026-11-15.
-  const counted = Math.max(1, Math.min(7, days.length));
+  const counted = Math.max(1, days.filter((d) => d.day >= since(7)).length);
   const engaged = week.minutes.buckets.slice(3).reduce((a, b) => a + b, 0);
   const seconds = Object.entries(amplitude?.sessionSeconds ?? {}).filter(([day, v]) => day >= since(7) && v > 0).map(([, v]) => v);
   const session = seconds.length ? `${(seconds.reduce((a, b) => a + b, 0) / seconds.length / 60).toFixed(1)} min` : "–";
@@ -140,7 +142,7 @@ ${columns("Devices a day, last 30 days", month.map((d) => ({ label: dayName(d.da
 ${columns("When, São Paulo time, last 7 days", hours.map((value, local) => ({ label: `${String(local).padStart(2, "0")}:00`, value })), { note: "Devices with the app open in each hour, added up over the 7 days.", ticks: ["0h", "6h", "12h", "18h", "23h"] })}
 <div class="grid2">
 ${bars("Kind of device", Object.entries(week.platforms), { label: (k) => PLATFORMS[k] ?? k, note: "Device-days over the last 7 days: a device that came on 3 days counts 3. Builds up to 51 do not say their kind." })}
-${amplitude ? bars("Countries, Amplitude", Object.entries(amplitude.countries), { note: "Users who said yes, last 7 days, from each device's own address. A device on a VPN shows in the VPN's country too." }) : ""}
+${amplitude ? bars("Countries, Amplitude", Object.entries(amplitude.countries), { note: "Users who said yes over the last 7 days, once per country, from each device's own address. A device on a VPN shows in the VPN's country too." }) : ""}
 ${bars("Countries", Object.entries(week.countries), { label: regionName })}
 ${bars("Time zones", Object.entries(week.timeZones))}
 ${bars("Languages", Object.entries(week.languages))}

@@ -5,8 +5,8 @@ fr-FR, en-US, pt-BR, es-ES). Written on 2026-10-27 and entered in App Store
 Connect the same day at Julien's word ("Yes please"); the app's primary
 language there is en-US. This file is the source: change the words here, then
 `node scripts/store-listing.mjs` checks every field against Apple's limits and
-`node scripts/store-listing.mjs push` sends whatever differs to the tvOS
-version being prepared (`--dry-run` lists it first). Apple once answered a
+`node scripts/store-listing.mjs push [--platform IOS]` sends whatever differs to the tvOS
+(or iPhone and iPad) version being prepared; one text serves both (2026-11-15) (`--dry-run` lists it first). Apple once answered a
 change with a 500 and took it on the next try (2026-10-27): run the push
 again, it sends only what is left.
 
@@ -60,7 +60,7 @@ Live scores & where to watch
 
 ### Promotional text
 
-Live scores, standings and race weekends on your Apple TV, with the channel each game is on and a button that opens the app showing it.
+Live scores, standings and race weekends on your Apple TV, iPhone and iPad, with the channel each game is on and a button that opens the app showing it.
 
 ### Keywords
 
@@ -68,7 +68,7 @@ football,soccer,basketball,tennis,racing,motorsport,standings,fixtures,results,s
 
 ### Description
 
-TV Scores brings the scores to the biggest screen in the house: today's games live, with the minute of play, yesterday's results, what's coming next and, for every game, where to watch it.
+TV Scores brings the scores to the biggest screen in the house, and to your iPhone and iPad: today's games live, with the minute of play, yesterday's results, what's coming next and, for every game, where to watch it.
 
 WHERE TO WATCH
 Each game shows its TV channels in France, the United States and Brazil: choose one country, several or none. How to Watch opens the broadcaster's app or the streaming service straight from the game, or its App Store page when the app isn't installed.
@@ -80,13 +80,13 @@ RACE WEEKENDS
 Formula 1 and MotoGP: qualifying, the sprint and the race at your local time, then the starting grid, the full result and the championships for drivers and teams.
 
 THE COMPETITIONS
-Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Copa Libertadores, Brasileirão, the Nations League and international friendlies; the NFL and the NBA; Formula 1 and MotoGP; ATP and WTA tennis.
+Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Copa Libertadores, Brasileirão, the Nations League and international friendlies; the NFL and the NBA; Formula 1 and MotoGP; ATP and WTA tennis; and rugby union: the Top 14, the Champions Cup, the Premiership, the Six Nations, the Nations Championship and the World Cup.
 
 YOURS TO ARRANGE
 Keep the competitions you follow, in the order you like. Times follow your time zone, and the app speaks English, French, Portuguese and Spanish.
 
-PRIVATE
-No account, no ads, no tracking. Your choices stay on your Apple TV.
+YOUR DATA
+No account, no ads. The app asks once whether you want to share how you use it, to help make it better, and you can change your mind in Settings.
 
 TV Scores is not affiliated with the leagues, teams, players or broadcasters it shows.
 
@@ -98,7 +98,7 @@ Scores en direct, où regarder
 
 ### Promotional text
 
-Scores en direct, classements et week-ends de course sur votre Apple TV, avec la chaîne de chaque match et un bouton qui ouvre l'app qui le diffuse.
+Scores en direct, classements et week-ends de course sur Apple TV, iPhone et iPad, avec la chaîne de chaque match et un bouton qui ouvre l'app qui le diffuse.
 
 ### Keywords
 
@@ -106,7 +106,7 @@ football,foot,basket,tennis,course,formule,moto,classement,résultats,calendrier
 
 ### Description
 
-TV Scores met les scores sur le plus grand écran de la maison : les matchs du jour en direct, avec la minute de jeu, les résultats de la veille, ce qui arrive ensuite et, pour chaque match, où le regarder.
+TV Scores met les scores sur le plus grand écran de la maison, et sur votre iPhone et votre iPad : les matchs du jour en direct, avec la minute de jeu, les résultats de la veille, ce qui arrive ensuite et, pour chaque match, où le regarder.
 
 OÙ REGARDER
 Chaque match affiche ses chaînes en France, aux États-Unis et au Brésil : choisissez un pays, plusieurs ou aucun. Où regarder ouvre l'app du diffuseur ou du service de streaming directement depuis le match, ou sa page sur l'App Store quand l'app n'est pas installée.
@@ -118,13 +118,13 @@ LES WEEK-ENDS DE COURSE
 Formule 1 et MotoGP : les qualifications, le sprint et la course à votre heure, puis la grille de départ, le résultat complet et les championnats pilotes et équipes.
 
 LES COMPÉTITIONS
-Premier League, Liga, Serie A, Bundesliga, Ligue 1, Ligue des champions, Ligue Europa, Copa Libertadores, Brasileirão, Ligue des nations et matchs amicaux internationaux ; la NFL et la NBA ; la Formule 1 et le MotoGP ; le tennis ATP et WTA.
+Premier League, Liga, Serie A, Bundesliga, Ligue 1, Ligue des champions, Ligue Europa, Copa Libertadores, Brasileirão, Ligue des nations et matchs amicaux internationaux ; la NFL et la NBA ; la Formule 1 et le MotoGP ; le tennis ATP et WTA ; et le rugby à XV : le Top 14, la Champions Cup, la Premiership, le Tournoi des Six Nations, le Nations Championship et la Coupe du monde.
 
 À VOTRE GOÛT
 Gardez les compétitions que vous suivez, dans l'ordre qui vous plaît. Les horaires suivent votre fuseau horaire, et l'app parle français, anglais, portugais et espagnol.
 
-CONFIDENTIALITÉ
-Ni compte, ni publicité, ni pistage. Vos choix restent sur votre Apple TV.
+VOS DONNÉES
+Ni compte, ni publicité. L'app vous demande une fois si vous voulez partager la façon dont vous l'utilisez, pour l'améliorer, et vous pouvez changer d'avis dans Réglages.
 
 TV Scores n'a aucun lien avec les ligues, équipes, joueurs ou diffuseurs qu'elle affiche.
 
@@ -136,7 +136,7 @@ Placar ao vivo e onde assistir
 
 ### Promotional text
 
-Placares ao vivo, tabelas e fins de semana de corrida na sua Apple TV, com o canal de cada jogo e um botão que abre o app que transmite.
+Placares ao vivo, tabelas e fins de semana de corrida na Apple TV, no iPhone e no iPad, com o canal de cada jogo e um botão que abre o app que transmite.
 
 ### Keywords
 
@@ -144,7 +144,7 @@ futebol,basquete,tênis,fórmula,corrida,moto,tabela,classificação,resultados,
 
 ### Description
 
-O TV Scores leva os placares para a maior tela da casa: os jogos do dia ao vivo, com o minuto de jogo, os resultados de ontem, o que vem por aí e, para cada jogo, onde assistir.
+O TV Scores leva os placares para a maior tela da casa, e para o seu iPhone e iPad: os jogos do dia ao vivo, com o minuto de jogo, os resultados de ontem, o que vem por aí e, para cada jogo, onde assistir.
 
 ONDE ASSISTIR
 Cada jogo mostra os canais no Brasil, nos Estados Unidos e na França: escolha um país, vários ou nenhum. Onde assistir abre o app da emissora ou do serviço de streaming direto do jogo, ou a página dele na App Store quando o app não está instalado.
@@ -156,13 +156,13 @@ FINS DE SEMANA DE CORRIDA
 Fórmula 1 e MotoGP: o treino classificatório, a sprint e a corrida no seu horário, depois o grid de largada, o resultado completo e os campeonatos de pilotos e de equipes.
 
 AS COMPETIÇÕES
-Brasileirão, Copa Libertadores, Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Liga das Nações e amistosos de seleções; a NFL e a NBA; a Fórmula 1 e a MotoGP; o tênis da ATP e da WTA.
+Brasileirão, Copa Libertadores, Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Liga das Nações e amistosos de seleções; a NFL e a NBA; a Fórmula 1 e a MotoGP; o tênis da ATP e da WTA; e o rúgbi: o Top 14, a Champions Cup, a Premiership, o Six Nations, o Nations Championship e a Copa do Mundo.
 
 DO SEU JEITO
 Fique com as competições que você acompanha, na ordem que preferir. Os horários seguem o seu fuso, e o app fala português, inglês, francês e espanhol.
 
-PRIVACIDADE
-Sem conta, sem anúncios, sem rastreamento. As suas escolhas ficam na sua Apple TV.
+SEUS DADOS
+Sem conta, sem anúncios. O app pergunta uma vez se você quer compartilhar como o usa, para melhorá-lo, e você pode mudar de ideia em Ajustes.
 
 O TV Scores não tem ligação com as ligas, equipes, jogadores ou emissoras que mostra.
 
@@ -174,7 +174,7 @@ Resultados y dónde verlo
 
 ### Promotional text
 
-Resultados en directo, clasificaciones y fines de semana de carreras en tu Apple TV, con el canal de cada partido y un botón que abre la app que lo emite.
+Resultados en directo, clasificaciones y fines de semana de carreras en Apple TV, iPhone y iPad, con el canal de cada partido y un botón que abre la app que lo emite.
 
 ### Keywords
 
@@ -182,7 +182,7 @@ fútbol,baloncesto,tenis,fórmula,motociclismo,directo,marcadores,clasificación
 
 ### Description
 
-TV Scores lleva los resultados a la pantalla más grande de casa: los partidos de hoy en directo, con el minuto de juego, los resultados de ayer, lo que viene después y, para cada partido, dónde verlo.
+TV Scores lleva los resultados a la pantalla más grande de casa, y a tu iPhone y tu iPad: los partidos de hoy en directo, con el minuto de juego, los resultados de ayer, lo que viene después y, para cada partido, dónde verlo.
 
 DÓNDE VERLO
 Cada partido muestra sus canales en Francia, Estados Unidos y Brasil: elige un país, varios o ninguno. Dónde ver abre la app de la cadena o del servicio de streaming directamente desde el partido, o su página en el App Store si la app no está instalada.
@@ -194,12 +194,12 @@ FINES DE SEMANA DE CARRERAS
 Fórmula 1 y MotoGP: la sesión de clasificación, el sprint y la carrera a tu hora, y después la parrilla de salida, el resultado completo y los mundiales de pilotos y de equipos.
 
 LAS COMPETICIONES
-LaLiga, Premier League, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Copa Libertadores, Brasileirão, Liga de Naciones y amistosos internacionales; la NFL y la NBA; la Fórmula 1 y MotoGP; el tenis de la ATP y la WTA.
+LaLiga, Premier League, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Copa Libertadores, Brasileirão, Liga de Naciones y amistosos internacionales; la NFL y la NBA; la Fórmula 1 y MotoGP; el tenis de la ATP y la WTA; y el rugby: el Top 14, la Champions Cup, la Premiership, el Seis Naciones, el Nations Championship y la Copa del Mundo.
 
 A TU MANERA
 Quédate con las competiciones que sigues, en el orden que prefieras. Los horarios siguen tu zona horaria, y la app habla español, inglés, francés y portugués.
 
-PRIVACIDAD
-Sin cuenta, sin anuncios, sin seguimiento. Tus elecciones se quedan en tu Apple TV.
+TUS DATOS
+Sin cuenta, sin anuncios. La app te pregunta una vez si quieres compartir cómo la usas, para mejorarla, y puedes cambiar de opinión en Ajustes.
 
 TV Scores no tiene relación con las ligas, equipos, jugadores ni cadenas que muestra.

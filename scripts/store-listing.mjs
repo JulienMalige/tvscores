@@ -6,7 +6,10 @@
 // Zero dependencies.
 //
 //   node scripts/store-listing.mjs
-//   node scripts/store-listing.mjs push [--dry-run]
+//   node scripts/store-listing.mjs push [--platform TV_OS|IOS] [--dry-run]
+//
+// One listing serves both platforms' versions; the app's information (name,
+// subtitle, privacy policy) is the app's, shared by both.
 import { readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -113,23 +116,24 @@ export function problems (listing) {
   return found
 }
 
-/** The app, its information and its tvOS version, as long as App Store
- *  Connect still lets them change. `call` is the API (a stand-in in the tests). */
-export async function openVersion (call = asc) {
+/** The app, its information and its version on `platform` (TV_OS or IOS), as
+ *  long as App Store Connect still lets them change. `call` is the API (a
+ *  stand-in in the tests). */
+export async function openVersion (call = asc, platform = 'TV_OS') {
   const app = (await call(`/v1/apps?filter[bundleId]=${BUNDLE_ID}`)).data.find((a) => a.attributes.bundleId === BUNDLE_ID)
   if (!app) throw new Error(`no app with the bundle id ${BUNDLE_ID} in App Store Connect`)
   const info = (await call(`/v1/apps/${app.id}/appInfos?include=primaryCategory`)).data.find((i) => EDITABLE.includes(i.attributes.state))
-  const version = (await call(`/v1/apps/${app.id}/appStoreVersions?filter[platform]=TV_OS`)).data.find((v) => EDITABLE.includes(v.attributes.appVersionState))
-  if (!info || !version) throw new Error('no tvOS version open for changes: add the next version in App Store Connect first')
+  const version = (await call(`/v1/apps/${app.id}/appStoreVersions?filter[platform]=${platform}`)).data.find((v) => EDITABLE.includes(v.attributes.appVersionState))
+  if (!info || !version) throw new Error(`no ${platform === 'IOS' ? 'iOS' : 'tvOS'} version open for changes: add the next version in App Store Connect first`)
   return { app, info, version }
 }
 
 /** Sends the listing to the tvOS version being prepared: each field that
  *  differs, each locale App Store Connect lacks, the category, the copyright
  *  and the free price. */
-export async function push (listing, { call = asc, dryRun = false, log = console.log } = {}) {
+export async function push (listing, { call = asc, dryRun = false, log = console.log, platform = 'TV_OS' } = {}) {
   const send = (path, method, data, included) => dryRun ? null : call(path, { method, body: JSON.stringify({ data, included }) })
-  const { app, info, version } = await openVersion(call)
+  const { app, info, version } = await openVersion(call, platform)
 
   for (const [type, owner, parent, names] of [
     ['appInfoLocalizations', 'appInfo', info, INFO_FIELDS],
@@ -191,7 +195,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   for (const p of found) console.error(`✗ ${p}`)
   if (found.length) process.exit(1)
   if (process.argv[2] === 'push') {
-    await push(listing, { dryRun: process.argv.includes('--dry-run') }).catch((err) => {
+    const at = process.argv.indexOf('--platform')
+    await push(listing, { dryRun: process.argv.includes('--dry-run'), platform: at > 0 ? process.argv[at + 1] : 'TV_OS' }).catch((err) => {
       console.error(err.message)
       process.exit(1)
     })

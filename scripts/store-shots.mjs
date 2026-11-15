@@ -1,19 +1,26 @@
 #!/usr/bin/env node
 // Uploads the App Store's screenshots, as the store-shots workflow leaves
-// them (<folder>/<locale>/<n>-<name>.png), to the tvOS version being
-// prepared. Each locale's Apple TV set is replaced, in file name order,
-// unless App Store Connect holds those very files already. Zero dependencies.
+// them, to the version being prepared: the Apple TV's from
+// <folder>/<locale>/<n>-<name>.png, the iPhone's and the iPad's from
+// <folder>/<locale>/iphone/ and ipad/ (--platform IOS). Each set is replaced,
+// in file name order, unless App Store Connect holds those very files
+// already. Zero dependencies.
 //
 //   gh run download <run id> -n store-shots -D <folder>
-//   node scripts/store-shots.mjs <folder> [--dry-run]
+//   node scripts/store-shots.mjs <folder> [--platform TV_OS|IOS] [--dry-run]
 import { createHash } from 'node:crypto'
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { asc } from './asc.mjs'
 import { LOCALES, openVersion } from './store-listing.mjs'
 
-// App Store Connect's name for the Apple TV's pictures, 1920x1080 or 3840x2160.
-const DISPLAY = 'APP_APPLE_TV'
+// App Store Connect's names for each platform's sets, and where their files
+// are: the Apple TV's 3840x2160; the 6.9-inch iPhone's 1320x2868, which
+// Apple files under 6.7 (forum thread 763908); the 13-inch iPad's 2064x2752.
+export const SETS = {
+  TV_OS: [{ display: 'APP_APPLE_TV', sub: '' }],
+  IOS: [{ display: 'APP_IPHONE_67', sub: 'iphone' }, { display: 'APP_IPAD_PRO_3GEN_129', sub: 'ipad' }]
+}
 
 const json = (method, data) => ({ method, body: JSON.stringify({ data }) })
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -21,13 +28,14 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 /** Replaces each locale's Apple TV screenshots with the folder's, then waits
  *  until Apple has accepted every picture, those of an earlier run included.
  *  `call` is the API and `put` the upload: stand-ins in the tests. */
-export async function upload (folder, { call = asc, put = fetch, dryRun = false, log = console.log, pause = wait } = {}) {
-  const { version } = await openVersion(call)
+export async function upload (folder, { call = asc, put = fetch, dryRun = false, log = console.log, pause = wait, platform = 'TV_OS' } = {}) {
+  const { version } = await openVersion(call, platform)
   const { data: localizations } = await call(`/v1/appStoreVersions/${version.id}/appStoreVersionLocalizations?limit=50`)
   const waiting = []
-  for (const locale of LOCALES) {
-    const shots = readdirSync(join(folder, locale)).filter((name) => name.endsWith('.png')).sort().map((name) => {
-      const bytes = readFileSync(join(folder, locale, name))
+  for (const locale of LOCALES) for (const { display: DISPLAY, sub } of SETS[platform]) {
+    const label = sub ? `${locale} ${sub}` : locale
+    const shots = readdirSync(join(folder, locale, sub)).filter((name) => name.endsWith('.png')).sort().map((name) => {
+      const bytes = readFileSync(join(folder, locale, sub, name))
       return { name, bytes, md5: createHash('md5').update(bytes).digest('hex') }
     })
     const localization = localizations.find((l) => l.attributes.locale === locale)
@@ -41,10 +49,10 @@ export async function upload (folder, { call = asc, put = fetch, dryRun = false,
       ? a.sourceFileChecksum === shots[i].md5
       : a.fileName === shots[i].name && a.fileSize === shots[i].bytes.length)
     if (held) {
-      if (present.some((s) => s.attributes.assetDeliveryState?.state !== 'COMPLETE')) waiting.push({ locale, set: set.id })
+      if (present.some((s) => s.attributes.assetDeliveryState?.state !== 'COMPLETE')) waiting.push({ locale: label, set: set.id })
       continue
     }
-    log(`${locale}: ${shots.length} screenshots${present.length ? `, in place of ${present.length}` : ''}`)
+    log(`${label}: ${shots.length} screenshots${present.length ? `, in place of ${present.length}` : ''}`)
     if (dryRun) continue
     set ??= (await call('/v1/appScreenshotSets', json('POST', {
       type: 'appScreenshotSets',
@@ -64,11 +72,11 @@ export async function upload (folder, { call = asc, put = fetch, dryRun = false,
       for (const part of reserved.attributes.uploadOperations) {
         const headers = Object.fromEntries(part.requestHeaders.map((h) => [h.name, h.value]))
         const res = await put(part.url, { method: part.method, headers, body: shot.bytes.subarray(part.offset, part.offset + part.length) })
-        if (!res.ok) throw new Error(`${locale} ${shot.name}: the upload answered ${res.status}`)
+        if (!res.ok) throw new Error(`${label} ${shot.name}: the upload answered ${res.status}`)
       }
       await call(`/v1/appScreenshots/${reserved.id}`, json('PATCH', { type: 'appScreenshots', id: reserved.id, attributes: { uploaded: true, sourceFileChecksum: shot.md5 } }))
     }
-    waiting.push({ locale, set: set.id })
+    waiting.push({ locale: label, set: set.id })
   }
   // Apple looks at each picture once it is in, minutes later at times
   // (2026-10-27): a wrong size fails here, not above.
@@ -90,10 +98,11 @@ export async function upload (folder, { call = asc, put = fetch, dryRun = false,
 if (import.meta.url === `file://${process.argv[1]}`) {
   const [folder] = process.argv.slice(2).filter((arg) => !arg.startsWith('--'))
   if (!folder) {
-    console.error('usage: store-shots.mjs <folder> [--dry-run]')
+    console.error('usage: store-shots.mjs <folder> [--platform TV_OS|IOS] [--dry-run]')
     process.exit(2)
   }
-  await upload(folder, { dryRun: process.argv.includes('--dry-run') }).catch((err) => {
+  const at = process.argv.indexOf('--platform')
+  await upload(folder, { dryRun: process.argv.includes('--dry-run'), platform: at > 0 ? process.argv[at + 1] : 'TV_OS' }).catch((err) => {
     console.error(err.message)
     process.exit(1)
   })

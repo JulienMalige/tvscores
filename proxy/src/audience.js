@@ -196,8 +196,12 @@ export class Audience {
     }
   }
 
-  /** The last `n` days, newest first, today's as it stands. */
+  /** The last `n` days, newest first, today's as it stands; a day ended with no request since closes here. */
   days(n = 30) {
+    if (dayOf(this.now()) !== this.day) {
+      this.close();
+      this.open(dayOf(this.now()));
+    }
     const kept = readdirSync(this.dir)
       .filter((f) => /^\d{4}-\d{2}-\d{2}\.json$/.test(f) && f.slice(0, 10) !== this.day)
       .map((f) => f.slice(0, 10))

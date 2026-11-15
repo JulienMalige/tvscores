@@ -138,27 +138,27 @@ test("Amplitude's count of the viewers who said yes sits beside the server's, in
   const fetch = async (url, { headers }) => {
     asked.push({ url, auth: headers.authorization });
     const data = url.includes("sessions/average") ? { xValues: ["2026-11-14T00:00:00", "2026-11-15T00:00:00"], series: [[42.9, 36.4]] }
-      : url.includes("g=country") ? { xValues: ["2026-11-14", "2026-11-15"], series: [[1, 2], [0, 1]], seriesLabels: ["Brazil", "France"] }
-      : url.includes("store") ? { xValues: ["2026-11-14", "2026-11-15"], series: [[0, 0]], seriesLabels: [0] }
+      : url.includes("g=country") ? { xValues: ["2026-11-09"], series: [[2], [1]], seriesLabels: ["Brazil", "France"] }
+      : url.includes("i=30") ? { xValues: ["2026-11-01"], series: [[2]], seriesLabels: [0] }
       : { xValues: ["2026-11-14", "2026-11-15"], series: [[1, 2]], seriesLabels: [0] };
     return { ok: true, json: async () => ({ data }) };
   };
   const summary = amplitudeReader({ key: "k", secret: "s", fetch, now: () => noon });
   const said = await summary();
   assert.deepEqual(said.days, { "2026-11-14": 1, "2026-11-15": 2 });
-  assert.deepEqual(said.countries, { Brazil: 3, France: 1 });
-  assert.deepEqual(said.tester, { "2026-11-14": 1, "2026-11-15": 2 });
-  assert.deepEqual(said.store, { "2026-11-14": 0, "2026-11-15": 0 });
+  assert.deepEqual(said.countries, { Brazil: 2, France: 1 });
+  assert.equal(said.thisMonth, 2);
+  assert.ok(asked.some((a) => a.url.includes("&i=30") && !a.url.includes("&i=1")), "the month asked once, by month");
   assert.deepEqual(said.sessionSeconds, { "2026-11-14": 42.9, "2026-11-15": 36.4 });
   await summary();
-  assert.equal(asked.length, 6, "kept ten minutes: opening the page twice asks once");
+  assert.equal(asked.length, 4, "kept ten minutes: opening the page twice asks once");
   assert.equal(asked[0].auth, `Basic ${Buffer.from("k:s").toString("base64")}`);
   const a = new Audience({ dir: dir(), now: () => noon });
   // Three devices on the server, two of them on the same build.
   board(a, ask("203.0.113.9", { agent: "TV%20Scores/50 CFNetwork/1 Darwin/25.1.0" }));
   board(a, ask("198.51.100.4", { agent: "TV%20Scores/50 CFNetwork/1 Darwin/25.1.0" }));
   board(a, ask("192.0.2.1", { agent: "TV%20Scores/51 CFNetwork/1 Darwin/25.1.0" }));
-  const html = renderAudience(a.days(30), { amplitude: { ...said, tester: { "2026-11-15": 2 } } });
+  const html = renderAudience(a.days(30), { amplitude: said });
   assert.match(html, /How many use it\?<\/span><strong>3</);
   assert.match(html, /How many different people this month\?<\/span><strong>2</, "Amplitude's month");
   assert.match(html, /of today&#39;s said yes \(Amplitude\)/);
@@ -186,4 +186,16 @@ test("Apple's downloads: first ones apart from re-downloads, by device and count
   assert.match(html, /How many installed it\?<\/span><strong>2</);
   assert.match(html, /1 re-downloads/);
   assert.match(html, /installs: Apple TV 100%/);
+});
+
+test("updates are not re-downloads, and a day with no request since its end still closes", async () => {
+  const { parseDownloads } = await import("../src/apple-reports.js");
+  const rows = parseDownloads("Date\tDownload Type\tDevice\tTerritory\tCounts\n2026-11-14\tAuto-update\tApple TV\tFR\t40\n2026-11-14\tRedownload\tApple TV\tFR\t1\n");
+  let now = noon;
+  const a = new Audience({ dir: dir(), now: () => now });
+  board(a, ask("203.0.113.9"));
+  assert.match(renderAudience(a.days(30), { apple: rows }), /· 1 re-downloads/);
+  now = noon + 24 * 3600e3;
+  assert.equal(a.days(30)[0].day, "2026-11-16", "the page's today is today, not the last day a request came");
+  assert.equal(a.days(30)[1].devices, 1);
 });
