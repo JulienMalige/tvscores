@@ -16,7 +16,7 @@ import { createSite } from "./site.js";
 const IMAGE_CACHE = "public, max-age=31536000, immutable"; // a year: a crest changes at a rebrand, and ImageMirror.VERSION is the lever
 
 /** @param limits per-source daily caps ({ football: 100, f1: 200, photos: 1000, ... }), supplied by index.js from the actual quotas. */
-export function createApp({ store, config, startedAt = Date.now(), photos, images, details, broadcasts, appIcons, activeSports = [], limits = {}, log = () => {} }) {
+export function createApp({ store, config, startedAt = Date.now(), photos, images, details, broadcasts, appIcons, audience, activeSports = [], limits = {}, log = () => {} }) {
   const watch = createWatch(config.channelApps);
   // An app's icon is its store listing's, mirrored (shrunk, cached) like a crest.
   const appIcon = (key) => (mirror && appIcons?.get(key) ? mirror(appIcons.get(key)) : undefined);
@@ -87,6 +87,7 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
     const tz = canonicalTz(rawTz);
     // The API's alone: a page of the website ignores a stray ?tz=.
     if (!tz && path.startsWith("/v1/")) return send(res, 400, { error: `unknown tz ${rawTz.slice(0, 64)}` });
+    audience?.note(req, path, url, tz); // the audience's totals (docs/analytics.md); it never throws
 
     if (path === "/v1/scoreboard") {
       const sports = shownSports(url.searchParams.get("sports"), config);

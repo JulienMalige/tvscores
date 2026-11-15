@@ -17,6 +17,8 @@ import { EventDetails } from "./details.js";
 import { LiveBackup } from "./providers/live-backup.js";
 import { AppIcons } from "./app-icons.js";
 import { TvChannels } from "./broadcasts.js";
+import { Audience } from "./audience.js";
+import { createAudienceServer } from "./audience-page.js";
 
 const log = (msg) => console.log(`${new Date().toISOString()} ${msg}`);
 const store = new Store(config.cacheDir);
@@ -106,7 +108,17 @@ const broadcasts = new TvChannels({
   log,
 });
 const appIcons = new AppIcons({ table: config.channelApps, store, log });
-const app = createApp({ store, config, photos, images, details, broadcasts, appIcons, activeSports: schedulers.map((s) => s.p.sport), limits, log });
+// How the app is used, in totals, for every copy of it (docs/analytics.md).
+const audience = new Audience({ dir: join(config.cacheDir, "audience"), log });
+const app = createApp({ store, config, photos, images, details, broadcasts, appIcons, audience, activeSports: schedulers.map((s) => s.p.sport), limits, log });
+// Its page, on a port the tunnel never reaches: Tailscale's serve puts it on the tailnet alone.
+const nameOf = (key) => {
+  const [sport, id] = key.split(":");
+  return config.leagues[sport]?.find((l) => String(l.id) === id)?.name ?? key;
+};
+const audiencePort = Number(process.env.TVSCORES_AUDIENCE_PORT || 8789);
+const audiencePage = createAudienceServer(audience, { nameOf });
+audiencePage.listen(audiencePort, "127.0.0.1", () => log(`audience page on http://127.0.0.1:${audiencePort}`));
 // A promise nobody caught is a bug to read about in the journal, not a reason for every television to lose us.
 process.on("unhandledRejection", (err) => log(`unhandled rejection: ${err?.stack || err}`));
 app.listen(config.port, config.host, () => {
@@ -127,6 +139,8 @@ for (const sig of ["SIGINT", "SIGTERM"]) {
     broadcasts.stop();
     appIcons.stop();
     store.save();
+    audience.save();
+    audiencePage.close();
     app.close(() => process.exit(0));
   });
 }

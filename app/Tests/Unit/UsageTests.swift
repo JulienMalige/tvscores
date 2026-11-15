@@ -101,6 +101,14 @@ struct UsageTests {
         #expect(Set(properties.keys) == ["app", "app_name", "country"])
     }
 
+    @Test("the app's requests say the kind of device, for the server's totals")
+    @MainActor
+    func requestsSayTheKindOfDevice() throws {
+        let request = ScoreboardStore.request(try #require(URL(string: "https://example.com/v1/scoreboard")))
+        #expect(request.value(forHTTPHeaderField: "X-TVScores-Platform") == "tv", "the tests run on the television")
+        #expect(request.timeoutInterval == 15)
+    }
+
     @Test("a page counts only while in sight, and every Page Left has its Page Viewed")
     func pageCountsWhileInSight() {
         // The review of 2026-11-14: a page under a game or a pushed page, and

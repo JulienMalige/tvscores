@@ -167,6 +167,11 @@ Cloudflare caches the PNGs at fixed addresses (`/v1/assets/...`) at its edge for
 max-age: flags a year, teams a week, leagues a day. After redrawing one, purge the zone's
 cache in Cloudflare's dashboard, or fresh installs keep the old picture.
 
+The audience's daily totals (`src/audience.js`, `docs/analytics.md`) are files in
+`~/.local/state/tvscores/audience/`, one a day, nothing in them that names a
+device; their page answers on `http://127.0.0.1:8789/` (`TVSCORES_AUDIENCE_PORT`),
+which `tailscale serve` puts on the tailnet at `:8448` and nowhere else.
+
 Cache lives in `~/.local/state/tvscores/` and survives restarts; on an upstream
 failure the last good data is served and `stale` turns true after 6 h without a
 successful fetch. Bumping `SCHEMA_VERSION` in `src/cache.js` clears resolved

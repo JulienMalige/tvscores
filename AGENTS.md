@@ -124,6 +124,9 @@ up to 44 used the Tailscale Funnel address,
 build 45 worked on the television; they no longer reach the proxy.
 The app reads `/v1/scoreboard` and `/v1/standings/{sport}/{league}`, and loads
 images from `/v1/img/...` and `/v1/assets/...` which the scoreboard hands it.
+Those requests are also counted, in daily totals that name no one
+(`proxy/src/audience.js`, `docs/analytics.md`), read on a page that only Tailscale
+reaches (127.0.0.1:8789, served on the tailnet at `:8448`).
 Rules: polling on a schedule, never per request; per-sport daily budget with a
 reserve; last good cache served with `stale` flags when upstream fails; the
 `/v1/health` endpoint exposes quota use per sport.

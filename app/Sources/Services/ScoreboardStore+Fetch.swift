@@ -1,8 +1,21 @@
 import Foundation
+import UIKit
 
 /// What the store asks the proxy for: the board, one game's page, a competition's table.
 /// (Kept apart from the store's state and its picture warming, which are long enough.)
 extension ScoreboardStore {
+    /// The kind of device asking (tv, phone or pad), for the server's daily
+    /// totals (docs/analytics.md): what it is, never who.
+    static let platform = UsageProfile.platform(UIDevice.current.userInterfaceIdiom)
+
+    /// A request to the proxy, with its time-out and the kind of device.
+    static func request(_ url: URL) -> URLRequest {
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 15
+        request.setValue(platform, forHTTPHeaderField: "X-TVScores-Platform")
+        return request
+    }
+
     /// One game's page from the proxy, or nil: the bundled demo has none,
     /// and a race, a tennis match or a failed request has none either.
     func detail(for eventId: String) async -> GameDetail? {
@@ -11,10 +24,8 @@ extension ScoreboardStore {
         else { return nil }
         comps.queryItems = [URLQueryItem(name: "id", value: eventId)]
         guard let url = comps.url else { return nil }
-        var request = URLRequest(url: url)
-        request.timeoutInterval = 15
         do {
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await URLSession.shared.data(for: Self.request(url))
             guard (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
             return try ScoreboardDecoder.make().decode(GameDetail.self, from: data)
         } catch {
@@ -31,8 +42,7 @@ extension ScoreboardStore {
                 let bundle = try ScoreboardDecoder.make().decode(StandingsBundle.self, from: Data(contentsOf: url))
                 return bundle.standings["\(ref.sport):\(ref.leagueId)"]
             case .remote(let base):
-                var req = URLRequest(url: base.appending(path: "v1/standings/\(ref.sport)/\(ref.leagueId)"))
-                req.timeoutInterval = 15
+                let req = Self.request(base.appending(path: "v1/standings/\(ref.sport)/\(ref.leagueId)"))
                 let (d, resp) = try await URLSession.shared.data(for: req)
                 guard let http = resp as? HTTPURLResponse, http.statusCode == 200 else { return nil }
                 return try ScoreboardDecoder.make().decode(Standings.self, from: d)
@@ -61,9 +71,7 @@ extension ScoreboardStore {
             }
             data = try Data(contentsOf: url)
         case .remote(let base):
-            var req = URLRequest(url: Self.boardURL(base))
-            req.timeoutInterval = 15
-            let (d, resp) = try await URLSession.shared.data(for: req)
+            let (d, resp) = try await URLSession.shared.data(for: Self.request(Self.boardURL(base)))
             guard let http = resp as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
                 throw URLError(.badServerResponse)
             }

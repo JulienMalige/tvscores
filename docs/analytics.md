@@ -131,6 +131,37 @@ addresses after ingestion; turning the address off in the library
 (`disableTrackIpAddress`) would empty the location fields as well
 (amplitude.com/docs/data/understand-ip-address-and-location, 2026-11-10).
 
+## The server's totals, for everyone (2026-11-15)
+
+Amplitude sees only the viewers who say yes, and only from version 1.1. Julien
+asked whether the back end could count too ("Is it possible to do some
+analytics on the back end"), and said "Build it, but without the Pi backup"
+(2026-11-15). The proxy counts the requests every copy of the app already
+makes, whatever its version and its answer (`proxy/src/audience.js`):
+
+- **What**: per UTC day, the devices that asked for the board, the sittings
+  (board requests less than 10 minutes apart; the app asks every 3 minutes,
+  every 30 s during a game) and the minutes they add up to, the hours with
+  the app open, and per device and day its kind (`X-TVScores-Platform`, sent
+  by builds after 51), app build, country (Cloudflare's `CF-IPCountry`), time
+  zone and language; and how many devices opened each competition's table and
+  each sport's game pages, and how often.
+- **Not who.** Within a day a device is a keyed hash of its address, user
+  agent and language. The key is random, held in memory only, and dropped with
+  the day's table when the day closes. Only totals reach the disk, one file a
+  day in `~/.local/state/tvscores/audience/`, kept for good and **not backed
+  up** (Julien's choice). A restart makes a new key: the day carries the totals
+  counted before it, and a device seen on both sides counts twice
+  (`restarts`). CI's builds (build 1), browsers and the machine's own calls are
+  not counted.
+- **Where Julien reads it**: `https://srv1822832.tailf78112.ts.net:8448/`,
+  tailnet only (`tailscale serve` to the proxy's second port, 127.0.0.1:8789;
+  `~/VPS.md`): the last 30 days, and the last 7 broken down, hours in São Paulo
+  time.
+- **No question needed**: nothing in it can name or follow a person, and the
+  privacy pages say what is counted. App Privacy needs no new answer: the
+  usage data is declared already, for Amplitude.
+
 ## Apple's App Privacy form
 
 To fill in App Store Connect, App Privacy, before the version that carries
