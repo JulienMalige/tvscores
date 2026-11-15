@@ -159,22 +159,22 @@ struct SplitMenu: View {
         }
     }
 
-    /// Apple Sports' pill: the view you are in, Home or My Teams, and the
-    /// other one a tap away (Julien, 2026-11-15).
+    /// The way to the other view: "★ My Teams" on Home, "⌂ Home" on My
+    /// Teams, words and symbol both. Apple Sports' pill names the view you
+    /// are in, which a phone's toolbar shrank to a lone house on Home, read
+    /// as a Home button on the Home page (Julien, build 55).
     private var viewSwitch: some View {
-        Menu {
-            Picker(selection: Binding(get: { selection == .myTeams ? MenuItem.myTeams : .home }, set: { selection = $0 })) {
-                Label { Text("tab.home") } icon: { Image(systemName: "house.fill") }.tag(MenuItem.home)
-                Label { Text("myTeams.title") } icon: { Image(systemName: "star.fill") }.tag(MenuItem.myTeams)
-            } label: { EmptyView() }
+        let onMyTeams = selection == .myTeams
+        return Button {
+            selection = onMyTeams ? .home : .myTeams
         } label: {
-            if selection == .myTeams {
-                Label { Text("myTeams.title") } icon: { Image(systemName: "star.fill") }
-            } else {
-                Label { Text("tab.home") } icon: { Image(systemName: "house.fill") }
+            HStack(spacing: 6) {
+                Image(systemName: onMyTeams ? "house.fill" : "star.fill")
+                Text(onMyTeams ? "tab.home" : "myTeams.title")
             }
+            .font(.subheadline.weight(.semibold))
+            .fixedSize()
         }
-        .labelStyle(.titleAndIcon)
         .accessibilityIdentifier("view.switch")
     }
 

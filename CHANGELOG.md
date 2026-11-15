@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- On iPhone and iPad, the button at the top right says where it takes you, "My Teams"
+  on Home and "Home" on My Teams, in words; on My Teams, Edit chooses the teams.
 
 ## 1.2 builds 54 (Apple TV) and 55 (iPhone and iPad) — 15 November 2026
 - My Teams: follow teams, and Formula 1 drivers, MotoGP riders and tennis players too.
