@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+
+## 1.2 builds 54 (Apple TV) and 55 (iPhone and iPad) — 15 November 2026
 - My Teams: follow teams, and Formula 1 drivers, MotoGP riders and tennis players too.
   Their games come first on Home, under "My Teams", with a star before their crest, and
   My Teams, under Home in the menu, shows only theirs. Choose them by competition or search
