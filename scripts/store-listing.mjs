@@ -21,7 +21,7 @@ const SITE = join(ROOT, 'site')
 const BUNDLE_ID = 'com.julienmalige.tvscores'
 export const LOCALES = ['en-US', 'fr-FR', 'pt-BR', 'es-ES']
 // App Store Connect's limits, in characters.
-const LIMITS = { Subtitle: 30, 'Promotional text': 170, Keywords: 100, Description: 4000 }
+const LIMITS = { Subtitle: 30, 'Promotional text': 170, Keywords: 100, Description: 4000, "What's New": 4000 }
 // The lines every locale shares ("- Name: TV Scores"). <lang> in a value is
 // the website's folder for the locale, its first two letters: en, fr, pt, es.
 const SHARED = ['Name', 'Category', 'Price', 'Copyright', 'Support URL', 'Marketing URL', 'Privacy policy URL']
@@ -30,6 +30,9 @@ const TRADEMARKS = ['nfl', 'nba', 'f1', 'motogp', 'premier', 'laliga', 'liga', '
 // Where each field goes in App Store Connect: the app's information, or the version's.
 const INFO_FIELDS = { Name: 'name', Subtitle: 'subtitle', 'Privacy policy URL': 'privacyPolicyUrl', 'Privacy policy text': 'privacyPolicyText' }
 const VERSION_FIELDS = { Description: 'description', Keywords: 'keywords', 'Promotional text': 'promotionalText', 'Marketing URL': 'marketingUrl', 'Support URL': 'supportUrl' }
+// What's New belongs to an update: a platform's first version, as the iPhone and
+// iPad's 1.1 is (2026-11-15), takes none.
+const UPDATE_FIELDS = { "What's New": 'whatsNew' }
 // The states in which App Store Connect lets a version, and its app information, change.
 const EDITABLE = ['PREPARE_FOR_SUBMISSION', 'DEVELOPER_REJECTED', 'REJECTED', 'METADATA_REJECTED', 'INVALID_BINARY']
 // The entities a hand-written page of site/ may use.
@@ -137,7 +140,7 @@ export async function push (listing, { call = asc, dryRun = false, log = console
 
   for (const [type, owner, parent, names] of [
     ['appInfoLocalizations', 'appInfo', info, INFO_FIELDS],
-    ['appStoreVersionLocalizations', 'appStoreVersion', version, VERSION_FIELDS]
+    ['appStoreVersionLocalizations', 'appStoreVersion', version, platform === 'TV_OS' ? { ...VERSION_FIELDS, ...UPDATE_FIELDS } : VERSION_FIELDS]
   ]) {
     const { data: present } = await call(`/v1/${parent.type}/${parent.id}/${type}?limit=50`)
     for (const locale of LOCALES) {

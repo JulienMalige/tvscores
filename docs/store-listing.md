@@ -90,6 +90,14 @@ No account, no ads. The app asks once whether you want to share how you use it, 
 
 TV Scores is not affiliated with the leagues, teams, players or broadcasters it shows.
 
+### What's New
+
+Rugby union arrives: the Top 14, the Champions Cup, the Premiership, the Nations Championship, the Six Nations and the World Cup, with their tables.
+TV Scores is now on iPhone and iPad too.
+Tennis's season finals are listed before they start.
+In Settings, hold the select button on a competition to move it up or down.
+The first time it opens, the app asks whether you want to share how you use it, to help make it better. You can change your answer in Settings.
+
 ## fr-FR
 
 ### Subtitle
@@ -127,6 +135,14 @@ VOS DONNÉES
 Ni compte, ni publicité. L'app vous demande une fois si vous voulez partager la façon dont vous l'utilisez, pour l'améliorer, et vous pouvez changer d'avis dans Réglages.
 
 TV Scores n'a aucun lien avec les ligues, équipes, joueurs ou diffuseurs qu'elle affiche.
+
+### What's New
+
+Le rugby à XV arrive : le Top 14, la Champions Cup, la Premiership, le Nations Championship, le Tournoi des Six Nations et la Coupe du monde, avec leurs classements.
+TV Scores est désormais aussi sur iPhone et iPad.
+Les finales de la saison de tennis sont listées avant leur début.
+Dans Réglages, maintenez le bouton de sélection sur une compétition pour la monter ou la descendre.
+À la première ouverture, l'app vous demande si vous voulez partager la façon dont vous l'utilisez, pour l'améliorer. Vous pouvez changer d'avis dans Réglages.
 
 ## pt-BR
 
@@ -166,6 +182,14 @@ Sem conta, sem anúncios. O app pergunta uma vez se você quer compartilhar como
 
 O TV Scores não tem ligação com as ligas, equipes, jogadores ou emissoras que mostra.
 
+### What's New
+
+Chegou o rúgbi: o Top 14, a Champions Cup, a Premiership, o Nations Championship, o Six Nations e a Copa do Mundo, com suas tabelas.
+O TV Scores agora também está no iPhone e no iPad.
+As finais da temporada de tênis aparecem antes de começar.
+Em Ajustes, mantenha o botão de seleção pressionado numa competição para subi-la ou descê-la.
+Na primeira vez que abre, o app pergunta se você quer compartilhar como o usa, para melhorá-lo. Você pode mudar a resposta em Ajustes.
+
 ## es-ES
 
 ### Subtitle
@@ -203,3 +227,11 @@ TUS DATOS
 Sin cuenta, sin anuncios. La app te pregunta una vez si quieres compartir cómo la usas, para mejorarla, y puedes cambiar de opinión en Ajustes.
 
 TV Scores no tiene relación con las ligas, equipos, jugadores ni cadenas que muestra.
+
+### What's New
+
+Llega el rugby: el Top 14, la Champions Cup, la Premiership, el Nations Championship, el Seis Naciones y la Copa del Mundo, con sus clasificaciones.
+TV Scores ya está también en iPhone y iPad.
+Las finales de la temporada de tenis aparecen antes de empezar.
+En Ajustes, mantén pulsado el botón de selección sobre una competición para subirla o bajarla.
+La primera vez que se abre, la app te pregunta si quieres compartir cómo la usas, para mejorarla. Puedes cambiar tu respuesta en Ajustes.
