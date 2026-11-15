@@ -12,6 +12,9 @@ const SAO_PAULO = -3;
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const fmt = (n) => Math.round(n).toLocaleString("en-US");
 const BUCKETS = MINUTES.map((bound, i) => (i === 0 ? `under ${bound}` : `${MINUTES[i - 1]}–${bound}`)).concat(`${MINUTES.at(-1)}+`);
+const SPORTS = { football: "Football", nfl: "NFL", nba: "NBA" };
+/** A UTC day as a person says it: "Sat 15 Nov". */
+const dayName = (day) => (day ? new Date(`${day}T12:00:00Z`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }) : "");
 const PLATFORMS = { tv: "Apple TV", phone: "iPhone", pad: "iPad", unknown: "Not said (builds before the header)" };
 
 /** A list of bars, longest first: one row per key, its count at the end. */
@@ -23,25 +26,17 @@ function bars(title, entries, { label = (k) => k, note = "", limit = 12, detail,
     <li><span class="label">${esc(label(key))}</span><span class="track"><span class="bar" style="width:${((n / max) * 100).toFixed(1)}%"></span></span><span class="value">${fmt(n)}${detail ? `<small>${esc(detail(key))}</small>` : ""}</span></li>`).join("")}</ul></section>`;
 }
 
-/** Vertical bars on one baseline, oldest on the left: each with its value on hover, and a table below says them all. */
-function columns(title, points, { note = "", tick = () => "" } = {}) {
-  const w = 720, h = 180, top = 16, bottom = 24, gap = 2;
+/**
+ * Vertical bars on one baseline, oldest on the left, drawn in HTML so their
+ * words keep their size on a phone: the tallest bar's value above, each bar's
+ * own on hover, and the table below says them all.
+ */
+function columns(title, points, { note = "", ticks = [] } = {}) {
   const max = Math.max(...points.map((p) => p.value), 1);
-  const step = w / points.length;
-  const width = Math.max(step - gap, 1);
-  const base = h - bottom;
-  const scale = (v) => ((base - top) * v) / max;
-  const path = (x, v) => {
-    const y = base - scale(v);
-    const r = Math.min(4, width / 2, scale(v));
-    return `M${x},${base} V${y + r} Q${x},${y} ${x + r},${y} H${x + width - r} Q${x + width},${y} ${x + width},${y + r} V${base} Z`;
-  };
   return `<section><h2>${esc(title)}</h2>${note ? `<p class="muted">${esc(note)}</p>` : ""}
-  <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(title)}">
-    <line class="grid" x1="0" x2="${w}" y1="${top}" y2="${top}"/><text class="axis" x="${w}" y="${top - 4}" text-anchor="end">${fmt(max)}</text>
-    <line class="baseline" x1="0" x2="${w}" y1="${base}" y2="${base}"/>
-    ${points.map((p, i) => `<g>${p.value ? `<path class="mark" d="${path(i * step + gap / 2, p.value)}"/>` : ""}<rect x="${i * step}" y="0" width="${step}" height="${h}" fill="transparent"><title>${esc(p.label)}: ${fmt(p.value)}</title></rect>${tick(i) ? `<text class="axis" x="${i * step + step / 2}" y="${h - 6}" text-anchor="middle">${esc(tick(i))}</text>` : ""}</g>`).join("")}
-  </svg></section>`;
+  <p class="max">${fmt(max)}</p>
+  <div class="cols" role="img" aria-label="${esc(title)}">${points.map((p) => `<span class="col" title="${esc(p.label)}: ${fmt(p.value)}"><span class="colbar" style="height:${((p.value / max) * 100).toFixed(1)}%"></span></span>`).join("")}</div>
+  <div class="ticks">${ticks.map((t) => `<span>${esc(t)}</span>`).join("")}</div></section>`;
 }
 
 /** A number with what it counts, for today and the day before. */
@@ -70,13 +65,15 @@ section, .tiles { background: var(--surface); border-radius: 14px; padding: 16px
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
 .tile { display: flex; flex-direction: column; } .tile strong { font-size: 30px; font-variant-numeric: tabular-nums; }
 .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0 14px; } .grid2 section { margin: 14px 0 0; }
-svg { width: 100%; height: auto; display: block; } .mark { fill: var(--mark); } .grid { stroke: var(--grid); stroke-width: 1; } .baseline { stroke: var(--axis); stroke-width: 1; }
-.axis { fill: var(--muted); font-size: 11px; }
+.max { color: var(--muted); font-size: 12px; text-align: right; margin: 0; border-bottom: 1px solid var(--grid); }
+.cols { display: flex; align-items: flex-end; gap: 2px; height: 150px; border-bottom: 1px solid var(--axis); }
+.col { flex: 1; height: 100%; display: flex; align-items: flex-end; } .colbar { width: 100%; background: var(--mark); border-radius: 4px 4px 0 0; }
+.ticks { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; margin-top: 4px; }
 .bars { list-style: none; margin: 0; padding: 0; } .bars li { display: grid; grid-template-columns: minmax(90px, 38%) 1fr auto; align-items: center; gap: 10px; padding: 3px 0; }
 .label { color: var(--ink2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .track { height: 12px; }
 .bar { display: block; height: 12px; background: var(--mark); border-radius: 0 4px 4px 0; min-width: 2px; }
 .value { font-variant-numeric: tabular-nums; text-align: right; } .value small { color: var(--muted); margin-left: 6px; }
-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; } th, td { text-align: right; padding: 4px 6px; border-bottom: 1px solid var(--grid); } th:first-child, td:first-child { text-align: left; } th { color: var(--muted); font-weight: 500; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; } th, td { text-align: right; padding: 4px 6px; border-bottom: 1px solid var(--grid); white-space: nowrap; } th:first-child, td:first-child { text-align: left; } th { color: var(--muted); font-weight: 500; }
 </style></head><body><main>
 <h1>TV Scores audience</h1>
 <p class="muted">Counted on the server from the requests of every copy of the app, 1.0 included, whether or not its viewer shares usage with Amplitude. Totals only; days are UTC days. A device is one address, one app build and one language within a day.</p>
@@ -86,8 +83,8 @@ table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nu
   ${tile("Minutes with the app open", today.minutes.total, yesterday.minutes.total)}
   ${tile("Boards served", today.boards, yesterday.boards)}
 </div>
-${columns("Devices a day, last 30 days", month.map((d) => ({ label: d.day, value: d.devices })), { tick: (i) => (i === 0 || i === month.length - 1 ? month[i].day.slice(5) : "") })}
-${columns("When, São Paulo time, last 7 days", hours.map((value, local) => ({ label: `${String(local).padStart(2, "0")}:00`, value })), { note: "Devices with the app open in each hour, added up over the 7 days.", tick: (i) => (i % 3 === 0 ? `${i}h` : "") })}
+${columns("Devices a day, last 30 days", month.map((d) => ({ label: dayName(d.day), value: d.devices })), { ticks: [dayName(month[0]?.day), dayName(month.at(-1)?.day)] })}
+${columns("When, São Paulo time, last 7 days", hours.map((value, local) => ({ label: `${String(local).padStart(2, "0")}:00`, value })), { note: "Devices with the app open in each hour, added up over the 7 days.", ticks: ["0h", "6h", "12h", "18h", "23h"] })}
 <div class="grid2">
 ${bars("Kind of device", Object.entries(week.platforms), { label: (k) => PLATFORMS[k] ?? k, note: "Device-days over the last 7 days: a device that came on 3 days counts 3." })}
 ${bars("Countries", Object.entries(week.countries), { label: (k) => (k === "unknown" ? "Unknown" : new Intl.DisplayNames(["en"], { type: "region" }).of(k) ?? k) })}
@@ -96,11 +93,11 @@ ${bars("Languages", Object.entries(week.languages))}
 ${bars("App builds", Object.entries(week.builds), { label: (k) => `build ${k}` })}
 ${bars("Minutes with the app open, per device and day", BUCKETS.map((label, i) => [label, week.minutes.buckets[i]]).filter(([, n]) => n), { limit: BUCKETS.length, sorted: false })}
 ${bars("Tables opened", Object.entries(week.tables).map(([k, v]) => [k, v.devices]), { label: nameOf, detail: (k) => `${fmt(week.tables[k].opens)} opens`, note: "Devices that opened each competition's table; the opens beside them." })}
-${bars("Game pages opened", Object.entries(week.games).map(([k, v]) => [k, v.devices]), { detail: (k) => `${fmt(week.games[k].opens)} opens`, note: "Football, NFL and NBA: the sports whose games have a page from the server." })}
+${bars("Game pages opened", Object.entries(week.games).map(([k, v]) => [k, v.devices]), { label: (k) => SPORTS[k] ?? k, detail: (k) => `${fmt(week.games[k].opens)} opens`, note: "Football, NFL and NBA: the sports whose games have a page from the server." })}
 </div>
 <section><h2>Day by day</h2>${restarts ? `<p class="muted">The server restarted ${restarts} time${restarts > 1 ? "s" : ""} this week: a device seen on both sides of a restart counts twice that day.</p>` : ""}
 <table><thead><tr><th>Day</th><th>Devices</th><th>Sittings</th><th>Minutes</th><th>Boards</th></tr></thead><tbody>
-${days.map((d) => `<tr><td>${esc(d.day)}${d.restarts ? " *" : ""}</td><td>${fmt(d.devices)}</td><td>${fmt(d.sittings)}</td><td>${fmt(d.minutes.total)}</td><td>${fmt(d.boards)}</td></tr>`).join("")}
+${days.map((d) => `<tr><td>${esc(dayName(d.day))}${d.restarts ? " *" : ""}</td><td>${fmt(d.devices)}</td><td>${fmt(d.sittings)}</td><td>${fmt(d.minutes.total)}</td><td>${fmt(d.boards)}</td></tr>`).join("")}
 </tbody></table></section>
 </main></body></html>`;
 }
