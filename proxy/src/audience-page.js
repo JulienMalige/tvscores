@@ -91,7 +91,7 @@ section, .tiles { background: var(--surface); border-radius: 14px; padding: 16px
 table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; } th, td { text-align: right; padding: 4px 6px; border-bottom: 1px solid var(--grid); white-space: nowrap; } th:first-child, td:first-child { text-align: left; } th { color: var(--muted); font-weight: 500; }
 </style></head><body><main>
 <h1>TV Scores audience</h1>
-<p class="muted">Counted on the server from the requests of every copy of the app, 1.0 included, whether or not its viewer shares usage with Amplitude. Totals only; days are UTC days. A device is one address, one app build and one language within a day.</p>
+<p class="muted">Counted on the server from the requests of every copy of the app, 1.0 included, whether or not its viewer shares usage with Amplitude. Totals only; days are UTC days. A device is one address, one app build, one system version and one language within a day (and, from the next build, one kind of device).</p>
 <div class="tiles">
   ${tile("Devices today", today.devices, yesterday.devices)}
   ${tile("Sittings", today.sittings, yesterday.sittings)}

@@ -153,3 +153,12 @@ test("Amplitude's count of the viewers who said yes sits beside the server's, in
   assert.match(html, /Said yes \(Amplitude\)/);
   assert.match(html, /Countries, Amplitude/);
 });
+
+test("an iPhone and an iPad behind one address, on the same build and system, are two devices once they say their kind", () => {
+  const a = new Audience({ dir: dir(), now: () => noon });
+  board(a, ask("203.0.113.9", { platform: "phone" }));
+  board(a, ask("203.0.113.9", { platform: "pad" }));
+  board(a, ask("203.0.113.9", { platform: "phone" }));
+  assert.equal(a.totals().devices, 2);
+  assert.deepEqual(a.totals().platforms, { phone: 1, pad: 1 });
+});

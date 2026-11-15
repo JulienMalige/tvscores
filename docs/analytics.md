@@ -147,7 +147,7 @@ makes, whatever its version and its answer (`proxy/src/audience.js`):
   zone and language; and how many devices opened each competition's table and
   each sport's game pages, and how often.
 - **Not who.** Within a day a device is a keyed hash of its address, user
-  agent and language. The key is random, held in memory only, and dropped with
+  agent (app build and system version), language and kind of device. The key is random, held in memory only, and dropped with
   the day's table when the day closes. Only totals reach the disk, one file a
   day in `~/.local/state/tvscores/audience/`, kept for good and **not backed
   up** (Julien's choice). A restart makes a new key: the day carries the totals

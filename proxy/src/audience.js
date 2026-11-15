@@ -10,7 +10,7 @@ import { join } from "node:path";
  * (Julien's choice).
  *
  * Within a day a device is told apart by a keyed hash of its address, its
- * user agent and its language. The key is random, lives in memory only and
+ * user agent, its language and its kind. The key is random, lives in memory only and
  * goes with the day's table when the day closes, so no device can be followed
  * from one day to the next, and only counts reach the disk. A restart makes a
  * new key: the day carries what was counted before it, and a device seen on
@@ -114,7 +114,7 @@ export class Audience {
       this.open(dayOf(t));
     }
     const language = languageOf(req.headers["accept-language"]);
-    const id = createHmac("sha256", this.key).update(`${ip}|${ua}|${language}`).digest("base64url");
+    const id = createHmac("sha256", this.key).update(`${ip}|${ua}|${language}|${req.headers["x-tvscores-platform"] ?? ""}`).digest("base64url");
     let device = this.devices.get(id);
     if (!device) {
       if (this.devices.size >= MAX_DEVICES) return;
