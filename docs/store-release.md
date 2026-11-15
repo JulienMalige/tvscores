@@ -90,6 +90,19 @@ television (`WAITING_FOR_REVIEW`, review submission
   Release") for Julien's go; the release is then one call,
   `POST /v1/appStoreVersionReleaseRequests`, or a button on the website.
 
+Version 1.1 went to App Review on 2026-11-15 at Julien's "Go", on both
+platforms at once: the Apple TV with build 52 (review submission
+`780ea569-001a-47a2-ab80-4323d6efd240`) and, for the first time, the iPhone and
+iPad with build 53 (`25ea43ce-5774-46c2-94ad-7ca641b0c4ca`; the version Julien
+created as 1.0 was renamed 1.1 to match its builds). Both are store builds, both
+released by hand once approved. With them: App Privacy published by Julien
+the same day (7 data types, linked, none for tracking; `docs/analytics.md`),
+the privacy policy text of 15 November, the listing naming the three devices,
+What's New for the Apple TV, the iPhone and iPad screenshots
+(`store-shots.yml` with `platform: ios`, run 43734887739), and a note telling
+the reviewer about the first-launch question. On release, add 52 and 53 to
+`STORE_BUILDS` in `proxy/src/audience-page.js`.
+
 What can come back: Apple's reasons for a rejection arrive in App Store
 Connect (App Review) and by email to the account holder. A version under
 review can still be withdrawn, and changed, then sent again.
