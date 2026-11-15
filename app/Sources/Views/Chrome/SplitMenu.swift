@@ -26,6 +26,8 @@ struct SplitMenu: View {
     /// The game or race whose page is up, over the page it was opened from.
     @State private var game: Event?
     @State private var settingsOpen = false
+    /// The picker of teams, on a sheet.
+    @State private var choosingTeams = false
     @State private var homeOpenedRace = false
 
     var body: some View {
@@ -34,7 +36,7 @@ struct SplitMenu: View {
         }
         .task { store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
-        .usageQuestion(store: store, covered: game != nil || settingsOpen)
+        .usageQuestion(store: store, covered: game != nil || settingsOpen || choosingTeams)
         // The pictures the system emptied while the app was away come back.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             Task { await store.rewarm() }
@@ -68,7 +70,7 @@ struct SplitMenu: View {
         }
         // Under a game or Settings the page is out of sight; the sheets
         // themselves, outside this, count.
-        .environment(\.usageCovered, game != nil || settingsOpen)
+        .environment(\.usageCovered, game != nil || settingsOpen || choosingTeams)
         .sheet(item: $game) { event in
             if event.kind == .race {
                 RaceScreen(eventId: event.id, fallback: event, store: store)
@@ -77,10 +79,11 @@ struct SplitMenu: View {
             }
         }
         .sheet(isPresented: $settingsOpen) { SettingsScreen(leagues: store.leagues, apps: store.board?.apps ?? [:]) }
+        .sheet(isPresented: $choosingTeams) { ChooseTeamsScreen(store: store, leagues: store.leagues) }
         // Outside the sheets, so the pages on them read the same.
         .environment(\.openGame) { event in
             game = event
-            let from = opened.isEmpty && selection == .home ? "home" : "competition"
+            let from = !opened.isEmpty ? "competition" : selection == .home ? "home" : selection == .myTeams ? "my teams" : "competition"
             Analytics.shared.gameOpened(event, board: store.board, from: from)
         }
         .environment(\.boardNow, store.board?.generatedAt)
@@ -100,6 +103,11 @@ struct SplitMenu: View {
             // A phone shows the list when nothing in it is chosen.
             if LaunchRequest.argument("-TVScoresMenuOpen") != nil { selection = nil; column = .sidebar }
             if LaunchRequest.argument("-TVScoresSettings") != nil { settingsOpen = true }
+            // `-TVScoresMyTeams` opens My Teams, `-TVScoresMyTeams choose` the picker (CI screenshots).
+            if let wanted = LaunchRequest.argument("-TVScoresMyTeams") {
+                selection = .myTeams
+                choosingTeams = wanted == "choose"
+            }
         }
     }
 
@@ -110,6 +118,9 @@ struct SplitMenu: View {
             Label { Text("tab.home") } icon: { MenuIcon.symbol("house.fill").view(size: Metrics.menuIcon) }
                 .tag(MenuItem.home)
                 .accessibilityIdentifier("menu.home")
+            Label { Text("myTeams.title") } icon: { MenuIcon.symbol("star.fill").view(size: Metrics.menuIcon) }
+                .tag(MenuItem.myTeams)
+                .accessibilityIdentifier("menu.myTeams")
             ForEach(SportSection.grouped(store.leagues), id: \.section.id) { entry in
                 Section {
                     ForEach(entry.leagues) { league in
@@ -134,7 +145,11 @@ struct SplitMenu: View {
     private func page(_ item: MenuItem) -> some View {
         switch item {
         case .home:
-            HomeScreen(store: store, day: $day, openLeague: open, openedInitialRace: $homeOpenedRace)
+            HomeScreen(store: store, day: $day, openLeague: open, openMyTeams: { selection = .myTeams }, openedInitialRace: $homeOpenedRace)
+                .toolbar { ToolbarItem(placement: .topBarTrailing) { viewSwitch } }
+        case .myTeams:
+            MyTeamsScreen(store: store, day: $day, chooseTeams: { choosingTeams = true })
+                .toolbar { ToolbarItem(placement: .topBarLeading) { viewSwitch } }
         case .league(let key):
             if let league = league(key) {
                 CompetitionScreen(ref: LeagueRef(league), store: store, day: leagueDays[key] ?? LaunchRequest.initialDay())
@@ -144,6 +159,25 @@ struct SplitMenu: View {
         case .settings:
             EmptyView() // never a page: the gear opens the sheet
         }
+    }
+
+    /// Apple Sports' pill: the view you are in, Home or My Teams, and the
+    /// other one a tap away (Julien, 2026-11-15).
+    private var viewSwitch: some View {
+        Menu {
+            Picker(selection: Binding(get: { selection == .myTeams ? MenuItem.myTeams : .home }, set: { selection = $0 })) {
+                Label { Text("tab.home") } icon: { Image(systemName: "house.fill") }.tag(MenuItem.home)
+                Label { Text("myTeams.title") } icon: { Image(systemName: "star.fill") }.tag(MenuItem.myTeams)
+            } label: { EmptyView() }
+        } label: {
+            if selection == .myTeams {
+                Label { Text("myTeams.title") } icon: { Image(systemName: "star.fill") }
+            } else {
+                Label { Text("tab.home") } icon: { Image(systemName: "house.fill") }
+            }
+        }
+        .labelStyle(.titleAndIcon)
+        .accessibilityIdentifier("view.switch")
     }
 
     private func league(_ key: String) -> LeagueSummary? {

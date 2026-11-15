@@ -5,7 +5,7 @@ import UIKit
 /// yes as Amplitude's user properties (Julien, 2026-11-14: "the most data we
 /// can, to understand who are the users and how they use the app"): the
 /// device's kind, the languages, the zone, the competitions followed in their
-/// order, the countries and apps chosen. Nothing that says who they are.
+/// order, the countries and apps chosen, the teams followed. Nothing that says who they are.
 struct UsageProfile: Equatable {
     var platform: String
     var edition: String
@@ -21,12 +21,15 @@ struct UsageProfile: Equatable {
     var countries: [String]
     var hiddenApps: [String]
     var since: Date?
+    /// The teams, drivers and players followed in My Teams, by name.
+    var teams: [String] = []
 
     var properties: [String: Any] {
         var properties: [String: Any] = [
             "platform": platform, "edition": edition, "app_language": appLanguage, "locale": locale,
             "time_zone": timeZone, "competitions_shown": shown, "competitions_hidden": hidden,
             "competitions_followed": shown.count, "countries": countries, "apps_hidden": hiddenApps,
+            "teams_followed": teams, "teams_count": teams.count,
         ]
         properties["system_language"] = systemLanguage
         properties["region"] = region
@@ -50,7 +53,8 @@ struct UsageProfile: Equatable {
             hidden: leagues.filter { !LeagueChoice.shared.isShown(MenuItem.key($0)) }.map(\.givenName),
             countries: ChannelChoice.shared.countries,
             hiddenApps: AppChoice.shared.hidden.sorted(),
-            since: UsageChoice.shared.since)
+            since: UsageChoice.shared.since,
+            teams: Favourites.shared.followed.values.sorted())
     }
 
     static func platform(_ idiom: UIUserInterfaceIdiom) -> String {

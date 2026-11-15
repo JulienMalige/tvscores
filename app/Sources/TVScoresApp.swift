@@ -8,6 +8,7 @@ struct TVScoresApp: App {
         URLCache.shared = URLCache(memoryCapacity: 32 << 20, diskCapacity: 256 << 20)
         LeagueChoice.resetIfAsked()
         UsageChoice.resetIfAsked()
+        Favourites.prepareIfAsked()
         // A viewer who said yes to sharing is counted from launch (docs/analytics.md).
         Analytics.shared.launch()
     }

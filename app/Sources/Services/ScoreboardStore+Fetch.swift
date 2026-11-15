@@ -52,6 +52,29 @@ extension ScoreboardStore {
         }
     }
 
+    /// Every competition's teams, drivers and players, for My Teams' picker
+    /// and search (`/v1/teams`), keyed "sport:league"; nil when unreachable.
+    func teams() async -> [String: [TeamEntry]]? {
+        do {
+            let data: Data
+            switch source {
+            case .bundled:
+                guard let url = Bundle.main.url(forResource: "sample-teams", withExtension: "json") else { return nil }
+                data = try Data(contentsOf: url)
+            case .remote(let base):
+                let url = base.appending(path: "v1/teams").appending(queryItems: [
+                    URLQueryItem(name: "sports", value: SportSection.sports.joined(separator: ",")),
+                ])
+                let (d, resp) = try await URLSession.shared.data(for: Self.request(url))
+                guard (resp as? HTTPURLResponse)?.statusCode == 200 else { return nil }
+                data = d
+            }
+            return try JSONDecoder().decode(TeamsList.self, from: data).teams
+        } catch {
+            return nil
+        }
+    }
+
     /// The board's address: the viewer's time zone, and the sports this build
     /// can show and hide. The proxy holds back any other, which is how a build
     /// up to 1.0, naming none, never sees rugby.

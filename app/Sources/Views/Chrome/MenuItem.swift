@@ -4,6 +4,8 @@ import SwiftUI
 /// phone's or a tablet's split view (`SplitMenu`).
 enum MenuItem: Hashable {
     case home
+    /// Only the followed sides' games (My Teams).
+    case myTeams
     case league(String)
     /// The gear at the top: opens settings over the page, not a page.
     case settings

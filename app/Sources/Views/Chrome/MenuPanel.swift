@@ -47,6 +47,7 @@ struct MenuPanel: View {
                 .padding(.leading, Metrics.menuRowInsetH)
                 .padding(.vertical, Metrics.menuRowInsetV)
                 row(.home, title: Text("tab.home"), icon: .symbol("house.fill"), id: "menu.home")
+                row(.myTeams, title: Text("myTeams.title"), icon: .symbol("star.fill"), id: "menu.myTeams")
                 ForEach(sections, id: \.section.id) { entry in
                     Text(entry.section.title)
                         .font(.callout.weight(.semibold))
@@ -116,11 +117,13 @@ struct MenuPanel: View {
     }
 
     private var currentTitle: Text {
-        currentLeague.map { Text(verbatim: $0.menu) } ?? Text("tab.home")
+        if selection == .myTeams { return Text("myTeams.title") }
+        return currentLeague.map { Text(verbatim: $0.menu) } ?? Text("tab.home")
     }
 
     private var currentIcon: MenuIcon {
-        currentLeague.map { .league($0) } ?? .symbol("house.fill")
+        if selection == .myTeams { return .symbol("star.fill") }
+        return currentLeague.map { .league($0) } ?? .symbol("house.fill")
     }
 }
 

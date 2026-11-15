@@ -8,5 +8,9 @@
 	<array>
 		<string>runs-as-current-user</string>
 	</array>
+	<!-- My Teams: the followed sides, kept in the viewer's iCloud so the
+	     Apple TV and the iPhone share them (docs/roadmap.md §4). -->
+	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
+	<string>$(TeamIdentifierPrefix)$(CFBundleIdentifier)</string>
 </dict>
 </plist>

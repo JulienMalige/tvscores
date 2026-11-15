@@ -95,13 +95,13 @@ https://claude.ai/artifact/FfxPac3PNtchfCokUQmobv).
 - Competitions stay in Settings (Julien, 2026-11-15).
 - Favourites sync between the Apple TV and the iPhone through iCloud
   (Julien, 2026-11-15).
-- Reminders before kickoff only, no goals or results (Julien, 2026-11-15:
-  "I just want reminder before the games"): a bell per favourite, a
-  setting for how long before (15 min, 30 min by default, 1 hour). Local
-  notifications scheduled by the iPhone and iPad from the games the app
-  loads, refreshed in the background; tvOS shows none, and the TV's
-  favourites reach the iPhone through iCloud. Nothing is kept on the
-  server, so no push key and no new data in App Privacy; the privacy pages
-  gain a line on favourites kept in the viewer's iCloud.
-- My Teams and the reminders ship together, in one version (Julien,
-  2026-11-15).
+- Version 1.2 is My Teams alone; reminders come in a later version
+  (Julien, 2026-11-15: "let's do in two time"). Reminders before kickoff
+  only, no goals or results ("I just want reminder before the games"), sent
+  by the proxy through Apple's push service so they come even when the app
+  stays closed: the phone alone schedules only the games it knows when it
+  last ran, and football's are known one day ahead. That version needs an
+  Apple push key (Julien creates it on developer.apple.com), each device's
+  push token and favourites kept on the proxy, and the privacy pages and
+  App Privacy rewritten. tvOS shows no notifications; the TV's favourites
+  reach the iPhone through iCloud.

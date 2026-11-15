@@ -137,6 +137,9 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.julienmalige.tvscores
         PRODUCT_NAME: TVScores
         TARGETED_DEVICE_FAMILY: "1,2"
+        # The iCloud key-value store, for My Teams; the App ID has the
+        # iCloud capability and the profiles carry it (docs/release.md).
+        CODE_SIGN_ENTITLEMENTS: TVScoresiOS.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         TVSCORES_EDITION: tester
       configs:

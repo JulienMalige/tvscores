@@ -93,6 +93,14 @@ enum UsageEvent: Equatable {
             Page(name: "home", properties: ["day": day.rawValue])
         }
 
+        /// My Teams, on a day.
+        static func myTeams(_ day: Day) -> Page {
+            Page(name: "my teams", properties: ["day": day.rawValue])
+        }
+
+        /// The picker of teams, drivers and players.
+        static let chooseTeams = Page(name: "choose teams", properties: [:])
+
         static func competition(_ ref: LeagueRef, day: Day) -> Page {
             Page(name: "competition", properties: ["competition": ref.givenName, "competition_id": MenuItem.key(ref),
                                                    "sport": ref.sport, "day": day.rawValue])

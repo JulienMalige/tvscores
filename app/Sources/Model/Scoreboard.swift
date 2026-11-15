@@ -116,6 +116,8 @@ struct TeamRef: Decodable, Equatable {
     let logo: URL?
     let photo: URL?
     let flag: String?
+    /// The proxy's name for it, "football:paris-saint-germain": what My Teams keeps.
+    let key: String?
     /// What the row shows under the badge: nickname for US teams, club name otherwise.
     var label: String { nick ?? name }
 }
@@ -147,6 +149,8 @@ struct RaceResult: Decodable, Identifiable, Equatable {
     let points: Int?
     let laps: Int?
     let fastestLap: Bool?
+    /// The proxy's key for the driver or rider, "f1:k-antonelli" (My Teams).
+    let key: String?
     var id: String { "\(pos.map { String($0) } ?? "-")-\(driver)" }
     var finished: Bool { pos != nil }
 }

@@ -6,31 +6,21 @@ struct HomeScreen: View {
     @Binding var day: Day
     /// Takes the viewer to a competition's own place in the menu.
     let openLeague: (LeagueRef) -> Void
+    /// Takes the viewer to My Teams, from the "★ My Teams ›" heading.
+    let openMyTeams: () -> Void
+    @State private var favourites = Favourites.shared
     /// Held by the menu's owner, so it outlives this screen.
     @Binding var openedInitialRace: Bool
     #if os(tvOS)
     @Environment(\.openMenu) private var openMenu
     #endif
     @Environment(\.openGame) private var openGame
-    @Environment(\.pageScrolled) private var pageScrolled
 
     var body: some View {
-        ScrollView {
-            // Title and day switch scroll away with the list. On a
-            // television a pinned bar saves no input, since reaching them
-            // means moving focus up there anyway, and the focus engine
-            // brings them back on screen when it does.
-            VStack(alignment: .leading, spacing: Metrics.sectionGap / 2) {
-                header
-                BoardCard(day: $day) { content }
-            }
-            .frame(maxWidth: Metrics.pageWidth)
-            .frame(maxWidth: .infinity)
-            .pageMargins()
+        BoardPage {
+            header
+            BoardCard(day: $day) { content }
         }
-        // Scrolled away from the top, the menu chip drops its name.
-        .onScrollGeometryChange(for: Bool.self, of: { $0.contentOffset.y > 60 }) { _, down in pageScrolled(down) }
-        .pageTint(.homeTint)
         .usagePage(.home(day))
         .onChange(of: day) { _, picked in Analytics.shared.track(.dayPicked(picked, on: "home")) }
         #if os(tvOS)
@@ -99,10 +89,17 @@ struct HomeScreen: View {
     private var content: some View {
         if let board = store.board {
             let groups = Self.arranged(board.groups(for: day), leagues: board.leagues)
-            if groups.isEmpty {
+            // The followed sides' games first, under "★ My Teams ›", as Apple
+            // Sports opens its Home (Julien, 2026-11-15); found in every
+            // competition, hidden ones too: a team followed is wanted.
+            let followed = favourites.games(in: board.groups(for: day))
+            if groups.isEmpty, followed.isEmpty {
                 EmptyDay(day: day)
             } else {
                 LazyVStack(alignment: .leading, spacing: Metrics.sectionGap) {
+                    if !followed.isEmpty {
+                        FollowedSection(games: followed, day: day, now: board.generatedAt, openMyTeams: openMyTeams)
+                    }
                     if day == .upcoming {
                         let days = LeagueGroup.byDay(groups, now: board.generatedAt)
                         ForEach(days, id: \.day) { entry in

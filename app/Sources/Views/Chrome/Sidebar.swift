@@ -33,6 +33,8 @@ struct Sidebar: View {
     /// The game or race whose page is up, over whatever page it was opened from.
     @State private var game: Event?
     @State private var settingsOpen = false
+    /// The picker of teams, over the page.
+    @State private var choosingTeams = false
     @State private var homeOpenedRace = false
     @State private var expanded = false
     /// Set while the menu opens or shuts, when focus moves under our feet.
@@ -47,7 +49,7 @@ struct Sidebar: View {
         }
         .task { Diagnostics.shared.start(); store.startAutoRefresh() }
         .onDisappear { store.stopAutoRefresh() }
-        .usageQuestion(store: store, covered: game != nil || settingsOpen)
+        .usageQuestion(store: store, covered: game != nil || settingsOpen || choosingTeams)
         // The pictures the system emptied while the app was in the background come back.
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             Task { await store.rewarm() }
@@ -79,7 +81,7 @@ struct Sidebar: View {
                 .environment(\.openMenu, openMenu)
                 .environment(\.openGame) { event in
                     game = event
-                    Analytics.shared.gameOpened(event, board: store.board, from: selection == .home ? "home" : "competition")
+                    Analytics.shared.gameOpened(event, board: store.board, from: selection == .home ? "home" : selection == .myTeams ? "my teams" : "competition")
                 }
                 .environment(\.menuIsOpen) { expanded }
                 .environment(\.boardNow, store.board?.generatedAt)
@@ -88,7 +90,7 @@ struct Sidebar: View {
                     if scrolled != chipShrunk { chipShrunk = scrolled }
                 }
                 // Under a game or Settings the page is out of sight.
-                .environment(\.usageCovered, game != nil || settingsOpen)
+                .environment(\.usageCovered, game != nil || settingsOpen || choosingTeams)
             if expanded {
                 Color.black.opacity(0.45)
                     .ignoresSafeArea()
@@ -109,6 +111,7 @@ struct Sidebar: View {
             }
         }
         .fullScreenCover(isPresented: $settingsOpen) { SettingsScreen(leagues: store.leagues, apps: store.board?.apps ?? [:]) }
+        .fullScreenCover(isPresented: $choosingTeams) { ChooseTeamsScreen(store: store, leagues: store.leagues) }
         // A competition hidden in Settings while its page was up: back to
         // Home, as for one gone from the list (review, build 36).
         .onChange(of: LeagueChoice.shared.hidden) { _, hidden in
@@ -131,7 +134,7 @@ struct Sidebar: View {
                 // A game's page over everything owns the remote: a press left
                 // on it is not the page underneath asking for the menu (build 28).
                 guard let context = note.userInfo?[UIFocusSystem.focusUpdateContextUserInfoKey] as? UIFocusUpdateContext,
-                      !moving, game == nil, !settingsOpen, !UsageQuestion.isUp else { continue }
+                      !moving, game == nil, !settingsOpen, !choosingTeams, !UsageQuestion.isUp else { continue }
                 if context.focusHeading.contains(.left), !expanded { openMenu() }
                 if context.focusHeading.contains(.right), expanded { shut() }
             }
@@ -141,6 +144,11 @@ struct Sidebar: View {
             if LaunchRequest.argument("-TVScoresMenuOpen") != nil { openMenu() }
             // `-TVScoresSettings` opens the settings card (CI screenshots).
             if LaunchRequest.argument("-TVScoresSettings") != nil { settingsOpen = true }
+            // `-TVScoresMyTeams` opens My Teams, `-TVScoresMyTeams choose` the picker (CI screenshots).
+            if let wanted = LaunchRequest.argument("-TVScoresMyTeams") {
+                selection = .myTeams
+                choosingTeams = wanted == "choose"
+            }
         }
     }
 
@@ -148,7 +156,9 @@ struct Sidebar: View {
     private var page: some View {
         switch selection {
         case .home:
-            HomeScreen(store: store, day: $day, openLeague: open, openedInitialRace: $homeOpenedRace)
+            HomeScreen(store: store, day: $day, openLeague: open, openMyTeams: { selection = .myTeams }, openedInitialRace: $homeOpenedRace)
+        case .myTeams:
+            MyTeamsScreen(store: store, day: $day, chooseTeams: { choosingTeams = true })
         case .league(let key):
             if let league = store.leagues.first(where: { MenuItem.key($0) == key }) {
                 CompetitionScreen(ref: LeagueRef(league), store: store, day: leagueDays[key] ?? LaunchRequest.initialDay())

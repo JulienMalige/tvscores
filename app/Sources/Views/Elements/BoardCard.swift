@@ -38,6 +38,28 @@ struct BoardCard<Content: View>: View {
     }
 }
 
+/// Home's and My Teams' page: the heading and the card scrolling together,
+/// at the page's width on the page's tint. Title and day switch scroll away
+/// with the list: on a television a pinned bar saves no input, since
+/// reaching them means moving focus up there anyway, and the focus engine
+/// brings them back on screen when it does.
+struct BoardPage<Content: View>: View {
+    @ViewBuilder var content: () -> Content
+    @Environment(\.pageScrolled) private var pageScrolled
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: Metrics.sectionGap / 2) { content() }
+                .frame(maxWidth: Metrics.pageWidth)
+                .frame(maxWidth: .infinity)
+                .pageMargins()
+        }
+        // Scrolled away from the top, the menu chip drops its name.
+        .onScrollGeometryChange(for: Bool.self, of: { $0.contentOffset.y > 60 }) { _, down in pageScrolled(down) }
+        .pageTint(.homeTint)
+    }
+}
+
 /// The hair line between two rows on a card, as Apple Sports draws it.
 struct RowRule: View {
     var body: some View {

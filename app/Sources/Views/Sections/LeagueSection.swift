@@ -95,11 +95,19 @@ struct LeagueHeader: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(.vertical, .tv(8))
-        .padding(.horizontal, .tv(16))
-        .focusGlass(isFocused, in: RoundedRectangle(cornerRadius: .tv(14), style: .continuous))
-        .scaleEffect(isFocused ? 1.03 : 1)
-        .animation(.easeOut(duration: 0.15), value: isFocused)
+        .headingGlass(isFocused)
+    }
+}
+
+extension View {
+    /// A section's heading that opens something: lit on glass, a little
+    /// larger, when the remote is on it.
+    func headingGlass(_ isFocused: Bool) -> some View {
+        padding(.vertical, .tv(8))
+            .padding(.horizontal, .tv(16))
+            .focusGlass(isFocused, in: RoundedRectangle(cornerRadius: .tv(14), style: .continuous))
+            .scaleEffect(isFocused ? 1.03 : 1)
+            .animation(.easeOut(duration: 0.15), value: isFocused)
     }
 }
 

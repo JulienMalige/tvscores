@@ -7,6 +7,11 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- My Teams: follow teams, and Formula 1 drivers, MotoGP riders and tennis players too.
+  Their games come first on Home, under "★ My Teams", with a star before their crest, and
+  My Teams, under Home in the menu, shows only theirs. Choose them by competition or search
+  them by name; the teams you follow are shared between your Apple TV, iPhone and iPad
+  through iCloud. On iPhone and iPad, the button at the top switches between Home and My Teams.
 
 ## 1.1 build 51 — 14 November 2026
 - TV Scores on iPhone and iPad, the same app as on the Apple TV: the day's games by

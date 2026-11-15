@@ -108,6 +108,14 @@ jobs:
           live game-final-en -TVScoresTab yesterday -TVScoresGame "final:football|final:rugby|final:nba" -AppleLanguages "(en)"
           live game-scheduled-tv-en -TVScoresTab upcoming -TVScoresGame "scheduled:football:tv|scheduled:rugby:tv|scheduled:nba:tv" -AppleLanguages "(en)"
           live race-f1-next-en -TVScoresTab upcoming -TVScoresRace "f1:next|motogp:next" -AppleLanguages "(en)"
+          # My Teams (docs/roadmap.md §4), last on the phone: the followed
+          # sides stay starred for any launch after.
+          follow=(-TVScoresReset -TVScoresFollow "football:flamengo,nfl:buffalo-bills,football:crystal-palace")
+          demo my-teams-home-en "${follow[@]}" -TVScoresTab today -AppleLanguages "(en)"
+          demo my-teams-en "${follow[@]}" -TVScoresTab today -TVScoresMyTeams -AppleLanguages "(en)"
+          demo my-teams-choose-fr "${follow[@]}" -TVScoresTab today -TVScoresMyTeams choose -AppleLanguages "(fr)"
+          demo my-teams-empty-en -TVScoresReset -TVScoresTab today -TVScoresMyTeams -AppleLanguages "(en)"
+          live my-teams-home-fr -TVScoresReset -TVScoresFollow "football:paris-saint-germain,rugby:stade-toulousain,nba:boston-celtics,f1:k-antonelli" -TVScoresTab today -AppleLanguages "(fr)" -AppleLocale fr_FR
           IPAD=$(device '^iPad Pro 13')
           echo "iPad: $IPAD"
           start "$IPAD"

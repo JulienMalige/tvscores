@@ -185,6 +185,20 @@ jobs:
             sleep 8
             xcrun simctl io "$UDID" screenshot "shots/motogp-$table-en.png"
           done
+          # My Teams (docs/roadmap.md §4): the followed games first on Home,
+          # the page, the picker, and the page with nobody followed, which
+          # also forgets them for the pictures after.
+          teams() { # $1 file name, then the launch arguments
+            xcrun simctl terminate "$UDID" com.julienmalige.tvscores 2>/dev/null || true
+            SIMCTL_CHILD_TZ=America/Sao_Paulo xcrun simctl launch "$UDID" com.julienmalige.tvscores -TVScoresDemo -TVScoresReset -TVScoresTab today "${@:2}"
+            sleep 8
+            xcrun simctl io "$UDID" screenshot "shots/$1.png"
+          }
+          follow=(-TVScoresFollow "football:flamengo,nfl:buffalo-bills,football:crystal-palace")
+          teams my-teams-home-en "${follow[@]}" -AppleLanguages "(en)"
+          teams my-teams-en "${follow[@]}" -TVScoresMyTeams -AppleLanguages "(en)"
+          teams my-teams-choose-fr "${follow[@]}" -TVScoresMyTeams choose -AppleLanguages "(fr)"
+          teams my-teams-empty-en -TVScoresMyTeams -AppleLanguages "(en)"
           race en f1
           race en motogp
           race fr f1
