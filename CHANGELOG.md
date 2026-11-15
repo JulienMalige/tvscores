@@ -8,7 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
-## 1.2 build 56 — 15 November 2026
+## 1.2 builds 56 (Apple TV) and 57 (iPhone and iPad) — 15 November 2026
 - On iPhone and iPad, the button at the top right says where it takes you, "My Teams"
   on Home and "Home" on My Teams, in words; on My Teams, Edit chooses the teams.
 
