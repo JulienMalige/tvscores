@@ -19,6 +19,7 @@ import { AppIcons } from "./app-icons.js";
 import { TvChannels } from "./broadcasts.js";
 import { Audience } from "./audience.js";
 import { createAudienceServer } from "./audience-page.js";
+import { amplitudeCredentials, amplitudeReader } from "./amplitude.js";
 
 const log = (msg) => console.log(`${new Date().toISOString()} ${msg}`);
 const store = new Store(config.cacheDir);
@@ -117,7 +118,8 @@ const nameOf = (key) => {
   return config.leagues[sport]?.find((l) => String(l.id) === id)?.name ?? key;
 };
 const audiencePort = Number(process.env.TVSCORES_AUDIENCE_PORT || 8789);
-const audiencePage = createAudienceServer(audience, { nameOf });
+const credentials = amplitudeCredentials();
+const audiencePage = createAudienceServer(audience, { nameOf, amplitude: credentials ? amplitudeReader(credentials) : undefined });
 audiencePage.listen(audiencePort, "127.0.0.1", () => log(`audience page on http://127.0.0.1:${audiencePort}`));
 // A promise nobody caught is a bug to read about in the journal, not a reason for every television to lose us.
 process.on("unhandledRejection", (err) => log(`unhandled rejection: ${err?.stack || err}`));

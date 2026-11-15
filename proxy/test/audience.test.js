@@ -131,3 +131,25 @@ test("the page names the competitions, says the hours in São Paulo time, and es
   assert.match(html, /09:00: 1/, "noon UTC is 9 in São Paulo");
   assert.doesNotMatch(html, /<script/);
 });
+
+test("Amplitude's count of the viewers who said yes sits beside the server's, in totals", async () => {
+  const { amplitudeReader } = await import("../src/amplitude.js");
+  const asked = [];
+  const fetch = async (url, { headers }) => {
+    asked.push({ url, auth: headers.authorization });
+    const grouped = url.includes("g=country");
+    return { ok: true, json: async () => ({ data: grouped
+      ? { xValues: ["2026-11-14", "2026-11-15"], series: [[1, 2], [0, 1]], seriesLabels: ["Brazil", "France"] }
+      : { xValues: ["2026-11-14", "2026-11-15"], series: [[1, 2]], seriesLabels: [0] } }) };
+  };
+  const summary = amplitudeReader({ key: "k", secret: "s", fetch, now: () => noon });
+  const said = await summary();
+  assert.deepEqual(said, { days: { "2026-11-14": 1, "2026-11-15": 2 }, countries: { Brazil: 3, France: 1 } });
+  await summary();
+  assert.equal(asked.length, 2, "kept ten minutes: opening the page twice asks once");
+  assert.equal(asked[0].auth, `Basic ${Buffer.from("k:s").toString("base64")}`);
+  const a = new Audience({ dir: dir(), now: () => noon });
+  const html = renderAudience(a.days(30), { amplitude: said });
+  assert.match(html, /Said yes \(Amplitude\)/);
+  assert.match(html, /Countries, Amplitude/);
+});

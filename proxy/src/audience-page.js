@@ -43,7 +43,16 @@ function columns(title, points, { note = "", ticks = [] } = {}) {
 /** A number with what it counts, for today and the day before. */
 const tile = (label, today, before) => `<div class="tile"><span class="muted">${esc(label)}</span><strong>${fmt(today)}</strong><span class="muted">yesterday ${fmt(before)}</span></div>`;
 
-export function renderAudience(days, { nameOf = (key) => key } = {}) {
+/**
+ * The builds on the App Store; the others are test copies, Julien's own among
+ * them. Add a build here when a version ships (docs/analytics.md).
+ */
+const STORE_BUILDS = ["46"];
+const storeDevices = (d) => STORE_BUILDS.reduce((n, b) => n + (d.builds?.[b] ?? 0), 0);
+
+/** `amplitude`: its count of the viewers who said yes, by day and by country (`amplitude.js`), or nothing. */
+export function renderAudience(days, { nameOf = (key) => key, amplitude } = {}) {
+  const said = (day) => amplitude?.days?.[day] ?? 0;
   const today = days[0] ?? blank("today");
   const yesterday = days[1] ?? blank("yesterday");
   const week = days.slice(0, 7).reduce((acc, d) => sum(acc, d), blank("week"));
@@ -88,11 +97,14 @@ table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nu
   ${tile("Sittings", today.sittings, yesterday.sittings)}
   ${tile("Minutes with the app open", today.minutes.total, yesterday.minutes.total)}
   ${tile("Boards served", today.boards, yesterday.boards)}
+  ${tile("On the App Store build", storeDevices(today), storeDevices(yesterday))}
+  ${amplitude ? tile("Said yes (Amplitude)", said(today.day), said(yesterday.day)) : ""}
 </div>
 ${columns("Devices a day, last 30 days", month.map((d) => ({ label: dayName(d.day), value: d.devices })), { ticks: [dayName(month[0]?.day), dayName(month.at(-1)?.day)] })}
 ${columns("When, São Paulo time, last 7 days", hours.map((value, local) => ({ label: `${String(local).padStart(2, "0")}:00`, value })), { note: "Devices with the app open in each hour, added up over the 7 days.", ticks: ["0h", "6h", "12h", "18h", "23h"] })}
 <div class="grid2">
 ${bars("Kind of device", Object.entries(week.platforms), { label: (k) => PLATFORMS[k] ?? k, note: "Device-days over the last 7 days: a device that came on 3 days counts 3. Builds up to 51 do not say their kind." })}
+${amplitude ? bars("Countries, Amplitude", Object.entries(amplitude.countries), { note: "Users who said yes, last 7 days, from each device's own address. A device on a VPN shows in the VPN's country too." }) : ""}
 ${bars("Countries", Object.entries(week.countries), { label: (k) => (k === "unknown" ? "Unknown" : new Intl.DisplayNames(["en"], { type: "region" }).of(k) ?? k) })}
 ${bars("Time zones", Object.entries(week.timeZones))}
 ${bars("Languages", Object.entries(week.languages))}
@@ -102,21 +114,23 @@ ${bars("Tables opened", Object.entries(week.tables).map(([k, v]) => [k, v.device
 ${bars("Game pages opened", Object.entries(week.games).map(([k, v]) => [k, v.devices]), { label: (k) => SPORTS[k] ?? k, detail: (k) => opens(week.games[k].opens), note: "Football, NFL and NBA: the sports whose games have a page from the server." })}
 </div>
 <section><h2>Day by day</h2>${restarts ? `<p class="muted">The server restarted ${restarts} time${restarts > 1 ? "s" : ""} this week: a device seen on both sides of a restart counts twice that day.</p>` : ""}
-<table><thead><tr><th>Day</th><th>Devices</th><th>Sittings</th><th>Minutes</th><th>Boards</th></tr></thead><tbody>
-${days.map((d) => `<tr><td>${esc(dayName(d.day))}${d.restarts ? " *" : ""}</td><td>${fmt(d.devices)}</td><td>${fmt(d.sittings)}</td><td>${fmt(d.minutes.total)}</td><td>${fmt(d.boards)}</td></tr>`).join("")}
+<table><thead><tr><th>Day</th><th>Devices</th><th>Sittings</th><th>Minutes</th><th>Boards</th><th>Store build</th>${amplitude ? "<th>Said yes</th>" : ""}</tr></thead><tbody>
+${days.map((d) => `<tr><td>${esc(dayName(d.day))}${d.restarts ? " *" : ""}</td><td>${fmt(d.devices)}</td><td>${fmt(d.sittings)}</td><td>${fmt(d.minutes.total)}</td><td>${fmt(d.boards)}</td><td>${fmt(storeDevices(d))}</td>${amplitude ? `<td>${fmt(said(d.day))}</td>` : ""}</tr>`).join("")}
 </tbody></table></section>
 </main></body></html>`;
 }
 
 /** The page's own server, GET / and nothing else, for a port only Tailscale's serve reaches (~/VPS.md). */
-export function createAudienceServer(audience, options) {
-  return createServer((req, res) => {
+export function createAudienceServer(audience, { amplitude, ...options } = {}) {
+  return createServer(async (req, res) => {
     try {
       if (req.method !== "GET" || String(req.url).split("?")[0] !== "/") {
         res.writeHead(404, { "content-type": "text/plain" });
         return res.end("not found");
       }
-      const body = renderAudience(audience.days(30), options);
+      // Amplitude's side when it answers; the server's alone when it does not.
+      const said = await amplitude?.().catch(() => undefined);
+      const body = renderAudience(audience.days(30), { ...options, amplitude: said });
       res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" });
       res.end(body);
     } catch {

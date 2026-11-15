@@ -162,6 +162,22 @@ makes, whatever its version and its answer (`proxy/src/audience.js`):
   privacy pages say what is counted. App Privacy needs no new answer: the
   usage data is declared already, for Amplitude.
 
+### Crossed with Amplitude, in totals (2026-11-15)
+
+Julien: "Try to cross with amplitude" (he uses a VPN, and was seen in Brazil
+and France). The page sets Amplitude's daily count of users who said yes, and
+its countries over 7 days, beside the server's devices (`proxy/src/amplitude.js`,
+Amplitude's Dashboard REST API, asked when the page opens and kept 10 min). Only
+totals: matching device by device would need an identifier the server does not
+keep, and would follow the viewers who said no. The key and the secret key are
+in `~/.config/tvscores/amplitude.key` and `amplitude.secret` (600), never in the
+repo. The page also counts the devices on the App Store build alone
+(`STORE_BUILDS` in `proxy/src/audience-page.js`: add a build when it ships), so
+test copies, Julien's among them, stand apart.
+
+A VPN switched within a day makes the server count the device twice; Amplitude,
+which follows its random number, counts it once and lists both countries.
+
 ## Apple's App Privacy form
 
 To fill in App Store Connect, App Privacy, before the version that carries
