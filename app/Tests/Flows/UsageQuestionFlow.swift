@@ -23,7 +23,10 @@ final class UsageQuestionFlow: FlowCase {
         XCTAssertEqual(alert.label, "Help improve TV Scores?", "in words, not keys", file: file, line: line)
         // Side by side on a television, Share holding the focus at first.
         let button = alert.buttons[choice].firstMatch
-        let reached = Flow.walk(.left, until: button, limit: 3) || Flow.walk(.right, until: button, limit: 3)
+        // The alert takes focus a moment after it shows, later while the
+        // demo's crests load behind it (2026-11-15): wait for it to have one.
+        _ = app.buttons.matching(NSPredicate(format: "hasFocus == 1")).firstMatch.waitForExistence(timeout: 5)
+        let reached = Flow.walk(.left, until: button, limit: 4) || Flow.walk(.right, until: button, limit: 4)
         XCTAssertTrue(reached, "the remote reaches \(choice)", file: file, line: line)
         Flow.remote.press(.select)
         let gone = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: alert)

@@ -40,7 +40,9 @@ final class StoreEditionFlow: FlowCase {
         // it: the remote walks down to its end, as a tester would.
         XCTAssertTrue(Flow.walk(.down, until: Flow.settingsRow(app, "settings.openApps"), limit: 15),
                       "a tester's Settings ends with Open apps, where a tester can try every app's links")
-        XCTAssertTrue(app.staticTexts["settings.debug"].exists, "under Debug")
+        // Waited for, not read at once: a list drawn while the demo's crests
+        // load can bring its heading a moment after its row (2026-11-15).
+        XCTAssertTrue(app.staticTexts["settings.debug"].waitForExistence(timeout: 5), "under Debug")
     }
 
     func testTheStoreBuildHasNoDebugSection() {
