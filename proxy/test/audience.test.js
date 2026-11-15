@@ -137,19 +137,30 @@ test("Amplitude's count of the viewers who said yes sits beside the server's, in
   const asked = [];
   const fetch = async (url, { headers }) => {
     asked.push({ url, auth: headers.authorization });
-    const grouped = url.includes("g=country");
-    return { ok: true, json: async () => ({ data: grouped
-      ? { xValues: ["2026-11-14", "2026-11-15"], series: [[1, 2], [0, 1]], seriesLabels: ["Brazil", "France"] }
-      : { xValues: ["2026-11-14", "2026-11-15"], series: [[1, 2]], seriesLabels: [0] } }) };
+    const data = url.includes("sessions/average") ? { xValues: ["2026-11-14T00:00:00", "2026-11-15T00:00:00"], series: [[42.9, 36.4]] }
+      : url.includes("g=country") ? { xValues: ["2026-11-14", "2026-11-15"], series: [[1, 2], [0, 1]], seriesLabels: ["Brazil", "France"] }
+      : url.includes("store") ? { xValues: ["2026-11-14", "2026-11-15"], series: [[0, 0]], seriesLabels: [0] }
+      : { xValues: ["2026-11-14", "2026-11-15"], series: [[1, 2]], seriesLabels: [0] };
+    return { ok: true, json: async () => ({ data }) };
   };
   const summary = amplitudeReader({ key: "k", secret: "s", fetch, now: () => noon });
   const said = await summary();
-  assert.deepEqual(said, { days: { "2026-11-14": 1, "2026-11-15": 2 }, countries: { Brazil: 3, France: 1 } });
+  assert.deepEqual(said.days, { "2026-11-14": 1, "2026-11-15": 2 });
+  assert.deepEqual(said.countries, { Brazil: 3, France: 1 });
+  assert.deepEqual(said.tester, { "2026-11-14": 1, "2026-11-15": 2 });
+  assert.deepEqual(said.store, { "2026-11-14": 0, "2026-11-15": 0 });
+  assert.deepEqual(said.sessionSeconds, { "2026-11-14": 42.9, "2026-11-15": 36.4 });
   await summary();
-  assert.equal(asked.length, 2, "kept ten minutes: opening the page twice asks once");
+  assert.equal(asked.length, 5, "kept ten minutes: opening the page twice asks once");
   assert.equal(asked[0].auth, `Basic ${Buffer.from("k:s").toString("base64")}`);
   const a = new Audience({ dir: dir(), now: () => noon });
-  const html = renderAudience(a.days(30), { amplitude: said });
+  // Three test-build device-days on the server for Amplitude's two testers: 1.5 seen for one real.
+  board(a, ask("203.0.113.9", { agent: "TV%20Scores/50 CFNetwork/1 Darwin/25.1.0" }));
+  board(a, ask("198.51.100.4", { agent: "TV%20Scores/50 CFNetwork/1 Darwin/25.1.0" }));
+  board(a, ask("192.0.2.1", { agent: "TV%20Scores/51 CFNetwork/1 Darwin/25.1.0" }));
+  const html = renderAudience(a.days(30), { amplitude: { ...said, tester: { "2026-11-15": 2 } } });
+  assert.match(html, /Server devices for one real device<\/span><span class="value">1\.50/);
+  assert.match(html, /Real devices a day, estimated<\/span><span class="value">2</);
   assert.match(html, /Said yes \(Amplitude\)/);
   assert.match(html, /Countries, Amplitude/);
 });

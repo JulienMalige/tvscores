@@ -49,6 +49,38 @@ const tile = (label, today, before) => `<div class="tile"><span class="muted">${
  */
 const STORE_BUILDS = ["46"];
 const storeDevices = (d) => STORE_BUILDS.reduce((n, b) => n + (d.builds?.[b] ?? 0), 0);
+/** The first build that asks the question: older ones send Amplitude nothing. */
+const FIRST_ASKING = 50;
+const devicesOn = (d, keep) => Object.entries(d.builds ?? {}).reduce((n, [b, count]) => n + (keep(Number(b), b) ? count : 0), 0);
+const pct = (x) => `${Math.round(x * 100)}%`;
+
+/**
+ * Amplitude as a sample, the server as the headcount (docs/analytics.md): the
+ * test copies, whose viewers all said yes, show how many devices the server
+ * sees for one real one; that corrects the App Store's devices, which give
+ * the share who said yes, and Amplitude's sessions correct the server's minutes.
+ */
+function combined(week, amplitude) {
+  const sum = (byDay) => week.reduce((n, d) => n + (byDay?.[d.day] ?? 0), 0);
+  const testServer = week.reduce((n, d) => n + devicesOn(d, (b, s) => b >= FIRST_ASKING && !STORE_BUILDS.includes(s)), 0);
+  const testAmplitude = sum(amplitude.tester);
+  const over = testServer && testAmplitude ? testServer / testAmplitude : undefined;
+  const asking = week.reduce((n, d) => n + devicesOn(d, (b, s) => b >= FIRST_ASKING && STORE_BUILDS.includes(s)), 0);
+  const yes = sum(amplitude.store);
+  const share = over && asking ? Math.min(1, yes / (asking / over)) : undefined;
+  const all = week.reduce((n, d) => n + d.devices, 0);
+  const days = week.filter((d) => amplitude.sessionSeconds?.[d.day] > 0);
+  const ampMinutes = days.reduce((n, d) => n + amplitude.sessionSeconds[d.day], 0) / 60 / (days.length || 1);
+  const sittings = week.reduce((n, d) => n + d.sittings, 0);
+  const serverMinutes = sittings ? week.reduce((n, d) => n + d.minutes.total, 0) / sittings : undefined;
+  const row = (label, value, note) => `<li><span class="label">${esc(label)}</span><span class="value">${value}</span><small class="muted">${esc(note)}</small></li>`;
+  return `<section><h2>Combined, last 7 days</h2><p class="muted">Amplitude counts exactly, but only those who said yes; the server counts everyone, roughly. Each corrects the other.</p><ul class="combined">
+  ${row("Server devices for one real device", over ? over.toFixed(2) : "–", over ? `${fmt(testServer)} device-days seen for ${fmt(testAmplitude)} on the test builds, whose viewers all said yes: VPNs and changing addresses` : "needs a test build used this week")}
+  ${row("Real devices a day, estimated", over ? fmt(all / over / week.length) : "–", "the server's devices, corrected")}
+  ${row("Said yes", share !== undefined ? pct(share) : "–", share !== undefined ? `${fmt(yes)} in Amplitude for about ${fmt(asking / over)} App Store devices that were asked` : `from the first App Store build that asks (build ${FIRST_ASKING} or later, in STORE_BUILDS)`)}
+  ${row("A sitting, minutes", serverMinutes !== undefined && ampMinutes ? `${ampMinutes.toFixed(1)} <small>server ${serverMinutes.toFixed(1)}</small>` : "–", "Amplitude's average session, beside the server's guess from the board's polls")}
+  </ul></section>`;
+}
 
 /** `amplitude`: its count of the viewers who said yes, by day and by country (`amplitude.js`), or nothing. */
 export function renderAudience(days, { nameOf = (key) => key, amplitude } = {}) {
@@ -87,6 +119,7 @@ section, .tiles { background: var(--surface); border-radius: 14px; padding: 16px
 .bars { list-style: none; margin: 0; padding: 0; } .bars li { display: grid; grid-template-columns: minmax(90px, 38%) 1fr auto; align-items: center; gap: 10px; padding: 3px 0; }
 .label { color: var(--ink2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .track { height: 12px; }
 .bar { display: block; height: 12px; background: var(--mark); border-radius: 0 4px 4px 0; min-width: 2px; }
+.combined { list-style: none; margin: 0; padding: 0; } .combined li { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 8px 0; border-bottom: 1px solid var(--grid); } .combined .value { font-size: 20px; font-weight: 600; } .combined small.muted { grid-column: 1 / -1; margin: 0; }
 .value { font-variant-numeric: tabular-nums; text-align: right; } .value small { color: var(--muted); margin-left: 6px; }
 table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; } th, td { text-align: right; padding: 4px 6px; border-bottom: 1px solid var(--grid); white-space: nowrap; } th:first-child, td:first-child { text-align: left; } th { color: var(--muted); font-weight: 500; }
 </style></head><body><main>
@@ -104,6 +137,7 @@ ${columns("Devices a day, last 30 days", month.map((d) => ({ label: dayName(d.da
 ${columns("When, São Paulo time, last 7 days", hours.map((value, local) => ({ label: `${String(local).padStart(2, "0")}:00`, value })), { note: "Devices with the app open in each hour, added up over the 7 days.", ticks: ["0h", "6h", "12h", "18h", "23h"] })}
 <div class="grid2">
 ${bars("Kind of device", Object.entries(week.platforms), { label: (k) => PLATFORMS[k] ?? k, note: "Device-days over the last 7 days: a device that came on 3 days counts 3. Builds up to 51 do not say their kind." })}
+${amplitude ? combined(days.slice(0, 7), amplitude) : ""}
 ${amplitude ? bars("Countries, Amplitude", Object.entries(amplitude.countries), { note: "Users who said yes, last 7 days, from each device's own address. A device on a VPN shows in the VPN's country too." }) : ""}
 ${bars("Countries", Object.entries(week.countries), { label: (k) => (k === "unknown" ? "Unknown" : new Intl.DisplayNames(["en"], { type: "region" }).of(k) ?? k) })}
 ${bars("Time zones", Object.entries(week.timeZones))}

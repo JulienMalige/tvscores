@@ -178,6 +178,14 @@ test copies, Julien's among them, stand apart.
 A VPN switched within a day makes the server count the device twice; Amplitude,
 which follows its random number, counts it once and lists both countries.
 
+**Combined** (Julien's OK, 2026-11-15): Amplitude as the sample, the server as
+the headcount. The test builds (50 and later, not in `STORE_BUILDS`), whose
+viewers all said yes, give how many devices the server sees for one real one;
+that corrects the server's devices into an estimate of real ones, and the App
+Store builds that ask (`FIRST_ASKING`, 50) into the share who said yes, against
+Amplitude's `edition = store` users. Amplitude's average session sets the
+server's polled minutes right. Last 7 days, on the page's "Combined" section.
+
 ## Apple's App Privacy form
 
 To fill in App Store Connect, App Privacy, before the version that carries
