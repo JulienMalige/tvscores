@@ -77,7 +77,7 @@ Noted 2026-10-03.
     publishes per-game deep links we could use.
 
 
-## 4. My Teams (favourites) and notifications
+## 4. My Teams (favourites) and kickoff reminders
 
 Noted 2026-10-03; redrawn 2026-11-15 after Apple Sports' screens (draft:
 https://claude.ai/artifact/FfxPac3PNtchfCokUQmobv).
@@ -95,10 +95,13 @@ https://claude.ai/artifact/FfxPac3PNtchfCokUQmobv).
 - Competitions stay in Settings (Julien, 2026-11-15).
 - Favourites sync between the Apple TV and the iPhone through iCloud
   (Julien, 2026-11-15).
-- Notifications on iPhone and iPad (tvOS shows none), sent by the proxy
-  through Apple's push service, with switches per favourite that change by
-  sport, and a "hide the score" option. They need the proxy to keep each
-  device's push token and what it follows: the privacy pages and App
-  Privacy change.
-- My Teams and notifications ship together, in one version (Julien,
+- Reminders before kickoff only, no goals or results (Julien, 2026-11-15:
+  "I just want reminder before the games"): a bell per favourite, a
+  setting for how long before (15 min, 30 min by default, 1 hour). Local
+  notifications scheduled by the iPhone and iPad from the games the app
+  loads, refreshed in the background; tvOS shows none, and the TV's
+  favourites reach the iPhone through iCloud. Nothing is kept on the
+  server, so no push key and no new data in App Privacy; the privacy pages
+  gain a line on favourites kept in the viewer's iCloud.
+- My Teams and the reminders ship together, in one version (Julien,
   2026-11-15).
