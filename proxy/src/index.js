@@ -20,6 +20,7 @@ import { TvChannels } from "./broadcasts.js";
 import { Audience } from "./audience.js";
 import { createAudienceServer } from "./audience-page.js";
 import { amplitudeCredentials, amplitudeReader } from "./amplitude.js";
+import { ADMIN_ENV, appleDownloads } from "./apple-reports.js";
 
 const log = (msg) => console.log(`${new Date().toISOString()} ${msg}`);
 const store = new Store(config.cacheDir);
@@ -119,7 +120,11 @@ const nameOf = (key) => {
 };
 const audiencePort = Number(process.env.TVSCORES_AUDIENCE_PORT || 8789);
 const credentials = amplitudeCredentials();
-const audiencePage = createAudienceServer(audience, { nameOf, amplitude: credentials ? amplitudeReader(credentials) : undefined });
+// Apple's downloads, through the repository's App Store Connect client and the Admin key (docs/release.md).
+process.env.ASC_ENV ??= ADMIN_ENV;
+const { asc } = await import("../../scripts/asc.mjs");
+const apple = appleDownloads({ dir: join(config.cacheDir, "audience"), asc, log });
+const audiencePage = createAudienceServer(audience, { nameOf, amplitude: credentials ? amplitudeReader(credentials) : undefined, apple });
 audiencePage.listen(audiencePort, "127.0.0.1", () => log(`audience page on http://127.0.0.1:${audiencePort}`));
 // A promise nobody caught is a bug to read about in the journal, not a reason for every television to lose us.
 process.on("unhandledRejection", (err) => log(`unhandled rejection: ${err?.stack || err}`));

@@ -38,15 +38,16 @@ export function amplitudeReader({ key, secret, fetch = globalThis.fetch, now = D
     const end = ymd(now());
     const start = ymd(now() - 29 * 864e5);
     const edition = (name) => `&s=${encodeURIComponent(JSON.stringify([{ prop: "gp:edition", op: "is", values: [name] }]))}`;
-    const [month, week, tester, store, sessions] = await Promise.all([
+    const monthStart = `${end.slice(0, 6)}01`;
+    const [month, week, tester, store, sessions, calendar] = await Promise.all([
       get(start, end), get(ymd(now() - 6 * 864e5), end, "&g=country"), get(start, end, edition("tester")), get(start, end, edition("store")),
-      get(start, end, "", "sessions/average"),
+      get(start, end, "", "sessions/average"), get(monthStart, end, "&i=30"),
     ]);
     const byDay = (data) => Object.fromEntries(data.xValues.map((day, i) => [day.slice(0, 10), data.series[0][i] ?? 0]));
     const countries = Object.fromEntries(week.seriesLabels.map((label, i) => [String(label), week.series[i].reduce((a, b) => a + b, 0)]));
     // Users by edition: test copies (all Julien's, all said yes) and the App
     // Store's; and the average session in seconds, as Amplitude measures it.
-    held = { at: now(), value: { days: byDay(month), countries, tester: byDay(tester), store: byDay(store), sessionSeconds: byDay(sessions) } };
+    held = { at: now(), value: { days: byDay(month), countries, tester: byDay(tester), store: byDay(store), sessionSeconds: byDay(sessions), thisMonth: calendar.series[0].at(-1) ?? 0 } };
     return held.value;
   };
 }

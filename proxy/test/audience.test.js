@@ -151,17 +151,17 @@ test("Amplitude's count of the viewers who said yes sits beside the server's, in
   assert.deepEqual(said.store, { "2026-11-14": 0, "2026-11-15": 0 });
   assert.deepEqual(said.sessionSeconds, { "2026-11-14": 42.9, "2026-11-15": 36.4 });
   await summary();
-  assert.equal(asked.length, 5, "kept ten minutes: opening the page twice asks once");
+  assert.equal(asked.length, 6, "kept ten minutes: opening the page twice asks once");
   assert.equal(asked[0].auth, `Basic ${Buffer.from("k:s").toString("base64")}`);
   const a = new Audience({ dir: dir(), now: () => noon });
-  // Three test-build device-days on the server for Amplitude's two testers: 1.5 seen for one real.
+  // Three devices on the server, two of them on the same build.
   board(a, ask("203.0.113.9", { agent: "TV%20Scores/50 CFNetwork/1 Darwin/25.1.0" }));
   board(a, ask("198.51.100.4", { agent: "TV%20Scores/50 CFNetwork/1 Darwin/25.1.0" }));
   board(a, ask("192.0.2.1", { agent: "TV%20Scores/51 CFNetwork/1 Darwin/25.1.0" }));
   const html = renderAudience(a.days(30), { amplitude: { ...said, tester: { "2026-11-15": 2 } } });
-  assert.match(html, /Server devices for one real device<\/span><span class="value">1\.50/);
-  assert.match(html, /Real devices a day, estimated<\/span><span class="value">2</);
-  assert.match(html, /Said yes \(Amplitude\)/);
+  assert.match(html, /How many use it\?<\/span><strong>3</);
+  assert.match(html, /How many different people this month\?<\/span><strong>2</, "Amplitude's month");
+  assert.match(html, /of today&#39;s said yes \(Amplitude\)/);
   assert.match(html, /Countries, Amplitude/);
 });
 
@@ -172,4 +172,18 @@ test("an iPhone and an iPad behind one address, on the same build and system, ar
   board(a, ask("203.0.113.9", { platform: "phone" }));
   assert.equal(a.totals().devices, 2);
   assert.deepEqual(a.totals().platforms, { phone: 1, pad: 1 });
+});
+
+test("Apple's downloads: first ones apart from re-downloads, by device and country", async () => {
+  const { parseDownloads } = await import("../src/apple-reports.js");
+  const rows = parseDownloads("Date\tApp Name\tDownload Type\tDevice\tTerritory\tCounts\n2026-11-13\tTV Scores\tFirst-time download\tApple TV\tUS\t2\n2026-11-14\tTV Scores\tRestore\tApple TV\tFR\t1\n");
+  assert.deepEqual(rows, [
+    { date: "2026-11-13", type: "First-time download", device: "Apple TV", territory: "US", count: 2 },
+    { date: "2026-11-14", type: "Restore", device: "Apple TV", territory: "FR", count: 1 },
+  ]);
+  const a = new Audience({ dir: dir(), now: () => noon });
+  const html = renderAudience(a.days(30), { apple: rows });
+  assert.match(html, /How many installed it\?<\/span><strong>2</);
+  assert.match(html, /1 re-downloads/);
+  assert.match(html, /installs: Apple TV 100%/);
 });

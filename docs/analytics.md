@@ -186,6 +186,26 @@ Store builds that ask (`FIRST_ASKING`, 50) into the share who said yes, against
 Amplitude's `edition = store` users. Amplitude's average session sets the
 server's polled minutes right. Last 7 days, on the page's "Combined" section.
 
+### The page answers six questions (2026-11-15)
+
+Julien found the page confusing and asked for the numbers that matter: how
+many installed the app, how many use it, how many use it with engagement,
+from where and on which device, "using both amplitude and backend". The top
+of the page answers each with the source that knows it best:
+
+| Question | Source |
+|---|---|
+| Installed | Apple's daily "App Downloads Standard" report (first downloads; re-downloads apart), read with the Admin key (`proxy/src/apple-reports.js`), a day or two behind |
+| Use it | the server: devices today, and a day over 7 days |
+| Different people this month | Amplitude, exact, only those who said yes |
+| Really use it | the server: share of device-days of 15 minutes or more; Amplitude's session length |
+| From where | the server's countries; Apple's for installs |
+| On which device | Apple's for installs; the server's kind of device from the next build |
+
+The rest (charts, breakdowns, day by day) is folded under Details. Apple's
+installation, deletion and session reports have no daily data yet: Apple
+leaves them empty below a threshold of devices.
+
 ## Apple's App Privacy form
 
 To fill in App Store Connect, App Privacy, before the version that carries
