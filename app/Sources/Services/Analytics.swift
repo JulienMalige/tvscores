@@ -38,6 +38,8 @@ final class Analytics {
     #endif
     @ObservationIgnored private let launched = Date()
     @ObservationIgnored private var boardShown = false
+    /// This device's person in iCloud, for Amplitude's user (`SharedPerson`).
+    @ObservationIgnored private lazy var person = SharedPerson()
     /// The competitions the board names, for the profile; kept from the last board.
     @ObservationIgnored private var leagues: [LeagueSummary] = []
 
@@ -96,6 +98,17 @@ final class Analytics {
         // With every yes: after Off and On again the random number is new,
         // and it has no setup until it is sent.
         refreshProfile()
+        joinPerson()
+    }
+
+    /// The user Amplitude files this device under: the device number of
+    /// the first device of this Apple ID that shared, read from iCloud, so
+    /// one person's Apple TV, iPhone and iPad count once (`SharedPerson`).
+    /// After Off and On the device number is new, and joins the same person.
+    private func joinPerson() {
+        guard let client, let device = client.getDeviceId() else { return }
+        person.changed = { [weak self] id in self?.client?.setUserId(userId: id) }
+        person.join(deviceId: device)
     }
 
     private func makeClient(_ project: (key: String, zone: String)) -> Amplitude {
