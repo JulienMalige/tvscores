@@ -1,82 +1,117 @@
 import Foundation
 
+/// The little of `NSUbiquitousKeyValueStore` a shared person needs, so a
+/// test can stand in for iCloud.
+protocol PersonStore: AnyObject {
+    func string(forKey key: String) -> String?
+    func set(_ value: Any?, forKey key: String)
+    @discardableResult func synchronize() -> Bool
+}
+
+extension NSUbiquitousKeyValueStore: PersonStore {}
+
 /// One person's Apple TV, iPhone and iPad, counted as one in Amplitude
 /// (Julien, 2026-11-15: "when it joins the iCloud, we can use this device
 /// ID to understand that all these devices, in fact, are the same iCloud
-/// user"). The first device of an Apple ID to share its usage writes its own
-/// Amplitude device number into that Apple ID's iCloud key-value store; every
-/// device that shares then gives Amplitude that number as its user, and
-/// Amplitude files the devices under one person.
+/// user"). The Apple ID's iCloud key-value store holds one random number
+/// for the person; every device of that Apple ID that shares its usage
+/// gives Amplitude that number as its user, and Amplitude files the devices
+/// under one person.
 ///
-/// Only for viewers who said yes (`Analytics` asks for it after the yes),
-/// only between devices on the same Apple ID with iCloud on, and nothing on
-/// screen. Two devices sharing for the first time before iCloud has synced
-/// each write theirs; the older one wins as soon as each sees the other's.
+/// A device never writes over a number already there: it takes what iCloud
+/// holds, and makes one only when iCloud still has none once it has had
+/// time to sync. Two devices making one at the same moment converge, since
+/// iCloud keeps one value and tells every device which. The number is the
+/// person's, not a device's, so a device that stops sharing leaves nothing
+/// of itself behind. Only for viewers who said yes (`Analytics` joins after
+/// the yes and stops at a no), only between devices on the same Apple ID
+/// with iCloud on, and nothing on screen.
 @MainActor
 final class SharedPerson {
     static let storeKey = "person"
+    /// How long a device with no number in iCloud waits for the first sync
+    /// before it makes one.
+    static let firstSync: Duration = .seconds(15)
 
-    struct Entry: Equatable {
-        let id: String
-        /// When it was written: the older entry is the one kept.
-        let since: Double
-
-        init(id: String, since: Double) {
-            self.id = id
-            self.since = since
-        }
-
-        init?(_ stored: Any?) {
-            guard let dict = stored as? [String: Any], let id = dict["id"] as? String, id.count >= 5,
-                  let since = dict["since"] as? Double else { return nil }
-            self.init(id: id, since: since)
-        }
-
-        var stored: [String: Any] { ["id": id, "since": since] }
-    }
-
-    /// What this device goes by, given what iCloud holds: the stored person
-    /// when there is one and it is older; else this device, to be written.
-    nonisolated static func pick(stored: Entry?, mine: Entry) -> (person: Entry, write: Bool) {
-        guard let stored else { return (mine, true) }
-        if stored.since <= mine.since || stored.id == mine.id { return (stored, false) }
-        return (mine, true)
-    }
-
-    private let cloud: NSUbiquitousKeyValueStore
+    private let store: PersonStore
+    private let wait: Duration
+    private let makeId: () -> String
     private var observer: NSObjectProtocol?
-    /// This device's entry, the first time it was asked: its number and when.
-    private var mine: Entry?
-    private(set) var person: Entry?
-    /// Told whenever the person changes: at the start, and if an older
-    /// device's entry arrives from iCloud later.
+    private var waiting: Task<Void, Never>?
+    /// The number last handed to `changed`; nil while not joined.
+    private(set) var person: String?
+    /// Told the person's number when joining, and whenever iCloud changes it.
     var changed: (String) -> Void = { _ in }
 
-    init(cloud: NSUbiquitousKeyValueStore = .default) {
-        self.cloud = cloud
+    init(store: PersonStore = NSUbiquitousKeyValueStore.default, wait: Duration = SharedPerson.firstSync,
+         makeId: @escaping () -> String = { UUID().uuidString.lowercased() }) {
+        self.store = store
+        self.wait = wait
+        self.makeId = makeId
     }
 
-    /// Joins this device to its person: `deviceId` is Amplitude's number for it.
-    func join(deviceId: String, now: Date = .now) {
-        if mine?.id != deviceId { mine = Entry(id: deviceId, since: now.timeIntervalSince1970) }
-        if observer == nil {
+    /// Valid as Amplitude's user: five characters at least.
+    nonisolated static func valid(_ id: String?) -> String? {
+        guard let id, id.count >= 5 else { return nil }
+        return id
+    }
+
+    /// After a yes: this device's person, told through `changed` even when
+    /// it is the one it had before a no.
+    func join() {
+        person = nil
+        joined = true
+        if observer == nil, let cloud = store as? NSUbiquitousKeyValueStore {
             observer = NotificationCenter.default.addObserver(forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
                                                               object: cloud, queue: .main) { [weak self] note in
                 let keys = note.userInfo?[NSUbiquitousKeyValueStoreChangedKeysKey] as? [String] ?? []
                 guard keys.contains(SharedPerson.storeKey) else { return }
-                MainActor.assumeIsolated { self?.settle() }
+                MainActor.assumeIsolated { self?.cloudChanged() }
             }
         }
-        cloud.synchronize()
-        settle()
+        store.synchronize()
+        if adoptStored() { return }
+        waiting?.cancel()
+        waiting = Task { [weak self, wait] in
+            try? await Task.sleep(for: wait)
+            guard !Task.isCancelled, let self, self.joined else { return }
+            if !self.adoptStored() {
+                let id = self.makeId()
+                self.store.set(id, forKey: Self.storeKey)
+                self.apply(id)
+            }
+        }
     }
 
-    private func settle() {
-        guard let mine else { return }
-        let (person, write) = Self.pick(stored: Entry(cloud.object(forKey: Self.storeKey)), mine: mine)
-        if write { cloud.set(person.stored, forKey: Self.storeKey) }
-        guard person != self.person else { return }
-        self.person = person
-        changed(person.id)
+    /// After a no: nothing more read, written or told.
+    func stop() {
+        waiting?.cancel()
+        waiting = nil
+        if let observer { NotificationCenter.default.removeObserver(observer) }
+        observer = nil
+        person = nil
+        joined = false
+    }
+
+    /// iCloud brought another device's number: it is the person's now.
+    func cloudChanged() {
+        guard joined else { return }
+        waiting?.cancel()
+        _ = adoptStored()
+    }
+
+    /// Between a yes and a no.
+    private var joined = false
+
+    private func adoptStored() -> Bool {
+        guard let id = Self.valid(store.string(forKey: Self.storeKey)) else { return false }
+        apply(id)
+        return true
+    }
+
+    private func apply(_ id: String) {
+        guard id != person else { return }
+        person = id
+        changed(id)
     }
 }

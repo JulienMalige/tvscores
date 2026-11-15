@@ -197,28 +197,3 @@ struct UsageTests {
         }
     }
 }
-
-/// One person's devices, joined through iCloud (`SharedPerson`).
-@Suite("Shared person")
-struct SharedPersonTests {
-    @Test("the first device writes itself; a later one takes the older entry; the same device keeps its own")
-    func olderEntryWins() {
-        let tv = SharedPerson.Entry(id: "tv-device-1", since: 100)
-        let phone = SharedPerson.Entry(id: "phone-device-2", since: 200)
-        let first = SharedPerson.pick(stored: nil, mine: tv)
-        #expect(first.person == tv && first.write, "the first device writes its own number")
-        let later = SharedPerson.pick(stored: tv, mine: phone)
-        #expect(later.person == tv && !later.write, "the phone files itself under the television")
-        let raced = SharedPerson.pick(stored: phone, mine: tv)
-        #expect(raced.person == tv && raced.write, "two first devices at once: the older one is written over the newer")
-        let again = SharedPerson.pick(stored: tv, mine: SharedPerson.Entry(id: "tv-device-1", since: 900))
-        #expect(again.person == tv && !again.write, "a relaunch keeps the entry it wrote")
-    }
-
-    @Test("an entry from iCloud is read only when whole")
-    func entryReading() {
-        #expect(SharedPerson.Entry(["id": "abcdef", "since": 3.0]) == SharedPerson.Entry(id: "abcdef", since: 3))
-        #expect(SharedPerson.Entry(["id": "ab", "since": 3.0]) == nil, "Amplitude wants five characters at least")
-        #expect(SharedPerson.Entry(nil) == nil)
-    }
-}

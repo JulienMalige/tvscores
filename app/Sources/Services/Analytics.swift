@@ -72,6 +72,7 @@ final class Analytics {
             // apart from what comes after.
             client?.optOut = true
             client?.reset()
+            person.stop()
             #if os(iOS)
             // The recording stops with the rest, said here rather than left
             // to the plugin's reading of the opt-out.
@@ -101,14 +102,12 @@ final class Analytics {
         joinPerson()
     }
 
-    /// The user Amplitude files this device under: the device number of
-    /// the first device of this Apple ID that shared, read from iCloud, so
-    /// one person's Apple TV, iPhone and iPad count once (`SharedPerson`).
-    /// After Off and On the device number is new, and joins the same person.
+    /// The user Amplitude files this device under: the person's number in
+    /// this Apple ID's iCloud, so one person's Apple TV, iPhone and iPad
+    /// count once (`SharedPerson`). Joined again after every yes.
     private func joinPerson() {
-        guard let client, let device = client.getDeviceId() else { return }
         person.changed = { [weak self] id in self?.client?.setUserId(userId: id) }
-        person.join(deviceId: device)
+        person.join()
     }
 
     private func makeClient(_ project: (key: String, zone: String)) -> Amplitude {

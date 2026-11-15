@@ -168,7 +168,7 @@ struct SplitMenu: View {
         return Button {
             selection = onMyTeams ? .home : .myTeams
         } label: {
-            HStack(spacing: 6) {
+            HStack(spacing: Metrics.switchGap) {
                 Image(systemName: onMyTeams ? "house.fill" : "star.fill")
                 Text(onMyTeams ? "tab.home" : "myTeams.title")
             }

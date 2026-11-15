@@ -101,15 +101,18 @@ many are followed, the countries chosen, the apps hidden, the teams,
 drivers and players followed in My Teams by name, and how many (from 1.2,
 2026-11-15), and when the yes was given.
 
-**One person, several devices** (Julien, 2026-11-15, from 1.2): the first
-device of an Apple ID to share writes its Amplitude device number into that
-Apple ID's iCloud key-value store, and every device that shares sends it as
-Amplitude's user id, so an Apple TV, an iPhone and an iPad on one Apple ID are
-one user with three devices. Only between devices that said yes, on the same
-Apple ID with iCloud on; two first devices before a sync settle on the older
-entry. After Off and On a device's number is new and joins the same person.
-App Privacy gains Identifiers, User ID (below), which Julien adds in App
-Store Connect before 1.2 is submitted.
+**One person, several devices** (Julien, 2026-11-15, from 1.2): the Apple
+ID's iCloud key-value store holds one random number for the person, and every
+device of that Apple ID that shares sends it as Amplitude's user id, so an
+Apple TV, an iPhone and an iPad on one Apple ID are one user with three
+devices (`SharedPerson`). A device takes the number iCloud holds and never
+writes over one; it makes one only when iCloud still has none 15 seconds
+after it asked, and two made at once converge on the one iCloud keeps. The
+number is the person's, not a device's: a device that says no stops reading
+and sending it, and leaves nothing of its own behind; after a yes again it
+joins the same person. Only between devices that said yes, on the same Apple
+ID with iCloud on. App Privacy gains Identifiers, User ID (below), which
+Julien adds in App Store Connect before 1.2 is submitted.
 
 **Session Replay**, on iPhone and iPad only: every visit recorded (the
 plugin's default rate is none; ours is 1.0), at Amplitude's default masking,
@@ -241,7 +244,7 @@ read 2026-11-14):
 |---|---|---|---|---|
 | Location, Coarse Location | the city from the address | Analytics | yes | no |
 | Identifiers, Device ID | the random number per install | Analytics | yes | no |
-| Identifiers, User ID | from 1.2: the first device's number, shared through the viewer's iCloud so that one Apple ID's devices count as one person (`SharedPerson`) | Analytics | yes | no |
+| Identifiers, User ID | from 1.2: a random number for the person, kept in the viewer's iCloud so that one Apple ID's devices count as one (`SharedPerson`) | Analytics | yes | no |
 | Usage Data, Product Interaction | pages, time on them, taps, sessions; on iPhone and iPad the replays | Analytics | yes | no |
 | Usage Data, Other Usage Data | the choices in Settings: competitions, countries, apps, language; from 1.2, the sides followed in My Teams (the same type, so App Privacy needs no new answer) | Analytics | yes | no |
 | Diagnostics, Performance Data | the time from launch to the first board | Analytics | yes | no |
