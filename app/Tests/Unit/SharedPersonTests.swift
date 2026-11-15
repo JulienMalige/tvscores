@@ -34,9 +34,12 @@ struct SharedPersonTests {
     func firstDeviceMakesIt() async throws {
         let store = FakeStore()
         var told: [String] = []
-        person(store) { told.append($0) }.join()
+        // Held, as `Analytics` holds it: the wait is let go with its owner.
+        let p = person(store) { told.append($0) }
+        p.join()
         #expect(told.isEmpty, "not before iCloud has had time to sync")
         try await Task.sleep(for: .milliseconds(200))
+        withExtendedLifetime(p) {}
         #expect(told == ["new-person-id"])
         #expect(store.string(forKey: SharedPerson.storeKey) == "new-person-id")
     }
