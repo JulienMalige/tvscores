@@ -21,10 +21,12 @@ test("counts the app through Cloudflare, not this machine, a browser or CI's bui
   board(a, { headers: { "user-agent": APP } });
   board(a, ask("203.0.113.9", { agent: "Mozilla/5.0 (iPad)" }));
   board(a, ask("203.0.113.9", { agent: "TV%20Scores/1 CFNetwork/3826 Darwin/25.1.0" }));
+  board(a, ask("203.0.113.9", { agent: "curl/8.5.0" }));
   assert.equal(a.totals().devices, 0);
   board(a, ask("203.0.113.9"));
-  assert.equal(a.totals().devices, 1);
-  assert.deepEqual(a.totals().builds, { 51: 1 });
+  board(a, ask("198.51.100.4", { agent: "TVScores/46 CFNetwork/1568.300.101 Darwin/24.0.0" }));
+  assert.equal(a.totals().devices, 2, "the app, however the system spells its name");
+  assert.deepEqual(a.totals().builds, { 51: 1, 46: 1 });
 });
 
 test("a device is an address, an agent and a language within the day", () => {

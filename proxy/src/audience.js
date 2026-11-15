@@ -101,9 +101,10 @@ export class Audience {
     if (!kind) return;
     const ip = req.headers["cf-connecting-ip"];
     const ua = String(req.headers["user-agent"] ?? "");
-    // The system's user agent names the app by its bundle name, "TV Scores",
-    // escaped, then its build: "TV%20Scores/51 CFNetwork/… Darwin/…".
-    const build = ua.match(/^TV(?:%20| )?Scores\/(\d+)\b/)?.[1];
+    // The system's user agent: the app's name, its build, then the system's
+    // network stack, "TV%20Scores/51 CFNetwork/… Darwin/…". Only the app
+    // calls /v1/, so the name is not checked, whatever its escaping.
+    const build = ua.match(/^[^/\s]+\/(\d+) CFNetwork\//)?.[1];
     // The app through Cloudflare only: not this machine's own calls, not a
     // browser, and not the builds CI runs against the live server (build 1).
     if (!ip || !build || build === "1") return;
