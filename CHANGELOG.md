@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+
+## 1.2 build 56 — 15 November 2026
 - On iPhone and iPad, the button at the top right says where it takes you, "My Teams"
   on Home and "Home" on My Teams, in words; on My Teams, Edit chooses the teams.
 
