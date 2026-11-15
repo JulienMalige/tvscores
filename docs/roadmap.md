@@ -77,17 +77,28 @@ Noted 2026-10-03.
     publishes per-game deep links we could use.
 
 
-## 4. My Teams (favourites)
+## 4. My Teams (favourites) and notifications
 
-Noted 2026-10-03.
+Noted 2026-10-03; redrawn 2026-11-15 after Apple Sports' screens (draft:
+https://claude.ai/artifact/FfxPac3PNtchfCokUQmobv).
 
-- A "My Teams" entry in the menu, near Home, as in Apple Sports' sidebar.
-- The viewer picks the teams and players they follow, in any sport or
-  competition we carry.
-- My Teams shows only their games, laid out like Home: Yesterday, Today and
-  Upcoming, with the same rows and game pages.
-- Choosing the teams needs a picker: browse by competition, then tick
-  teams. Searching by name could come later.
-- Kept on the Apple TV, like the Settings choices. The proxy already
-  serves every game; it may need a list of each competition's teams for
-  the picker.
+- Follow teams, and athletes too: F1 drivers, MotoGP riders, tennis players.
+- Two views of the day, as in Apple Sports, switched by a pill at the top
+  right that names the current one:
+  - Home: a "My Teams" section first, with a star before each followed
+    team's crest, then the competitions as today;
+  - My Teams: only the followed games, by Yesterday, Today and Upcoming.
+  On the Apple TV both are menu entries.
+- Choosing: competition, then its teams, each with a star; and a search
+  (Teams and Leagues tabs, the competition under each name), from the first
+  version. A team in two competitions is one favourite.
+- Competitions stay in Settings (Julien, 2026-11-15).
+- Favourites sync between the Apple TV and the iPhone through iCloud
+  (Julien, 2026-11-15).
+- Notifications on iPhone and iPad (tvOS shows none), sent by the proxy
+  through Apple's push service, with switches per favourite that change by
+  sport, and a "hide the score" option. They need the proxy to keep each
+  device's push token and what it follows: the privacy pages and App
+  Privacy change.
+- My Teams and notifications ship together, in one version (Julien,
+  2026-11-15).
