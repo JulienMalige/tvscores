@@ -15,7 +15,8 @@ const BUCKETS = MINUTES.map((bound, i) => (i === 0 ? `under ${bound}` : `${MINUT
 const SPORTS = { football: "Football", nfl: "NFL", nba: "NBA" };
 /** A UTC day as a person says it: "Sat 15 Nov". */
 const dayName = (day) => (day ? new Date(`${day}T12:00:00Z`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }) : "");
-const PLATFORMS = { tv: "Apple TV", phone: "iPhone", pad: "iPad", unknown: "Not said (builds before the header)" };
+const PLATFORMS = { tv: "Apple TV", phone: "iPhone", pad: "iPad", unknown: "Not said" };
+const opens = (n) => `${fmt(n)} open${n === 1 ? "" : "s"}`;
 
 /** A list of bars, longest first: one row per key, its count at the end. */
 function bars(title, entries, { label = (k) => k, note = "", limit = 12, detail, sorted = true } = {}) {
@@ -46,7 +47,12 @@ export function renderAudience(days, { nameOf = (key) => key } = {}) {
   const today = days[0] ?? blank("today");
   const yesterday = days[1] ?? blank("yesterday");
   const week = days.slice(0, 7).reduce((acc, d) => sum(acc, d), blank("week"));
-  const month = [...days].reverse();
+  // Thirty slots, the days with nothing in them too, today's on the right.
+  const byDay = new Map(days.map((d) => [d.day, d]));
+  const month = Array.from({ length: 30 }, (_, i) => {
+    const day = new Date(Date.parse(`${today.day}T00:00:00Z`) - (29 - i) * 864e5).toISOString().slice(0, 10);
+    return byDay.get(day) ?? blank(day);
+  });
   const hours = Array.from({ length: 24 }, (_, local) => week.hours[(local - SAO_PAULO + 24) % 24]);
   const restarts = days.slice(0, 7).reduce((n, d) => n + (d.restarts ?? 0), 0);
 
@@ -86,14 +92,14 @@ table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nu
 ${columns("Devices a day, last 30 days", month.map((d) => ({ label: dayName(d.day), value: d.devices })), { ticks: [dayName(month[0]?.day), dayName(month.at(-1)?.day)] })}
 ${columns("When, São Paulo time, last 7 days", hours.map((value, local) => ({ label: `${String(local).padStart(2, "0")}:00`, value })), { note: "Devices with the app open in each hour, added up over the 7 days.", ticks: ["0h", "6h", "12h", "18h", "23h"] })}
 <div class="grid2">
-${bars("Kind of device", Object.entries(week.platforms), { label: (k) => PLATFORMS[k] ?? k, note: "Device-days over the last 7 days: a device that came on 3 days counts 3." })}
+${bars("Kind of device", Object.entries(week.platforms), { label: (k) => PLATFORMS[k] ?? k, note: "Device-days over the last 7 days: a device that came on 3 days counts 3. Builds up to 51 do not say their kind." })}
 ${bars("Countries", Object.entries(week.countries), { label: (k) => (k === "unknown" ? "Unknown" : new Intl.DisplayNames(["en"], { type: "region" }).of(k) ?? k) })}
 ${bars("Time zones", Object.entries(week.timeZones))}
 ${bars("Languages", Object.entries(week.languages))}
 ${bars("App builds", Object.entries(week.builds), { label: (k) => `build ${k}` })}
 ${bars("Minutes with the app open, per device and day", BUCKETS.map((label, i) => [label, week.minutes.buckets[i]]).filter(([, n]) => n), { limit: BUCKETS.length, sorted: false })}
-${bars("Tables opened", Object.entries(week.tables).map(([k, v]) => [k, v.devices]), { label: nameOf, detail: (k) => `${fmt(week.tables[k].opens)} opens`, note: "Devices that opened each competition's table; the opens beside them." })}
-${bars("Game pages opened", Object.entries(week.games).map(([k, v]) => [k, v.devices]), { label: (k) => SPORTS[k] ?? k, detail: (k) => `${fmt(week.games[k].opens)} opens`, note: "Football, NFL and NBA: the sports whose games have a page from the server." })}
+${bars("Tables opened", Object.entries(week.tables).map(([k, v]) => [k, v.devices]), { label: nameOf, detail: (k) => opens(week.tables[k].opens), note: "Devices that opened each competition's table; the opens beside them." })}
+${bars("Game pages opened", Object.entries(week.games).map(([k, v]) => [k, v.devices]), { label: (k) => SPORTS[k] ?? k, detail: (k) => opens(week.games[k].opens), note: "Football, NFL and NBA: the sports whose games have a page from the server." })}
 </div>
 <section><h2>Day by day</h2>${restarts ? `<p class="muted">The server restarted ${restarts} time${restarts > 1 ? "s" : ""} this week: a device seen on both sides of a restart counts twice that day.</p>` : ""}
 <table><thead><tr><th>Day</th><th>Devices</th><th>Sittings</th><th>Minutes</th><th>Boards</th></tr></thead><tbody>
