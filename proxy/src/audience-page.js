@@ -71,13 +71,15 @@ function answers(days, amplitude, apple = []) {
   const again = apple.filter((r) => r.type !== "First-time download");
   const byKey = (rows, key) => rows.reduce((acc, r) => ({ ...acc, [r[key]]: (acc[r[key]] ?? 0) + r.count }), {});
   const deviceDays = week.devices;
+  // The days counted so far, up to 7: the server began on 2026-11-15.
+  const counted = Math.max(1, Math.min(7, days.length));
   const engaged = week.minutes.buckets.slice(3).reduce((a, b) => a + b, 0);
   const seconds = Object.entries(amplitude?.sessionSeconds ?? {}).filter(([day, v]) => day >= since(7) && v > 0).map(([, v]) => v);
   const session = seconds.length ? `${(seconds.reduce((a, b) => a + b, 0) / seconds.length / 60).toFixed(1)} min` : "–";
   const kinds = Object.fromEntries(Object.entries(week.platforms).filter(([k]) => k !== "unknown"));
   return `<div class="answers">
   ${answer("How many installed it?", fmt(count(first, since(30))), "first downloads, last 30 days", `Apple, a day or two behind · ${fmt(count(first, since(7)))} in the last 7 days · ${fmt(count(again, since(30)))} re-downloads`)}
-  ${answer("How many use it?", fmt(today.devices), "devices today", `Server, every version · ${fmt(deviceDays / 7)} a day over 7 days${amplitude ? ` · ${fmt(amplitude.days?.[today.day] ?? 0)} of today's said yes (Amplitude)` : ""}`)}
+  ${answer("How many use it?", fmt(today.devices), "devices today", `Server, every version · ${fmt(deviceDays / counted)} a day over the last ${counted} day${counted > 1 ? "s" : ""}${amplitude ? ` · ${fmt(amplitude.days?.[today.day] ?? 0)} of today's said yes (Amplitude)` : ""}`)}
   ${answer("How many different people this month?", amplitude ? fmt(amplitude.thisMonth ?? 0) : "–", "since the 1st, counted once each", "Amplitude, exact, only those who said yes; the server cannot tell days apart")}
   ${answer("How many really use it?", pct(engaged, deviceDays), "of the days a device came, it stayed 15 minutes or more", `Server, everyone, last 7 days · a session lasts ${session} (Amplitude)`)}
   ${answer("From where?", "", top(week.countries, regionName), `Server, last 7 days · installs: ${top(byKey(first, "territory"), regionName)} (Apple)`)}
