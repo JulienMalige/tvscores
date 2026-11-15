@@ -14,7 +14,8 @@ struct SplitMenu: View {
     /// Owned by the app, not by this view: a new language rebuilds the screens
     /// and must not take the board and its pictures with them.
     let store: ScoreboardStore
-    @State private var selection: MenuItem? = .home
+    /// `-TVScoresMyTeams` starts on My Teams (CI screenshots).
+    @State private var selection: MenuItem? = LaunchRequest.argument("-TVScoresMyTeams") != nil ? .myTeams : .home
     /// The column a phone shows: the page, until Back leads to the list.
     @State private var column = NavigationSplitViewColumn.detail
     /// Competitions opened from the front page, over it.
@@ -103,11 +104,8 @@ struct SplitMenu: View {
             // A phone shows the list when nothing in it is chosen.
             if LaunchRequest.argument("-TVScoresMenuOpen") != nil { selection = nil; column = .sidebar }
             if LaunchRequest.argument("-TVScoresSettings") != nil { settingsOpen = true }
-            // `-TVScoresMyTeams` opens My Teams, `-TVScoresMyTeams choose` the picker (CI screenshots).
-            if let wanted = LaunchRequest.argument("-TVScoresMyTeams") {
-                selection = .myTeams
-                choosingTeams = wanted == "choose"
-            }
+            // `-TVScoresMyTeams choose` opens the picker over it (CI screenshots).
+            if LaunchRequest.argument("-TVScoresMyTeams") == "choose" { choosingTeams = true }
         }
     }
 

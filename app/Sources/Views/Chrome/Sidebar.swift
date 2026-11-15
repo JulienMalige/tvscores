@@ -25,7 +25,8 @@ struct Sidebar: View {
     init(store: ScoreboardStore) {
         self.store = store
     }
-    @State private var selection = MenuItem.home
+    /// `-TVScoresMyTeams` starts on My Teams (CI screenshots).
+    @State private var selection = LaunchRequest.argument("-TVScoresMyTeams") != nil ? MenuItem.myTeams : .home
     @State private var day: Day = LaunchRequest.initialDay()
     /// The day a competition's page was opened on from the front page, so
     /// Yesterday's La Liga header opens Yesterday's La Liga.
@@ -144,11 +145,8 @@ struct Sidebar: View {
             if LaunchRequest.argument("-TVScoresMenuOpen") != nil { openMenu() }
             // `-TVScoresSettings` opens the settings card (CI screenshots).
             if LaunchRequest.argument("-TVScoresSettings") != nil { settingsOpen = true }
-            // `-TVScoresMyTeams` opens My Teams, `-TVScoresMyTeams choose` the picker (CI screenshots).
-            if let wanted = LaunchRequest.argument("-TVScoresMyTeams") {
-                selection = .myTeams
-                choosingTeams = wanted == "choose"
-            }
+            // `-TVScoresMyTeams choose` opens the picker over it (CI screenshots).
+            if LaunchRequest.argument("-TVScoresMyTeams") == "choose" { choosingTeams = true }
         }
     }
 
