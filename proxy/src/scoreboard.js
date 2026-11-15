@@ -1,5 +1,6 @@
 import { STATE } from "./model.js";
 import { photoKey } from "./photos.js";
+import { withKeys } from "./teams.js";
 import { recordsFor } from "./details.js";
 
 /** Local calendar date (YYYY-MM-DD) of an instant in a time zone. */
@@ -201,7 +202,7 @@ export function buildScoreboard(events, { tz = "UTC", now = Date.now(), sports, 
   }
   // An event with no readable start cannot be placed on a day; one of them must
   // not be the reason nobody gets a board.
-  events = events.filter((e) => Number.isFinite(Date.parse(e.start))).map((e) => withWatch(withBroadcasts(withPhotos(e, photoFor, mirror), broadcastsFor), watch));
+  events = events.filter((e) => Number.isFinite(Date.parse(e.start))).map((e) => withKeys(withWatch(withBroadcasts(withPhotos(e, photoFor, mirror), broadcastsFor), watch)));
   const today = localDate(new Date(now).toISOString(), tz);
   const yesterday = localDate(new Date(now - 86400e3).toISOString(), tz);
   // Upcoming is a window, not the whole calendar: a fixture list weeks out is

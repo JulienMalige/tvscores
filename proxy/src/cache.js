@@ -1,5 +1,6 @@
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { noteRoster, pruneRoster } from "./teams.js";
 
 /**
  * Bump when a cached shape changes. load() then drops the events, the derived
@@ -23,6 +24,7 @@ export class Store {
     this.photos = {}; // athlete name -> { url|null, at }
     this.appIcons = {}; // How to Watch app key -> { url, at }: the store listing's icon, see app-icons.js
     this.broadcasts = {}; // per country: { FR: { tsdb: { idEvent: [names] }, xmltv: { eventId: [names] } } }, see broadcasts.js
+    this.roster = {}; // "sport:leagueId" -> { teamKey: { name, logo, flag, seen } }, see teams.js
     this.meta = {};
     this.dirty = false; // per sport: { lastDaily, lastLive, lastOk, lastError, calls: { day, used } }
     mkdirSync(dir, { recursive: true });
@@ -37,6 +39,8 @@ export class Store {
       this.photos = raw.photos || {};
       this.broadcasts = raw.broadcasts || {};
       this.appIcons = raw.appIcons || {};
+      this.roster = raw.roster || {};
+      noteRoster(this.roster, [...this.events.values()]); // the games already kept, the first time
       this.meta = raw.meta || {};
       this.migrateBroadcasts();
       if (raw.schemaVersion !== SCHEMA_VERSION) {
@@ -84,7 +88,7 @@ export class Store {
     if (every && Date.now() - (this.savedAt || 0) < every) return;
     this.savedAt = Date.now();
     const tmp = this.file + ".tmp";
-    writeFileSync(tmp, JSON.stringify({ schemaVersion: SCHEMA_VERSION, events: [...this.events.values()], standings: this.standings, photos: this.photos, broadcasts: this.broadcasts, appIcons: this.appIcons, meta: this.meta }));
+    writeFileSync(tmp, JSON.stringify({ schemaVersion: SCHEMA_VERSION, events: [...this.events.values()], standings: this.standings, photos: this.photos, broadcasts: this.broadcasts, appIcons: this.appIcons, roster: this.roster, meta: this.meta }));
     renameSync(tmp, this.file);
     this.dirty = false;
   }
@@ -107,6 +111,7 @@ export class Store {
       }
       this.events.set(e.id, merged);
     }
+    if (noteRoster(this.roster, events)) this.dirty = true;
   }
 
   setPhoto(name, entry) {
@@ -148,6 +153,7 @@ export class Store {
 
   /** Drop team-sport events older than 3 days (any state but live) so the file does not grow forever. */
   prune(now = Date.now()) {
+    if (pruneRoster(this.roster, now)) this.dirty = true;
     const cutoff = now - 3 * 86400e3;
     for (const [id, e] of this.events) {
       if (e.kind !== "race" && Date.parse(e.start) < cutoff && e.status.state !== "live") {

@@ -7,6 +7,7 @@ const ASSETS = join(dirname(fileURLToPath(import.meta.url)), "..", "assets");
 const SITE = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "site");
 import { buildScoreboard, localDate, shownSports, withTablePhotos, withBroadcasts } from "./scoreboard.js";
 import { slug } from "./model.js";
+import { teamsBody } from "./teams.js";
 import { createWatch } from "./watch.js";
 import { prepare, send, canonicalTz } from "./respond.js";
 import { appendTrace, POSTS_PER_MIN } from "./trace.js";
@@ -114,6 +115,8 @@ export function createApp({ store, config, startedAt = Date.now(), photos, image
       });
       return send(res, 200, undefined, {}, req, prepared);
     }
+    const teamsOf = path === "/v1/teams" && shownSports(url.searchParams.get("sports"), config); // My Teams' picker, teams.js
+    if (teamsOf) return send(res, 200, undefined, {}, req, remember(`teams|${teamsOf}`, () => prepare(teamsBody(store, { sports: teamsOf, leagues: config.leagues, photoFor, mirror, badgeFor }))));
     if (path === "/v1/standings") {
       return send(res, 200, { standings: Object.fromEntries(Object.entries(store.standings).map(([k, v]) => [k, withTablePhotos(v, photoFor, mirror, badgeFor(k.split(":")[0]))])) });
     }
