@@ -37,7 +37,7 @@ struct MyTeamsScreen: View {
         .navigationTitle(Text("myTeams.title"))
         .toolbar {
             if !favourites.isEmpty {
-                // A word, not a second star beside the switch's (Julien, build 55).
+                // A word: a star there read as a second one (Julien, build 55).
                 Button(action: chooseTeams) { Text("myTeams.edit").fontWeight(.semibold) }
                     .accessibilityIdentifier("myTeams.edit")
             }

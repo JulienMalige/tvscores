@@ -40,6 +40,23 @@ struct LeagueGroup: Decodable, Identifiable, Equatable {
     let league: League
     let events: [Event]
     var id: String { "\(sport):\(league.id.raw)" }
+
+    /// The same competition with other games: a day's share of them, or
+    /// what is left once Home's My Teams has taken its own.
+    func with(events: [Event]) -> LeagueGroup {
+        LeagueGroup(sport: sport, league: league, events: events)
+    }
+}
+
+extension [LeagueGroup] {
+    /// The groups without these games, and without a group left empty.
+    func without(_ ids: Set<String>) -> [LeagueGroup] {
+        guard !ids.isEmpty else { return self }
+        return compactMap { group in
+            let rest = group.events.filter { !ids.contains($0.id) }
+            return rest.isEmpty ? nil : group.with(events: rest)
+        }
+    }
 }
 
 /// League ids are numbers for API-Sports and strings for NBA ("standard") and F1.

@@ -93,8 +93,9 @@ struct HomeScreen: View {
             // competition, hidden ones too: a team followed is wanted. Each
             // is there once: not again under its competition (Julien,
             // 2026-11-16), which is left out when nothing else of it remains.
-            let followed = favourites.games(in: board.groups(for: day))
-            let groups = Self.arranged(board.groups(for: day), leagues: board.leagues)
+            let dayGroups = board.groups(for: day)
+            let followed = favourites.games(in: dayGroups)
+            let groups = Self.arranged(dayGroups, leagues: board.leagues)
                 .without(Set(followed.map(\.event.id)))
             if groups.isEmpty, followed.isEmpty {
                 EmptyDay(day: day)

@@ -38,7 +38,7 @@ extension LeagueGroup {
                 calendar.startOfDay(for: event.sessions(on: .upcoming, now: now, calendar: calendar).map(\.start).min() ?? event.start)
             }
             for (day, events) in split {
-                days[day, default: []].append(LeagueGroup(sport: group.sport, league: group.league, events: events))
+                days[day, default: []].append(group.with(events: events))
             }
         }
         return days.keys.sorted().map { ($0, days[$0] ?? []) }
