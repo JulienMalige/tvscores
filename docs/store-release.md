@@ -103,6 +103,14 @@ What's New for the Apple TV, the iPhone and iPad screenshots
 the reviewer about the first-launch question. On release, add 52 and 53 to
 `STORE_BUILDS` in `proxy/src/audience-page.js`.
 
+**Approved and released** (2026-11-16): the iPhone and iPad version, asked
+for information under Guideline 2.1 as 1.0 was, went on once Julien replied
+with a screen recording from his iPhone and the answers drafted for 1.0,
+adapted (Amplitude, Session Replay, rugby's sources). Both versions were
+"Pending Developer Release" on 2026-11-16 and released together on Julien's
+go ("release"), with `POST /v1/appStoreVersionReleaseRequests`; builds 52 and
+53 joined `STORE_BUILDS` in `proxy/src/audience-page.js` the same day.
+
 What can come back: Apple's reasons for a rejection arrive in App Store
 Connect (App Review) and by email to the account holder. A version under
 review can still be withdrawn, and changed, then sent again.

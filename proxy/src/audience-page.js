@@ -45,7 +45,7 @@ function columns(title, points, { note = "", ticks = [] } = {}) {
  * The builds on the App Store; the others are test copies, Julien's own among
  * them. Add a build here when a version ships (docs/analytics.md).
  */
-const STORE_BUILDS = ["46"];
+const STORE_BUILDS = ["46", "52", "53"];
 const storeDevices = (d) => STORE_BUILDS.reduce((n, b) => n + (d.builds?.[b] ?? 0), 0);
 const pct = (part, whole) => (whole ? `${Math.round((part / whole) * 100)}%` : "–");
 const regionName = (k) => (k === "unknown" ? "Unknown" : new Intl.DisplayNames(["en"], { type: "region" }).of(k) ?? k);
