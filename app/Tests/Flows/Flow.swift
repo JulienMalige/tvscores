@@ -26,6 +26,11 @@ enum Flow {
         // shows when it is back instead — so its sign is the Standings heading.
         let sign = ready.map { app.staticTexts[$0] } ?? (league == nil ? day(app, tab) : app.staticTexts["Standings"])
         XCTAssertTrue(sign.waitForExistence(timeout: 25), "the app finished loading and shows \(ready ?? "the \(tab) pill")")
+        // The demo's crests load for real since 2026-11-15, and for the first
+        // seconds the simulator drops presses while it draws them: the
+        // Settings and question flows then missed their rows in four runs
+        // of five. Let it settle before the remote starts.
+        sleep(3)
         return app
     }
 
@@ -48,7 +53,7 @@ enum Flow {
         for _ in 0..<limit {
             if element.exists && element.hasFocus { return true }
             remote.press(direction)
-            usleep(150_000)
+            usleep(300_000)
         }
         return element.exists && element.hasFocus
     }
