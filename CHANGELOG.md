@@ -8,7 +8,7 @@ notes when a version ships.
 
 ## Unreleased
 
-## 1.2 build 58 — 16 November 2026
+## 1.2 builds 58 (Apple TV) and 59 (iPhone and iPad) — 16 November 2026
 - On Home, a game of your teams is shown once, under My Teams, and no longer again under
   its competition.
 - On iPhone and iPad, no more button at the top right of Home: Home and My Teams are both
