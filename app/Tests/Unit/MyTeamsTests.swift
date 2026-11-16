@@ -66,6 +66,14 @@ struct MyTeamsTests {
         #expect(games.first?.group.league.id.raw == "4334", "each under its own competition")
     }
 
+    @Test("Home lists a followed game once: not again under its competition, which goes when emptied")
+    func followedGamesAreNotRepeated() throws {
+        let psg = try Self.game("1", home: "Paris Saint-Germain", away: "Lens")
+        let other = try Self.game("2", home: "Brest", away: "Nice")
+        let groups = [try Self.group(4334, [psg, other]), try Self.group(4480, [psg])].without(["1"])
+        #expect(groups.map { $0.events.map(\.id) } == [["2"]], "Ligue 1 keeps Brest–Nice; the Champions League, PSG's only, goes")
+    }
+
     @Test("a driver followed makes every race of the series the viewer's")
     func racesOfAFollowedDriver() throws {
         let favourites = Favourites(defaults: Self.defaults(), cloud: nil)

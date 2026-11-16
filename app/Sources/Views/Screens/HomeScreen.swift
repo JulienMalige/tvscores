@@ -88,11 +88,14 @@ struct HomeScreen: View {
     @ViewBuilder
     private var content: some View {
         if let board = store.board {
-            let groups = Self.arranged(board.groups(for: day), leagues: board.leagues)
             // The followed sides' games first, under "★ My Teams ›", as Apple
             // Sports opens its Home (Julien, 2026-11-15); found in every
-            // competition, hidden ones too: a team followed is wanted.
+            // competition, hidden ones too: a team followed is wanted. Each
+            // is there once: not again under its competition (Julien,
+            // 2026-11-16), which is left out when nothing else of it remains.
             let followed = favourites.games(in: board.groups(for: day))
+            let groups = Self.arranged(board.groups(for: day), leagues: board.leagues)
+                .without(Set(followed.map(\.event.id)))
             if groups.isEmpty, followed.isEmpty {
                 EmptyDay(day: day)
             } else {

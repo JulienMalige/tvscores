@@ -145,3 +145,14 @@ extension TeamRef {
         return slug.isEmpty ? nil : "\(sport):\(slug)"
     }
 }
+
+extension [LeagueGroup] {
+    /// The groups without these games, and without a group left empty.
+    func without(_ ids: Set<String>) -> [LeagueGroup] {
+        guard !ids.isEmpty else { return self }
+        return compactMap { group in
+            let rest = group.events.filter { !ids.contains($0.id) }
+            return rest.isEmpty ? nil : LeagueGroup(sport: group.sport, league: group.league, events: rest)
+        }
+    }
+}
