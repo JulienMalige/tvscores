@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- On iPhone and iPad, no more button at the top right of Home: Home and My Teams are both
+  in the menu, as on the Apple TV. On My Teams, Edit still chooses the teams.
 
 ## 1.2 builds 56 (Apple TV) and 57 (iPhone and iPad) — 15 November 2026
 - On iPhone and iPad, the button at the top right says where it takes you, "My Teams"

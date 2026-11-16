@@ -144,10 +144,8 @@ struct SplitMenu: View {
         switch item {
         case .home:
             HomeScreen(store: store, day: $day, openLeague: open, openMyTeams: { selection = .myTeams }, openedInitialRace: $homeOpenedRace)
-                .toolbar { ToolbarItem(placement: .topBarTrailing) { viewSwitch } }
         case .myTeams:
             MyTeamsScreen(store: store, day: $day, chooseTeams: { choosingTeams = true })
-                .toolbar { ToolbarItem(placement: .topBarTrailing) { viewSwitch } }
         case .league(let key):
             if let league = league(key) {
                 CompetitionScreen(ref: LeagueRef(league), store: store, day: leagueDays[key] ?? LaunchRequest.initialDay())
@@ -157,25 +155,6 @@ struct SplitMenu: View {
         case .settings:
             EmptyView() // never a page: the gear opens the sheet
         }
-    }
-
-    /// The way to the other view: "★ My Teams" on Home, "⌂ Home" on My
-    /// Teams, words and symbol both. Apple Sports' pill names the view you
-    /// are in, which a phone's toolbar shrank to a lone house on Home, read
-    /// as a Home button on the Home page (Julien, build 55).
-    private var viewSwitch: some View {
-        let onMyTeams = selection == .myTeams
-        return Button {
-            selection = onMyTeams ? .home : .myTeams
-        } label: {
-            HStack(spacing: Metrics.switchGap) {
-                Image(systemName: onMyTeams ? "house.fill" : "star.fill")
-                Text(onMyTeams ? "tab.home" : "myTeams.title")
-            }
-            .font(.subheadline.weight(.semibold))
-            .fixedSize()
-        }
-        .accessibilityIdentifier("view.switch")
     }
 
     private func league(_ key: String) -> LeagueSummary? {

@@ -168,8 +168,6 @@ enum Metrics {
     static let menuRowInsetH: CGFloat = .tv(18)
     static let menuRowGap: CGFloat = .tv(8)
     static let menuIcon: CGFloat = .tv(40, phone: 28)
-    /// Between the symbol and the word of the Home and My Teams switch.
-    static let switchGap: CGFloat = .tv(12)
     static let menuFont: CGFloat = .tv(26)
     static let menuRadius: CGFloat = .tv(40)
     /// One column of a table read as numbers — played, won, points.

@@ -83,12 +83,13 @@ Noted 2026-10-03; redrawn 2026-11-15 after Apple Sports' screens (draft:
 https://claude.ai/artifact/FfxPac3PNtchfCokUQmobv).
 
 - Follow teams, and athletes too: F1 drivers, MotoGP riders, tennis players.
-- Two views of the day, as in Apple Sports, switched by a pill at the top
-  right that names the current one:
+- Two views of the day, as in Apple Sports, both entries of the menu on
+  every device (Julien, 2026-11-16: no button at the top right, the menu
+  has them):
   - Home: a "My Teams" section first, with a star before each followed
     team's crest, then the competitions as today;
-  - My Teams: only the followed games, by Yesterday, Today and Upcoming.
-  On the Apple TV both are menu entries.
+  - My Teams: only the followed games, by Yesterday, Today and Upcoming,
+    with Edit to choose them.
 - Choosing: competition, then its teams, each with a star; and a search
   (Teams and Leagues tabs, the competition under each name), from the first
   version. A team in two competitions is one favourite.
