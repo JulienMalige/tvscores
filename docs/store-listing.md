@@ -82,6 +82,9 @@ Formula 1 and MotoGP: qualifying, the sprint and the race at your local time, th
 THE COMPETITIONS
 Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Copa Libertadores, Brasileirão, the Nations League and international friendlies; the NFL and the NBA; Formula 1 and MotoGP; ATP and WTA tennis; and rugby union: the Top 14, the Champions Cup, the Premiership, the Six Nations, the Nations Championship and the World Cup.
 
+MY TEAMS
+Follow your teams, drivers and players: their games come first on Home, with a star, and My Teams shows only theirs. They follow you through iCloud, from the Apple TV to the iPhone and iPad.
+
 YOURS TO ARRANGE
 Keep the competitions you follow, in the order you like. Times follow your time zone, and the app speaks English, French, Portuguese and Spanish.
 
@@ -92,11 +95,8 @@ TV Scores is not affiliated with the leagues, teams, players or broadcasters it 
 
 ### What's New
 
-Rugby union arrives: the Top 14, the Champions Cup, the Premiership, the Nations Championship, the Six Nations and the World Cup, with their tables.
-TV Scores is now on iPhone and iPad too.
-Tennis's season finals are listed before they start.
-In Settings, hold the select button on a competition to move it up or down.
-The first time it opens, the app asks whether you want to share how you use it, to help make it better. You can change your answer in Settings.
+My Teams: follow your teams, and Formula 1 drivers, MotoGP riders and tennis players too. Their games come first on Home, marked with a star, and My Teams in the menu shows only theirs. Choose them by competition or search them by name.
+Your teams and your choices in Settings follow you through iCloud, from the Apple TV to the iPhone and iPad.
 
 ## fr-FR
 
@@ -128,6 +128,9 @@ Formule 1 et MotoGP : les qualifications, le sprint et la course à votre heure
 LES COMPÉTITIONS
 Premier League, Liga, Serie A, Bundesliga, Ligue 1, Ligue des champions, Ligue Europa, Copa Libertadores, Brasileirão, Ligue des nations et matchs amicaux internationaux ; la NFL et la NBA ; la Formule 1 et le MotoGP ; le tennis ATP et WTA ; et le rugby à XV : le Top 14, la Champions Cup, la Premiership, le Tournoi des Six Nations, le Nations Championship et la Coupe du monde.
 
+MES ÉQUIPES
+Suivez vos équipes, pilotes et joueurs : leurs matchs arrivent en tête de l'Accueil, avec une étoile, et Mes équipes ne montre que les leurs. Ils vous suivent grâce à iCloud, de l'Apple TV à l'iPhone et à l'iPad.
+
 À VOTRE GOÛT
 Gardez les compétitions que vous suivez, dans l'ordre qui vous plaît. Les horaires suivent votre fuseau horaire, et l'app parle français, anglais, portugais et espagnol.
 
@@ -138,11 +141,8 @@ TV Scores n'a aucun lien avec les ligues, équipes, joueurs ou diffuseurs qu'ell
 
 ### What's New
 
-Le rugby à XV arrive : le Top 14, la Champions Cup, la Premiership, le Nations Championship, le Tournoi des Six Nations et la Coupe du monde, avec leurs classements.
-TV Scores est désormais aussi sur iPhone et iPad.
-Les finales de la saison de tennis sont listées avant leur début.
-Dans Réglages, maintenez le bouton de sélection sur une compétition pour la monter ou la descendre.
-À la première ouverture, l'app vous demande si vous voulez partager la façon dont vous l'utilisez, pour l'améliorer. Vous pouvez changer d'avis dans Réglages.
+Mes équipes : suivez vos équipes, et aussi des pilotes de Formule 1 et de MotoGP et des joueurs de tennis. Leurs matchs arrivent en tête de l'Accueil, marqués d'une étoile, et Mes équipes, dans le menu, ne montre que les leurs. Choisissez-les par compétition ou cherchez-les par leur nom.
+Vos équipes et vos choix dans Réglages vous suivent grâce à iCloud, de l'Apple TV à l'iPhone et à l'iPad.
 
 ## pt-BR
 
@@ -174,6 +174,9 @@ Fórmula 1 e MotoGP: o treino classificatório, a sprint e a corrida no seu hor�
 AS COMPETIÇÕES
 Brasileirão, Copa Libertadores, Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Liga das Nações e amistosos de seleções; a NFL e a NBA; a Fórmula 1 e a MotoGP; o tênis da ATP e da WTA; e o rúgbi: o Top 14, a Champions Cup, a Premiership, o Six Nations, o Nations Championship e a Copa do Mundo.
 
+MEUS TIMES
+Siga seus times, pilotos e jogadores: os jogos deles aparecem primeiro no Início, com uma estrela, e Meus times mostra só os deles. Eles acompanham você pelo iCloud, da Apple TV ao iPhone e ao iPad.
+
 DO SEU JEITO
 Fique com as competições que você acompanha, na ordem que preferir. Os horários seguem o seu fuso, e o app fala português, inglês, francês e espanhol.
 
@@ -184,11 +187,8 @@ O TV Scores não tem ligação com as ligas, equipes, jogadores ou emissoras que
 
 ### What's New
 
-Chegou o rúgbi: o Top 14, a Champions Cup, a Premiership, o Nations Championship, o Six Nations e a Copa do Mundo, com suas tabelas.
-O TV Scores agora também está no iPhone e no iPad.
-As finais da temporada de tênis aparecem antes de começar.
-Em Ajustes, mantenha o botão de seleção pressionado numa competição para subi-la ou descê-la.
-Na primeira vez que abre, o app pergunta se você quer compartilhar como o usa, para melhorá-lo. Você pode mudar a resposta em Ajustes.
+Meus times: siga seus times, e também pilotos de Fórmula 1 e de MotoGP e jogadores de tênis. Os jogos deles aparecem primeiro no Início, marcados com uma estrela, e Meus times, no menu, mostra só os deles. Escolha por competição ou procure pelo nome.
+Seus times e suas escolhas em Ajustes acompanham você pelo iCloud, da Apple TV ao iPhone e ao iPad.
 
 ## es-ES
 
@@ -220,6 +220,9 @@ Fórmula 1 y MotoGP: la sesión de clasificación, el sprint y la carrera a tu h
 LAS COMPETICIONES
 LaLiga, Premier League, Serie A, Bundesliga, Ligue 1, Champions League, Europa League, Copa Libertadores, Brasileirão, Liga de Naciones y amistosos internacionales; la NFL y la NBA; la Fórmula 1 y MotoGP; el tenis de la ATP y la WTA; y el rugby: el Top 14, la Champions Cup, la Premiership, el Seis Naciones, el Nations Championship y la Copa del Mundo.
 
+MIS EQUIPOS
+Sigue a tus equipos, pilotos y jugadores: sus partidos aparecen primero en Inicio, con una estrella, y Mis equipos muestra solo los suyos. Te siguen gracias a iCloud, del Apple TV al iPhone y al iPad.
+
 A TU MANERA
 Quédate con las competiciones que sigues, en el orden que prefieras. Los horarios siguen tu zona horaria, y la app habla español, inglés, francés y portugués.
 
@@ -230,8 +233,5 @@ TV Scores no tiene relación con las ligas, equipos, jugadores ni cadenas que mu
 
 ### What's New
 
-Llega el rugby: el Top 14, la Champions Cup, la Premiership, el Nations Championship, el Seis Naciones y la Copa del Mundo, con sus clasificaciones.
-TV Scores ya está también en iPhone y iPad.
-Las finales de la temporada de tenis aparecen antes de empezar.
-En Ajustes, mantén pulsado el botón de selección sobre una competición para subirla o bajarla.
-La primera vez que se abre, la app te pregunta si quieres compartir cómo la usas, para mejorarla. Puedes cambiar tu respuesta en Ajustes.
+Mis equipos: sigue a tus equipos, y también a pilotos de Fórmula 1 y de MotoGP y a tenistas. Sus partidos aparecen primero en Inicio, marcados con una estrella, y Mis equipos, en el menú, muestra solo los suyos. Elígelos por competición o búscalos por su nombre.
+Tus equipos y tus elecciones en Ajustes te siguen gracias a iCloud, del Apple TV al iPhone y al iPad.

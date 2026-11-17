@@ -62,13 +62,20 @@ function token () {
   return `${head}.${body}.${sig.toString('base64url')}`
 }
 
-export async function asc (path, init = {}) {
+export async function asc (path, init = {}, retries = 2) {
   if (!path) throw new Error('asc(path): a path is required, e.g. /v1/apps')
   const url = path.startsWith('http') ? path : `https://api.appstoreconnect.apple.com${path}`
   const res = await fetch(url, {
     ...init,
     headers: { authorization: `Bearer ${token()}`, 'content-type': 'application/json', ...init.headers }
   })
+  // Apple answers a sound token 401 now and then: on 2026-11-17 one push in
+  // two lost a call that way, with the clock right to the second. A fresh
+  // token a moment later goes through.
+  if (res.status === 401 && retries > 0) {
+    await new Promise((resolve) => setTimeout(resolve, 3000))
+    return asc(path, init, retries - 1)
+  }
   const text = await res.text()
   if (!res.ok) throw new Error(`${res.status} ${url}\n${text}`)
   return text ? JSON.parse(text) : null
