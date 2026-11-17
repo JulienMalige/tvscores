@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+
+## 1.2 build 62 — 17 November 2026
 - On the Apple TV, Choose Teams at the top of My Teams can be reached: press up from
   Yesterday, Today and Upcoming.
 
