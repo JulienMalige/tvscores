@@ -25,6 +25,11 @@ struct MyTeamsScreen: View {
                         .accessibilityIdentifier("myTeams.edit")
                 }
             }
+            // One place for focus, the width of the page: a press up from the
+            // day switch reaches the button at the far right, which nothing
+            // under it lines up with (Julien, build 58: "I cannot go to my
+            // team's choose teams button").
+            .focusSection()
             #endif
             BoardCard(day: $day) { content }
         }

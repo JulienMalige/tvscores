@@ -40,4 +40,15 @@ final class MyTeamsFlow: FlowCase {
         Flow.remote.press(.select)
         XCTAssertTrue(app.buttons["team.football:paris-saint-germain"].isSelected, "a press stars the club")
     }
+
+    func testWithTeamsFollowedUpFromTheDaySwitchReachesChooseTeams() {
+        // Build 58: the button at the top right had nothing under it, and a
+        // press up from the day switch went nowhere.
+        let app = Flow.launch(tab: "today", extra: followed + ["-TVScoresMyTeams"])
+        let choose = app.buttons["myTeams.edit"]
+        choose.appears()
+        XCTAssertTrue(Flow.walk(.up, until: choose, limit: 6), "a press up from the day switch reaches Choose Teams")
+        Flow.remote.press(.select)
+        XCTAssertTrue(Flow.settingsRow(app, "chooseTeams.football.4334").waitForExistence(timeout: 10), "the picker opens")
+    }
 }

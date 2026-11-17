@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- On the Apple TV, Choose Teams at the top of My Teams can be reached: press up from
+  Yesterday, Today and Upcoming.
 
 ## 1.2 builds 58 (Apple TV) and 59 (iPhone and iPad) — 16 November 2026
 - On Home, a game of your teams is shown once, under My Teams, and no longer again under
