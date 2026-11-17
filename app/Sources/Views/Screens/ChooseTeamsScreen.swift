@@ -44,6 +44,11 @@ struct ChooseTeamsScreen: View {
             #endif
         }
         .tint(.primary)
+        #if os(tvOS)
+        // A cover of its own, as Settings: tvOS draws none behind a full-screen
+        // cover, and My Teams showed through the list (Julien, build 62).
+        .background(PageTint(color: .homeTint).ignoresSafeArea())
+        #endif
         .accessibilityIdentifier("page.chooseTeams")
         .usagePage(.chooseTeams)
         .task {
