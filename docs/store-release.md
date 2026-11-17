@@ -111,6 +111,16 @@ adapted (Amplitude, Session Replay, rugby's sources). Both versions were
 go ("release"), with `POST /v1/appStoreVersionReleaseRequests`; builds 52 and
 53 joined `STORE_BUILDS` in `proxy/src/audience-page.js` the same day.
 
+**Version 1.2, prepared** (2026-11-17): My Teams, Settings' choices in
+iCloud, and one person counted once in Amplitude. Versions created for both
+platforms (tvOS `bb29b302-c78c-483b-bacc-5848a3e6b22d`, iOS
+`265ec071-fcb2-4962-a708-782a45b6ae20`, manual release), carrying the store
+builds 65 (Apple TV) and 66 (iPhone and iPad); What's New in four languages
+on both platforms for the first time, the description's MY TEAMS paragraph,
+the privacy text, and a reviewer note on My Teams, iCloud and the user id.
+App Privacy gained Identifiers, User ID (analytics, linked, not tracking),
+set by Julien. Not submitted: waits for Julien's go.
+
 What can come back: Apple's reasons for a rejection arrive in App Store
 Connect (App Review) and by email to the account holder. A version under
 review can still be withdrawn, and changed, then sent again.
