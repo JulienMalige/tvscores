@@ -21,8 +21,7 @@ final class ChannelChoice {
         // Until the viewer chooses: the Apple TV's own country, or failing
         // that its language's — English the US, Portuguese Brazil, French
         // France (Julien, build 36).
-        let saved = defaults.stringArray(forKey: Self.key)
-        countries = (saved ?? Self.deviceDefault()).filter(Self.all.contains)
+        countries = Self.read(defaults)
         self.defaults = defaults
     }
 
@@ -40,7 +39,12 @@ final class ChannelChoice {
 
     /// Read again after iCloud brought another device's choice (`SettingsSync`).
     func reload() {
-        countries = (defaults.stringArray(forKey: Self.key) ?? Self.deviceDefault()).filter(Self.all.contains)
+        let read = Self.read(defaults)
+        if read != countries { countries = read }
+    }
+
+    private static func read(_ defaults: UserDefaults) -> [String] {
+        (defaults.stringArray(forKey: key) ?? deviceDefault()).filter(all.contains)
     }
 
     func isOn(_ country: String) -> Bool { countries.contains(country) }
@@ -50,6 +54,7 @@ final class ChannelChoice {
         if next.contains(country) { next.remove(country) } else { next.insert(country) }
         countries = Self.all.filter(next.contains)
         defaults.set(countries, forKey: Self.key)
+        SettingsSync.shared.saved(Self.key)
     }
 
     /// "🇫🇷" for "FR".

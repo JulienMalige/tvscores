@@ -9,10 +9,13 @@ import Foundation
 ///
 /// Each choice keeps its key in the device's settings, where its store
 /// reads it, and the same key in iCloud's key-value store. At launch,
-/// before any store reads: iCloud's copy wins where there is one, and a
-/// device's own goes up where iCloud has none. Then a change made here goes
-/// up as it is saved, and one made on another device comes down and its
-/// store reads it again.
+/// before any store reads, iCloud's copy wins where there is one; a device's
+/// own goes up where iCloud has none, but only once iCloud has been heard
+/// from, since an empty store may just not have synced yet. Then a change
+/// the viewer makes here goes up as its store saves it, and one made on
+/// another device comes down and its store reads it again. Each key is a
+/// whole list: two devices changing the same list at the same moment keep
+/// the later one, a rare case for choices made by hand in Settings.
 @MainActor
 final class SettingsSync {
     static let shared = SettingsSync()
@@ -20,13 +23,29 @@ final class SettingsSync {
     /// The keys that travel, each a list of strings.
     static let keys = [LeagueChoice.hiddenKey, LeagueChoice.orderKey, ChannelChoice.key, AppChoice.key]
 
+    /// How long a launch waits for iCloud's first sync before it fills an
+    /// empty iCloud with this device's choices.
+    static let firstSync: Duration = .seconds(15)
+
     private let defaults: UserDefaults
     private let cloud: PersonStore & ArrayStore
-    private var observers: [NSObjectProtocol] = []
+    private let wait: Duration
+    private var observer: NSObjectProtocol?
+    /// Whether iCloud has been heard from, or waited for: until then an
+    /// empty iCloud may only be not synced yet, and nothing goes up.
+    private(set) var settled = false
+    /// Told the keys that came down from another device.
+    var reload: ([String]) -> Void = { keys in
+        if keys.contains(where: [LeagueChoice.hiddenKey, LeagueChoice.orderKey].contains) { LeagueChoice.shared.reload() }
+        if keys.contains(ChannelChoice.key) { ChannelChoice.shared.reload() }
+        if keys.contains(AppChoice.key) { AppChoice.shared.reload() }
+    }
 
-    init(defaults: UserDefaults = .standard, cloud: PersonStore & ArrayStore = NSUbiquitousKeyValueStore.default) {
+    init(defaults: UserDefaults = .standard, cloud: PersonStore & ArrayStore = NSUbiquitousKeyValueStore.default,
+         wait: Duration = SettingsSync.firstSync) {
         self.defaults = defaults
         self.cloud = cloud
+        self.wait = wait
     }
 
     /// The launches that set their own choices (the flows, CI's pictures,
@@ -35,46 +54,60 @@ final class SettingsSync {
         Favourites.usesCloud(arguments) && !arguments.contains("-TVScoresDemo")
     }
 
-    /// At launch, before the stores read their choices.
+    private var started = false
+
+    /// At launch, before the stores read their choices: what iCloud already
+    /// holds comes down; this device's own go up only once iCloud is heard
+    /// from, or after `firstSync`, and only where iCloud has none.
     func start() {
-        guard observers.isEmpty else { return }
+        guard !started else { return }
+        started = true
         cloud.synchronize()
-        for key in Self.keys {
-            if let shared = cloud.strings(forKey: key) { defaults.set(shared, forKey: key) }
-            else if let mine = defaults.stringArray(forKey: key) { cloud.set(mine, forKey: key) }
-        }
-        // A choice saved here goes up.
-        observers.append(NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: defaults, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.sendChanged() }
-        })
-        // One made elsewhere comes down.
+        _ = take(Self.keys)
         if let store = cloud as? NSUbiquitousKeyValueStore {
-            observers.append(NotificationCenter.default.addObserver(forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification, object: store, queue: .main) { [weak self] note in
+            observer = NotificationCenter.default.addObserver(forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification, object: store, queue: .main) { [weak self] note in
                 let changed = note.userInfo?[NSUbiquitousKeyValueStoreChangedKeysKey] as? [String] ?? []
                 MainActor.assumeIsolated { self?.received(changed) }
-            })
+            }
+        }
+        Task { [weak self, wait] in
+            try? await Task.sleep(for: wait)
+            self?.settle()
         }
     }
 
-    /// The keys whose value here differs from iCloud's go up.
-    func sendChanged() {
-        for key in Self.keys {
-            let mine = defaults.stringArray(forKey: key)
-            guard let mine, mine != cloud.strings(forKey: key) else { continue }
-            cloud.set(mine, forKey: key)
+    /// iCloud has had its chance: this device's choices fill what it lacks.
+    func settle() {
+        guard !settled else { return }
+        settled = true
+        for key in Self.keys where cloud.strings(forKey: key) == nil {
+            if let mine = defaults.stringArray(forKey: key) { cloud.set(mine, forKey: key) }
         }
     }
 
-    /// Another device's choices, into this one's settings and its stores.
+    /// A store saved a choice the viewer made here: it goes up. Before iCloud
+    /// is heard from it waits, and goes up with the rest at `settle`.
+    func saved(_ key: String) {
+        guard started, settled, Self.keys.contains(key), let mine = defaults.stringArray(forKey: key),
+              mine != cloud.strings(forKey: key) else { return }
+        cloud.set(mine, forKey: key)
+    }
+
+    /// Another device's choices, into this one's settings and their stores.
     func received(_ changed: [String]) {
-        let ours = changed.filter(Self.keys.contains)
-        guard !ours.isEmpty else { return }
-        for key in ours {
-            if let shared = cloud.strings(forKey: key) { defaults.set(shared, forKey: key) }
+        let moved = take(changed.filter(Self.keys.contains))
+        settle()
+        if !moved.isEmpty { reload(moved) }
+    }
+
+    /// iCloud's values for these keys into the device's settings; the keys
+    /// whose value changed here.
+    private func take(_ keys: [String]) -> [String] {
+        keys.filter { key in
+            guard let shared = cloud.strings(forKey: key), shared != defaults.stringArray(forKey: key) else { return false }
+            defaults.set(shared, forKey: key)
+            return true
         }
-        LeagueChoice.shared.reload()
-        ChannelChoice.shared.reload()
-        AppChoice.shared.reload()
     }
 }
 

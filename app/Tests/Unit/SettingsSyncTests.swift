@@ -17,7 +17,7 @@ struct SettingsSyncTests {
 
     private func defaults() -> UserDefaults { UserDefaults(suiteName: "settings-sync-\(UUID().uuidString)")! }
 
-    @Test("at launch iCloud's choices win; a device's own go up where iCloud has none; the language stays")
+    @Test("at launch iCloud's choices come down; a device's own go up only once iCloud is heard from; the language stays")
     func launch() {
         let cloud = FakeCloud()
         cloud.values[ChannelChoice.key] = ["BR"]
@@ -25,24 +25,37 @@ struct SettingsSyncTests {
         local.set(["FR", "US"], forKey: ChannelChoice.key)
         local.set(["dazn"], forKey: AppChoice.key)
         local.set("fr", forKey: "appLanguage")
-        SettingsSync(defaults: local, cloud: cloud).start()
+        let sync = SettingsSync(defaults: local, cloud: cloud, wait: .seconds(60))
+        sync.start()
         #expect(local.stringArray(forKey: ChannelChoice.key) == ["BR"], "the countries chosen on another device")
-        #expect(cloud.values[AppChoice.key] as? [String] == ["dazn"], "the apps hidden here go up")
+        #expect(cloud.values[AppChoice.key] == nil, "an empty iCloud may only be not synced yet: nothing goes up")
+        sync.settle()
+        #expect(cloud.values[AppChoice.key] as? [String] == ["dazn"], "then the apps hidden here fill it")
+        #expect(cloud.values[ChannelChoice.key] as? [String] == ["BR"], "and nothing iCloud had is written over")
         #expect(cloud.values["appLanguage"] == nil, "the language is each device's own")
-        #expect(cloud.values["usageConsent"] == nil)
     }
 
-    @Test("a choice saved here goes up; one made elsewhere comes down")
+    @Test("a change made here goes up once settled; one made elsewhere comes down and only its store reloads")
     func both() {
         let cloud = FakeCloud()
         let local = defaults()
-        let sync = SettingsSync(defaults: local, cloud: cloud)
+        let sync = SettingsSync(defaults: local, cloud: cloud, wait: .seconds(60))
+        var reloaded: [[String]] = []
+        sync.reload = { reloaded.append($0) }
+        sync.start()
         local.set(["nfl:4391"], forKey: LeagueChoice.hiddenKey)
-        sync.sendChanged()
-        #expect(cloud.values[LeagueChoice.hiddenKey] as? [String] == ["nfl:4391"])
+        sync.saved(LeagueChoice.hiddenKey)
+        #expect(cloud.values[LeagueChoice.hiddenKey] == nil, "not before iCloud is heard from")
         cloud.values[LeagueChoice.orderKey] = ["football:4334", "football:4328"]
         sync.received([LeagueChoice.orderKey, "favourites"])
         #expect(local.stringArray(forKey: LeagueChoice.orderKey) == ["football:4334", "football:4328"])
+        #expect(reloaded == [[LeagueChoice.orderKey]], "only the store whose choice changed")
+        #expect(cloud.values[LeagueChoice.hiddenKey] as? [String] == ["nfl:4391"], "heard from: what waited goes up")
+        local.set(["nba:4387"], forKey: LeagueChoice.hiddenKey)
+        sync.saved(LeagueChoice.hiddenKey)
+        #expect(cloud.values[LeagueChoice.hiddenKey] as? [String] == ["nba:4387"])
+        sync.received([LeagueChoice.orderKey])
+        #expect(reloaded.count == 1, "the same value again reloads nothing")
     }
 
     @Test("the demo, the flows and CI's pictures leave iCloud alone")

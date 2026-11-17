@@ -33,8 +33,9 @@ final class LeagueChoice {
 
     /// Read again after iCloud brought another device's choice (`SettingsSync`).
     func reload() {
-        hidden = Set(defaults.stringArray(forKey: Self.hiddenKey) ?? [])
-        order = defaults.stringArray(forKey: Self.orderKey) ?? []
+        let hidden = Set(defaults.stringArray(forKey: Self.hiddenKey) ?? []), order = defaults.stringArray(forKey: Self.orderKey) ?? []
+        if hidden != self.hidden { self.hidden = hidden }
+        if order != self.order { self.order = order }
     }
 
     func isShown(_ key: String) -> Bool { !hidden.contains(key) }
@@ -42,6 +43,7 @@ final class LeagueChoice {
     func toggle(_ key: String) {
         if hidden.contains(key) { hidden.remove(key) } else { hidden.insert(key) }
         defaults.set(Array(hidden).sorted(), forKey: Self.hiddenKey)
+        SettingsSync.shared.saved(Self.hiddenKey)
     }
 
     /// `keys` in the viewer's order: those placed first, the rest after in
@@ -70,6 +72,7 @@ final class LeagueChoice {
         let others = arranged(order.filter { !siblings.contains($0) })
         order = others + list
         defaults.set(order, forKey: Self.orderKey)
+        SettingsSync.shared.saved(Self.orderKey)
     }
 }
 

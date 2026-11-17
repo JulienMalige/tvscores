@@ -16,12 +16,15 @@ final class AppChoice {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        hidden = Set(defaults.stringArray(forKey: Self.key) ?? [])
+        hidden = Self.read(defaults)
     }
+
+    private static func read(_ defaults: UserDefaults) -> Set<String> { Set(defaults.stringArray(forKey: key) ?? []) }
 
     /// Read again after iCloud brought another device's choice (`SettingsSync`).
     func reload() {
-        hidden = Set(defaults.stringArray(forKey: Self.key) ?? [])
+        let read = Self.read(defaults)
+        if read != hidden { hidden = read }
     }
 
     func isShown(_ key: String) -> Bool { !hidden.contains(key) }
@@ -29,5 +32,6 @@ final class AppChoice {
     func toggle(_ key: String) {
         if hidden.contains(key) { hidden.remove(key) } else { hidden.insert(key) }
         defaults.set(Array(hidden).sorted(), forKey: Self.key)
+        SettingsSync.shared.saved(Self.key)
     }
 }
