@@ -95,7 +95,9 @@ https://claude.ai/artifact/FfxPac3PNtchfCokUQmobv).
   version. A team in two competitions is one favourite.
 - Competitions stay in Settings (Julien, 2026-11-15).
 - Favourites sync between the Apple TV and the iPhone through iCloud
-  (Julien, 2026-11-15).
+  (Julien, 2026-11-15), and so do Settings' competitions and their order,
+  countries and apps (Julien, 2026-11-17: "Ok", `SettingsSync`); the
+  language and the usage answer stay each device's own.
 - Version 1.2 is My Teams alone; reminders come in a later version
   (Julien, 2026-11-15: "let's do in two time"). Reminders before kickoff
   only, no goals or results ("I just want reminder before the games"), sent

@@ -3,14 +3,14 @@ import Observation
 
 /// Which competitions the viewer wants, and in what order (Settings,
 /// Julien, build 36). Hidden ones leave the menu and Home; the order is the
-/// menu's within each family, and Home's. Kept on this Apple TV; the proxy
-/// still serves everything. Keys are "sport:league", as the menu's.
+/// menu's within each family, and Home's. Kept on the device and shared
+/// through iCloud (`SettingsSync`); the proxy still serves everything. Keys are "sport:league", as the menu's.
 @MainActor
 @Observable
 final class LeagueChoice {
     static let shared = LeagueChoice()
-    private static let hiddenKey = "hiddenLeagues"
-    private static let orderKey = "leagueOrder"
+    static let hiddenKey = "hiddenLeagues"
+    static let orderKey = "leagueOrder"
 
     private(set) var hidden: Set<String>
     private(set) var order: [String]
@@ -29,6 +29,12 @@ final class LeagueChoice {
         guard arguments.contains("-TVScoresReset") else { return }
         defaults.removeObject(forKey: hiddenKey)
         defaults.removeObject(forKey: orderKey)
+    }
+
+    /// Read again after iCloud brought another device's choice (`SettingsSync`).
+    func reload() {
+        hidden = Set(defaults.stringArray(forKey: Self.hiddenKey) ?? [])
+        order = defaults.stringArray(forKey: Self.orderKey) ?? []
     }
 
     func isShown(_ key: String) -> Bool { !hidden.contains(key) }

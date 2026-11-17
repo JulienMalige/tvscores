@@ -7,6 +7,9 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+- Your choices in Settings follow you through iCloud, as your teams do: the competitions
+  shown and their order, the countries for Where to Watch and the apps to show. The
+  language and the answer about sharing usage stay each device's own.
 - On the Apple TV, Choose Teams has a background of its own: the page under it no longer
   shows through.
 

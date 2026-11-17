@@ -3,19 +3,24 @@ import Observation
 
 /// Which apps How to Watch may offer (Settings; Julien, 2026-10-04: "I prefer only Canal, I
 /// don't want some": hidden, not removed). Every app is shown until it is turned off, and a
-/// hidden app is offered on no game. Kept on this Apple TV; the proxy still names them all.
+/// hidden app is offered on no game. Kept on the device and shared through iCloud (`SettingsSync`); the proxy still names them all.
 /// Keys are the table's, "canalplus", "disneyplus".
 @MainActor
 @Observable
 final class AppChoice {
     static let shared = AppChoice()
-    private static let key = "hiddenWatchApps"
+    static let key = "hiddenWatchApps"
 
     private(set) var hidden: Set<String>
     @ObservationIgnored private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        hidden = Set(defaults.stringArray(forKey: Self.key) ?? [])
+    }
+
+    /// Read again after iCloud brought another device's choice (`SettingsSync`).
+    func reload() {
         hidden = Set(defaults.stringArray(forKey: Self.key) ?? [])
     }
 

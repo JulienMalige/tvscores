@@ -2,7 +2,8 @@ import Foundation
 import Observation
 
 /// Which countries' TV channels the viewer wants beside each game, chosen in
-/// Settings: none, one or several (Julien, build 36). Kept on this Apple TV.
+/// Settings: none, one or several (Julien, build 36). Kept on the device and
+/// shared with the viewer's others through iCloud (`SettingsSync`).
 /// Views read it through `Event.channelList`, so a change in Settings
 /// redraws every row that shows channels.
 @MainActor
@@ -12,7 +13,7 @@ final class ChannelChoice {
 
     /// The countries the proxy has channels for, in the order they are shown.
     static let all = ["FR", "US", "BR"]
-    private static let key = "channelCountries"
+    static let key = "channelCountries"
 
     private(set) var countries: [String]
 
@@ -35,6 +36,11 @@ final class ChannelChoice {
         case "fr": return ["FR"]
         default: return []
         }
+    }
+
+    /// Read again after iCloud brought another device's choice (`SettingsSync`).
+    func reload() {
+        countries = (defaults.stringArray(forKey: Self.key) ?? Self.deviceDefault()).filter(Self.all.contains)
     }
 
     func isOn(_ country: String) -> Bool { countries.contains(country) }

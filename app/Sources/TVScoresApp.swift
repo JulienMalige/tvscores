@@ -7,6 +7,8 @@ struct TVScoresApp: App {
         // so images would be refetched every time a row scrolled back into view.
         URLCache.shared = URLCache(memoryCapacity: 32 << 20, diskCapacity: 256 << 20)
         LeagueChoice.resetIfAsked()
+        // The choices other devices made, before any store reads its own.
+        if SettingsSync.usesCloud() { SettingsSync.shared.start() }
         UsageChoice.resetIfAsked()
         Favourites.prepareIfAsked()
         // A viewer who said yes to sharing is counted from launch (docs/analytics.md).
