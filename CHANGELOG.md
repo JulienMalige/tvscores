@@ -7,6 +7,8 @@ build's "What to Test" note, and the same words become the store's release
 notes when a version ships.
 
 ## Unreleased
+
+## 1.2 build 63 — 17 November 2026
 - Your choices in Settings follow you through iCloud, as your teams do: the competitions
   shown and their order, the countries for Where to Watch and the apps to show. The
   language and the answer about sharing usage stay each device's own.
